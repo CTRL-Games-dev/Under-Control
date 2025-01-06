@@ -4,7 +4,8 @@ using UnityEngine.Timeline;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Animator))]
-public class EnemyController : LivingEntity
+[RequireComponent(typeof(LivingEntity))]
+public class EnemyController : MonoBehaviour
 {
     public Cooldown attackCooldown;
     public float attackRange = 1f;
@@ -27,12 +28,6 @@ public class EnemyController : LivingEntity
 
     void Update()
     {
-        // Health
-        health += regenRate * Time.deltaTime;
-        if(health > maxHealth) {
-            health = maxHealth;
-        }
-
         if (target != null) {
             // Attack
             if(Vector3.Distance(target.transform.position, transform.position) < attackRange && attackCooldown.Execute()) {
