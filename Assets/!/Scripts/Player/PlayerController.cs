@@ -1,11 +1,15 @@
+using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(LivingEntity))]
 public class PlayerController : MonoBehaviour
 {
+    // Movement
     public float acceleration = 2f;
     public float deceleration = 2f;
     public float maxWalkingSpeed = 1f;
@@ -58,7 +62,7 @@ public class PlayerController : MonoBehaviour
         Vector3 movementVector = new Vector3(movementInputVector.x, 0, movementInputVector.y);
         movementVector = transform.TransformDirection(movementVector);
 
-        controller.SimpleMove(movementVector);
+        controller.SimpleMove(movementVector * 5);
     }
 
     // Handles animator movement logic
@@ -173,5 +177,9 @@ public class PlayerController : MonoBehaviour
 
     void OnLand() {
         Debug.Log("Land");
+    }
+
+    public void OnDeath() {
+        Debug.Log("Player died");
     }
 }
