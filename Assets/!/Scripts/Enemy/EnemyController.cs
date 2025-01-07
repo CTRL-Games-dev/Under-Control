@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Timeline;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Animator))]
@@ -8,8 +7,8 @@ using UnityEngine.Timeline;
 public class EnemyController : MonoBehaviour
 {
     public Cooldown attackCooldown;
-    public float attackRange = 1f;
-    public float attackDamage = 1f;
+    public float attackRange = 1;
+    public float attackDamage = 1;
     public LivingEntity target;
 
     // References
@@ -31,7 +30,10 @@ public class EnemyController : MonoBehaviour
         if (target != null) {
             // Attack
             if(Vector3.Distance(target.transform.position, transform.position) < attackRange && attackCooldown.Execute()) {
-                target.TakeDamage(attackDamage);
+                target.TakeDamage(new Damage {
+                    type = DamageType.PHYSICAL,
+                    value = attackDamage
+                });
             }
 
             navMeshAgent.destination = target.transform.position;
@@ -40,10 +42,5 @@ public class EnemyController : MonoBehaviour
         // Animation
         animator.SetFloat(_animationIdVelocitySide, navMeshAgent.velocity.x);
         animator.SetFloat(_animationIdVelocityFront, navMeshAgent.velocity.z);
-    }
-
-    void OnDeath() {
-        Debug.Log("Enemy died");
-        Destroy(gameObject);
     }
 }
