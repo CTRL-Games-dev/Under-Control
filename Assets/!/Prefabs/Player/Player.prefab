@@ -391,6 +391,7 @@ GameObject:
   - component: {fileID: 2484441535233306198}
   - component: {fileID: 3826342652045181621}
   - component: {fileID: 1539793279636585543}
+  - component: {fileID: 8612418859672658487}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -407,13 +408,11 @@ Transform:
   m_GameObject: {fileID: 8272185431068916378}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.12, y: 5.03, z: 8.38}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 6810958970885982986}
   - {fileID: 6553389833745387777}
-  - {fileID: 8861293634329944899}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5249825092091137437
@@ -559,3 +558,26 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8612418859672658487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8272185431068916378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a23e42751b3623c4a938cdd3448ecea3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 100
+  maxHealth: 100
+  regenRate: 1
+  regenCooldown:
+    cooldownTime: 2
+  OnDeathEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDamageTakenEvent:
+    m_PersistentCalls:
+      m_Calls: []
