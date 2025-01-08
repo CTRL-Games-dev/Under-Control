@@ -12,10 +12,9 @@ public class Portal : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        playerEnteredPortal.Invoke(dimension);
-
         if(isOpen) 
         {
+            Debug.Log("Player entered portal to: " + dimension);
             playerEnteredPortal.Invoke(dimension);
         }
     }

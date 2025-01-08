@@ -1,16 +1,17 @@
 using UnityEngine;
 
-public enum GameDifficulty {
+public enum GameDifficulty
+{
     EASY,
     NORMAL,
     HARD
 }
 
-public enum Dimension {
+public enum Dimension
+{
+    MAIN_MENU,
     HUB,
-    LAS,
-    MOUTAIN,
-    HELL,
+    FOREST,
 }
 
 [CreateAssetMenu(fileName = "GameContext", menuName = "ScriptableObject/GameContext", order = 1)]
