@@ -4,9 +4,9 @@ using UnityEngine.UI;
 public class PlayerBarsHolder : MonoBehaviour
 
 {
-    [SerializeField] Image _healthBarImg;
-    [SerializeField] Image _manaBarImg;
-    [SerializeField] Image _controlBarImg;
+    [SerializeField] readonly Image _healthBarImg;
+    [SerializeField] readonly Image _manaBarImg;
+    [SerializeField] readonly Image _controlBarImg;
 
 
     [SerializeField] float _healthBarFillAmount;
@@ -14,9 +14,18 @@ public class PlayerBarsHolder : MonoBehaviour
     [SerializeField] float _controlBarFillAmount;
 
 
-    public float HealthBarFillAmount { set { _healthBarImg.fillAmount = value; } }
-    public float ManaBarFillAmount { set { _manaBarImg.fillAmount = value; } }
-    public float ControlBarFillAmount { set { _controlBarImg.fillAmount = value; } }
+    public float HealthBarFillAmount { set { 
+        _healthBarImg.fillAmount = value; 
+        } 
+    }
+    public float ManaBarFillAmount { set { 
+        _manaBarImg.fillAmount = value; 
+        } 
+    }
+    public float ControlBarFillAmount { set {
+        _controlBarImg.fillAmount = value; 
+        } 
+    }
 
 
     private void Start() {
