@@ -205,8 +205,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 977731813342315884}
-  - component: {fileID: 8974613204039339173}
   - component: {fileID: 6238726878941344721}
+  - component: {fileID: 774350751942770471}
+  - component: {fileID: 7162287103752310826}
+  - component: {fileID: 8974613204039339173}
   - component: {fileID: 5814925836689036330}
   m_Layer: 0
   m_Name: Enemy
@@ -232,6 +234,64 @@ Transform:
   - {fileID: 3338977304327278991}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6238726878941344721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3366227734027736264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a54a79fbd2a3991459f6790b56383268, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackCooldown:
+    cooldownTime: 1
+  attackRange: 1
+  attackDamage: 1
+  target: {fileID: 0}
+--- !u!114 &774350751942770471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3366227734027736264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a23e42751b3623c4a938cdd3448ecea3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  displayName: Enemy
+  maxHealth:
+    statType: 1
+    _raw: 100
+    _adjusted: 100
+  regenRate:
+    statType: 2
+    _raw: 1
+    _adjusted: 1
+  timeToRegenAfterDamage: 2
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &7162287103752310826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3366227734027736264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7268ef27f4efa5d43a43982b4df186ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activeModifiers: []
 --- !u!195 &8974613204039339173
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -254,33 +314,6 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &6238726878941344721
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3366227734027736264}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a54a79fbd2a3991459f6790b56383268, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: 100
-  maxHealth: 100
-  regenRate: 1
-  OnDeathEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  OnDamageTakenEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  attackCooldown:
-    lastExecuteTime: 0
-    cooldownTime: 1
-  attackRange: 1
-  attackDamage: 1
-  target: {fileID: 0}
 --- !u!95 &5814925836689036330
 Animator:
   serializedVersion: 7

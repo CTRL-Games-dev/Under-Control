@@ -27,10 +27,13 @@ public class PlayerController : MonoBehaviour
     private float velocitySide = 0;
     private float velocityFront = 0;
     public bool isTurning { private get; set; }
+    public bool applySpellTest = false;
+    public bool applySpellTests = false;
 
     // References
     private CharacterController controller;
     private Animator animator;
+    private LivingEntity livingEntity;
     
     // Animation IDs
     private int _animationIdVelocitySide = Animator.StringToHash("velocitySide");
@@ -43,12 +46,23 @@ public class PlayerController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
+        livingEntity = GetComponent<LivingEntity>();
         
         targetDirection = transform.forward;
     }
 
     void Update()
     {
+        if(applySpellTest) {
+            new TestSpell().Cast(livingEntity);
+            applySpellTest = false;
+        }
+
+        if(applySpellTests) {
+            new TestSpell().Cast(livingEntity);
+            applySpellTests = false;
+        }
+
         // Make use of this once we have proper animations and model
         // HandleMovement();
         // HandleTurning();
