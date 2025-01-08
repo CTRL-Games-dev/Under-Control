@@ -1,11 +1,15 @@
 using UnityEngine;
 
-public class HubManager : MonoBehaviour, LevelManager
+public class HubManager : MonoBehaviour, ILevelManager
 {    public Vector3 playerStartingPos = new(3,3,3);
-    [SerializeField] private GameObject player;
+    [SerializeField] private GameObject _player;
+    [SerializeField] private CameraManager _cameraManager;
     private void Start()
     {
-        Instantiate(player, playerStartingPos, Quaternion.identity);
+        Instantiate(_player, playerStartingPos, Quaternion.identity);
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        _cameraManager.Target = player.transform;
     }
 
     private void Update()

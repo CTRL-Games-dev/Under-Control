@@ -59,7 +59,6 @@ public class GameManager : MonoBehaviour
         GameObject[] portals = GameObject.FindGameObjectsWithTag("Portal");
         foreach(GameObject p in portals) 
         {
-            Debug.Log("NUGGER");
             var portal = p.GetComponent<Portal>();
             portal.playerEnteredPortal.AddListener(ChangeDimension);
         }
