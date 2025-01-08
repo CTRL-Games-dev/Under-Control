@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e228d529d5328df4fb1e7c7ecaf2c7c3, type: 2}
+  - {fileID: 2100000, guid: 4d6b147e5eac85340b3b5c2048bf5569, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -116,8 +116,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2203541731749885194}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.15212338, y: 0.00000008507485, z: -0.000000010190005, w: 0.98836154}
-  m_LocalPosition: {x: 0, y: 3.0070584, z: -9.537169}
+  m_LocalRotation: {x: 0.15212336, y: -0, z: -0, w: 0.98836154}
+  m_LocalPosition: {x: 0, y: 3.0070577, z: -9.537169}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -385,8 +385,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3614094562484013615}
-  - component: {fileID: 2484441535233306198}
   - component: {fileID: 5249825092091137437}
+  - component: {fileID: 8612418859672658487}
+  - component: {fileID: 2030617008684707472}
+  - component: {fileID: 2484441535233306198}
   - component: {fileID: 3826342652045181621}
   - component: {fileID: 1539793279636585543}
   m_Layer: 0
@@ -414,6 +416,72 @@ Transform:
   - {fileID: 8861293634329944899}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5249825092091137437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8272185431068916378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 063630ca55530384188525911dbcb86b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  acceleration: 2
+  deceleration: 2
+  maxWalkingSpeed: 1
+  maxSprintingSpeed: 2
+  mouseSensitivity: 0.1
+  walkingTurnSpeed: 1
+  sprintingTurnSpeed: 2.5
+  cameraTargetObject: {fileID: 3902248460667956287}
+  applySpellTest: 0
+--- !u!114 &8612418859672658487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8272185431068916378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a23e42751b3623c4a938cdd3448ecea3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  displayName: Player
+  health:
+    statType: 0
+    _raw: 100
+    _adjusted: 100
+  maxHealth:
+    statType: 1
+    _raw: 100
+    _adjusted: 100
+  regenRate:
+    statType: 2
+    _raw: 1
+    _adjusted: 1
+  timeToRegenAfterDamage: 2
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &2030617008684707472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8272185431068916378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7268ef27f4efa5d43a43982b4df186ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activeModifiers: []
 --- !u!114 &2484441535233306198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -444,26 +512,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &5249825092091137437
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8272185431068916378}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 063630ca55530384188525911dbcb86b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  acceleration: 2
-  deceleration: 2
-  maxWalkingSpeed: 1
-  maxSprintingSpeed: 2
-  mouseSensitivity: 0.1
-  walkingTurnSpeed: 1
-  sprintingTurnSpeed: 2.5
-  cameraTargetObject: {fileID: 3902248460667956287}
 --- !u!143 &3826342652045181621
 CharacterController:
   m_ObjectHideFlags: 0
