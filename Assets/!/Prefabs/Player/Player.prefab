@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: 8612418859672658487}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -235,11 +235,10 @@ MonoBehaviour:
   health: 100
   maxHealth: 100
   regenRate: 1
-  regenCooldown:
-    cooldownTime: 2
-  OnDeathEvent:
+  timeToRegenAfterDamage: 2
+  OnDeath:
     m_PersistentCalls:
       m_Calls: []
-  OnDamageTakenEvent:
+  OnDamageTaken:
     m_PersistentCalls:
       m_Calls: []
