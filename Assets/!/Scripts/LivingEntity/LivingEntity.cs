@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(ModifierSystem))]
+[RequireComponent(typeof(InventorySystem))]
 public class LivingEntity : MonoBehaviour
 {
     private struct EffectData {
@@ -25,6 +25,7 @@ public class LivingEntity : MonoBehaviour
 
     // References
     public ModifierSystem modifierSystem { get; private set; }
+    public InventorySystem inventorySystem { get; private set; }
 
     // Events
     public UnityEvent OnDeath;
@@ -33,6 +34,7 @@ public class LivingEntity : MonoBehaviour
     void Start()
     {
         modifierSystem = GetComponent<ModifierSystem>();
+        inventorySystem = GetComponent<InventorySystem>();
     }
 
     void Update() {

@@ -207,6 +207,7 @@ GameObject:
   - component: {fileID: 977731813342315884}
   - component: {fileID: 6238726878941344721}
   - component: {fileID: 774350751942770471}
+  - component: {fileID: 6865643187033961249}
   - component: {fileID: 7162287103752310826}
   - component: {fileID: 8974613204039339173}
   - component: {fileID: 5814925836689036330}
@@ -264,6 +265,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   displayName: Enemy
+  health:
+    statType: 0
+    _raw: 100
+    _adjusted: 100
   maxHealth:
     statType: 1
     _raw: 100
@@ -279,6 +284,20 @@ MonoBehaviour:
   OnDamageTaken:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6865643187033961249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3366227734027736264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a97e5a67a4882c41949af6f86f5c81b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventorySize: {x: 10, y: 10}
+  inventory: []
 --- !u!114 &7162287103752310826
 MonoBehaviour:
   m_ObjectHideFlags: 0
