@@ -10,6 +10,14 @@ public class InventorySystem : MonoBehaviour
         public Item item;
         public int amount;
         public Vector2Int position;
+
+        public Vector2Int Size {
+            get {
+                return item.Size;
+            }
+        }
+
+        public GameObject GameObject { get; set; }
     }
 
     [SerializeField] private Vector2Int inventorySize;
