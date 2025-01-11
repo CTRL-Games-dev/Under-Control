@@ -30,11 +30,15 @@ public class InvTile : MonoBehaviour
     }
 
     public void OnPointerEnter() {
-        _image.color = Color.gray;
         GridManager.SelectedTile = this;
     }
     public void OnPointerExit() {
-        _image.color = _defaultColor;
         GridManager.SelectedTile = null;
+    }
+    public void OnPointerClick() {
+        GridManager.MoveSelectedItem();
+    }
+    public void OnDrop() {
+        Debug.Log("Dropped on " + Pos);
     }
 }

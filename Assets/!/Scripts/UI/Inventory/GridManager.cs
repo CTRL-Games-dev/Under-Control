@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,8 +13,18 @@ public class GridManager : MonoBehaviour
 
     public InvTile SelectedTile { get; set; }
 
+    [SerializeField] private SelectedItemUI _selectedItemUI;
 
-    public float TileSize { get; private set; }
+
+    private static float _tileSize;
+    public static float TileSize { 
+        get {
+            return _tileSize;
+        } 
+        private set {
+            _tileSize = value;
+        }
+    }
 
     private GridLayoutGroup _gridLayoutGroup;
 
@@ -32,27 +43,35 @@ public class GridManager : MonoBehaviour
     }
 
 
-    public bool TryPlaceItem(Vector2Int pos, Vector2Int size) {
-        if (pos.x < 0 || pos.y < 0 || pos.x + size.x > InventoryWidth || pos.y + size.y > InventoryHeight) {
-            return false;
-        }
-
-        for (int y = pos.y; y < pos.y + size.y; y++) {
-            for (int x = pos.x; x < pos.x + size.x; x++) {
-                if (!_inventoryArray[y, x].IsEmpty) {
-                    return false;
-                }
-            }
-        }
+    public List<InvTile> PlaceItem(Vector2Int pos, Vector2Int size) {
+        List<InvTile> tiles = new();
 
         for (int y = pos.y; y < pos.y + size.y; y++) {
             for (int x = pos.x; x < pos.x + size.x; x++) {
                 _inventoryArray[y, x].IsEmpty = false;
+                tiles.Add(_inventoryArray[y, x]);
             }
         }
 
-        return true;
+        return tiles;
+    }
+    public void RemoveItem(ItemUI itemUI) {
+        foreach (var tile in itemUI.OccupiedTiles) {
+            tile.IsEmpty = true;
+        }
+        
+    }
 
+    public void MoveSelectedItem() {
+        if (SelectedTile == null) {
+            return;
+        }
+
+        SelectedTile.IsEmpty = false;
+
+        RemoveItem(_selectedItemUI.ItemUI);
+        _selectedItemUI.InventoryItem.RectTransform.anchoredPosition = new Vector2(SelectedTile.Pos.x, -SelectedTile.Pos.y) * TileSize;
+        _selectedItemUI.ItemUI.OccupiedTiles = PlaceItem(SelectedTile.Pos, _selectedItemUI.InventoryItem.Size);
     }
 
 

@@ -1,9 +1,6 @@
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using static InventorySystem;
 
-public class PlayerInventoryUI : MonoBehaviour
+public class InventoryUIManager : MonoBehaviour
 {
     [SerializeField] private GameObject _itemPrefab;
 
@@ -12,23 +9,14 @@ public class PlayerInventoryUI : MonoBehaviour
 
     [SerializeField] private InventorySystem _playerInventory;
     
-    private List<InventoryItem> _inventory;
-
-
-
     private void Start() {
         _gridManager.InventoryWidth = _playerInventory.InventorySize.x;
         _gridManager.InventoryHeight = _playerInventory.InventorySize.y;
         _gridManager.SetupGrid();
         
-        _inventory = _playerInventory.GetItems();
+        var inventory = _playerInventory.GetItems();
 
-        setupItems();
-    }
-
-
-    private void setupItems() {
-        foreach (InventoryItem inventoryItem in _inventory) {
+        foreach (var inventoryItem in inventory) {
             var itemGameObject = Instantiate(_itemPrefab, _itemHolder.transform);
             inventoryItem.ItemUI = itemGameObject.GetComponent<ItemUI>();
             inventoryItem.RectTransform = itemGameObject.GetComponent<RectTransform>();
@@ -37,6 +25,4 @@ public class PlayerInventoryUI : MonoBehaviour
             itemGameObject.GetComponent<ItemUI>().SetupItem(inventoryItem, GridManager.TileSize, _gridManager.PlaceItem(new Vector2Int(inventoryItem.position.x, inventoryItem.position.y), inventoryItem.Size));
         }
     }
-
 }
-

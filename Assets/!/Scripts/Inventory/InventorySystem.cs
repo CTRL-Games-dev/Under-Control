@@ -17,7 +17,8 @@ public class InventorySystem : MonoBehaviour
             }
         }
 
-        public GameObject GameObject { get; set; }
+        public ItemUI ItemUI { get; set; }
+        public RectTransform RectTransform { get; set; }
     }
 
     [SerializeField] private Vector2Int inventorySize;
