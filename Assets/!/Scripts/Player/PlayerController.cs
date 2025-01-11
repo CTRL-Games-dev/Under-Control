@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
     public bool isTurning { private get; set; }
     public bool applySpellTest = false;
     public bool applySpellTests = false;
+    public int gold = 0;
 
     // References
     private CharacterController controller;
