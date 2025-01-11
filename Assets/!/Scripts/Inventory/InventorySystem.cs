@@ -27,6 +27,13 @@ public class InventorySystem : MonoBehaviour
 
     [SerializeField] private List<InventoryItem> inventory = new List<InventoryItem>();
 
+    public bool FitsWithinBounds(Vector2Int position, Vector2Int size) {
+        if (position.x + size.x > inventorySize.x || position.y + size.y > inventorySize.y) {
+            return false;
+        }
+        return true;
+    }
+
     public bool DoesFitWithin(Vector2Int position, Vector2Int size) {
         // Position is out of bounds
         if(!IsWithinBounds(position)) {

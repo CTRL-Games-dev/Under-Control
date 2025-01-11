@@ -3,10 +3,10 @@ using UnityEngine.UI;
 
 public class InvTile : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private GameObject _highlightImage;
+
     private Image _image;
-    private Color _defaultColor;
-    public GridManager GridManager { get; set; }
+    public InventoryUIManager InventoryUIManager;
     
     private bool _isEmpty = true;
     public bool IsEmpty {
@@ -16,7 +16,7 @@ public class InvTile : MonoBehaviour
             if (_isEmpty) {
                 _image.color = Color.white;
             } else {
-                _image.color = Color.red;
+                _image.color = Color.gray;
             }
         }
     }
@@ -26,19 +26,34 @@ public class InvTile : MonoBehaviour
 
     void Awake() {
         _image = GetComponent<Image>();
-        _defaultColor = _image.color;
+        _highlightImage = transform.GetChild(0).gameObject;
     }
 
     public void OnPointerEnter() {
-        GridManager.SelectedTile = this;
+        InventoryUIManager.SelectedTile = this;
+        if (InventoryUIManager.SelectedInventoryItem != null) {
+            InventoryUIManager.HighlightNeighbours(Pos, InventoryUIManager.SelectedInventoryItem.Size);
+        }
+        
+        _highlightImage.SetActive(true);
     }
     public void OnPointerExit() {
-        GridManager.SelectedTile = null;
+        InventoryUIManager.SelectedTile = null;
+        InventoryUIManager.ClearHighlights();
     }
     public void OnPointerClick() {
-        GridManager.MoveSelectedItem();
+        InventoryUIManager.TryMoveSelectedItem();
     }
     public void OnDrop() {
         Debug.Log("Dropped on " + Pos);
+    }
+
+    public void SetHighlight(bool value) {
+        // if (!IsEmpty) {
+        //     _highlightImage.GetComponent<Image>().color = Color.red;
+        // } else {
+        //     _highlightImage.GetComponent<Image>().color = Color.green;
+        // }
+        _highlightImage.SetActive(value);
     }
 }

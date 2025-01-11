@@ -6,7 +6,11 @@ using static InventorySystem;
 
 public class ItemUI : MonoBehaviour
 {
+    [SerializeField] private RectTransform _amountRectTransform;
+    public InventoryUIManager InventoryUIManager;
+
     private Image _image;
+    public Image Image { get => _image; }
     private RectTransform _rectTransform;
     private TextMeshProUGUI _amountText;
     public int Amount { 
@@ -45,16 +49,21 @@ public class ItemUI : MonoBehaviour
         _rectTransform.sizeDelta = new Vector2(tileSize * _inventoryItem.Size.x, tileSize * _inventoryItem.Size.y);
         _rectTransform.anchoredPosition = new Vector2(tileSize * _inventoryItem.position.x, -tileSize * _inventoryItem.position.y);
         _image.sprite = _inventoryItem.item.Icon;
+        
+        _amountRectTransform.sizeDelta = new Vector2(tileSize / 2, tileSize / 2);
+
         Amount = _inventoryItem.amount;
     }
 
 
     public void OnPointerEnter() {
-        GetComponent<RectTransform>().localScale = new Vector3(1.1f, 1.1f, 1.1f);
+        Debug.Log("Enter");
+        InventoryUIManager.DisplayItemInfo(_inventoryItem);
     }
 
     public void OnPointerExit() {
-        GetComponent<RectTransform>().localScale = new Vector3(1f, 1f, 1f);
+        Debug.Log("Exit");
+        InventoryUIManager.DisplayItemInfo(null);
     }
 
     public void OnPointerDown() {
@@ -64,12 +73,10 @@ public class ItemUI : MonoBehaviour
         _image.color = new Color(1, 1, 1, 1);
     }
     public void OnPointerClick() {
-        if (FindAnyObjectByType<SelectedItemUI>() == null) {
-            Debug.LogError("SelectedItemUI not found");
-            return;
-        }
-        
-        FindAnyObjectByType<SelectedItemUI>().InventoryItem = _inventoryItem;
+        if(InventoryUIManager.SetSelectedInventoryItem(_inventoryItem)) {
+            _image.raycastTarget = false;
+        };
+    
     }
     public void OnDrag() {
         // _rectTransform.anchoredPosition += new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) * 10;
