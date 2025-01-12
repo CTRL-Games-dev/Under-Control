@@ -49,7 +49,6 @@ public class MapGenerator
                 if(grid[indexX, indexY] == Tile.WALL) { wall_count++; continue; }
             }
         }
-        Debug.Log(wall_count);
         if(wall_count >= 4) 
             return Tile.WALL;
         else
@@ -59,7 +58,7 @@ public class MapGenerator
     private Tile[,] GetNoise(int width, int height)
     {
         Tile[,] tiles = new Tile[width, height];
-        float density = 20;
+        float density = 40;
 
         for(int x = 0; x < width; x++)
         {
