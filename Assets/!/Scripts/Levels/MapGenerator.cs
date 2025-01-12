@@ -1,3 +1,4 @@
+using System.Text;
 using UnityEngine;
 public class MapGenerator
 {
@@ -17,7 +18,7 @@ public class MapGenerator
             {
                 for(int y = 0; y < height; y++)
                 {
-                    temp_grid[x,y] = CheckTile(temp_grid, x, y);
+                    temp_grid[x,y] = CheckTile(grid, x, y);
                 }
             }
             grid = temp_grid;
@@ -38,35 +39,33 @@ public class MapGenerator
             {
                 if(iy == 0 && ix == 0)
                     continue;
+                    
 
                 int indexX = x + ix;
                 int indexY = y + iy;
 
-                if(indexX > width || indexX < 0) { wall_count++; continue; }
-                if(indexY > height || indexY < 0) { wall_count++; continue; }
+                if(indexX >= width || indexX < 0) { wall_count++; continue; }
+                if(indexY >= height || indexY < 0) { wall_count++; continue; }
                 if(grid[indexX, indexY] == Tile.WALL) { wall_count++; continue; }
             }
         }
-
+        Debug.Log(wall_count);
         if(wall_count >= 4) 
-        {
             return Tile.WALL;
-        } else
-        {
+        else
             return Tile.FLOOR;
-        }
     }
 
     private Tile[,] GetNoise(int width, int height)
     {
         Tile[,] tiles = new Tile[width, height];
-        int density = 50;
+        float density = 20;
 
         for(int x = 0; x < width; x++)
         {
             for(int y = 0; y < height; y++)
             {
-                float chance = Random.Range(0, 1);
+                float chance = Random.Range(0, 100);
                 if(chance >= density)
                     tiles[x,y] = Tile.FLOOR;
                 else
