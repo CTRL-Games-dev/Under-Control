@@ -11,31 +11,31 @@ public class DynamicStat : Stat {
     }
 
     public void Add(float value) {
-        raw += value;
-        adjusted += value;
+        Raw += value;
+        Adjusted += value;
     }
 
     public void Subtract(float value) {
-        raw -= value;
-        adjusted -= value;
+        Raw -= value;
+        Adjusted -= value;
     }
 
     public void Multiply(float value) {
-        raw *= value;
-        adjusted *= value;
+        Raw *= value;
+        Adjusted *= value;
     }
 
     public void Divide(float value) {
-        raw /= value;
-        adjusted /= value;
+        Raw /= value;
+        Adjusted /= value;
     }
 
     // Beware! Potential magic behavior.
     // Difference between raw and value is added to adjusted value
     // Just saying, this is not "force" set
     public void Set(float value) {
-        var difference = value - raw;
-        raw = value;
-        adjusted += difference;
+        var difference = value - Raw;
+        Raw = value;
+        Adjusted += difference;
     }
 }

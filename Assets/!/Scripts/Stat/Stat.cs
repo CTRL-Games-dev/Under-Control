@@ -3,28 +3,28 @@ using UnityEngine;
 
 [Serializable]
 public class Stat {
-    public StatType statType;
+    public StatType StatType;
 
     [SerializeField]
     private float _raw;
-    public float raw { get => _raw; protected set => _raw = value; }
+    public float Raw { get => _raw; protected set => _raw = value; }
 
     [SerializeField]
     private float _adjusted;
-    public float adjusted { get => _adjusted; protected set => _adjusted = value; }
+    public float Adjusted { get => _adjusted; protected set => _adjusted = value; }
 
     public Stat(StatType statType, float initValue) {
-        this.statType = statType;
-        raw = initValue;
-        adjusted = initValue;
+        this.StatType = statType;
+        Raw = initValue;
+        Adjusted = initValue;
     }
 
     public float Recalculate(ModifierSystem modifierSystem) {
-        adjusted = modifierSystem.CalculateForStatType(statType, raw);
-        return adjusted;
+        Adjusted = modifierSystem.CalculateForStatType(StatType, Raw);
+        return Adjusted;
     }
 
     public static implicit operator float(Stat stat) {
-        return stat.adjusted;
+        return stat.Adjusted;
     }
 }

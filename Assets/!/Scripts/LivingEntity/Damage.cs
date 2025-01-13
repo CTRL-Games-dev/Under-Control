@@ -1,4 +1,4 @@
 public struct Damage {
-    public DamageType type;
-    public float value;
+    public DamageType Type;
+    public float Value;
 }

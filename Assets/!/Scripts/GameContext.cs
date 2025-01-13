@@ -17,14 +17,14 @@ public enum Dimension
 [CreateAssetMenu(fileName = "GameContext", menuName = "ScriptableObject/GameContext", order = 1)]
 public class GameContext : ScriptableObject
 {
-    public GameDifficulty difficulty = GameDifficulty.NORMAL;
-    public Dimension currentDimension = Dimension.HUB;
+    public GameDifficulty Difficulty = GameDifficulty.NORMAL;
+    public Dimension CurrentDimension = Dimension.HUB;
     [Range(0, 1)]
-    public float influence = 0;
+    public float Influence = 0;
 
     public void SetDefault(GameContext context) {
-        context.difficulty = GameDifficulty.NORMAL;
-        context.currentDimension = Dimension.HUB;
+        context.Difficulty = GameDifficulty.NORMAL;
+        context.CurrentDimension = Dimension.HUB;
     }
 }
 
