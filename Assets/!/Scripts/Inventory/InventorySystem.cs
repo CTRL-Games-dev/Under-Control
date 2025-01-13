@@ -10,6 +10,15 @@ public class InventorySystem : MonoBehaviour
         public Item item;
         public int amount;
         public Vector2Int position;
+
+        public Vector2Int Size {
+            get {
+                return item.Size;
+            }
+        }
+
+        public ItemUI ItemUI { get; set; }
+        public RectTransform RectTransform { get; set; }
     }
 
     [SerializeField] private Vector2Int inventorySize;
@@ -17,6 +26,13 @@ public class InventorySystem : MonoBehaviour
     public Vector2Int InventorySize { get => inventorySize; set => inventorySize = value; }
 
     [SerializeField] private List<InventoryItem> inventory = new List<InventoryItem>();
+
+    public bool FitsWithinBounds(Vector2Int position, Vector2Int size) {
+        if (position.x + size.x > inventorySize.x || position.y + size.y > inventorySize.y) {
+            return false;
+        }
+        return true;
+    }
 
     public bool DoesFitWithin(Vector2Int position, Vector2Int size) {
         // Position is out of bounds

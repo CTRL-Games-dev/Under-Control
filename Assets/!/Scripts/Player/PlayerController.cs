@@ -34,6 +34,8 @@ public class PlayerController : MonoBehaviour
     private CharacterController controller;
     private Animator animator;
     private LivingEntity livingEntity;
+
+    public LivingEntity LivingEntity { get => livingEntity; }
     
     // Animation IDs
     private int _animationIdVelocitySide = Animator.StringToHash("velocitySide");
