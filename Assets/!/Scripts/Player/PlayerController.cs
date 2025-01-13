@@ -10,32 +10,32 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     // Movement
-    public float acceleration = 2f;
-    public float deceleration = 2f;
-    public float maxWalkingSpeed = 1f;
-    public float maxSprintingSpeed = 2f;
-    public float mouseSensitivity = 0.1f;
-    public float walkingTurnSpeed = 1f;
-    public float sprintingTurnSpeed = 2.5f;
+    public float Acceleration = 2f;
+    public float Deceleration = 2f;
+    public float MaxWalkingSpeed = 1f;
+    public float MaxSprintingSpeed = 2f;
+    public float MouseSensitivity = 0.1f;
+    public float WalkingTurnSpeed = 1f;
+    public float SprintingTurnSpeed = 2.5f;
 
-    public GameObject cameraTargetObject;
+    public GameObject CameraTargetObject;
 
     // State    
-    private Vector2 movementInputVector = Vector2.zero;
-    private Vector3 targetDirection;
-    private bool sprinting = false;
-    private float velocitySide = 0;
-    private float velocityFront = 0;
-    public bool isTurning { private get; set; }
-    public bool applySpellTest = false;
-    public bool applySpellTests = false;
+    private Vector2 _movementInputVector = Vector2.zero;
+    private Vector3 _targetDirection;
+    private bool _sprinting = false;
+    private float _velocitySide = 0;
+    private float _velocityFront = 0;
+    public bool IsTurning { private get; set; }
+    public bool ApplySpellTest = false;
+    public bool ApplySpellTests = false;
 
     // References
-    private CharacterController controller;
-    private Animator animator;
-    private LivingEntity livingEntity;
+    private CharacterController _controller;
+    private Animator _animator;
+    private LivingEntity _livingEntity;
 
-    public LivingEntity LivingEntity { get => livingEntity; }
+    public LivingEntity LivingEntity { get => _livingEntity; }
     
     // Animation IDs
     private int _animationIdVelocitySide = Animator.StringToHash("velocitySide");
@@ -46,23 +46,23 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        controller = GetComponent<CharacterController>();
-        animator = GetComponent<Animator>();
-        livingEntity = GetComponent<LivingEntity>();
+        _controller = GetComponent<CharacterController>();
+        _animator = GetComponent<Animator>();
+        _livingEntity = GetComponent<LivingEntity>();
         
-        targetDirection = transform.forward;
+        _targetDirection = transform.forward;
     }
 
     void Update()
     {
-        if(applySpellTest) {
-            new TestSpell().Cast(livingEntity);
-            applySpellTest = false;
+        if(ApplySpellTest) {
+            new TestSpell().Cast(_livingEntity);
+            ApplySpellTest = false;
         }
 
-        if(applySpellTests) {
-            new TestSpell().Cast(livingEntity);
-            applySpellTests = false;
+        if(ApplySpellTests) {
+            new TestSpell().Cast(_livingEntity);
+            ApplySpellTests = false;
         }
 
         // Make use of this once we have proper animations and model
@@ -73,117 +73,117 @@ public class PlayerController : MonoBehaviour
         // cameraTargetObject.transform.rotation = Quaternion.FromToRotation(Vector3.forward, targetDirection);
    
         // Placeholder for movement logic
-        transform.rotation = Quaternion.FromToRotation(Vector3.forward, targetDirection);
+        transform.rotation = Quaternion.FromToRotation(Vector3.forward, _targetDirection);
      
-        Vector3 movementVector = new Vector3(movementInputVector.x, 0, movementInputVector.y);
+        Vector3 movementVector = new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
         movementVector = transform.TransformDirection(movementVector);
 
-        controller.SimpleMove(movementVector * 5);
+        _controller.SimpleMove(movementVector * 5);
     }
 
     // Handles animator movement logic
-    private void HandleMovement() {
-        float currentMaxVelocity = sprinting ? maxSprintingSpeed : maxWalkingSpeed;
+    private void handleMovement() {
+        float currentMaxVelocity = _sprinting ? MaxSprintingSpeed : MaxWalkingSpeed;
 
-        bool isVelocityXOverMax = velocitySide > currentMaxVelocity || velocitySide < -currentMaxVelocity;
-        bool isVelocityYOverMax = velocityFront > currentMaxVelocity || velocityFront < -currentMaxVelocity;
+        bool isVelocityXOverMax = _velocitySide > currentMaxVelocity || _velocitySide < -currentMaxVelocity;
+        bool isVelocityYOverMax = _velocityFront > currentMaxVelocity || _velocityFront < -currentMaxVelocity;
 
-        if(movementInputVector.x != 0 && !isVelocityXOverMax) {
-            velocitySide += acceleration * Time.deltaTime * movementInputVector.x;
-            if(velocitySide > currentMaxVelocity) {
-                velocitySide = currentMaxVelocity;
-            } else if(velocitySide < -currentMaxVelocity) {
-                velocitySide = -currentMaxVelocity;
+        if(_movementInputVector.x != 0 && !isVelocityXOverMax) {
+            _velocitySide += Acceleration * Time.deltaTime * _movementInputVector.x;
+            if(_velocitySide > currentMaxVelocity) {
+                _velocitySide = currentMaxVelocity;
+            } else if(_velocitySide < -currentMaxVelocity) {
+                _velocitySide = -currentMaxVelocity;
             }
         } else {
-            if (velocitySide > 0) {
-                velocitySide -= deceleration * Time.deltaTime;
-                if (velocitySide < 0) {
-                    velocitySide = 0;
+            if (_velocitySide > 0) {
+                _velocitySide -= Deceleration * Time.deltaTime;
+                if (_velocitySide < 0) {
+                    _velocitySide = 0;
                 }
             } else {
-                velocitySide += deceleration * Time.deltaTime;
-                if (velocitySide > 0) {
-                    velocitySide = 0;
+                _velocitySide += Deceleration * Time.deltaTime;
+                if (_velocitySide > 0) {
+                    _velocitySide = 0;
                 }
             }
         }
 
-        if(movementInputVector.y != 0 && !isVelocityYOverMax) {
-            velocityFront += acceleration * Time.deltaTime * movementInputVector.y;
-            if(velocityFront > currentMaxVelocity) {
-                velocityFront = currentMaxVelocity;
-            } else if(velocityFront < -currentMaxVelocity) {
-                velocityFront = -currentMaxVelocity;
+        if(_movementInputVector.y != 0 && !isVelocityYOverMax) {
+            _velocityFront += Acceleration * Time.deltaTime * _movementInputVector.y;
+            if(_velocityFront > currentMaxVelocity) {
+                _velocityFront = currentMaxVelocity;
+            } else if(_velocityFront < -currentMaxVelocity) {
+                _velocityFront = -currentMaxVelocity;
             } 
         } else {
-            if (velocityFront > 0) {
-                velocityFront -= deceleration * Time.deltaTime;
-                if (velocityFront < 0) {
-                    velocityFront = 0;
+            if (_velocityFront > 0) {
+                _velocityFront -= Deceleration * Time.deltaTime;
+                if (_velocityFront < 0) {
+                    _velocityFront = 0;
                 }
             } else {
-                velocityFront += deceleration * Time.deltaTime;
-                if (velocityFront > 0) {
-                    velocityFront = 0;
+                _velocityFront += Deceleration * Time.deltaTime;
+                if (_velocityFront > 0) {
+                    _velocityFront = 0;
                 }
             }
         }
 
-        animator.SetFloat(_animationIdVelocitySide, velocitySide);
-        animator.SetFloat(_animationIdVelocityFront, velocityFront);
+        _animator.SetFloat(_animationIdVelocitySide, _velocitySide);
+        _animator.SetFloat(_animationIdVelocityFront, _velocityFront);
 
 
-        if (velocitySide != 0 || velocityFront != 0) {
-            animator.SetBool("moving", true);
+        if (_velocitySide != 0 || _velocityFront != 0) {
+            _animator.SetBool("moving", true);
         } else {
-            animator.SetBool("moving", false);
+            _animator.SetBool("moving", false);
         }
     }
 
     // Handles animator turning logic
-    private void HandleTurning() {
-        if(animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) {
-            float x = Vector3.SignedAngle(transform.forward, targetDirection, Vector3.up);
+    private void handleTurning() {
+        if(_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) {
+            float x = Vector3.SignedAngle(transform.forward, _targetDirection, Vector3.up);
             
-            if(!isTurning) {
+            if(!IsTurning) {
                 if(x < -135) {
-                    animator.SetTrigger("leftTurnFull");
+                    _animator.SetTrigger("leftTurnFull");
                 } else if(x > 135) {
-                    animator.SetTrigger("rightTurnFull");
+                    _animator.SetTrigger("rightTurnFull");
                 } else if(x > 45) {
-                    animator.SetTrigger("rightTurn");
+                    _animator.SetTrigger("rightTurn");
                 } else if(x < -45) {
-                    animator.SetTrigger("leftTurn");
+                    _animator.SetTrigger("leftTurn");
                 }
             }
-        } else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Walk Blend Tree")) {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(Vector3.forward, targetDirection), Time.deltaTime * walkingTurnSpeed);
-        } else if (animator.GetCurrentAnimatorStateInfo(0).IsName("Sprint Blend Tree")) {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(Vector3.forward, targetDirection), Time.deltaTime * sprintingTurnSpeed);
+        } else if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Walk Blend Tree")) {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(Vector3.forward, _targetDirection), Time.deltaTime * WalkingTurnSpeed);
+        } else if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Sprint Blend Tree")) {
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(Vector3.forward, _targetDirection), Time.deltaTime * SprintingTurnSpeed);
         }
     }
 
     void OnMove(InputValue value) {
-        movementInputVector = value.Get<Vector2>();
+        _movementInputVector = value.Get<Vector2>();
     }
     void OnLook(InputValue value) {
         Vector2 turnVector = value.Get<Vector2>();
 
-        targetDirection = Quaternion.Euler(0, turnVector.x * mouseSensitivity, 0) * targetDirection;
+        _targetDirection = Quaternion.Euler(0, turnVector.x * MouseSensitivity, 0) * _targetDirection;
     }
 
     void OnSprint(InputValue value) {
-        sprinting = value.isPressed;
-        animator.SetBool("sprinting", sprinting);
+        _sprinting = value.isPressed;
+        _animator.SetBool("sprinting", _sprinting);
     }
 
     void OnAttack(InputValue value) {
-        animator.SetTrigger("punch");
+        _animator.SetTrigger("punch");
     }
 
     void OnJump(InputValue value) {
-        animator.SetTrigger("jump");
+        _animator.SetTrigger("jump");
     }
 
     // Animation events

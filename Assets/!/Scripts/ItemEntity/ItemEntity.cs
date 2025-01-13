@@ -6,11 +6,11 @@ public class ItemEntity : MonoBehaviour
     public int Amount;
     public Item Item;
 
-    [SerializeField] private TMP_Text title;
+    [SerializeField] private TMP_Text _title;
 
     void Start()
     {
-        title.text = Item.DisplayName;
+        _title.text = Item.DisplayName;
     }
 
     void OnTriggerEnter(Collider other)
@@ -20,7 +20,7 @@ public class ItemEntity : MonoBehaviour
             return;
         }
 
-        if(!livingEntity.inventorySystem.AddItem(Item, Amount)) {
+        if(!livingEntity.InventorySystem.AddItem(Item, Amount)) {
             return;
         }
 

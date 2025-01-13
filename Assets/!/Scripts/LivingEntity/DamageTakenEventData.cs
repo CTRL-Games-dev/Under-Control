@@ -1,5 +1,5 @@
 public struct DamageTakenEventData {
-    public Damage damage;
-    public float desiredDamageAmount;
-    public float actualDamageAmount;
+    public Damage Damage;
+    public float DesiredDamageAmount;
+    public float ActualDamageAmount;
 }

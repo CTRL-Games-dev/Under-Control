@@ -6,26 +6,26 @@ using UnityEngine.Events;
 [RequireComponent(typeof(InventorySystem))]
 public class LivingEntity : MonoBehaviour
 {
-    private struct EffectData {
-        public Effect effect;
-        public float expiration;
+    private struct _effectData {
+        public Effect Effect;
+        public float Expiration;
     }
 
-    public string displayName;
+    public string DisplayName;
 
     // Health
-    public DynamicStat health = new DynamicStat(StatType.HEALTH, 100);
-    public Stat maxHealth = new Stat(StatType.MAX_HEALTH, 100);
-    public Stat regenRate = new Stat(StatType.REGEN_RATE, 1);
-    public float timeToRegenAfterDamage = 2;
+    public DynamicStat Health = new DynamicStat(StatType.HEALTH, 100);
+    public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
+    public Stat RegenRate = new Stat(StatType.REGEN_RATE, 1);
+    public float TimeToRegenAfterDamage = 2;
 
     // State
-    private float lastDamageTime = 0;
-    private List<EffectData> activeEffects = new List<EffectData>();
+    private float _lastDamageTime = 0;
+    private List<_effectData> _activeEffects = new List<_effectData>();
 
     // References
-    public ModifierSystem modifierSystem { get; private set; }
-    public InventorySystem inventorySystem { get; private set; }
+    public ModifierSystem ModifierSystem { get; private set; }
+    public InventorySystem InventorySystem { get; private set; }
 
     // Events
     public UnityEvent OnDeath;
@@ -33,8 +33,8 @@ public class LivingEntity : MonoBehaviour
 
     void Start()
     {
-        modifierSystem = GetComponent<ModifierSystem>();
-        inventorySystem = GetComponent<InventorySystem>();
+        ModifierSystem = GetComponent<ModifierSystem>();
+        InventorySystem = GetComponent<InventorySystem>();
     }
 
     void Update() {
@@ -42,40 +42,40 @@ public class LivingEntity : MonoBehaviour
         recalculateStats();
    
         // Regen
-        if(Time.time - lastDamageTime > timeToRegenAfterDamage) {
-            health.Add(regenRate * Time.deltaTime);
-            if(health > maxHealth) {
-                health.Set(maxHealth);
+        if(Time.time - _lastDamageTime > TimeToRegenAfterDamage) {
+            Health.Add(RegenRate * Time.deltaTime);
+            if(Health > MaxHealth) {
+                Health.Set(MaxHealth);
             }
         }
     }
 
     public void TakeDamage(Damage damage)
     {
-        lastDamageTime = Time.time;
+        _lastDamageTime = Time.time;
 
         // Check if entity is dead
-        if(health == 0) {
+        if(Health == 0) {
             return;
         }
 
-        float desiredDamageAmount = damage.value;
+        float desiredDamageAmount = damage.Value;
         // TODO: Calculate damage based on damage type, current entity modifiers, spells and what not
 
         float actualDamageAmount = desiredDamageAmount;
-        if(actualDamageAmount > health) {
-            actualDamageAmount = health;
+        if(actualDamageAmount > Health) {
+            actualDamageAmount = Health;
         }
 
-        health.Subtract(actualDamageAmount);
+        Health.Subtract(actualDamageAmount);
 
         OnDamageTaken.Invoke(new DamageTakenEventData {
-            damage = damage,
-            desiredDamageAmount = desiredDamageAmount,
-            actualDamageAmount = actualDamageAmount
+            Damage = damage,
+            DesiredDamageAmount = desiredDamageAmount,
+            ActualDamageAmount = actualDamageAmount
         });
 
-        if (health == 0)
+        if (Health == 0)
         {
             OnDeath.Invoke();
         }
@@ -84,29 +84,29 @@ public class LivingEntity : MonoBehaviour
     #region Effects
 
     public void ApplyEffect(Effect effect) {
-        activeEffects.Add(new EffectData {
-            effect = effect,
-            expiration = Time.time + effect.duration
+        _activeEffects.Add(new _effectData {
+            Effect = effect,
+            Expiration = Time.time + effect.Duration
         });
 
-        for(int i = 0; i < effect.modifiers.Length; i++) {
-            var modifier = effect.modifiers[i];
-            modifierSystem.ApplyTemporaryModifier(modifier, effect.duration);
+        for(int i = 0; i < effect.Modifiers.Length; i++) {
+            var modifier = effect.Modifiers[i];
+            ModifierSystem.ApplyTemporaryModifier(modifier, effect.Duration);
         }
     }
 
     public void RemoveEffect(Effect effect) {
-        for(int i = 0; i < activeEffects.Count; i++) {
-            if(!activeEffects[i].effect.Equals(effect)) {
+        for(int i = 0; i < _activeEffects.Count; i++) {
+            if(!_activeEffects[i].Effect.Equals(effect)) {
                 continue;
             }
 
-            for(int j = 0; j < effect.modifiers.Length; j++) {
-                var modifier = effect.modifiers[j];
-                modifierSystem.RemoveModifier(modifier);
+            for(int j = 0; j < effect.Modifiers.Length; j++) {
+                var modifier = effect.Modifiers[j];
+                ModifierSystem.RemoveModifier(modifier);
             }
 
-            activeEffects.RemoveAt(i);
+            _activeEffects.RemoveAt(i);
         }
     }
 
@@ -128,12 +128,12 @@ public class LivingEntity : MonoBehaviour
     // }
 
     private void recheckEffects() {
-        for(int i = 0; i < activeEffects.Count; i++) {
-            if(activeEffects[i].expiration > Time.time) {
+        for(int i = 0; i < _activeEffects.Count; i++) {
+            if(_activeEffects[i].Expiration > Time.time) {
                 continue;
             }
 
-            activeEffects.RemoveAt(i);
+            _activeEffects.RemoveAt(i);
         }
     }
 
@@ -142,21 +142,21 @@ public class LivingEntity : MonoBehaviour
     #region Modifiers
 
     public void ApplyIndefiniteModifier(Modifier modifier) {
-        modifierSystem.ApplyIndefiniteModifier(modifier);
+        ModifierSystem.ApplyIndefiniteModifier(modifier);
     }
 
     public void ApplyTemporaryModifier(Modifier modifier, float duration) {
-        modifierSystem.ApplyTemporaryModifier(modifier, duration);
+        ModifierSystem.ApplyTemporaryModifier(modifier, duration);
     }
 
     public void RemoveModifier(Modifier modifier) {
-        modifierSystem.RemoveModifier(modifier);
+        ModifierSystem.RemoveModifier(modifier);
     }
 
     private void recalculateStats() {
-        health.Recalculate(modifierSystem);
-        maxHealth.Recalculate(modifierSystem);
-        regenRate.Recalculate(modifierSystem);
+        Health.Recalculate(ModifierSystem);
+        MaxHealth.Recalculate(ModifierSystem);
+        RegenRate.Recalculate(ModifierSystem);
     }
 
     #endregion
