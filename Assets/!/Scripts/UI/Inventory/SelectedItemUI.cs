@@ -19,12 +19,12 @@ public class SelectedItemUI : MonoBehaviour
                 gameObject.SetActive(true);
 
                 _rectTransform.sizeDelta = new Vector2(InventoryUIManager.TileSize * _inventoryItem.Size.x, InventoryUIManager.TileSize * _inventoryItem.Size.y);
-                _image.sprite = _inventoryItem.item.Icon;
-                if (_inventoryItem.amount == 1) {
+                _image.sprite = _inventoryItem.Item.Icon;
+                if (_inventoryItem.Amount == 1) {
                     _amountText.text = "";
                     return;
                 }
-                _amountText.text = _inventoryItem.amount.ToString(); 
+                _amountText.text = _inventoryItem.Amount.ToString(); 
             }
         }
     }

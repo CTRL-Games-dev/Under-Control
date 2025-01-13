@@ -429,16 +429,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 063630ca55530384188525911dbcb86b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: 2
-  deceleration: 2
-  maxWalkingSpeed: 1
-  maxSprintingSpeed: 2
-  mouseSensitivity: 0.1
-  walkingTurnSpeed: 1
-  sprintingTurnSpeed: 2.5
-  cameraTargetObject: {fileID: 3902248460667956287}
-  applySpellTest: 0
-  applySpellTests: 0
+  Acceleration: 2
+  Deceleration: 2
+  MaxWalkingSpeed: 1
+  MaxSprintingSpeed: 2
+  MouseSensitivity: 0.1
+  WalkingTurnSpeed: 1
+  SprintingTurnSpeed: 2.5
+  CameraTargetObject: {fileID: 0}
+  ApplySpellTest: 0
+  ApplySpellTests: 0
 --- !u!114 &8612418859672658487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -451,20 +451,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a23e42751b3623c4a938cdd3448ecea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  displayName: Player
-  health:
-    statType: 0
+  DisplayName: 
+  Health:
+    StatType: 0
     _raw: 100
     _adjusted: 100
-  maxHealth:
-    statType: 1
+  MaxHealth:
+    StatType: 1
     _raw: 100
     _adjusted: 100
-  regenRate:
-    statType: 2
+  RegenRate:
+    StatType: 2
     _raw: 1
     _adjusted: 1
-  timeToRegenAfterDamage: 2
+  TimeToRegenAfterDamage: 2
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -483,11 +483,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a97e5a67a4882c41949af6f86f5c81b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inventorySize: {x: 10, y: 10}
-  inventory:
-  - item: {fileID: 11400000, guid: 6d08def00a527c5418f0e2a406f2da3c, type: 2}
-    amount: 1
-    position: {x: 0, y: 0}
+  _inventorySize: {x: 5, y: 5}
+  _inventory: []
 --- !u!114 &2030617008684707472
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -500,7 +497,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7268ef27f4efa5d43a43982b4df186ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activeModifiers: []
+  _activeModifiers: []
 --- !u!114 &2484441535233306198
 MonoBehaviour:
   m_ObjectHideFlags: 0

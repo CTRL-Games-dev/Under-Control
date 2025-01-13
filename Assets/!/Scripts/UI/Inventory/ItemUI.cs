@@ -47,12 +47,12 @@ public class ItemUI : MonoBehaviour
         _occupiedTiles = occupiedTiles;
         
         _rectTransform.sizeDelta = new Vector2(tileSize * _inventoryItem.Size.x, tileSize * _inventoryItem.Size.y);
-        _rectTransform.anchoredPosition = new Vector2(tileSize * _inventoryItem.position.x, -tileSize * _inventoryItem.position.y);
-        _image.sprite = _inventoryItem.item.Icon;
+        _rectTransform.anchoredPosition = new Vector2(tileSize * _inventoryItem.Position.x, -tileSize * _inventoryItem.Position.y);
+        _image.sprite = _inventoryItem.Item.Icon;
         
         _amountRectTransform.sizeDelta = new Vector2(tileSize / 2, tileSize / 2);
 
-        Amount = _inventoryItem.amount;
+        Amount = _inventoryItem.Amount;
     }
 
 

@@ -79,8 +79,8 @@ public class InventoryUIManager : MonoBehaviour
         );
         
         _itemInfoPanel.SetActive(true);
-        _itemName.text = inventoryItem.item.DisplayName;
-        _itemDescription.text = inventoryItem.item.Description;
+        _itemName.text = inventoryItem.Item.DisplayName;
+        _itemDescription.text = inventoryItem.Item.Description;
     }
 
 
@@ -114,7 +114,7 @@ public class InventoryUIManager : MonoBehaviour
             return;
         }
 
-        _selectedInventoryItem.position = SelectedTile.Pos;
+        _selectedInventoryItem.Position = SelectedTile.Pos;
         _selectedInventoryItem.ItemUI.Image.raycastTarget = true;
         _selectedInventoryItem.ItemUI.OccupiedTiles = PlaceItem(SelectedTile.Pos, _selectedInventoryItem.Size);
         _selectedInventoryItem.RectTransform.anchoredPosition = new Vector2(SelectedTile.Pos.x, -SelectedTile.Pos.y) * TileSize;
@@ -127,13 +127,13 @@ public class InventoryUIManager : MonoBehaviour
     private void setupItems() {
         foreach (InventoryItem inventoryItem in _inventory) {
             var itemGameObject = Instantiate(_itemPrefab, _itemHolder.transform);
-            itemGameObject.name = inventoryItem.item.DisplayName;
+            itemGameObject.name = inventoryItem.Item.DisplayName;
 
             inventoryItem.RectTransform = itemGameObject.GetComponent<RectTransform>();
 
             inventoryItem.ItemUI = itemGameObject.GetComponent<ItemUI>();
             inventoryItem.ItemUI.InventoryUIManager = this;
-            inventoryItem.ItemUI.SetupItem(inventoryItem, TileSize, PlaceItem(inventoryItem.position, inventoryItem.Size));
+            inventoryItem.ItemUI.SetupItem(inventoryItem, TileSize, PlaceItem(inventoryItem.Position, inventoryItem.Size));
         }
     }
 
