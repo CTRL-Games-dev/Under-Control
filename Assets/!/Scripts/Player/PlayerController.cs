@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.FromToRotation(Vector3.forward, _targetDirection);
      
         Vector3 movementVector = new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
-        movementVector = transform.TransformDirection(movementVector);
+        // movementVector = transform.
 
         _controller.SimpleMove(movementVector * 5);
     }
