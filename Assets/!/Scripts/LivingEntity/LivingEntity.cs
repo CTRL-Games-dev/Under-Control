@@ -89,6 +89,10 @@ public class LivingEntity : MonoBehaviour
             Expiration = Time.time + effect.Duration
         });
 
+        if(effect.Modifiers == null) {
+            return;
+        }
+
         for(int i = 0; i < effect.Modifiers.Length; i++) {
             var modifier = effect.Modifiers[i];
             ModifierSystem.ApplyTemporaryModifier(modifier, effect.Duration);
