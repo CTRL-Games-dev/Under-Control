@@ -1,6 +1,6 @@
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 [CustomPropertyDrawer(typeof(Stat))]
@@ -27,3 +27,4 @@ public class StatPropertyDrawer : PropertyDrawer {
         return propertiesContainer;
     }
 }
+#endif
