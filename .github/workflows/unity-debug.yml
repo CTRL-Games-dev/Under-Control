@@ -1,6 +1,11 @@
-name: Unity Debug Build
+name: Unity Debug
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
 
 jobs:
   build_windows:
@@ -13,7 +18,7 @@ jobs:
           lfs: true
 
       - name: Cache Unity Library
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: Library
           key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
