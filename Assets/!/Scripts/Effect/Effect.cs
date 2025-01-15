@@ -9,6 +9,10 @@ public class Effect : ScriptableObject {
     public Modifier[] Modifiers;
 
     public override string ToString() {
+        if (Modifiers == null || Modifiers.Length == 0) {
+            return $"{DisplayName} ({Duration}s) [No modifiers]";
+        }
+        
         return $"{DisplayName} ({Duration}s) [{string.Join(", ", Modifiers)}]";
     }
 }

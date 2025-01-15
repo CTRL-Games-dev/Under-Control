@@ -1,4 +1,5 @@
 using System;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -17,23 +18,29 @@ public class PlayerController : MonoBehaviour
     public float MouseSensitivity = 0.1f;
     public float WalkingTurnSpeed = 1f;
     public float SprintingTurnSpeed = 2.5f;
-
+    public float MinCameraDistance = 10f;
+    public float MaxCameraDistance = 30f;
+    public float CameraDistanceSpeed = 1f;
+    public Vector2 CameraTargetObjectBounds = Vector2.zero;
+    public bool ApplySpellTest = false;
+    public bool ApplySpellTests = false;
+    public GameObject CameraObject;
     public GameObject CameraTargetObject;
 
-    // State    
+    // State
     private Vector2 _movementInputVector = Vector2.zero;
     private Vector3 _targetDirection;
     private bool _sprinting = false;
     private float _velocitySide = 0;
     private float _velocityFront = 0;
-    public bool IsTurning { private get; set; }
-    public bool ApplySpellTest = false;
-    public bool ApplySpellTests = false;
+    private bool _isTurning;
+    private float _cameraDistance { get => _cinemachinePositionComposer.CameraDistance; set => _cinemachinePositionComposer.CameraDistance = value; }
 
     // References
     private CharacterController _controller;
     private Animator _animator;
     private LivingEntity _livingEntity;
+    private CinemachinePositionComposer _cinemachinePositionComposer;
 
     public LivingEntity LivingEntity { get => _livingEntity; }
     
@@ -49,8 +56,10 @@ public class PlayerController : MonoBehaviour
         _controller = GetComponent<CharacterController>();
         _animator = GetComponent<Animator>();
         _livingEntity = GetComponent<LivingEntity>();
+        _cinemachinePositionComposer = CameraObject.GetComponent<CinemachinePositionComposer>();
         
         _targetDirection = transform.forward;
+        _cameraDistance = MinCameraDistance;
     }
 
     void Update()
@@ -73,10 +82,10 @@ public class PlayerController : MonoBehaviour
         // cameraTargetObject.transform.rotation = Quaternion.FromToRotation(Vector3.forward, targetDirection);
    
         // Placeholder for movement logic
-        transform.rotation = Quaternion.FromToRotation(Vector3.forward, _targetDirection);
+        // I guess in our game we don't need this?
+        // transform.rotation = Quaternion.FromToRotation(Vector3.forward, _targetDirection);
      
-        Vector3 movementVector = new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
-        // movementVector = transform.
+        var movementVector = Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
 
         _controller.SimpleMove(movementVector * 5);
     }
@@ -146,7 +155,7 @@ public class PlayerController : MonoBehaviour
         if(_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) {
             float x = Vector3.SignedAngle(transform.forward, _targetDirection, Vector3.up);
             
-            if(!IsTurning) {
+            if(!_isTurning) {
                 if(x < -135) {
                     _animator.SetTrigger("leftTurnFull");
                 } else if(x > 135) {
@@ -164,13 +173,41 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Input events
+
     void OnMove(InputValue value) {
         _movementInputVector = value.Get<Vector2>();
     }
     void OnLook(InputValue value) {
-        Vector2 turnVector = value.Get<Vector2>();
+        // Vector2 turnVector = value.Get<Vector2>();
 
-        _targetDirection = Quaternion.Euler(0, turnVector.x * MouseSensitivity, 0) * _targetDirection;
+        // _targetDirection = Quaternion.Euler(0, turnVector.x * MouseSensitivity, 0) * _targetDirection;
+
+        Vector2 pointerVector = value.Get<Vector2>();
+        pointerVector /= new Vector2(Screen.width, Screen.height);
+        if (pointerVector.x < 0) {
+            pointerVector.x = 0;
+        }
+        if (pointerVector.x > 1) {
+            pointerVector.x = 1;
+        }
+        if (pointerVector.y < 0) {
+            pointerVector.y = 0;
+        }
+        if (pointerVector.y > 1) {
+            pointerVector.y = 1;
+        }
+
+        pointerVector *= 2;
+        pointerVector -= Vector2.one;
+
+        var pointerVectorPos = pointerVector * CameraTargetObjectBounds;
+
+        CameraTargetObject.transform.localPosition = new Vector3(
+            pointerVectorPos.x,
+            CameraTargetObject.transform.localPosition.y,
+            pointerVectorPos.y
+        );
     }
 
     void OnSprint(InputValue value) {
@@ -186,7 +223,19 @@ public class PlayerController : MonoBehaviour
         _animator.SetTrigger("jump");
     }
 
+    void OnScrollWheel(InputValue value) {
+        var delta = value.Get<Vector2>();
+        _cameraDistance -= delta.y * CameraDistanceSpeed;
+        if (_cameraDistance < MinCameraDistance) {
+            _cameraDistance = MinCameraDistance;
+        }
+        if (_cameraDistance > MaxCameraDistance) {
+            _cameraDistance = MaxCameraDistance;
+        }
+    }
+
     // Animation events
+
     void OnFootstep() {
         Debug.Log("Footstep");
     }
