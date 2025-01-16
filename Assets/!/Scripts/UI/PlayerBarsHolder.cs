@@ -4,14 +4,16 @@ using UnityEngine.UI;
 public class PlayerBarsHolder : MonoBehaviour
 
 {
-    [SerializeField] Image _healthBarImg;
-    [SerializeField] Image _manaBarImg;
-    [SerializeField] Image _controlBarImg;
+    [SerializeField] private Image _healthBarImg;
+    [SerializeField] private Image _manaBarImg;
+    [SerializeField] private Image _controlBarImg;
 
 
-    public GameObject Player;
-    public PlayerController PlayerController;
-    public LivingEntity PlayerEntity;
+    private UICanvas _uiCanvasParent;
+    private GameObject _player;
+    private LivingEntity _livingEntity;
+    private float _maxHealth;
+
 
 
     public float HealthBarFillAmount { set { 
@@ -27,15 +29,21 @@ public class PlayerBarsHolder : MonoBehaviour
         } 
     }
 
+    private void Awake() {
+        _uiCanvasParent = gameObject.GetComponentInParent<UICanvas>();
+    }
 
     private void Start() {
+        _livingEntity = _uiCanvasParent.PlayerLivingEntity;
+        // _livingEntity = _player.GetComponent<PlayerController>().LivingEntity;
+        _maxHealth = _livingEntity.MaxHealth;
     }
 
 
     private void Update() {
         // Temporary solution to update bars
 
-        HealthBarFillAmount = PlayerEntity.Health / PlayerEntity.MaxHealth;
+        // HealthBarFillAmount = _livingEntity.Health / _maxHealth;
         // ManaBarFillAmount = _manaBarFillAmount;
         // ControlBarFillAmount = _controlBarFillAmount;
     }

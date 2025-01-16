@@ -1,31 +1,46 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 using static InventorySystem;
 
-
 public class InventoryUIManager : MonoBehaviour
 {
-    [SerializeField] private InventorySystem _playerInventory;
 
+    [Header("Prefabs")]
     [SerializeField] private GameObject _itemPrefab;
     [SerializeField] private GameObject _invTilePrefab;
+
+    [Header("Inventory Stuff")]
+    [SerializeField] private RectTransform _gridBoundsRectTransform;
+    [SerializeField] private GameObject _fullContainer;
     [SerializeField] private GameObject _gridHolder;
     [SerializeField] private GameObject _itemHolder;
+
+    [Header("Interactions")]
     [SerializeField] private SelectedItemUI _selectedItemUI;
     [SerializeField] private Image _redPanel;
+    
+    [Header("Item Info Panel")]
     [SerializeField] private GameObject _itemInfoPanel;
     [SerializeField] private TextMeshProUGUI _itemName;
     [SerializeField] private TextMeshProUGUI _itemDescription;
 
-
-    private RectTransform _rectTransform;
+    
+    // References set in Awake
+    private UICanvas _uiCanvasParent;
+    private InventorySystem _playerInventory;
     private GridLayoutGroup _gridLayoutGroup;
 
+    private Animator _animator;
+    private readonly int _slideDownAnimation = Animator.StringToHash("SlideDown");
+    private readonly int _slideUpAnimation = Animator.StringToHash("SlideUp");
+    private bool _isInventoryOpen = false;
+
+    // Inventory stuff
     private static float _tileSize;
     public static float TileSize { get { return _tileSize; } private set { _tileSize = value; } }
 
@@ -47,11 +62,15 @@ public class InventoryUIManager : MonoBehaviour
 
 
     private void Awake() {
-        _rectTransform = GetComponent<RectTransform>();
+        _uiCanvasParent = gameObject.GetComponentInParent<UICanvas>(); 
         _gridLayoutGroup = _gridHolder.GetComponent<GridLayoutGroup>();
+        _animator = GetComponent<Animator>();
     }
 
-    private void Start() {        
+    private void Start() {
+        _playerInventory = _uiCanvasParent.PlayerInventory;
+        _uiCanvasParent.PlayerController.OnInventoryToggleEvent.AddListener(OnToggleInventory);
+        _uiCanvasParent.PlayerController.OnUICancelEvent.AddListener(OnUICancel);
         setupGrid();
         _inventory = _playerInventory.GetItems();
         setupItems();
@@ -142,11 +161,15 @@ public class InventoryUIManager : MonoBehaviour
         _inventoryWidth = _playerInventory.InventorySize.x;
         _inventoryHeight = _playerInventory.InventorySize.y;
 
-        TileSize = Mathf.Clamp(_rectTransform.rect.width /_inventoryWidth, 0, _rectTransform.rect.height / _inventoryHeight);
+        TileSize = Mathf.Clamp(_gridBoundsRectTransform.rect.width /_inventoryWidth, 0, _gridBoundsRectTransform.rect.height / _inventoryHeight);
         _gridLayoutGroup.constraintCount = _inventoryWidth;
 
         _gridLayoutGroup.cellSize = new Vector2(TileSize, TileSize);
         _inventoryTileArray = new InvTile[_inventoryHeight, _inventoryWidth];
+
+        float xOffset = (_gridBoundsRectTransform.rect.width - _inventoryWidth * TileSize) / 2;
+        _gridHolder.GetComponent<RectTransform>().anchoredPosition = new Vector2(xOffset, 0);
+        _itemHolder.GetComponent<RectTransform>().anchoredPosition = new Vector2(xOffset, 0);
 
         generateGrid();
     }
@@ -223,5 +246,25 @@ public class InventoryUIManager : MonoBehaviour
             }
         }
         SelectedTile?.SetHighlight(false);
+    }
+
+    private void OnUICancel() {
+        _selectedInventoryItem.ItemUI.Image.raycastTarget = true;
+        SelectedInventoryItem = null;
+        Debug.Log("Cancel");
+        ClearHighlights();
+    }
+
+    private void OnToggleInventory() {
+        // _fullContainer.SetActive(!_fullContainer.activeSelf);
+        _isInventoryOpen = !_isInventoryOpen;
+        if (_isInventoryOpen) {
+            _animator.SetTrigger(_slideDownAnimation);
+        } else {
+            _animator.SetTrigger(_slideUpAnimation);
+            _selectedInventoryItem.ItemUI.Image.raycastTarget = true;
+            SelectedInventoryItem = null;
+        }
+         
     }
 }
