@@ -13,7 +13,6 @@ public class GameManager : MonoBehaviour
     public static Vector3 startingPos = new(10, 10, 10);
     [SerializeField] private GameContext context;
     static public GameManager gm;
-
     private void Awake() 
     {
         DontDestroyOnLoad(this);
@@ -60,6 +59,7 @@ public class GameManager : MonoBehaviour
         foreach(GameObject p in portals) 
         {
             var portal = p.GetComponent<Portal>();
+            Debug.Log(p);
             portal.playerEnteredPortal.AddListener(ChangeDimension);
         }
         Debug.Log("Connected portals");
@@ -68,5 +68,10 @@ public class GameManager : MonoBehaviour
     {
         // Connect portals
         ConnectPortals();
+    }
+
+    public float GetInfluence()
+    {
+        return context.Influence;
     }
 }
