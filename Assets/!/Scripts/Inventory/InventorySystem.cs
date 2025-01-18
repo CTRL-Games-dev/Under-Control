@@ -40,28 +40,26 @@ public class InventorySystem : MonoBehaviour
             return false;
         }
 
-        // Size is out of bounds
-        if(!IsWithinBounds(size)) {
+        // Item bounds are out of bounds
+        // Size 1 would be offset 0 so we need to check bounds for size - 1
+        if(!IsWithinBounds(position + size - Vector2Int.one)) {
             return false;
         }
 
         foreach(var inventoryItem in _inventory) {
-            var minX = inventoryItem.Position.x;
-            var maxX = inventoryItem.Position.x + inventoryItem.Item.Size.x;
+            // Illegal bounds = rectangle in which item can't be placed
+            var illegalBoundsMinX = inventoryItem.Position.x - size.x + 1;
+            var illegalBoundsMaxX = inventoryItem.Position.x + inventoryItem.Item.Size.x - 1;
 
-            var minY = inventoryItem.Position.y;
-            var maxY = inventoryItem.Position.y + inventoryItem.Item.Size.y;
+            var illegalBoundsMinY = inventoryItem.Position.y - size.y + 1;
+            var illegalBoundsMaxY = inventoryItem.Position.y + inventoryItem.Item.Size.y - 1;
 
-            if(position.x >= minX && position.x < maxX && position.y >= minY && position.y < maxY) {
+            if(position.x >= illegalBoundsMinX && position.x <= illegalBoundsMaxX && position.y >= illegalBoundsMinY && position.y <= illegalBoundsMaxY) {
                 return false;
             }
         }
 
         return true;
-    }
-
-    public bool CanBeAdded(Item item, Vector2Int position) {
-        return CanBeAdded(item, 1, position);
     }
 
     public bool CanBeAdded(Item item, int quantity, Vector2Int position) {
@@ -109,7 +107,35 @@ public class InventorySystem : MonoBehaviour
             throw new Exception("Position is out of bounds");
         }
 
+        if(!CanBeAdded(item, amount, position)) {
+            return false;
+        }
+
         return addItem(item, amount, position);
+    }
+
+    public bool AddItem(Item item, Vector2Int position) {
+        return AddItem(item, 1, position);
+    }
+
+    // Adds item anywhere in the inventory
+    // Searches for space by columns then rows
+    public bool AddItem(Item item, int amount) {
+        for(int y = 0; y < _inventorySize.y; y++) {
+            for(int x = 0; x < _inventorySize.x; x++) {
+                if(CanBeAdded(item, amount, new Vector2Int(x, y))) {
+                    return addItem(item, amount, new Vector2Int(x, y));
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // Adds item anywhere in the inventory
+    // Searches for space by columns then rows
+    public bool AddItem(Item item) {
+        return AddItem(item, 1);
     }
 
     private bool addItem(Item item, int amount, Vector2Int position) {
@@ -138,30 +164,6 @@ public class InventorySystem : MonoBehaviour
         // debugLogInventory();
 
         return true;
-    }
-
-    public bool AddItem(Item item, Vector2Int position) {
-        return AddItem(item, 1, position);
-    }
-
-    // Adds item anywhere in the inventory
-    // Searches for space by columns then rows
-    public bool AddItem(Item item, int amount) {
-        for(int y = 0; y < _inventorySize.y; y++) {
-            for(int x = 0; x < _inventorySize.x; x++) {
-                if(CanBeAdded(item, new Vector2Int(x, y))) {
-                    return addItem(item, amount, new Vector2Int(x, y));
-                }
-            }
-        }
-
-        return false;
-    }
-
-    // Adds item anywhere in the inventory
-    // Searches for space by columns then rows
-    public bool AddItem(Item item) {
-        return AddItem(item, 1);
     }
 
     // Returns true if the item was removed
