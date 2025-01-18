@@ -9,7 +9,7 @@ using UnityEngine;
 public class AdventureManager : MonoBehaviour, ILevelManager
 {
     public Vector3 playerStartingPos = new(3,3,3);
-    public readonly float DefaultTileWidth = 4.0f;
+    public readonly float DefaultTileWidth = 6.0f;
     [SerializeField] private GameObject _player;
     [SerializeField] private GameObject _portal;
     [SerializeField] private CameraManager _cameraManager;
@@ -35,9 +35,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
         _meshRenderer = GetComponent<MeshRenderer>();
         _meshCollider = GetComponent<MeshCollider>();
         _mesh = GetComponent<MeshFilter>();
-    }
-    private void Start()
-    {
+
         // Get game manager
         _gm = GameManager.gm;
 
@@ -51,6 +49,10 @@ public class AdventureManager : MonoBehaviour, ILevelManager
         SpawnPlayer();
         // Spawn enemies
         SpawnEnemies(_map);
+    }
+    private void Start()
+    {
+
     }
 
     private void Update()
@@ -81,10 +83,13 @@ public class AdventureManager : MonoBehaviour, ILevelManager
 
 
             var center = tile.GetCenter(_map.TileWidth);
-            Debug.Log(tile.X + " " + tile.Y);
-            Debug.Log(center);
-
-            Instantiate(_enemyPrefab, new Vector3(center.x, 1, center.y), Quaternion.identity);
+            var enemyCount = UnityEngine.Random.Range(3, 6);
+            for(int e = 0; e < enemyCount; e++)
+            {
+                float left = e%3*1.5f - 1.5f;
+                float bottom = e/3*1.5f - 1.5f;
+                Instantiate(_enemyPrefab, new Vector3(center.x + left, 1, center.y + bottom), Quaternion.identity);
+            }
         }
     }
 }

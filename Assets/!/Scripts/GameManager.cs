@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         // For some reason "scene change" is being called, even if it is the first scene?
-        // ConnectPortals();
+        ConnectPortals();
     }
     private void ChangeDimension(Dimension dimension)
     {
@@ -59,10 +59,9 @@ public class GameManager : MonoBehaviour
         foreach(GameObject p in portals) 
         {
             var portal = p.GetComponent<Portal>();
-            Debug.Log(p);
             portal.playerEnteredPortal.AddListener(ChangeDimension);
         }
-        Debug.Log("Connected portals");
+        Debug.Log("Connected portals. This message will appear twice");
     }
     private void OnLevelChange(Scene scene, LoadSceneMode mode)
     {
