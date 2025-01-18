@@ -1,12 +1,12 @@
 using UnityEngine;
 
 public class HubManager : MonoBehaviour, ILevelManager
-{    public Vector3 playerStartingPos = new(3,3,3);
+{    public Vector3 PlayerStartingPos = new(3,3,3);
     [SerializeField] private GameObject _player;
     [SerializeField] private CameraManager _cameraManager;
     private void Start()
     {
-        Instantiate(_player, playerStartingPos, Quaternion.identity);
+        Instantiate(_player, PlayerStartingPos, Quaternion.identity);
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         _cameraManager.Target = player.transform;

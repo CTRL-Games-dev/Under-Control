@@ -2,25 +2,25 @@ using System;
 
 [Serializable]
 public struct Modifier {
-    public StatType statType;
-    public float value;
-    public ModifierType type;
+    public StatType StatType;
+    public float Value;
+    public ModifierType Type;
     public Modifier(StatType statType, float value, ModifierType type = ModifierType.ADDITIVE) {
-        this.statType = statType;
-        this.value = value;
-        this.type = type;
+        this.StatType = statType;
+        this.Value = value;
+        this.Type = type;
     }
 
     public float Calculate(float baseValue) {
-        switch(type) {
+        switch(Type) {
             case ModifierType.ADDITIVE:
-                return baseValue + value;
+                return baseValue + Value;
             case ModifierType.MULTIPLICATIVE:
-                return baseValue * value;
+                return baseValue * Value;
             case ModifierType.PERCENT_CHANGE:
                 //  20 => value * 1.2
                 // -20 => value * 0.8
-                return baseValue * (1 + value / 100);
+                return baseValue * (1 + Value / 100);
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -28,23 +28,23 @@ public struct Modifier {
 
     public override string ToString() {
         string valueString;
-        switch(type) {
+        switch(Type) {
             case ModifierType.ADDITIVE:
-                if (value > 0) {
-                    valueString = $"+{value}";
+                if (Value > 0) {
+                    valueString = $"+{Value}";
                 } else {
-                    valueString = $"{value}";
+                    valueString = $"{Value}";
                 }
 
                 break;
             case ModifierType.MULTIPLICATIVE:
-                valueString = $"{value}x";
+                valueString = $"{Value}x";
                 break;
             case ModifierType.PERCENT_CHANGE:
-                if (value > 0) {
-                    valueString = $"+{value}%";
+                if (Value > 0) {
+                    valueString = $"+{Value}%";
                 } else {
-                    valueString = $"{value}%";
+                    valueString = $"{Value}%";
                 }
 
                 break;
@@ -52,31 +52,31 @@ public struct Modifier {
                 throw new ArgumentOutOfRangeException();
         }
 
-        return $"{valueString} {statType.GetDisplayName()}";
+        return $"{valueString} {StatType.GetDisplayName()}";
     }
 
     public ModifierImpact GetImpact() {
-        switch(statType) {
+        switch(StatType) {
             case StatType.HEALTH:
-                if (value > 0) {
+                if (Value > 0) {
                     return ModifierImpact.POSITIVE;
-                } else if (value < 0) {
+                } else if (Value < 0) {
                     return ModifierImpact.NEGATIVE;
                 } else {
                     return ModifierImpact.NEUTRAL;
                 }
             case StatType.MAX_HEALTH:
-                if (value > 0) {
+                if (Value > 0) {
                     return ModifierImpact.POSITIVE;
-                } else if (value < 0) {
+                } else if (Value < 0) {
                     return ModifierImpact.NEGATIVE;
                 } else {
                     return ModifierImpact.NEUTRAL;
                 }
             case StatType.REGEN_RATE:
-                if (value > 0) {
+                if (Value > 0) {
                     return ModifierImpact.POSITIVE;
-                } else if (value < 0) {
+                } else if (Value < 0) {
                     return ModifierImpact.NEGATIVE;
                 } else {
                     return ModifierImpact.NEUTRAL;

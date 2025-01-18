@@ -3,12 +3,16 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewEffect")]
 public class Effect : ScriptableObject {
-    public string displayName;
-    public Sprite icon;
-    public float duration;
-    public Modifier[] modifiers;
+    public string DisplayName;
+    public Sprite Icon;
+    public float Duration;
+    public Modifier[] Modifiers;
 
     public override string ToString() {
-        return $"{displayName} ({duration}s) [{string.Join(", ", modifiers)}]";
+        if (Modifiers == null || Modifiers.Length == 0) {
+            return $"{DisplayName} ({Duration}s) [No modifiers]";
+        }
+        
+        return $"{DisplayName} ({Duration}s) [{string.Join(", ", Modifiers)}]";
     }
 }

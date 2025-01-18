@@ -4,22 +4,22 @@ using UnityEngine;
 [Serializable]
 public class Cooldown
 {
-    private float lastExecuteTime = -1;
-    public float cooldownTime;
+    private float _lastExecuteTime = -1;
+    public float CooldownTime;
     
     public Cooldown(float cooldownTime)
     {
-        this.cooldownTime = cooldownTime;
+        this.CooldownTime = cooldownTime;
     }
 
     // Returns true if the cooldown is ready to execute
     public bool IsReady() {
-        return Time.time - lastExecuteTime >= cooldownTime;
+        return Time.time - _lastExecuteTime >= CooldownTime;
     }
 
     // Resets the cooldown by bypassing it
     public void Reset() {
-        lastExecuteTime = 0;
+        _lastExecuteTime = 0;
     }
 
     // Executes the cooldown
@@ -30,7 +30,7 @@ public class Cooldown
             return false;
         }
 
-        lastExecuteTime = Time.time;
+        _lastExecuteTime = Time.time;
 
         return true;
     }

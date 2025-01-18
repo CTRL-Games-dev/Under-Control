@@ -1,18 +1,14 @@
-using System;
-using UnityEditor.PackageManager;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour 
 {
-    public readonly static string mainMenuSceneName = "MainMenu";
-    public readonly static string hubSceneName = "Hub";
-    public readonly static string adventureSceneName = "Adventure";
-    public static Vector3 startingPos = new(10, 10, 10);
-    [SerializeField] private GameContext context;
-    static public GameManager Gm;
+    public const string MainMenuSceneName = "MainMenu";
+    public const string HubSceneName = "Hub";
+    public const string AdventureSceneName = "Adventure";
+    public static Vector3 StartingPos = new(10, 10, 10);
+    [SerializeField] private GameContext _context;
+    public static GameManager Gm;
     private void Awake() 
     {
         DontDestroyOnLoad(this);
@@ -37,20 +33,20 @@ public class GameManager : MonoBehaviour
     }
     private void ChangeDimension(Dimension dimension)
     {
-        context.currentDimension = dimension;
+        _context.CurrentDimension = dimension;
 
-        Debug.Log("Loading new scene: " + context.currentDimension);
-        if(context.currentDimension == Dimension.MAIN_MENU)
+        Debug.Log("Loading new scene: " + _context.CurrentDimension);
+        if(_context.CurrentDimension == Dimension.MAIN_MENU)
         {
-            SceneManager.LoadScene(mainMenuSceneName);
+            SceneManager.LoadScene(MainMenuSceneName);
         }
-        else if(context.currentDimension == Dimension.HUB)
+        else if(_context.CurrentDimension == Dimension.HUB)
         {
-            SceneManager.LoadScene(hubSceneName);
+            SceneManager.LoadScene(HubSceneName);
         }
         else 
         {
-            SceneManager.LoadScene(adventureSceneName);
+            SceneManager.LoadScene(AdventureSceneName);
         }
     }
     private void ConnectPortals()
@@ -59,7 +55,7 @@ public class GameManager : MonoBehaviour
         foreach(GameObject p in portals) 
         {
             var portal = p.GetComponent<Portal>();
-            portal.playerEnteredPortal.AddListener(ChangeDimension);
+            portal.PlayerEnteredPortal.AddListener(ChangeDimension);
         }
         Debug.Log("Connected portals. This message will appear twice");
     }

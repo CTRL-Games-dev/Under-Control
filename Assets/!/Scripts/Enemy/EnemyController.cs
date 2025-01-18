@@ -6,14 +6,14 @@ using UnityEngine.AI;
 [RequireComponent(typeof(LivingEntity))]
 public class EnemyController : MonoBehaviour
 {
-    public Cooldown attackCooldown;
-    public float attackRange = 1;
-    public float attackDamage = 1;
-    public LivingEntity target;
+    public Cooldown AttackCooldown;
+    public float AttackRange = 1;
+    public float AttackDamage = 1;
+    public LivingEntity Target;
 
     // References
-    private NavMeshAgent navMeshAgent;
-    private Animator animator;
+    private NavMeshAgent _navMeshAgent;
+    private Animator _animator;
 
     // Animation IDs
     private int _animationIdVelocitySide = Animator.StringToHash("velocitySide");
@@ -21,26 +21,26 @@ public class EnemyController : MonoBehaviour
 
     void Start()
     {
-        navMeshAgent = GetComponent<NavMeshAgent>();
-        animator = GetComponent<Animator>();
+        _navMeshAgent = GetComponent<NavMeshAgent>();
+        _animator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        if (target != null) {
+        if (Target != null) {
             // Attack
-            if(Vector3.Distance(target.transform.position, transform.position) < attackRange && attackCooldown.Execute()) {
-                target.TakeDamage(new Damage {
-                    type = DamageType.PHYSICAL,
-                    value = attackDamage
+            if(Vector3.Distance(Target.transform.position, transform.position) < AttackRange && AttackCooldown.Execute()) {
+                Target.TakeDamage(new Damage {
+                    Type = DamageType.PHYSICAL,
+                    Value = AttackDamage
                 });
             }
 
-            navMeshAgent.destination = target.transform.position;
+            _navMeshAgent.destination = Target.transform.position;
         }
 
         // Animation
-        animator.SetFloat(_animationIdVelocitySide, navMeshAgent.velocity.x);
-        animator.SetFloat(_animationIdVelocityFront, navMeshAgent.velocity.z);
+        _animator.SetFloat(_animationIdVelocitySide, _navMeshAgent.velocity.x);
+        _animator.SetFloat(_animationIdVelocityFront, _navMeshAgent.velocity.z);
     }
 }

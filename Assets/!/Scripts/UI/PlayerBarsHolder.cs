@@ -9,9 +9,9 @@ public class PlayerBarsHolder : MonoBehaviour
     [SerializeField] Image _controlBarImg;
 
 
-    public GameObject player;
-    public PlayerController playerController;
-    public LivingEntity playerEntity;
+    public GameObject Player;
+    public PlayerController PlayerController;
+    public LivingEntity PlayerEntity;
 
 
     public float HealthBarFillAmount { set { 
@@ -35,7 +35,7 @@ public class PlayerBarsHolder : MonoBehaviour
     private void Update() {
         // Temporary solution to update bars
 
-        HealthBarFillAmount = playerEntity.health / playerEntity.maxHealth;
+        HealthBarFillAmount = PlayerEntity.Health / PlayerEntity.MaxHealth;
         // ManaBarFillAmount = _manaBarFillAmount;
         // ControlBarFillAmount = _controlBarFillAmount;
     }

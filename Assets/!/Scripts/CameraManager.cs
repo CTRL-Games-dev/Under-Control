@@ -6,7 +6,7 @@ public class CameraManager : MonoBehaviour {
 
     // States
     public TopdownState Topdown = new();
-    public CameraState CurrentState;
+    public ICameraState CurrentState;
 
     private void Start()
     {
@@ -25,12 +25,12 @@ public class CameraManager : MonoBehaviour {
 
 }
 
-public interface CameraState 
+public interface ICameraState 
 {
     public void RunCameraLogic(CameraManager camera);
 }
 
-public class TopdownState : CameraState
+public class TopdownState : ICameraState
 {
     public Vector3 Offset = new(0, 8, 2);
     public Vector3 Rotation = new(70, 180, 0);

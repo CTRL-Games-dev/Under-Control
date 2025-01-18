@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ItemEntityManager : MonoBehaviour
 {
-    [SerializeField] private GameObject itemEntityPrefab;
+    [SerializeField] private GameObject _itemEntityPrefab;
     public static ItemEntityManager Instance { get; private set; }
 
     void Start() {
@@ -16,7 +16,7 @@ public class ItemEntityManager : MonoBehaviour
     public ItemEntityManager() {}
 
     public void SpawnItemEntity(Item item, int amount, Vector3 position) {
-        var gameObject = Instantiate(itemEntityPrefab, position, Quaternion.identity);
+        var gameObject = Instantiate(_itemEntityPrefab, position, Quaternion.identity);
 
         var itemEntity = gameObject.GetComponent<ItemEntity>();
         itemEntity.Amount = amount;

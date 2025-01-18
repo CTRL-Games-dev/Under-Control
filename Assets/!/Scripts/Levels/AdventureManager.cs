@@ -8,8 +8,9 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 public class AdventureManager : MonoBehaviour, ILevelManager
 {
-    public Vector3 playerStartingPos = new(3,3,3);
-    public readonly float DefaultTileWidth = 6.0f;
+    // This is just a place holder to see if portals work
+    // In main menu player will not be spawned
+    public Vector3 PlayerStartingPos = new(3,3,3);
     [SerializeField] private GameObject _player;
     [SerializeField] private GameObject _portal;
     [SerializeField] private CameraManager _cameraManager;
@@ -52,7 +53,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
     }
     private void Start()
     {
-
+        Instantiate(_player, PlayerStartingPos, Quaternion.identity);
     }
 
     private void Update()
