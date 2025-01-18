@@ -27,6 +27,11 @@ public class PlayerController : MonoBehaviour
     public GameObject CameraObject;
     public GameObject CameraTargetObject;
 
+    // Attack 
+    public static float LightAttackDamage = 10f;
+    public float ChargeAttackDamage = LightAttackDamage * 3;
+    private int _comboCounter;
+
     // State
     private Vector2 _movementInputVector = Vector2.zero;
     private Vector3 _targetDirection;
@@ -35,6 +40,7 @@ public class PlayerController : MonoBehaviour
     private float _velocityFront = 0;
     private bool _isTurning;
     private float _cameraDistance { get => _cinemachinePositionComposer.CameraDistance; set => _cinemachinePositionComposer.CameraDistance = value; }
+    private bool _lightAttack;
 
     // References
     private CharacterController _controller;
@@ -77,6 +83,7 @@ public class PlayerController : MonoBehaviour
         // Make use of this once we have proper animations and model
         // HandleMovement();
         // HandleTurning();
+        handleAttack();
         //
         // Rotate camera target to account for player mouse input 
         // cameraTargetObject.transform.rotation = Quaternion.FromToRotation(Vector3.forward, targetDirection);
@@ -86,6 +93,7 @@ public class PlayerController : MonoBehaviour
         // transform.rotation = Quaternion.FromToRotation(Vector3.forward, _targetDirection);
      
         var movementVector = Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
+
 
         _controller.SimpleMove(movementVector * 5);
     }
@@ -173,6 +181,27 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Handle attack logic
+    private void handleAttack() {
+        if (_lightAttack)
+        {
+            if (_comboCounter <= 3) {
+                print("Light attack");
+            
+            }
+            _comboCounter += 1;            
+            
+            _lightAttack = false;                        
+        }
+
+        if (_comboCounter == 4)
+        {
+            print("Knockback attack");
+
+            _comboCounter = 0;
+        }
+    }
+
     // Input events
 
     void OnMove(InputValue value) {
@@ -215,12 +244,22 @@ public class PlayerController : MonoBehaviour
         _animator.SetBool("sprinting", _sprinting);
     }
 
-    void OnAttack(InputValue value) {
+    /*void OnAttack(InputValue value) {
         _animator.SetTrigger("punch");
+    }*/
+
+    void OnLightAttack(InputValue value) {
+        //_animator.SetTrigger("lightAttack");
+        _lightAttack = value.isPressed;
+
     }
 
-    void OnJump(InputValue value) {
-        _animator.SetTrigger("jump");
+    void OnChargeAttack(InputValue value) {
+        //_animator.SetTrigger("chargeAttack");
+    }
+
+    void OnDodge(InputValue value) {
+        //_animator.SetTrigger("dodge");
     }
 
     void OnScrollWheel(InputValue value) {
