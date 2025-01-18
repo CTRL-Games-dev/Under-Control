@@ -23,7 +23,7 @@ public class ItemUI : MonoBehaviour
         } 
     } 
 
-    private InventoryItem _inventoryItem;
+    public InventoryItem InventoryItem;
     private List<InvTile> _occupiedTiles = new List<InvTile>();
     public List<InvTile> OccupiedTiles { 
         get { 
@@ -43,21 +43,21 @@ public class ItemUI : MonoBehaviour
 
 
     public void SetupItem(InventoryItem item, float tileSize, List<InvTile> occupiedTiles) {
-        _inventoryItem = item;
+        InventoryItem = item;
         _occupiedTiles = occupiedTiles;
         
-        _rectTransform.sizeDelta = new Vector2(tileSize * _inventoryItem.Size.x, tileSize * _inventoryItem.Size.y);
-        _rectTransform.anchoredPosition = new Vector2(tileSize * _inventoryItem.Position.x, -tileSize * _inventoryItem.Position.y);
-        _image.sprite = _inventoryItem.Item.Icon;
+        _rectTransform.sizeDelta = new Vector2(tileSize * InventoryItem.Size.x, tileSize * InventoryItem.Size.y);
+        _rectTransform.anchoredPosition = new Vector2(tileSize * InventoryItem.Position.x, -tileSize * InventoryItem.Position.y);
+        _image.sprite = InventoryItem.Item.Icon;
         
         _amountRectTransform.sizeDelta = new Vector2(tileSize / 2, tileSize / 2);
 
-        Amount = _inventoryItem.Amount;
+        Amount = InventoryItem.Amount;
     }
 
 
     public void OnPointerEnter() {
-        InventoryUIManager.DisplayItemInfo(_inventoryItem);
+        InventoryUIManager.DisplayItemInfo(InventoryItem);
     }
 
     public void OnPointerExit() {
@@ -71,7 +71,7 @@ public class ItemUI : MonoBehaviour
         _image.color = new Color(1, 1, 1, 1);
     }
     public void OnPointerClick() {
-        if(InventoryUIManager.SetSelectedInventoryItem(_inventoryItem)) {
+        if(InventoryUIManager.SetSelectedInventoryItem(InventoryItem)) {
             _image.raycastTarget = false;
         };
     

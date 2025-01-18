@@ -20,10 +20,11 @@ public class ItemEntity : MonoBehaviour
             return;
         }
 
-        // if(!livingEntity.InventorySystem.AddItem(Item, Amount)) {
-        //     return;
-        // }
+        if(!livingEntity.InventorySystem.AddItem(Item, Amount)) {
+            return;
+        }
 
+        EventBus.OnInventoryItemChanged?.Invoke();
         Destroy(gameObject);
     }
 }

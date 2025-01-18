@@ -14,8 +14,11 @@ public class SelectedItemUI : MonoBehaviour
         set {
             _inventoryItem = value;
             if (_inventoryItem == null) {
+                _image.sprite = null;
                 gameObject.SetActive(false);
             } else {
+                transform.position = Input.mousePosition;
+
                 gameObject.SetActive(true);
 
                 _rectTransform.sizeDelta = new Vector2(InventoryUIManager.TileSize * _inventoryItem.Size.x, InventoryUIManager.TileSize * _inventoryItem.Size.y);
