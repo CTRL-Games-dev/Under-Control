@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     public readonly static string adventureSceneName = "Adventure";
     public static Vector3 startingPos = new(10, 10, 10);
     [SerializeField] private GameContext context;
-    static public GameManager gm;
+    static public GameManager Gm;
     private void Awake() 
     {
         DontDestroyOnLoad(this);
@@ -21,9 +21,9 @@ public class GameManager : MonoBehaviour
         // We need to check if there is already existing manager
         // Manager don't destoy itself on load, but since it needs to be defined in every scene
         // singelton pattern must be used.
-        if(gm == null)
+        if(Gm == null)
         {
-            gm = this;
+            Gm = this;
         }
         else
         {
