@@ -27,7 +27,7 @@ public class WorldMap
     public Vector2 Size;
     public List<Location> Locations = new();
     public readonly float TileWidth;
-    public Vector3 spawnLocation = new(0,0);
+    public Vector3 SpawnLocation = new(0,0);
 
     public Material Grass, Walls;
     public WorldMap(TileType[,] tiles, Vector2 size, float tileWidth) {
@@ -35,14 +35,14 @@ public class WorldMap
         Size = size;
         TileWidth = tileWidth;
 
-        spawnLocation = new Vector3(size[0], 1, size[1]) /2*tileWidth;
+        SpawnLocation = new Vector3(size[0], 1, size[1]) /2*tileWidth;
     }
     public WorldMap(TileType[,] tiles, int sizeX, int sizeY, float tileWidth) {
         Tiles = tiles;
         Size = new Vector3(sizeX, 1, sizeY);
         TileWidth = tileWidth;
 
-        spawnLocation = new Vector3(sizeX, 1, sizeY)/2*tileWidth;
+        SpawnLocation = new Vector3(sizeX, 1, sizeY)/2*tileWidth;
     }
 
     public void Generate(MeshRenderer mr, MeshFilter mf, MeshCollider mc)

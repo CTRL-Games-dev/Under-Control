@@ -28,6 +28,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
     private MeshCollider _meshCollider;
     private MeshFilter _mesh;
     private WorldMap _map;
+    public readonly float DefaultTileWidth = 5.0f; 
 
     // Enemies
     [SerializeField] private GameObject _enemyPrefab;
@@ -46,7 +47,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
         _map.Walls = _wallMaterial;
         _map.Generate(_meshRenderer, _mesh, _meshCollider);
 
-        Debug.Log(_map.spawnLocation);
+        Debug.Log(_map.SpawnLocation);
         SpawnPlayer();
         // Spawn enemies
         SpawnEnemies(_map);
@@ -63,8 +64,8 @@ public class AdventureManager : MonoBehaviour, ILevelManager
 
     public void SpawnPlayer()
     {
-        GameObject.Instantiate(_player, _map.spawnLocation, Quaternion.identity);
-        GameObject.Instantiate(_portal, _map.spawnLocation + new Vector3(-3.5f, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
+        GameObject.Instantiate(_player, _map.SpawnLocation, Quaternion.identity);
+        GameObject.Instantiate(_portal, _map.SpawnLocation + new Vector3(-3.5f, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
         // GameObject player = GameObject.FindGameObjectWithTag("Player");
         // _cameraManager.Target = player.transform;
     }

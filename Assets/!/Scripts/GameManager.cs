@@ -67,6 +67,6 @@ public class GameManager : MonoBehaviour
 
     public float GetInfluence()
     {
-        return context.Influence;
+        return _context.Influence;
     }
 }
