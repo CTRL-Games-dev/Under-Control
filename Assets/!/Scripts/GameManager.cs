@@ -9,7 +9,6 @@ public class GameManager : MonoBehaviour
     public static Vector3 StartingPos = new(10, 10, 10);
     [SerializeField] private GameContext _context;
     public static GameManager Gm;
-
     private void Awake() 
     {
         DontDestroyOnLoad(this);
@@ -25,12 +24,13 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            
         }
     }
     private void Start()
     {
         // For some reason "scene change" is being called, even if it is the first scene?
-        // ConnectPortals();
+        ConnectPortals();
     }
     private void ChangeDimension(Dimension dimension)
     {
@@ -58,11 +58,16 @@ public class GameManager : MonoBehaviour
             var portal = p.GetComponent<Portal>();
             portal.PlayerEnteredPortal.AddListener(ChangeDimension);
         }
-        Debug.Log("Connected portals");
+        Debug.Log("Connected portals. This message will appear twice");
     }
     private void OnLevelChange(Scene scene, LoadSceneMode mode)
     {
         // Connect portals
         ConnectPortals();
+    }
+
+    public float GetInfluence()
+    {
+        return _context.Influence;
     }
 }
