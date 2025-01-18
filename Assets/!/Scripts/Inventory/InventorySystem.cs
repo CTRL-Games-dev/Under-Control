@@ -182,6 +182,8 @@ public class InventorySystem : MonoBehaviour
 
     // Returns true if the item was removed
     public bool RemoveInventoryItem(InventoryItem inventoryItem) {
+        inventoryItem.ItemUI = null;
+        inventoryItem.RectTransform = null;
         return _inventory.Remove(inventoryItem);
     }
 

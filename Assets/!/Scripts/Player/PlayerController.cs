@@ -10,6 +10,10 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(LivingEntity))]
 public class PlayerController : MonoBehaviour
 {
+    // UnityEvents
+    public UnityEvent OnInventoryToggleEvent;
+    public UnityEvent OnUICancelEvent;
+
     // Movement
     public float Acceleration = 2f;
     public float Deceleration = 2f;
@@ -232,6 +236,14 @@ public class PlayerController : MonoBehaviour
         if (_cameraDistance > MaxCameraDistance) {
             _cameraDistance = MaxCameraDistance;
         }
+    }
+
+    void OnToggleInventory(InputValue value) {
+        OnInventoryToggleEvent.Invoke();
+    }
+
+    void OnCancel(InputValue value) {
+        OnUICancelEvent.Invoke();
     }
 
     // Animation events

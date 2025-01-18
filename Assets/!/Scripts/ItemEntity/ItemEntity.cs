@@ -24,6 +24,7 @@ public class ItemEntity : MonoBehaviour
             return;
         }
 
+        EventBus.OnInventoryItemChanged?.Invoke();
         Destroy(gameObject);
     }
 }
