@@ -207,7 +207,6 @@ GameObject:
   - component: {fileID: 977731813342315884}
   - component: {fileID: 6238726878941344721}
   - component: {fileID: 774350751942770471}
-  - component: {fileID: 6865643187033961249}
   - component: {fileID: 7162287103752310826}
   - component: {fileID: 8974613204039339173}
   - component: {fileID: 5814925836689036330}
@@ -247,11 +246,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a54a79fbd2a3991459f6790b56383268, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackCooldown:
-    cooldownTime: 1
-  attackRange: 1
-  attackDamage: 1
-  target: {fileID: 0}
+  AttackCooldown:
+    CooldownTime: 0
+  AttackRange: 1
+  AttackDamage: 1
+  Target: {fileID: 0}
 --- !u!114 &774350751942770471
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -264,40 +263,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a23e42751b3623c4a938cdd3448ecea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  displayName: Enemy
-  health:
-    statType: 0
+  DisplayName: Enemy
+  Health:
+    StatType: 0
     _raw: 100
     _adjusted: 100
-  maxHealth:
-    statType: 1
+  MaxHealth:
+    StatType: 1
     _raw: 100
     _adjusted: 100
-  regenRate:
-    statType: 2
+  RegenRate:
+    StatType: 2
     _raw: 1
     _adjusted: 1
-  timeToRegenAfterDamage: 2
+  TimeToRegenAfterDamage: 2
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
   OnDamageTaken:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &6865643187033961249
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3366227734027736264}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a97e5a67a4882c41949af6f86f5c81b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inventorySize: {x: 10, y: 10}
-  inventory: []
 --- !u!114 &7162287103752310826
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -310,7 +295,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7268ef27f4efa5d43a43982b4df186ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activeModifiers: []
+  _activeModifiers: []
 --- !u!195 &8974613204039339173
 NavMeshAgent:
   m_ObjectHideFlags: 0
