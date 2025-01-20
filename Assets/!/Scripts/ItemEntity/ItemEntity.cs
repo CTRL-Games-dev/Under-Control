@@ -4,13 +4,13 @@ using TMPro;
 public class ItemEntity : MonoBehaviour
 {
     public int Amount;
-    public Item Item;
+    public ItemData ItemData;
 
     [SerializeField] private TMP_Text _title;
 
     void Start()
     {
-        _title.text = Item.DisplayName;
+        _title.text = ItemData.DisplayName;
     }
 
     void OnTriggerEnter(Collider other)
@@ -20,7 +20,7 @@ public class ItemEntity : MonoBehaviour
             return;
         }
 
-        if(!livingEntity.InventorySystem.AddItem(Item, Amount)) {
+        if(!livingEntity.Inventory.AddItem(ItemData, Amount)) {
             return;
         }
 

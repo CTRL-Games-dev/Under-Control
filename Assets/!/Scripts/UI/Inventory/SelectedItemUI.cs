@@ -1,8 +1,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static InventorySystem;
-
 
 public class SelectedItemUI : MonoBehaviour
 {
@@ -22,7 +20,7 @@ public class SelectedItemUI : MonoBehaviour
                 gameObject.SetActive(true);
 
                 _rectTransform.sizeDelta = new Vector2(InventoryUIManager.TileSize * _inventoryItem.Size.x, InventoryUIManager.TileSize * _inventoryItem.Size.y);
-                _image.sprite = _inventoryItem.Item.Icon;
+                _image.sprite = _inventoryItem.ItemData.Icon;
                 if (_inventoryItem.Amount == 1) {
                     _amountText.text = "";
                     return;
