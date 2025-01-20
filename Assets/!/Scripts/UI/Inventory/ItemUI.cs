@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static InventorySystem;
 
 public class ItemUI : MonoBehaviour
 {
@@ -48,7 +47,7 @@ public class ItemUI : MonoBehaviour
         
         _rectTransform.sizeDelta = new Vector2(tileSize * InventoryItem.Size.x, tileSize * InventoryItem.Size.y);
         _rectTransform.anchoredPosition = new Vector2(tileSize * InventoryItem.Position.x, -tileSize * InventoryItem.Position.y);
-        _image.sprite = InventoryItem.Item.Icon;
+        _image.sprite = InventoryItem.ItemData.Icon;
         
         _amountRectTransform.sizeDelta = new Vector2(tileSize / 2, tileSize / 2);
 

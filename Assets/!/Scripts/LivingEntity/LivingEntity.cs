@@ -3,10 +3,9 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(ModifierSystem))]
-[RequireComponent(typeof(InventorySystem))]
 public class LivingEntity : MonoBehaviour
 {
-    private struct _effectData {
+    private struct EffectData {
         public Effect Effect;
         public float Expiration;
     }
@@ -17,15 +16,22 @@ public class LivingEntity : MonoBehaviour
     public DynamicStat Health = new DynamicStat(StatType.HEALTH, 100);
     public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
     public Stat RegenRate = new Stat(StatType.REGEN_RATE, 1);
+    public Stat Armor = new Stat(StatType.ARMOR, 0);
+    public Stat ElementalArmor = new Stat(StatType.ELEMENTAL_ARMOR, 0);
+    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
+    public int Exp = 0;
+    public float Level { get => 1 + Exp / 100f; }
     public float TimeToRegenAfterDamage = 2;
+
+    [SerializeField]
+    public EntityInventory Inventory { get; private set; } = new EntityInventory();
 
     // State
     private float _lastDamageTime = 0;
-    private List<_effectData> _activeEffects = new List<_effectData>();
+    private List<EffectData> _activeEffects = new List<EffectData>();
 
     // References
     public ModifierSystem ModifierSystem { get; private set; }
-    public InventorySystem InventorySystem { get; private set; }
 
     // Events
     public UnityEvent OnDeath;
@@ -34,7 +40,6 @@ public class LivingEntity : MonoBehaviour
     void Start()
     {
         ModifierSystem = GetComponent<ModifierSystem>();
-        InventorySystem = GetComponent<InventorySystem>();
     }
 
     void Update() {
@@ -84,7 +89,7 @@ public class LivingEntity : MonoBehaviour
     #region Effects
 
     public void ApplyEffect(Effect effect) {
-        _activeEffects.Add(new _effectData {
+        _activeEffects.Add(new EffectData {
             Effect = effect,
             Expiration = Time.time + effect.Duration
         });
@@ -161,6 +166,9 @@ public class LivingEntity : MonoBehaviour
         Health.Recalculate(ModifierSystem);
         MaxHealth.Recalculate(ModifierSystem);
         RegenRate.Recalculate(ModifierSystem);
+        Armor.Recalculate(ModifierSystem);
+        ElementalArmor.Recalculate(ModifierSystem);
+        MovementSpeed.Recalculate(ModifierSystem);
     }
 
     #endregion

@@ -15,11 +15,11 @@ public class ItemEntityManager : MonoBehaviour
     }
     public ItemEntityManager() {}
 
-    public void SpawnItemEntity(Item item, int amount, Vector3 position) {
+    public void SpawnItemEntity(ItemData itemData, int amount, Vector3 position) {
         var gameObject = Instantiate(_itemEntityPrefab, position, Quaternion.identity);
 
         var itemEntity = gameObject.GetComponent<ItemEntity>();
         itemEntity.Amount = amount;
-        itemEntity.Item = item;
+        itemEntity.ItemData = itemData;
     }
 }

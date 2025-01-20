@@ -1,13 +1,15 @@
 using System;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEngine.UIElements;
+#endif
 
 [Serializable]
 public class Stat {
-    public StatType StatType;
-
-    [SerializeField]
-    private float _raw;
-    public float Raw { get => _raw; protected set => _raw = value; }
+    [HideInInspector, NonSerialized]
+    public readonly StatType StatType;
 
     [SerializeField]
     private float _adjusted;
@@ -15,12 +17,11 @@ public class Stat {
 
     public Stat(StatType statType, float initValue) {
         this.StatType = statType;
-        Raw = initValue;
         Adjusted = initValue;
     }
 
-    public float Recalculate(ModifierSystem modifierSystem) {
-        Adjusted = modifierSystem.CalculateForStatType(StatType, Raw);
+    public virtual float Recalculate(ModifierSystem modifierSystem) {
+        Adjusted = modifierSystem.CalculateForStatType(StatType, 0);
         return Adjusted;
     }
 
@@ -28,3 +29,15 @@ public class Stat {
         return stat.Adjusted;
     }
 }
+
+#if UNITY_EDITOR
+[CustomPropertyDrawer(typeof(Stat))]
+public class StatPropertyDrawer : PropertyDrawer {
+    public override VisualElement CreatePropertyGUI(SerializedProperty property) {
+        var adjustedPropertyField = new PropertyField(property.FindPropertyRelative("_adjusted"), property.displayName);
+        adjustedPropertyField.SetEnabled(false);
+
+        return adjustedPropertyField;
+    }
+}
+#endif

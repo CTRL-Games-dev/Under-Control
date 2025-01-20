@@ -128,7 +128,6 @@ GameObject:
   - component: {fileID: 3614094562484013615}
   - component: {fileID: 5249825092091137437}
   - component: {fileID: 8612418859672658487}
-  - component: {fileID: 3533266966017834762}
   - component: {fileID: 2030617008684707472}
   - component: {fileID: 2484441535233306198}
   - component: {fileID: 3826342652045181621}
@@ -169,6 +168,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 063630ca55530384188525911dbcb86b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnInventoryToggleEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUICancelEvent:
+    m_PersistentCalls:
+      m_Calls: []
   Acceleration: 2
   Deceleration: 2
   MaxWalkingSpeed: 1
@@ -176,9 +181,14 @@ MonoBehaviour:
   MouseSensitivity: 0.1
   WalkingTurnSpeed: 1
   SprintingTurnSpeed: 2.5
-  CameraTargetObject: {fileID: 7734850922315019929}
+  MinCameraDistance: 10
+  MaxCameraDistance: 30
+  CameraDistanceSpeed: 1
+  CameraTargetObjectBounds: {x: 0, y: 0}
   ApplySpellTest: 0
   ApplySpellTests: 0
+  CameraObject: {fileID: 0}
+  CameraTargetObject: {fileID: 7734850922315019929}
 --- !u!114 &8612418859672658487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,17 +203,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DisplayName: 
   Health:
-    StatType: 0
-    _raw: 100
     _adjusted: 100
-  MaxHealth:
-    StatType: 1
     _raw: 100
+  MaxHealth:
     _adjusted: 100
   RegenRate:
-    StatType: 2
-    _raw: 1
     _adjusted: 1
+  Armor:
+    _adjusted: 0
+  ElementalArmor:
+    _adjusted: 0
+  MovementSpeed:
+    _adjusted: 1
+  Exp: 0
   TimeToRegenAfterDamage: 2
   OnDeath:
     m_PersistentCalls:
@@ -211,20 +223,6 @@ MonoBehaviour:
   OnDamageTaken:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &3533266966017834762
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8272185431068916378}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a97e5a67a4882c41949af6f86f5c81b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _inventorySize: {x: 5, y: 5}
-  _inventory: []
 --- !u!114 &2030617008684707472
 MonoBehaviour:
   m_ObjectHideFlags: 0
