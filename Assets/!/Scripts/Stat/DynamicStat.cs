@@ -13,10 +13,6 @@ using UnityEngine.UIElements;
 // - @londek
 [Serializable]
 public class DynamicStat : Stat {
-    [SerializeField]
-    private float _raw;
-    public float Raw { get => _raw; protected set => _raw = value; }
-
     public DynamicStat(StatType statType, float initValue) : base(statType, initValue) {
         Raw = initValue;
     }

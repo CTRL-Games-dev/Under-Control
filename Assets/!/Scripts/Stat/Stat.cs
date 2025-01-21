@@ -12,16 +12,21 @@ public class Stat {
     public readonly StatType StatType;
 
     [SerializeField]
+    private float _raw;
+    public float Raw { get => _raw; protected set => _raw = value; }
+
+    [SerializeField]
     private float _adjusted;
     public float Adjusted { get => _adjusted; protected set => _adjusted = value; }
 
     public Stat(StatType statType, float initValue) {
-        this.StatType = statType;
+        StatType = statType;
+        Raw = initValue;
         Adjusted = initValue;
     }
 
     public virtual float Recalculate(ModifierSystem modifierSystem) {
-        Adjusted = modifierSystem.CalculateForStatType(StatType, 0);
+        Adjusted = modifierSystem.CalculateForStatType(StatType, Raw);
         return Adjusted;
     }
 
