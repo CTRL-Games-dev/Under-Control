@@ -92,7 +92,7 @@ public class PlayerController : MonoBehaviour
      
         var movementVector = Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
 
-        CharacterController.SimpleMove(movementVector * 5);
+        CharacterController.SimpleMove(movementVector * LivingEntity.MovementSpeed);
     }
 
     // Handles animator movement logic
