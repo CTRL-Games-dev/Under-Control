@@ -46,7 +46,7 @@ public class StatPropertyField : PropertyField {
 
     public static readonly string alignedFieldUssClassName = ussClassName + "__aligned";
 
-    private static readonly string inspectorFieldUssClassName = ussClassName + "__inspector-field";
+    public static readonly string inspectorFieldUssClassName = ussClassName + "__inspector-field";
 
     private VisualElement m_CachedContextWidthElement;
     private VisualElement m_CachedInspectorElement;
@@ -63,6 +63,7 @@ public class StatPropertyField : PropertyField {
         AddToClassList("unity-base-composite-field");
         AddToClassList("unity-base-field__aligned");
         AddToClassList("unity-base-field__inspector-field");
+        AddToClassList(alignedFieldUssClassName);
 
         var testField = new PropertyField();
 
@@ -139,6 +140,7 @@ public class StatPropertyField : PropertyField {
     {
         if (ClassListContains(alignedFieldUssClassName) && m_CachedInspectorElement != null)
         {
+
             float labelExtraPadding = 37; // m_LabelExtraPadding;
             float num = worldBound.x - m_CachedInspectorElement.worldBound.x - m_CachedInspectorElement.resolvedStyle.paddingLeft;
             labelExtraPadding += num;
