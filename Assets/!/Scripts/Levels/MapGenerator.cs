@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
-
+using NUnit.Framework.Internal;
 using UnityEngine;
 
 public enum TileType
@@ -28,7 +28,6 @@ public class WorldMap
     public List<Location> Locations = new();
     public readonly float TileWidth;
     public Vector3 SpawnLocation = new(0,0);
-
     public Material Grass, Walls;
     public WorldMap(TileType[,] tiles, Vector2 size, float tileWidth) {
         Tiles = tiles;
@@ -72,16 +71,27 @@ public class WorldMap
     private void GenerateMesh(MeshRenderer mr, MeshFilter mf, MeshCollider mc)
     {
         Mesh newMesh = new();
-
-        newMesh.subMeshCount = 2;
         
         List<Vector3> vertices = new();
         List<int> trianglesFloor = new();
-        List<int> trianglesWalls = new();
         List<Vector2> uv = new();
 
         // var grassTexture = Resources.Load<Material>("Assets/!/Materials/Placeholders/Adventure Grass.mat");
         // var wallTexture = Resources.Load<Material>("Assets/!/Materials/Placeholders/Adventure Walls.mat");
+
+        // wall prefab should have dimensions: 1x1
+        var wallPrefabs = new List<GameObject>();
+        wallPrefabs.Add(Resources.Load<GameObject>("Prefabs/Forest/ForestWall1"));
+        wallPrefabs.Add(Resources.Load<GameObject>("Prefabs/Forest/ForestWall2"));
+        wallPrefabs.Add(Resources.Load<GameObject>("Prefabs/Forest/ForestWall3"));
+        wallPrefabs.Add(Resources.Load<GameObject>("Prefabs/Forest/ForestWall4"));
+
+        foreach(var p in wallPrefabs)
+        {
+            p.transform.localScale += new Vector3(TileWidth, TileWidth, TileWidth);
+            var randomizer = p.GetComponent<ForestTileRandomizer>();
+            randomizer.RandomizeTile();
+        }
 
         int mapWidth = Tiles.GetLength(0), mapHeight = Tiles.GetLength(1);
         for(int x = 0; x < mapWidth; x++)
@@ -89,101 +99,45 @@ public class WorldMap
             for(int y = 0; y < mapHeight; y++) {
                 int index = x * ((int)Size[0]) + y;
                 var tile = Tiles[x, y];
+                var pos = new Vector3(x * TileWidth, 0, y * TileWidth);
 
                 Vector3 p0 = new(TileWidth * x,     0, TileWidth * y);
                 Vector3 p1 = new(TileWidth * x,     0, TileWidth * (y+1));
                 Vector3 p2 = new(TileWidth * (x+1), 0, TileWidth * (y+1));
                 Vector3 p3 = new(TileWidth * (x+1), 0, TileWidth * y);
 
-                Vector3 p4 = new(TileWidth * x,     TileWidth, TileWidth * y);
-                Vector3 p5 = new(TileWidth * x,     TileWidth, TileWidth * (y+1));
-                Vector3 p6 = new(TileWidth * (x+1), TileWidth, TileWidth * (y+1));
-                Vector3 p7 = new(TileWidth * (x+1), TileWidth, TileWidth * y);
-
                 vertices.Add(p0);
                 vertices.Add(p1);
                 vertices.Add(p2);
                 vertices.Add(p3);
 
-                vertices.Add(p4);
-                vertices.Add(p5);
-                vertices.Add(p6);
-                vertices.Add(p7);
-
                 uv.Add(new (0, 0));
                 uv.Add(new (1, 0));
                 uv.Add(new (1, 1));
                 uv.Add(new (0, 1));
 
-                uv.Add(new (0, 0));
-                uv.Add(new (1, 0));
-                uv.Add(new (1, 1));
-                uv.Add(new (0, 1));
+                trianglesFloor.Add(index * 4 + 0);
+                trianglesFloor.Add(index * 4 + 1);
+                trianglesFloor.Add(index * 4 + 2);
+                
+                trianglesFloor.Add(index * 4 + 0);
+                trianglesFloor.Add(index * 4 + 2);
+                trianglesFloor.Add(index * 4 + 3);
 
-                if(tile == TileType.FLOOR)
-                {
-
-                    trianglesFloor.Add(index * 8 + 0);
-                    trianglesFloor.Add(index * 8 + 1);
-                    trianglesFloor.Add(index * 8 + 2);
-                    
-                    trianglesFloor.Add(index * 8 + 0);
-                    trianglesFloor.Add(index * 8 + 2);
-                    trianglesFloor.Add(index * 8 + 3);
-                }
                 if(tile == TileType.WALL)
                 {
-
-                    trianglesWalls.Add(index * 8 + 0);
-                    trianglesWalls.Add(index * 8 + 1);
-                    trianglesWalls.Add(index * 8 + 5);
-                    
-                    trianglesWalls.Add(index * 8 + 0);
-                    trianglesWalls.Add(index * 8 + 5);
-                    trianglesWalls.Add(index * 8 + 4);
-
-                    trianglesWalls.Add(index * 8 + 5);
-                    trianglesWalls.Add(index * 8 + 1);
-                    trianglesWalls.Add(index * 8 + 2);
-
-                    trianglesWalls.Add(index * 8 + 5);
-                    trianglesWalls.Add(index * 8 + 2);
-                    trianglesWalls.Add(index * 8 + 6);
-
-                    trianglesWalls.Add(index * 8 + 7);
-                    trianglesWalls.Add(index * 8 + 6);
-                    trianglesWalls.Add(index * 8 + 2);
-
-                    trianglesWalls.Add(index * 8 + 7);
-                    trianglesWalls.Add(index * 8 + 2);
-                    trianglesWalls.Add(index * 8 + 3);
-                    
-                    trianglesWalls.Add(index * 8 + 0);
-                    trianglesWalls.Add(index * 8 + 4);
-                    trianglesWalls.Add(index * 8 + 7);
-
-                    trianglesWalls.Add(index * 8 + 0);
-                    trianglesWalls.Add(index * 8 + 7);
-                    trianglesWalls.Add(index * 8 + 3);
-
-                    trianglesWalls.Add(index * 8 + 4);
-                    trianglesWalls.Add(index * 8 + 5);
-                    trianglesWalls.Add(index * 8 + 6);
-
-                    trianglesWalls.Add(index * 8 + 4);
-                    trianglesWalls.Add(index * 8 + 6);
-                    trianglesWalls.Add(index * 8 + 7);
+                    var wall = wallPrefabs[UnityEngine.Random.Range(0, wallPrefabs.Count - 1)];
+                    GameObject.Instantiate(wall, pos, Quaternion.identity);
                 }
             }
         }
 
         newMesh.SetVertices(vertices);
         newMesh.SetTriangles(trianglesFloor, 0);
-        newMesh.SetTriangles(trianglesWalls, 1);
         newMesh.SetUVs(0, uv);
 
         mf.mesh = newMesh;
-        mr.materials = new Material[] {Grass, Walls};
+        mr.materials = new Material[] {Grass};
         mc.sharedMesh = newMesh;
     }
 

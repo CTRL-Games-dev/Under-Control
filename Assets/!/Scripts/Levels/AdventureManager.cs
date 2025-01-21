@@ -54,7 +54,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
     }
     private void Start()
     {
-        Instantiate(_player, PlayerStartingPos, Quaternion.identity);
+        
     }
 
     private void Update()
