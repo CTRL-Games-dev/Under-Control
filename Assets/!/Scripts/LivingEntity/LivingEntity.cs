@@ -18,6 +18,9 @@ public class LivingEntity : MonoBehaviour
     private EntityInventory _inventory = new EntityInventory();
     public EntityInventory Inventory { get => _inventory; private set => _inventory = value; }
 
+    public int Exp = 0;
+    public float Level { get => 1 + Exp / 100f; }
+
     [Header("Stats")]
     public DynamicStat Health = new DynamicStat(StatType.HEALTH, 100);
     public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
@@ -25,8 +28,6 @@ public class LivingEntity : MonoBehaviour
     public Stat Armor = new Stat(StatType.ARMOR, 0);
     public Stat ElementalArmor = new Stat(StatType.ELEMENTAL_ARMOR, 0);
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
-    public int Exp = 0;
-    public float Level { get => 1 + Exp / 100f; }
 
     [Header("Events")]
     public UnityEvent OnDeath;
