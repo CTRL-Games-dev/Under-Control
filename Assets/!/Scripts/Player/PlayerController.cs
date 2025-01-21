@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     // UnityEvents
     public UnityEvent OnInventoryToggleEvent;
     public UnityEvent OnUICancelEvent;
+    public UnityEvent OnItemRotateEvent;
 
     // Movement
     public float Acceleration = 2f;
@@ -244,6 +245,10 @@ public class PlayerController : MonoBehaviour
 
     void OnCancel(InputValue value) {
         OnUICancelEvent.Invoke();
+    }
+
+    void OnRotateItem(InputValue value) {
+        OnItemRotateEvent.Invoke();
     }
 
     // Animation events

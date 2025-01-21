@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,15 +33,29 @@ public class InvTile : MonoBehaviour
     public void OnPointerEnter() {
         InventoryUIManager.SelectedTile = this;
         if (InventoryUIManager.SelectedInventoryItem != null) {
-            InventoryUIManager.HighlightNeighbours(Pos, InventoryUIManager.SelectedInventoryItem.Size);
+            InventoryUIManager.ClearHighlights();
+            InventoryUIManager.HighlightNeighbours(Pos, InventoryUIManager.SelectedInventoryItem);
+        } else {
+            InventoryUIManager.ClearHighlights();
         }
-        
         _highlightImage.SetActive(true);
+        
     }
     public void OnPointerExit() {
-        InventoryUIManager.SelectedTile = null;
-        InventoryUIManager.ClearHighlights();
+        if (InventoryUIManager.SelectedTile == this) {
+            InventoryUIManager.SelectedTile = null;
+            _highlightImage.SetActive(false);
+        }
+        // StartCoroutine(DeHighlight());
     }
+    private IEnumerator DeHighlight() {
+        yield return new WaitForSeconds(0.1f);
+        if (InventoryUIManager.SelectedTile == this) {
+            InventoryUIManager.SelectedTile = null;
+            _highlightImage.SetActive(false);
+        }
+    }
+
     public void OnPointerClick() {
         InventoryUIManager.TryMoveSelectedItem();
     }

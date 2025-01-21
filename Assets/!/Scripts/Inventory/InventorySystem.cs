@@ -17,6 +17,7 @@ public class InventorySystem : MonoBehaviour
             }
         }
 
+        public bool Rotated;
         public ItemUI ItemUI { get; set; }
         public RectTransform RectTransform { get; set; }
     }
