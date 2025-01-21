@@ -139,13 +139,7 @@ public class LivingEntity : MonoBehaviour
     // }
 
     private void recheckEffects() {
-        for(int i = 0; i < _activeEffects.Count; i++) {
-            if(_activeEffects[i].Expiration > Time.time) {
-                continue;
-            }
-
-            _activeEffects.RemoveAt(i);
-        }
+        _activeEffects.RemoveAll(x => x.Expiration < Time.time);
     }
 
     #endregion
