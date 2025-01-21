@@ -25,6 +25,8 @@ public static class StatTypeExtensions {
                 return "Elemental Attack Damage";
             case StatType.VEKTHAR_CONTROL:
                 return "Vekhtar Control";
+            case StatType.EXP_DROPPED:
+                return "Exp Dropped";
             default:
                 throw new ArgumentOutOfRangeException(nameof(statType), statType, null);
         }

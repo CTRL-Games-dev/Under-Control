@@ -6,6 +6,9 @@ using UnityEngine.AI;
 [RequireComponent(typeof(LivingEntity))]
 public class EnemyController : MonoBehaviour
 {
+    [Header("Stats")]
+    public Stat ExpDropped = new Stat(StatType.EXP_DROPPED, 0);
+
     [Header("Properties")]
     public Cooldown AttackCooldown;
     public float AttackRange = 1;
