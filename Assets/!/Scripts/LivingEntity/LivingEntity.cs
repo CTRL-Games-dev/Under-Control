@@ -10,16 +10,28 @@ public class LivingEntity : MonoBehaviour
         public float Expiration;
     }
 
+    [Header("Properties")]
     public string DisplayName;
-
-    // Health
-    public DynamicStat Health = new DynamicStat(StatType.HEALTH, 100);
-    public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
-    public Stat RegenRate = new Stat(StatType.REGEN_RATE, 1);
     public float TimeToRegenAfterDamage = 2;
 
     [SerializeField]
-    public EntityInventory Inventory { get; private set; } = new EntityInventory();
+    private EntityInventory _inventory = new EntityInventory();
+    public EntityInventory Inventory { get => _inventory; private set => _inventory = value; }
+
+    public int Exp = 0;
+    public float Level { get => 1 + Exp / 100f; }
+
+    [Header("Stats")]
+    public DynamicStat Health = new DynamicStat(StatType.HEALTH, 100);
+    public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
+    public Stat RegenRate = new Stat(StatType.REGEN_RATE, 1);
+    public Stat Armor = new Stat(StatType.ARMOR, 0);
+    public Stat ElementalArmor = new Stat(StatType.ELEMENTAL_ARMOR, 0);
+    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
+
+    [Header("Events")]
+    public UnityEvent OnDeath;
+    public UnityEvent<DamageTakenEventData> OnDamageTaken;
 
     // State
     private float _lastDamageTime = 0;
@@ -27,10 +39,6 @@ public class LivingEntity : MonoBehaviour
 
     // References
     public ModifierSystem ModifierSystem { get; private set; }
-
-    // Events
-    public UnityEvent OnDeath;
-    public UnityEvent<DamageTakenEventData> OnDamageTaken;
 
     void Start()
     {
@@ -132,13 +140,7 @@ public class LivingEntity : MonoBehaviour
     // }
 
     private void recheckEffects() {
-        for(int i = 0; i < _activeEffects.Count; i++) {
-            if(_activeEffects[i].Expiration > Time.time) {
-                continue;
-            }
-
-            _activeEffects.RemoveAt(i);
-        }
+        _activeEffects.RemoveAll(x => x.Expiration < Time.time);
     }
 
     #endregion
@@ -161,6 +163,9 @@ public class LivingEntity : MonoBehaviour
         Health.Recalculate(ModifierSystem);
         MaxHealth.Recalculate(ModifierSystem);
         RegenRate.Recalculate(ModifierSystem);
+        Armor.Recalculate(ModifierSystem);
+        ElementalArmor.Recalculate(ModifierSystem);
+        MovementSpeed.Recalculate(ModifierSystem);
     }
 
     #endregion

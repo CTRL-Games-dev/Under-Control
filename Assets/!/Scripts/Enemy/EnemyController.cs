@@ -6,6 +6,10 @@ using UnityEngine.AI;
 [RequireComponent(typeof(LivingEntity))]
 public class EnemyController : MonoBehaviour
 {
+    [Header("Stats")]
+    public Stat ExpDropped = new Stat(StatType.EXP_DROPPED, 0);
+
+    [Header("Properties")]
     public Cooldown AttackCooldown;
     public float AttackRange = 1;
     public float AttackDamage = 1;
@@ -16,8 +20,8 @@ public class EnemyController : MonoBehaviour
     private Animator _animator;
 
     // Animation IDs
-    private int _animationIdVelocitySide = Animator.StringToHash("velocitySide");
-    private int _animationIdVelocityFront = Animator.StringToHash("velocityFront");
+    // private int _animationIdVelocitySide = Animator.StringToHash("velocitySide");
+    // private int _animationIdVelocityFront = Animator.StringToHash("velocityFront");
 
     void Start()
     {
@@ -40,7 +44,7 @@ public class EnemyController : MonoBehaviour
         }
 
         // Animation
-        _animator.SetFloat(_animationIdVelocitySide, _navMeshAgent.velocity.x);
-        _animator.SetFloat(_animationIdVelocityFront, _navMeshAgent.velocity.z);
+        // _animator.SetFloat(_animationIdVelocitySide, _navMeshAgent.velocity.x);
+        // _animator.SetFloat(_animationIdVelocityFront, _navMeshAgent.velocity.z);
     }
 }
