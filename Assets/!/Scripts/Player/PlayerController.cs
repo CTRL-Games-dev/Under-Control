@@ -10,11 +10,7 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(LivingEntity))]
 public class PlayerController : MonoBehaviour
 {
-    // UnityEvents
-    public UnityEvent OnInventoryToggleEvent;
-    public UnityEvent OnUICancelEvent;
-
-    // Movement
+    [Header("Properties")]
     public float Acceleration = 2f;
     public float Deceleration = 2f;
     public float MaxWalkingSpeed = 1f;
@@ -26,9 +22,15 @@ public class PlayerController : MonoBehaviour
     public float MaxCameraDistance = 30f;
     public float CameraDistanceSpeed = 1f;
     public Vector2 CameraTargetObjectBounds = Vector2.zero;
-    public DynamicStat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);    
     public GameObject CameraObject;
     public GameObject CameraTargetObject;
+
+    [Header("Stats")]
+    public DynamicStat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);    
+
+    [Header("Events")]
+    public UnityEvent OnInventoryToggleEvent;
+    public UnityEvent OnUICancelEvent;
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
@@ -46,11 +48,11 @@ public class PlayerController : MonoBehaviour
     public CinemachinePositionComposer CinemachinePositionComposer { get; private set; }
     
     // Animation IDs
-    private int _animationIdVelocitySide = Animator.StringToHash("velocitySide");
-    private int _animationIdVelocityFront = Animator.StringToHash("velocityFront");
-    private int _animationIdMoving = Animator.StringToHash("moving");
-    private int _animationIdSprinting = Animator.StringToHash("sprinting");
-    private int _animationIdJumping = Animator.StringToHash("jumping");
+    // private int _animationIdVelocitySide = Animator.StringToHash("velocitySide");
+    // private int _animationIdVelocityFront = Animator.StringToHash("velocityFront");
+    // private int _animationIdMoving = Animator.StringToHash("moving");
+    // private int _animationIdSprinting = Animator.StringToHash("sprinting");
+    // private int _animationIdJumping = Animator.StringToHash("jumping");
 
     void Start()
     {

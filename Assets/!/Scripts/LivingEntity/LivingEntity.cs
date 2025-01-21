@@ -10,9 +10,15 @@ public class LivingEntity : MonoBehaviour
         public float Expiration;
     }
 
+    [Header("Properties")]
     public string DisplayName;
+    public float TimeToRegenAfterDamage = 2;
 
-    // Health
+    [SerializeField]
+    private EntityInventory _inventory = new EntityInventory();
+    public EntityInventory Inventory { get => _inventory; private set => _inventory = value; }
+
+    [Header("Stats")]
     public DynamicStat Health = new DynamicStat(StatType.HEALTH, 100);
     public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
     public Stat RegenRate = new Stat(StatType.REGEN_RATE, 1);
@@ -21,10 +27,10 @@ public class LivingEntity : MonoBehaviour
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
     public int Exp = 0;
     public float Level { get => 1 + Exp / 100f; }
-    public float TimeToRegenAfterDamage = 2;
 
-    [SerializeField]
-    public EntityInventory Inventory { get; private set; } = new EntityInventory();
+    [Header("Events")]
+    public UnityEvent OnDeath;
+    public UnityEvent<DamageTakenEventData> OnDamageTaken;
 
     // State
     private float _lastDamageTime = 0;
@@ -32,10 +38,6 @@ public class LivingEntity : MonoBehaviour
 
     // References
     public ModifierSystem ModifierSystem { get; private set; }
-
-    // Events
-    public UnityEvent OnDeath;
-    public UnityEvent<DamageTakenEventData> OnDamageTaken;
 
     void Start()
     {
