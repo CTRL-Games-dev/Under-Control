@@ -1,3 +1,6 @@
+using System;
+
+[Serializable]
 public class EntityInventory : ItemContainer
 {
     // TODO: These WONT be InventoryItems soon, that's just a placeholder
