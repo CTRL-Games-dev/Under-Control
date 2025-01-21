@@ -7,7 +7,8 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(PlayerInput))]
-public class PlayerController : LivingEntity
+[RequireComponent(typeof(LivingEntity))]
+public class PlayerController : MonoBehaviour
 {
     // UnityEvents
     public UnityEvent OnInventoryToggleEvent;
@@ -56,7 +57,7 @@ public class PlayerController : LivingEntity
         CharacterController = GetComponent<CharacterController>();
         Animator = GetComponent<Animator>();
         LivingEntity = GetComponent<LivingEntity>();
-        CinemachinePositionComposer= CameraObject.GetComponent<CinemachinePositionComposer>();
+        CinemachinePositionComposer = CameraObject.GetComponent<CinemachinePositionComposer>();
         
         // _targetDirection = transform.forward;
         _cameraDistance = MinCameraDistance;
@@ -176,7 +177,7 @@ public class PlayerController : LivingEntity
     // }
 
     private void recalculateStats() {
-        VekhtarControl.Recalculate(ModifierSystem);
+        VekhtarControl.Recalculate(LivingEntity.ModifierSystem);
     }
 
     // Input events
