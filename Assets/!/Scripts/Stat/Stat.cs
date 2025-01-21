@@ -36,31 +36,44 @@ public class Stat {
 }
 
 #if UNITY_EDITOR
-// ile ja nad tym pracowalem wtf
-[CustomPropertyDrawer(typeof(Stat))]
-public class StatPropertyDrawer : PropertyDrawer {
-    public override VisualElement CreatePropertyGUI(SerializedProperty property)
-    {
-        // Hack to get the ACTUAL label width
-        bool hierarchyMode = EditorGUIUtility.hierarchyMode;
-        EditorGUIUtility.hierarchyMode = true;
-        float labelWidth = EditorGUIUtility.labelWidth;
-        EditorGUIUtility.hierarchyMode = hierarchyMode;
+// Source: UnityEditor.UIElements.PropertyField
+public class StatPropertyField : PropertyField {
+    public static readonly string noLabelVariantUssClassName = ussClassName + "--no-label";
 
-        var container = new VisualElement();
-        container.AddToClassList("unity-base-field");
-        container.AddToClassList("unity-base-composite-field");
-        container.AddToClassList("unity-base-field__aligned");
-        container.AddToClassList("unity-base-field__inspector-field");
+    public static readonly string labelDraggerVariantUssClassName = labelUssClassName + "--with-dragger";
 
-        var label = new Label(property.displayName);
-        label.AddToClassList("unity-base-field__label");
-        label.AddToClassList("unity-base-text-field__label");
-        label.AddToClassList("unity-float-field__label");
-        label.AddToClassList("unity-base-field__label--with-dragger");
-        label.AddToClassList("unity-property-field__label");
+    public static readonly string mixedValueLabelUssClassName = labelUssClassName + "--mixed-value";
 
-        label.style.width = labelWidth;
+    public static readonly string alignedFieldUssClassName = ussClassName + "__aligned";
+
+    private static readonly string inspectorFieldUssClassName = ussClassName + "__inspector-field";
+
+    private VisualElement m_CachedContextWidthElement;
+    private VisualElement m_CachedInspectorElement;
+    
+    private Label labelElement;
+
+    public StatPropertyField(SerializedProperty property) {
+        var labelWidth = EditorGUIUtility.labelWidth;
+
+        RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
+        RegisterCallback<GeometryChangedEvent>(OnInspectorFieldGeometryChanged);
+
+        AddToClassList("unity-base-field");
+        AddToClassList("unity-base-composite-field");
+        AddToClassList("unity-base-field__aligned");
+        AddToClassList("unity-base-field__inspector-field");
+
+        var testField = new PropertyField();
+
+        labelElement = new Label(property.displayName);
+        labelElement.AddToClassList("unity-base-field__label");
+        labelElement.AddToClassList("unity-base-text-field__label");
+        labelElement.AddToClassList("unity-float-field__label");
+        labelElement.AddToClassList("unity-base-field__label--with-dragger");
+        labelElement.AddToClassList("unity-property-field__label");
+
+        labelElement.style.width = labelWidth;
 
         var inputContainer = new VisualElement();
         inputContainer.style.flexDirection = FlexDirection.Row;
@@ -95,10 +108,59 @@ public class StatPropertyDrawer : PropertyDrawer {
         inputContainer.Add(arrowLabel);
         inputContainer.Add(adjustedField);
 
-        container.Add(label);
-        container.Add(inputContainer);
-        
-        return container;
+        Add(labelElement);
+        Add(inputContainer);
+    }
+
+    private void OnAttachToPanel(AttachToPanelEvent evt) {
+        m_CachedInspectorElement = null;
+        m_CachedContextWidthElement = null;
+        for (VisualElement visualElement = base.parent; visualElement != null; visualElement = visualElement.parent)
+        {
+            if (visualElement.ClassListContains("unity-inspector-element"))
+            {
+                m_CachedInspectorElement = visualElement;
+            }
+
+            if (visualElement.ClassListContains("unity-inspector-main-container"))
+            {
+                m_CachedContextWidthElement = visualElement;
+                break;
+            }
+        }
+    }
+
+    private void OnInspectorFieldGeometryChanged(GeometryChangedEvent e)
+    {
+        AlignLabel();
+    }
+
+    private void AlignLabel()
+    {
+        if (ClassListContains(alignedFieldUssClassName) && m_CachedInspectorElement != null)
+        {
+            float labelExtraPadding = 37; // m_LabelExtraPadding;
+            float num = worldBound.x - m_CachedInspectorElement.worldBound.x - m_CachedInspectorElement.resolvedStyle.paddingLeft;
+            labelExtraPadding += num;
+            labelExtraPadding += resolvedStyle.paddingLeft;
+            float a = 120 - num - resolvedStyle.paddingLeft;
+            VisualElement visualElement = m_CachedContextWidthElement ?? m_CachedInspectorElement;
+            labelElement.style.minWidth = Mathf.Max(a, 0f);
+            float num2 = Mathf.Ceil(visualElement.resolvedStyle.width * 0.45f) - labelExtraPadding;
+            if (Mathf.Abs(labelElement.resolvedStyle.width - num2) > 1E-30f)
+            {
+                labelElement.style.width = Mathf.Max(0f, num2);
+            }
+        }
+    }
+}
+
+// ile ja nad tym pracowalem wtf
+[CustomPropertyDrawer(typeof(Stat))]
+public class StatPropertyDrawer : PropertyDrawer {
+    public override VisualElement CreatePropertyGUI(SerializedProperty property)
+    {
+        return new StatPropertyField(property);
     }
 }
 #endif
