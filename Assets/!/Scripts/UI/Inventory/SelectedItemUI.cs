@@ -24,7 +24,7 @@ public class SelectedItemUI : MonoBehaviour
                 _rectTransform.sizeDelta = new Vector2(InventoryUIManager.TileSize, InventoryUIManager.TileSize);
                 _imageRectTransform.sizeDelta = new Vector2(InventoryUIManager.TileSize * _inventoryItem.Size.x, InventoryUIManager.TileSize * _inventoryItem.Size.y);
 
-                _image.sprite = _inventoryItem.Item.Icon;
+                _image.sprite = _inventoryItem.ItemData.Icon;
                 if (_inventoryItem.Amount == 1) {
                     _amountText.text = "";
                     return;
