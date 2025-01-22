@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
@@ -30,7 +31,7 @@ public class PlayerController : MonoBehaviour
     // Attack 
     public static float LightAttackDamage = 10f;
     public float ChargeAttackDamage = LightAttackDamage * 3;
-    private int _comboCounter;
+    public float ComboGapTime = 1.0f;
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
@@ -41,6 +42,7 @@ public class PlayerController : MonoBehaviour
     private bool _isTurning;
     private float _cameraDistance { get => _cinemachinePositionComposer.CameraDistance; set => _cinemachinePositionComposer.CameraDistance = value; }
     private bool _lightAttack;
+    private int _comboCounter;
 
     // References
     private CharacterController _controller;
@@ -185,21 +187,32 @@ public class PlayerController : MonoBehaviour
     private void handleAttack() {
         if (_lightAttack)
         {
-            if (_comboCounter <= 3) {
-                print("Light attack");
-            
-            }
-            _comboCounter += 1;            
-            
-            _lightAttack = false;                        
+            StartCoroutine(ResetCombo());
+            if (_comboCounter < 3) {
+                print("Light attack" + _comboCounter);
+            }            
+            _comboCounter++;    
+            _lightAttack = false;                    
         }
 
         if (_comboCounter == 4)
         {
             print("Knockback attack");
-
             _comboCounter = 0;
         }
+    }
+
+    public IEnumerator ResetCombo() {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < ComboGapTime) {
+            if (_lightAttack) {
+                elapsedTime = 0f;
+            }
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        _comboCounter = 0;
     }
 
     // Input events
