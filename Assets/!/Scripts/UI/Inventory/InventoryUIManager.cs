@@ -39,6 +39,7 @@ public class InventoryUIManager : MonoBehaviour
     private readonly int _slideDownAnimation = Animator.StringToHash("SlideDown");
     private readonly int _slideUpAnimation = Animator.StringToHash("SlideUp");
     private bool _isInventoryOpen = false;
+    private bool _isItemInfoOpen = false;
 
     // Inventory stuff
     private static float _tileSize;
@@ -46,6 +47,8 @@ public class InventoryUIManager : MonoBehaviour
 
 
     private int _inventoryWidth, _inventoryHeight;
+    public int InventoryHeight { get { return _inventoryHeight; } }
+    public int InventoryWidth { get { return _inventoryWidth; } }
     private InvTile[,] _inventoryTileArray;
     public InvTile SelectedTile;
     private InventoryItem _selectedInventoryItem;
@@ -55,6 +58,10 @@ public class InventoryUIManager : MonoBehaviour
             _dropArea.SetActive(value != null);
             _selectedItemUI.InventoryItem = value; 
             _selectedInventoryItem = value;
+            ClearHighlights();
+            if (value != null && SelectedTile != null) {
+                HighlightNeighbours(SelectedTile.Pos, value);
+            }
         }
     }
 
@@ -75,9 +82,20 @@ public class InventoryUIManager : MonoBehaviour
         _playerInventory = _uiCanvasParent.PlayerInventory;
         _uiCanvasParent.PlayerController.OnInventoryToggleEvent.AddListener(OnToggleInventory);
         _uiCanvasParent.PlayerController.OnUICancelEvent.AddListener(OnUICancel);
+        _uiCanvasParent.PlayerController.OnItemRotateEvent.AddListener(OnItemRotate);
+
         setupGrid();
         _inventory = _playerInventory.GetItems();
         UpdateItemUIS();
+    }
+
+    private void LateUpdate() {
+        if (_isItemInfoOpen) {
+            _itemInfoPanel.transform.position = new Vector2(
+                Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _itemInfoPanel.GetComponent<RectTransform>().rect.width), 
+                Mathf.Clamp(Input.mousePosition.y, _itemInfoPanel.GetComponent<RectTransform>().rect.height, Screen.height)
+            );
+        }
     }
 
 
@@ -97,7 +115,7 @@ public class InventoryUIManager : MonoBehaviour
 
         inventoryItem.ItemUI = itemGameObject.GetComponent<ItemUI>();
         inventoryItem.ItemUI.InventoryUIManager = this;
-        inventoryItem.ItemUI.SetupItem(inventoryItem, TileSize, OccupyTiles(inventoryItem.Position, inventoryItem.Size));
+        inventoryItem.ItemUI.SetupItem(inventoryItem, TileSize, OccupyTiles(inventoryItem));
     }
 
     private void destroyItemUI(InventoryItem inventoryItem) {
@@ -113,13 +131,6 @@ public class InventoryUIManager : MonoBehaviour
             }
         }
     }
-
-    private void moveItemUI(InventoryItem inventoryItem, Vector2Int pos) {
-        inventoryItem.Position = pos;
-        inventoryItem.ItemUI.Image.raycastTarget = true;
-        inventoryItem.ItemUI.OccupiedTiles = OccupyTiles(SelectedTile.Pos, _selectedInventoryItem.Size);
-        inventoryItem.RectTransform.anchoredPosition = new Vector2(inventoryItem.Position.x, -inventoryItem.Position.y) * TileSize;
-    }
     
     public void TryMoveSelectedItem() {
         ClearHighlights();
@@ -134,25 +145,35 @@ public class InventoryUIManager : MonoBehaviour
             return;
         }
 
-        if (!_playerInventory.FitsWithinBounds(SelectedTile.Pos, _selectedInventoryItem.Size)) {
+        Vector2Int selectedTilePos = SelectedTile.Pos;
+        if (SelectedInventoryItem.Size.x > 1 && SelectedInventoryItem.Rotated) {
+            selectedTilePos = new Vector2Int(SelectedTile.Pos.x, SelectedTile.Pos.y - SelectedInventoryItem.Size.x + 1);
+        }
+
+
+        Vector2Int size = SelectedInventoryItem.Rotated ? new Vector2Int(SelectedInventoryItem.Size.y, SelectedInventoryItem.Size.x) : SelectedInventoryItem.Size;
+
+        if (!_playerInventory.FitsWithinBounds(selectedTilePos, size)) {
             Debug.Log("Doesn't fit within");
             StartCoroutine(redPanelShow());
             return;
         }
 
-        List<InvTile> occupiedBeforeTiles = _selectedInventoryItem.ItemUI.OccupiedTiles;
-        _selectedInventoryItem.ItemUI.OccupiedTiles.ForEach(tile => tile.IsEmpty = true);
 
-        if (!canBePlaced(SelectedTile.Pos, _selectedInventoryItem.Size)) {
+        if (!canBePlaced(selectedTilePos, size)) {
             Debug.Log("Can't be placed");
-            _selectedInventoryItem.ItemUI.OccupiedTiles = occupiedBeforeTiles;
-            _selectedInventoryItem.ItemUI.OccupiedTiles.ForEach(tile => tile.IsEmpty = false);
             StartCoroutine(redPanelShow());
             return;
         }
 
-        moveItemUI(_selectedInventoryItem, SelectedTile.Pos);
+        // moveItemUI(_selectedInventoryItem, SelectedTile.Pos);
+        // moveItemUI(_selectedInventoryItem, SelectedTile.Pos);
+        // destroyItemUI(SelectedInventoryItem);
+        SelectedInventoryItem.Position = selectedTilePos;
+        createItemUI(SelectedInventoryItem);
         SelectedInventoryItem = null;
+        SetImagesRaycastTarget(true);
+
 
         SelectedTile.SetHighlight(false);
     }
@@ -196,6 +217,9 @@ public class InventoryUIManager : MonoBehaviour
     private bool canBePlaced(Vector2Int pos, Vector2Int size) {
         for (int y = pos.y; y < pos.y + size.y; y++) {
             for (int x = pos.x; x < pos.x + size.x; x++) {
+                if (x < 0 || x >= _inventoryWidth || y < 0 || y >= _inventoryHeight) {
+                    return false;
+                }
                 if (!_inventoryTileArray[y, x].IsEmpty) {
                     return false;
                 }
@@ -204,8 +228,17 @@ public class InventoryUIManager : MonoBehaviour
         return true;
     }
 
-    public List<InvTile> OccupyTiles(Vector2Int pos, Vector2Int size) {
+    public List<InvTile> OccupyTiles(InventoryItem inventoryItem) {
         List<InvTile> tiles = new();
+
+        Vector2Int pos = inventoryItem.Position;
+        Vector2Int size;
+
+        if (inventoryItem.Rotated) {
+            size = new Vector2Int(inventoryItem.Size.y, inventoryItem.Size.x);
+        } else {
+            size = inventoryItem.Size;
+        }
 
         for (int y = pos.y; y < pos.y + size.y; y++) {
             for (int x = pos.x; x < pos.x + size.x; x++) {
@@ -216,16 +249,26 @@ public class InventoryUIManager : MonoBehaviour
         return tiles;
     }
 
-    public bool HighlightNeighbours(Vector2Int pos, Vector2Int size) {
-        for (int y = pos.y; y < pos.y + size.y; y++) {
-            for (int x = pos.x; x < pos.x + size.x; x++) {
+    public bool HighlightNeighbours(Vector2Int pos, InventoryItem inventoryItem) {
+        Vector2Int size = inventoryItem.Rotated ? new Vector2Int(inventoryItem.Size.y, inventoryItem.Size.x) : inventoryItem.Size;
+        int startingY = pos.y;
+        int endingY = startingY + size.y;
+
+        if (inventoryItem.Size.x > 1 && inventoryItem.Rotated) {
+            startingY = pos.y - inventoryItem.Size.x + 1;
+            endingY = startingY + inventoryItem.Size.x;
+        }
+
+        for(int y = startingY; y < endingY; y++) {
+            for(int x = pos.x; x < pos.x + size.x; x++) {
                 if (x < 0 || x >= _inventoryWidth || y < 0 || y >= _inventoryHeight) {
-                    return false;
+                    continue;
                 }
                 _inventoryTileArray[y, x].SetHighlight(true);
             }
         }
-        return true;
+
+        return false;
     }
 
     public void ClearHighlights() {
@@ -235,6 +278,12 @@ public class InventoryUIManager : MonoBehaviour
             }
         }
         SelectedTile?.SetHighlight(false);
+    }
+
+    public void SetImagesRaycastTarget(bool val) {
+        foreach (Transform child in _itemHolder.transform) {
+            child.GetComponent<ItemUI>().Image.raycastTarget = val;
+        }
     }
 
 
@@ -247,10 +296,13 @@ public class InventoryUIManager : MonoBehaviour
         _itemInfoPanel.SetActive(false);
         SelectedInventoryItem = inventoryItem;
         _selectedItemUI.InventoryItem = _selectedInventoryItem;
+        destroyItemUI(inventoryItem);
+        SetImagesRaycastTarget(false);
         return true;
     }
 
     public void DisplayItemInfo(InventoryItem inventoryItem) {
+        _isItemInfoOpen = inventoryItem != null;
         if (SelectedInventoryItem != null) {
             return;
         }
@@ -259,14 +311,10 @@ public class InventoryUIManager : MonoBehaviour
             return;
         }
 
-        _itemInfoPanel.transform.position = new Vector2(
-            Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _itemInfoPanel.GetComponent<RectTransform>().rect.width), 
-            Mathf.Clamp(Input.mousePosition.y, _itemInfoPanel.GetComponent<RectTransform>().rect.height, Screen.height)
-        );
         
-        _itemInfoPanel.SetActive(true);
         _itemName.text = inventoryItem.ItemData.DisplayName;
         _itemDescription.text = inventoryItem.ItemData.Description;
+        _itemInfoPanel.SetActive(true);
     }
 
     public void ClearSelectedItem() {
@@ -276,6 +324,7 @@ public class InventoryUIManager : MonoBehaviour
             }   
             SelectedInventoryItem = null;
         }
+        SetImagesRaycastTarget(true);
     }
 
     public void DropItem() {
@@ -299,19 +348,34 @@ public class InventoryUIManager : MonoBehaviour
 
     // Callbacks
     private void OnUICancel() {
-        _selectedInventoryItem.ItemUI.Image.raycastTarget = true;
-        SelectedInventoryItem = null;
-        ClearHighlights();
+        if (SelectedInventoryItem != null) {
+            createItemUI(SelectedInventoryItem);
+            ClearSelectedItem();
+        }
     }
 
     private void OnToggleInventory() {
-        // _fullContainer.SetActive(!_fullContainer.activeSelf);
         _isInventoryOpen = !_isInventoryOpen;
         if (_isInventoryOpen) {
             _animator.SetTrigger(_slideDownAnimation);
         } else {
             _animator.SetTrigger(_slideUpAnimation);
-            ClearSelectedItem();
+            if (SelectedInventoryItem != null) {
+                createItemUI(SelectedInventoryItem);
+                ClearSelectedItem();
+            }
         }
+    }
+
+    private void OnItemRotate() {
+        if (SelectedInventoryItem == null) {
+            return;
+        }
+        SelectedInventoryItem.Rotated = !SelectedInventoryItem.Rotated;
+
+        ClearHighlights();
+        if (SelectedTile != null) HighlightNeighbours(SelectedTile.Pos, SelectedInventoryItem);
+
+        _selectedItemUI.Rotate(SelectedInventoryItem.Rotated);
     }
 }

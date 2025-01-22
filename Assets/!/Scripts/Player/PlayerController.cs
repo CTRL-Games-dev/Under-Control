@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
     [Header("Events")]
     public UnityEvent OnInventoryToggleEvent;
     public UnityEvent OnUICancelEvent;
+    public UnityEvent OnItemRotateEvent;
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
@@ -249,6 +250,10 @@ public class PlayerController : MonoBehaviour
 
     void OnCancel(InputValue value) {
         OnUICancelEvent.Invoke();
+    }
+
+    void OnRotateItem(InputValue value) {
+        OnItemRotateEvent.Invoke();
     }
 
     // Animation events
