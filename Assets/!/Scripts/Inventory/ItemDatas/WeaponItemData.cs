@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Weapon Item", menuName = "Items/Weapon Item")]
-public class WeaponItem : Item
+public class WeaponItemData : ItemData
 {
     public float Damage;
     public float Range;

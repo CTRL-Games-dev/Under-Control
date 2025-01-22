@@ -1,8 +1,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static InventorySystem;
-
 
 public class SelectedItemUI : MonoBehaviour
 {

@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using static InventorySystem;
 
 public class InventoryUIManager : MonoBehaviour
 {
@@ -33,7 +32,7 @@ public class InventoryUIManager : MonoBehaviour
     
     // References set in Awake
     private UICanvas _uiCanvasParent;
-    private InventorySystem _playerInventory;
+    private EntityInventory _playerInventory;
     private GridLayoutGroup _gridLayoutGroup;
 
     private Animator _animator;
@@ -110,7 +109,7 @@ public class InventoryUIManager : MonoBehaviour
 
     private void createItemUI(InventoryItem inventoryItem){
         var itemGameObject = Instantiate(_itemPrefab, _itemHolder.transform);
-        itemGameObject.name = inventoryItem.Item.DisplayName;
+        itemGameObject.name = inventoryItem.ItemData.DisplayName;
 
         inventoryItem.RectTransform = itemGameObject.GetComponent<RectTransform>();
 
@@ -183,8 +182,8 @@ public class InventoryUIManager : MonoBehaviour
 
     // Inventory grid methods
     private void setupGrid() {
-        _inventoryWidth = _playerInventory.InventorySize.x;
-        _inventoryHeight = _playerInventory.InventorySize.y;
+        _inventoryWidth = _playerInventory.Size.x;
+        _inventoryHeight = _playerInventory.Size.y;
 
         TileSize = Mathf.Clamp(_gridBoundsRectTransform.rect.width /_inventoryWidth, 0, _gridBoundsRectTransform.rect.height / _inventoryHeight);
         _gridLayoutGroup.constraintCount = _inventoryWidth;
@@ -313,8 +312,8 @@ public class InventoryUIManager : MonoBehaviour
         }
 
         
-        _itemName.text = inventoryItem.Item.DisplayName;
-        _itemDescription.text = inventoryItem.Item.Description;
+        _itemName.text = inventoryItem.ItemData.DisplayName;
+        _itemDescription.text = inventoryItem.ItemData.Description;
         _itemInfoPanel.SetActive(true);
     }
 
@@ -332,7 +331,7 @@ public class InventoryUIManager : MonoBehaviour
         if (SelectedInventoryItem == null) {
             return;
         }
-        _itemEntityManager.SpawnItemEntity(SelectedInventoryItem.Item, SelectedInventoryItem.Amount, _uiCanvasParent.PlayerController.transform.position + new Vector3(Random.Range(1f, 5f), 1, Random.Range(1f, 5f)));
+        _itemEntityManager.SpawnItemEntity(SelectedInventoryItem.ItemData, SelectedInventoryItem.Amount, _uiCanvasParent.PlayerController.transform.position + new Vector3(Random.Range(1f, 5f), 1, Random.Range(1f, 5f)));
         destroyItemUI(SelectedInventoryItem);
         _playerInventory.RemoveInventoryItem(SelectedInventoryItem);
         // SelectedInventoryItem.ItemUI.OccupiedTiles.ForEach(tile => tile.IsEmpty = true);

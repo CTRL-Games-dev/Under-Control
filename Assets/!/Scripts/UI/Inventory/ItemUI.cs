@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static InventorySystem;
 
 public class ItemUI : MonoBehaviour
 {
@@ -60,7 +59,7 @@ public class ItemUI : MonoBehaviour
         _pivotRectTransform.rotation = InventoryItem.Rotated ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
 
         _imageRectTransform.sizeDelta = new Vector2(tileSize * InventoryItem.Size.x, tileSize * InventoryItem.Size.y);
-        _image.sprite = InventoryItem.Item.Icon;
+        _image.sprite = InventoryItem.ItemData.Icon;
 
         
 

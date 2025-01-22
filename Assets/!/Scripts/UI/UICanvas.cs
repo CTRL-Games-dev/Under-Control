@@ -6,5 +6,5 @@ public class UICanvas : MonoBehaviour
     public GameObject Player;
     public PlayerController PlayerController;
     public LivingEntity PlayerLivingEntity;
-    public InventorySystem PlayerInventory;
+    public EntityInventory PlayerInventory;
 }

@@ -1,35 +1,25 @@
 using System;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
-public class InventorySystem : MonoBehaviour
+public class ItemContainer
 {
-    [Serializable]
-    public class InventoryItem {
-        public Item Item;
-        public int Amount;
-        public Vector2Int Position;
-
-        public Vector2Int Size {
-            get {
-                return Item.Size;
-            }
-        }
-
-        public bool Rotated;
-        public ItemUI ItemUI { get; set; }
-        public RectTransform RectTransform { get; set; }
-    }
-
     [SerializeField] private Vector2Int _inventorySize;
     // TODO: Handle side effects
-    public Vector2Int InventorySize { get => _inventorySize; set => _inventorySize = value; }
+    public Vector2Int Size { get => _inventorySize; set => _inventorySize = value; }
 
     [SerializeField] private List<InventoryItem> _inventory = new List<InventoryItem>();
 
+    public ItemContainer(int width, int height) {
+        if(width < 1 || height < 1) {
+            throw new ArgumentOutOfRangeException("Inventory size must be greater than 0");
+        }
+
+        _inventorySize = new Vector2Int(width, height);
+    }
+
     public bool FitsWithinBounds(Vector2Int position, Vector2Int size) {
-        if (position.x + size.x > InventorySize.x || position.y + size.y > InventorySize.y) {
+        if (position.x + size.x > Size.x || position.y + size.y > Size.y) {
             return false;
         }
         return true;
@@ -50,10 +40,10 @@ public class InventorySystem : MonoBehaviour
         foreach(var inventoryItem in _inventory) {
             // Illegal bounds = rectangle in which item can't be placed
             var illegalBoundsMinX = inventoryItem.Position.x - size.x + 1;
-            var illegalBoundsMaxX = inventoryItem.Position.x + inventoryItem.Item.Size.x - 1;
+            var illegalBoundsMaxX = inventoryItem.Position.x + inventoryItem.ItemData.Size.x - 1;
 
             var illegalBoundsMinY = inventoryItem.Position.y - size.y + 1;
-            var illegalBoundsMaxY = inventoryItem.Position.y + inventoryItem.Item.Size.y - 1;
+            var illegalBoundsMaxY = inventoryItem.Position.y + inventoryItem.ItemData.Size.y - 1;
 
             if(position.x >= illegalBoundsMinX && position.x <= illegalBoundsMaxX && position.y >= illegalBoundsMinY && position.y <= illegalBoundsMaxY) {
                 return false;
@@ -63,17 +53,17 @@ public class InventorySystem : MonoBehaviour
         return true;
     }
 
-    public bool CanBeAdded(Item item, int quantity, Vector2Int position) {
+    public bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position) {
         var inventoryItem = GetInventoryItem(position);
         if(inventoryItem == null) {
-            return DoesFitWithin(position, item.Size);
+            return DoesFitWithin(position, itemData.Size);
         }
 
-        if(!inventoryItem.Item.Equals(item)) {
+        if(!inventoryItem.ItemData.Equals(itemData)) {
             return false;
         }
 
-        if(inventoryItem.Amount + quantity > inventoryItem.Item.MaxQuantity) {
+        if(inventoryItem.Amount + quantity > inventoryItem.ItemData.MaxQuantity) {
             return false;
         }
 
@@ -89,10 +79,10 @@ public class InventorySystem : MonoBehaviour
     public InventoryItem GetInventoryItem(Vector2Int position) {
         foreach(var inventoryItem in _inventory) {
             var minX = inventoryItem.Position.x;
-            var maxX = inventoryItem.Position.x + inventoryItem.Item.Size.x;
+            var maxX = inventoryItem.Position.x + inventoryItem.ItemData.Size.x;
 
             var minY = inventoryItem.Position.y;
-            var maxY = inventoryItem.Position.y + inventoryItem.Item.Size.y;
+            var maxY = inventoryItem.Position.y + inventoryItem.ItemData.Size.y;
 
             if(position.x >= minX && position.x < maxX && position.y >= minY && position.y < maxY) {
                 return inventoryItem;
@@ -103,29 +93,29 @@ public class InventorySystem : MonoBehaviour
     }
 
     // Returns true if the item was added
-    public bool AddItem(Item item, int amount, Vector2Int position) {
+    public bool AddItem(ItemData itemData, int amount, Vector2Int position) {
         if(!IsWithinBounds(position)) {
             throw new Exception("Position is out of bounds");
         }
 
-        if(!CanBeAdded(item, amount, position)) {
+        if(!CanBeAdded(itemData, amount, position)) {
             return false;
         }
 
-        return addItem(item, amount, position);
+        return addItem(itemData, amount, position);
     }
 
-    public bool AddItem(Item item, Vector2Int position) {
-        return AddItem(item, 1, position);
+    public bool AddItem(ItemData itemData, Vector2Int position) {
+        return AddItem(itemData, 1, position);
     }
 
     // Adds item anywhere in the inventory
     // Searches for space by columns then rows
-    public bool AddItem(Item item, int amount) {
+    public bool AddItem(ItemData itemData, int amount) {
         for(int y = 0; y < _inventorySize.y; y++) {
             for(int x = 0; x < _inventorySize.x; x++) {
-                if(CanBeAdded(item, amount, new Vector2Int(x, y))) {
-                    return addItem(item, amount, new Vector2Int(x, y));
+                if(CanBeAdded(itemData, amount, new Vector2Int(x, y))) {
+                    return addItem(itemData, amount, new Vector2Int(x, y));
                 }
             }
         }
@@ -135,34 +125,33 @@ public class InventorySystem : MonoBehaviour
 
     // Adds item anywhere in the inventory
     // Searches for space by columns then rows
-    public bool AddItem(Item item) {
-        return AddItem(item, 1);
+    public bool AddItem(ItemData itemData) {
+        return AddItem(itemData, 1);
     }
 
-    private bool addItem(Item item, int amount, Vector2Int position) {
+    private bool addItem(ItemData itemData, int amount, Vector2Int position) {
         var inventoryItem = GetInventoryItem(position);
         if(inventoryItem != null) {
-            if(!inventoryItem.Item.Equals(item)) {
+            if(!inventoryItem.ItemData.Equals(itemData)) {
                 return false;
             }
     
-            if(inventoryItem.Amount + amount >= inventoryItem.Item.MaxQuantity) {
+            if(inventoryItem.Amount + amount >= inventoryItem.ItemData.MaxQuantity) {
                 return false;
             }
 
             inventoryItem.Amount += amount;
+
             return true;
         }
 
         inventoryItem = new InventoryItem {
-            Item = item,
+            ItemData = itemData,
             Amount = amount,
             Position = position
         };
 
         _inventory.Add(inventoryItem);
-
-        // debugLogInventory();
 
         return true;
     }
@@ -178,16 +167,19 @@ public class InventorySystem : MonoBehaviour
             return false;
         }
 
-        _inventory.Remove(inventoryItem);
-
-        return true;
+        return _inventory.Remove(inventoryItem);
     }
 
     // Returns true if the item was removed
     public bool RemoveInventoryItem(InventoryItem inventoryItem) {
+        if(!_inventory.Remove(inventoryItem)) {
+            return false;
+        }
+
         inventoryItem.ItemUI = null;
         inventoryItem.RectTransform = null;
-        return _inventory.Remove(inventoryItem);
+
+        return true;
     }
 
     public List<InventoryItem> GetItems() {
@@ -204,10 +196,10 @@ public class InventorySystem : MonoBehaviour
 
         foreach(var inventoryItem in _inventory) {
             var minX = inventoryItem.Position.x;
-            var maxX = inventoryItem.Position.x + inventoryItem.Item.Size.x;
+            var maxX = inventoryItem.Position.x + inventoryItem.ItemData.Size.x;
 
             var minY = inventoryItem.Position.y;
-            var maxY = inventoryItem.Position.y + inventoryItem.Item.Size.y;
+            var maxY = inventoryItem.Position.y + inventoryItem.ItemData.Size.y;
 
             if(newSize.x < minX || newSize.x > maxX || newSize.y < minY || newSize.y > maxY) {
                 outOfBoundsItems.Add(inventoryItem);
@@ -215,29 +207,5 @@ public class InventorySystem : MonoBehaviour
         }
 
         return outOfBoundsItems;
-    }
-
-    private void debugLogInventory() {
-        string s = "\n  ";
-
-        for(int y = 0; y < _inventorySize.y; y++) {
-            s += "-";
-        }
-
-        s += "\n";
-        
-        for(int y = 0; y < _inventorySize.y; y++) {
-            s += "|";
-            for(int x = 0; x < _inventorySize.x; x++) {
-                var slot = GetInventoryItem(new Vector2Int(x, y));
-                if(slot != null) {
-                    s += "#";
-                } else {
-                    s += "  ";
-                }
-            }
-            s += "\n";
-        }
-        Debug.Log(s);
     }
 }
