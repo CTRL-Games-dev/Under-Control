@@ -4,8 +4,6 @@ using UnityEngine;
 [Serializable]
 public class EntityInventory : ItemContainer
 {
-    // TODO: These WONT be InventoryItems soon, that's just a placeholder
-    // Don't rely on these being InventoryItems
     public HelmetItemData Helmet;
     public ChestplateItemData Chestplate;
     public BootsItemData Boots;
