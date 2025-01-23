@@ -168,27 +168,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 063630ca55530384188525911dbcb86b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnInventoryToggleEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUICancelEvent:
-    m_PersistentCalls:
-      m_Calls: []
   Acceleration: 2
   Deceleration: 2
   MaxWalkingSpeed: 1
   MaxSprintingSpeed: 2
   MouseSensitivity: 0.1
   WalkingTurnSpeed: 1
-  SprintingTurnSpeed: 2.5
   MinCameraDistance: 10
   MaxCameraDistance: 30
   CameraDistanceSpeed: 1
-  CameraTargetObjectBounds: {x: 0, y: 0}
-  ApplySpellTest: 0
-  ApplySpellTests: 0
+  CameraTargetObjectBounds: {x: 1, y: 1}
   CameraObject: {fileID: 0}
   CameraTargetObject: {fileID: 7734850922315019929}
+  VekhtarControl:
+    _raw: 0
+    _adjusted: 0
+  OnInventoryToggleEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUICancelEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnItemRotateEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &8612418859672658487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,21 +205,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DisplayName: 
+  TimeToRegenAfterDamage: 2
+  _inventory:
+    _size: {x: 4, y: 4}
+    _items: []
+    Helmet: {fileID: 0}
+    Chestplate: {fileID: 0}
+    Boots: {fileID: 0}
+    Amulet: {fileID: 0}
+    Ring: {fileID: 0}
+    leftHand: {fileID: 0}
+    rightHand: {fileID: 0}
+  Exp: 0
   Health:
-    _adjusted: 100
     _raw: 100
+    _adjusted: 100
   MaxHealth:
+    _raw: 100
     _adjusted: 100
   RegenRate:
+    _raw: 1
     _adjusted: 1
   Armor:
+    _raw: 0
     _adjusted: 0
   ElementalArmor:
+    _raw: 0
     _adjusted: 0
   MovementSpeed:
+    _raw: 1
     _adjusted: 1
-  Exp: 0
-  TimeToRegenAfterDamage: 2
   OnDeath:
     m_PersistentCalls:
       m_Calls: []

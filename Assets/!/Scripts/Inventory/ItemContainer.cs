@@ -4,18 +4,19 @@ using UnityEngine;
 
 public class ItemContainer
 {
-    [SerializeField] private Vector2Int _inventorySize;
+    [SerializeField] private Vector2Int _size;
     // TODO: Handle side effects
-    public Vector2Int Size { get => _inventorySize; set => _inventorySize = value; }
+    public Vector2Int Size { get => _size; set => _size = value; }
 
-    [SerializeField] private List<InventoryItem> _inventory = new List<InventoryItem>();
+    [SerializeField]
+    private List<InventoryItem> _items = new List<InventoryItem>();
 
     public ItemContainer(int width, int height) {
         if(width < 1 || height < 1) {
             throw new ArgumentOutOfRangeException("Inventory size must be greater than 0");
         }
 
-        _inventorySize = new Vector2Int(width, height);
+        _size = new Vector2Int(width, height);
     }
 
     public bool FitsWithinBounds(Vector2Int position, Vector2Int size) {
@@ -37,7 +38,7 @@ public class ItemContainer
             return false;
         }
 
-        foreach(var inventoryItem in _inventory) {
+        foreach(var inventoryItem in _items) {
             // Illegal bounds = rectangle in which item can't be placed
             var illegalBoundsMinX = inventoryItem.Position.x - size.x + 1;
             var illegalBoundsMaxX = inventoryItem.Position.x + inventoryItem.ItemData.Size.x - 1;
@@ -71,13 +72,13 @@ public class ItemContainer
     }
 
     public bool IsWithinBounds(Vector2Int position) {
-        return position.x >= 0 && position.y >= 0 && position.x < _inventorySize.x && position.y < _inventorySize.y;
+        return position.x >= 0 && position.y >= 0 && position.x < _size.x && position.y < _size.y;
     }
 
     // This will throw an exception if the position is out of bounds
     // Use IsWithinBounds to check if the position is valid
     public InventoryItem GetInventoryItem(Vector2Int position) {
-        foreach(var inventoryItem in _inventory) {
+        foreach(var inventoryItem in _items) {
             var minX = inventoryItem.Position.x;
             var maxX = inventoryItem.Position.x + inventoryItem.ItemData.Size.x;
 
@@ -112,8 +113,8 @@ public class ItemContainer
     // Adds item anywhere in the inventory
     // Searches for space by columns then rows
     public bool AddItem(ItemData itemData, int amount) {
-        for(int y = 0; y < _inventorySize.y; y++) {
-            for(int x = 0; x < _inventorySize.x; x++) {
+        for(int y = 0; y < _size.y; y++) {
+            for(int x = 0; x < _size.x; x++) {
                 if(CanBeAdded(itemData, amount, new Vector2Int(x, y))) {
                     return addItem(itemData, amount, new Vector2Int(x, y));
                 }
@@ -151,7 +152,7 @@ public class ItemContainer
             Position = position
         };
 
-        _inventory.Add(inventoryItem);
+        _items.Add(inventoryItem);
 
         return true;
     }
@@ -167,12 +168,12 @@ public class ItemContainer
             return false;
         }
 
-        return _inventory.Remove(inventoryItem);
+        return _items.Remove(inventoryItem);
     }
 
     // Returns true if the item was removed
     public bool RemoveInventoryItem(InventoryItem inventoryItem) {
-        if(!_inventory.Remove(inventoryItem)) {
+        if(!_items.Remove(inventoryItem)) {
             return false;
         }
 
@@ -183,7 +184,7 @@ public class ItemContainer
     }
 
     public List<InventoryItem> GetItems() {
-        return _inventory;
+        return _items;
     }
 
     public bool CanBeSafelyResizedTo(Vector2Int newSize) {
@@ -194,7 +195,7 @@ public class ItemContainer
     public List<InventoryItem> GetOutOfBoundsItemsIfResizedTo(Vector2Int newSize) {
         var outOfBoundsItems = new List<InventoryItem>();
 
-        foreach(var inventoryItem in _inventory) {
+        foreach(var inventoryItem in _items) {
             var minX = inventoryItem.Position.x;
             var maxX = inventoryItem.Position.x + inventoryItem.ItemData.Size.x;
 
