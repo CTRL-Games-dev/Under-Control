@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 public class InventoryUIManager : MonoBehaviour
 {
+    [Header("Assign if not player inventory")]
+    public EntityInventory OtherEntityInventory;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject _itemPrefab;
@@ -32,7 +34,7 @@ public class InventoryUIManager : MonoBehaviour
     
     // References set in Awake
     private UICanvas _uiCanvasParent;
-    private EntityInventory _playerInventory;
+    private EntityInventory _currentEntityInventory;
     private GridLayoutGroup _gridLayoutGroup;
 
     private Animator _animator;
@@ -79,13 +81,14 @@ public class InventoryUIManager : MonoBehaviour
     private void Start() {
         EventBus.OnInventoryItemChanged.AddListener(UpdateItemUIS);
 
-        _playerInventory = _uiCanvasParent.PlayerInventory;
         _uiCanvasParent.PlayerController.OnInventoryToggleEvent.AddListener(OnToggleInventory);
         _uiCanvasParent.PlayerController.OnUICancelEvent.AddListener(OnUICancel);
         _uiCanvasParent.PlayerController.OnItemRotateEvent.AddListener(OnItemRotate);
 
+        _currentEntityInventory = OtherEntityInventory ?? _uiCanvasParent.PlayerInventory; // If OtherEntityInventory is null, use PlayerInventory
+
         setupGrid();
-        _inventory = _playerInventory.GetItems();
+        _inventory = _currentEntityInventory.GetItems();
         UpdateItemUIS();
     }
 
@@ -114,7 +117,7 @@ public class InventoryUIManager : MonoBehaviour
         inventoryItem.RectTransform = itemGameObject.GetComponent<RectTransform>();
 
         inventoryItem.ItemUI = itemGameObject.GetComponent<ItemUI>();
-        inventoryItem.ItemUI.InventoryUIManager = this;
+        // inventoryItem.ItemUI.InventoryUIManager = this;
         inventoryItem.ItemUI.SetupItem(inventoryItem, TileSize, OccupyTiles(inventoryItem));
     }
 
@@ -150,10 +153,9 @@ public class InventoryUIManager : MonoBehaviour
             selectedTilePos = new Vector2Int(SelectedTile.Pos.x, SelectedTile.Pos.y - SelectedInventoryItem.Size.x + 1);
         }
 
-
         Vector2Int size = SelectedInventoryItem.Rotated ? new Vector2Int(SelectedInventoryItem.Size.y, SelectedInventoryItem.Size.x) : SelectedInventoryItem.Size;
 
-        if (!_playerInventory.FitsWithinBounds(selectedTilePos, size)) {
+        if (!_currentEntityInventory.FitsWithinBounds(selectedTilePos, size)) {
             Debug.Log("Doesn't fit within");
             StartCoroutine(redPanelShow());
             return;
@@ -182,8 +184,8 @@ public class InventoryUIManager : MonoBehaviour
 
     // Inventory grid methods
     private void setupGrid() {
-        _inventoryWidth = _playerInventory.Size.x;
-        _inventoryHeight = _playerInventory.Size.y;
+        _inventoryWidth = _currentEntityInventory.Size.x;
+        _inventoryHeight = _currentEntityInventory.Size.y;
 
         TileSize = Mathf.Clamp(_gridBoundsRectTransform.rect.width /_inventoryWidth, 0, _gridBoundsRectTransform.rect.height / _inventoryHeight);
         _gridLayoutGroup.constraintCount = _inventoryWidth;
@@ -208,7 +210,7 @@ public class InventoryUIManager : MonoBehaviour
 
                 _inventoryTileArray[y, x] = invTile;
                 
-                invTile.InventoryUIManager = this;
+                // invTile.InventoryUIManager = this;
                 invTile.Pos = new Vector2Int(x, y);
             }
         }
@@ -333,7 +335,7 @@ public class InventoryUIManager : MonoBehaviour
         }
         _itemEntityManager.SpawnItemEntity(SelectedInventoryItem.ItemData, SelectedInventoryItem.Amount, _uiCanvasParent.PlayerController.transform.position + new Vector3(Random.Range(1f, 5f), 1, Random.Range(1f, 5f)));
         destroyItemUI(SelectedInventoryItem);
-        _playerInventory.RemoveInventoryItem(SelectedInventoryItem);
+        _currentEntityInventory.RemoveInventoryItem(SelectedInventoryItem);
         // SelectedInventoryItem.ItemUI.OccupiedTiles.ForEach(tile => tile.IsEmpty = true);
 
         ClearSelectedItem();
@@ -376,6 +378,6 @@ public class InventoryUIManager : MonoBehaviour
         ClearHighlights();
         if (SelectedTile != null) HighlightNeighbours(SelectedTile.Pos, SelectedInventoryItem);
 
-        _selectedItemUI.Rotate(SelectedInventoryItem.Rotated);
+        // _selectedItemUI.Rotate(SelectedInventoryItem.Rotated);
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class SelectedItemUI : MonoBehaviour
 {
+    [SerializeField] private RectTransform _imageRectTransform;
     [SerializeField] private TextMeshProUGUI _amountText;
 
     private InventoryItem _inventoryItem = null;
@@ -11,6 +12,7 @@ public class SelectedItemUI : MonoBehaviour
         get { return _inventoryItem; } 
         set {
             _inventoryItem = value;
+            gameObject.SetActive(_inventoryItem != null);
             if (_inventoryItem == null) {
                 _image.sprite = null;
                 transform.rotation = Quaternion.identity;
@@ -21,8 +23,8 @@ public class SelectedItemUI : MonoBehaviour
 
                 gameObject.SetActive(true);
 
-                _rectTransform.sizeDelta = new Vector2(InventoryUIManager.TileSize, InventoryUIManager.TileSize);
-                _imageRectTransform.sizeDelta = new Vector2(InventoryUIManager.TileSize * _inventoryItem.Size.x, InventoryUIManager.TileSize * _inventoryItem.Size.y);
+                _rectTransform.sizeDelta = new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize);
+                _imageRectTransform.sizeDelta = new Vector2(InventoryPanel.TileSize * _inventoryItem.Size.x, InventoryPanel.TileSize * _inventoryItem.Size.y);
 
                 _image.sprite = _inventoryItem.ItemData.Icon;
                 if (_inventoryItem.Amount == 1) {
@@ -35,13 +37,18 @@ public class SelectedItemUI : MonoBehaviour
     }
 
     private RectTransform _rectTransform;
-    [SerializeField] private RectTransform _imageRectTransform;
     private Image _image;
+    private UICanvas _uiCanvasParent;
 
 
     private void Awake() {
         _rectTransform = GetComponent<RectTransform>();
         _image = GetComponentInChildren<Image>();
+        _uiCanvasParent = gameObject.GetComponentInParent<UICanvas>();
+    }
+
+    private void Start() {
+        _uiCanvasParent.PlayerController.OnItemRotateEvent.AddListener(Rotate);
     }
 
     private void Update()  {
@@ -51,10 +58,14 @@ public class SelectedItemUI : MonoBehaviour
         transform.position = Input.mousePosition;
     }
 
-    public void Rotate(bool val) {
+    public void Rotate() {
         if(_inventoryItem == null) {
             return;
         }
-        transform.rotation = val ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
+        Debug.Log("Rotating");
+        InventoryItem.Rotated = !InventoryItem.Rotated;
+
+        Debug.Log(InventoryItem.Rotated);
+        _rectTransform.rotation = InventoryItem.Rotated ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
     }
 }

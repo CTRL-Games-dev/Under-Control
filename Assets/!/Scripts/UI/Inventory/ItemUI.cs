@@ -10,8 +10,6 @@ public class ItemUI : MonoBehaviour
     [SerializeField] private RectTransform _imageRectTransform;
     [SerializeField] private GameObject _quantityGameObject;
 
-    public InventoryUIManager InventoryUIManager;
-
     private Image _image;
     public Image Image { get => _image; }
 
@@ -61,8 +59,6 @@ public class ItemUI : MonoBehaviour
         _imageRectTransform.sizeDelta = new Vector2(tileSize * InventoryItem.Size.x, tileSize * InventoryItem.Size.y);
         _image.sprite = InventoryItem.ItemData.Icon;
 
-        
-
         _quantityGameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(tileSize, tileSize / 2);
         _amountText = _quantityGameObject.GetComponent<TextMeshProUGUI>();
 
@@ -79,12 +75,12 @@ public class ItemUI : MonoBehaviour
 
     public void OnPointerEnter() {
         _imageRectTransform.localScale = new Vector3(1.1f, 1.1f, 1);
-        InventoryUIManager.DisplayItemInfo(InventoryItem);
+        EventBus.OnItemUIHover.Invoke(InventoryItem);
     }
 
     public void OnPointerExit() {
         _imageRectTransform.localScale = new Vector3(1, 1, 1);
-        InventoryUIManager.DisplayItemInfo(null);
+        EventBus.OnItemUIHover.Invoke(null);
     }
 
     public void OnPointerDown() {
@@ -94,7 +90,7 @@ public class ItemUI : MonoBehaviour
         _image.color = new Color(1, 1, 1, 1);
     }
     public void OnPointerClick() {
-        InventoryUIManager.SetSelectedInventoryItem(InventoryItem);
+        EventBus.OnItemUIClick.Invoke(this);
     }
 
 }
