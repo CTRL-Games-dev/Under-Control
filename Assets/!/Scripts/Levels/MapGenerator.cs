@@ -86,12 +86,7 @@ public class WorldMap
         wallPrefabs.Add(Resources.Load<GameObject>("Prefabs/Forest/ForestWall3"));
         wallPrefabs.Add(Resources.Load<GameObject>("Prefabs/Forest/ForestWall4"));
 
-        foreach(var p in wallPrefabs)
-        {
-            p.transform.localScale += new Vector3(TileWidth, TileWidth, TileWidth);
-            var randomizer = p.GetComponent<ForestTileRandomizer>();
-            randomizer.RandomizeTile();
-        }
+
 
         int mapWidth = Tiles.GetLength(0), mapHeight = Tiles.GetLength(1);
         for(int x = 0; x < mapWidth; x++)
@@ -126,8 +121,12 @@ public class WorldMap
 
                 if(tile == TileType.WALL)
                 {
-                    var wall = wallPrefabs[UnityEngine.Random.Range(0, wallPrefabs.Count - 1)];
-                    GameObject.Instantiate(wall, pos, Quaternion.identity);
+                    var wall = wallPrefabs[Random.Range(0, wallPrefabs.Count - 1)];
+                    var tileInstance = GameObject.Instantiate(wall, pos, Quaternion.identity);
+
+                    tileInstance.transform.localScale += new Vector3(TileWidth, TileWidth, TileWidth);
+                    var randomizer = tileInstance.GetComponent<ForestTileRandomizer>();
+                    randomizer.RandomizeTile();
                 }
             }
         }
