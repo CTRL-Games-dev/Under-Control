@@ -86,6 +86,8 @@ public class WorldMap
         wallPrefabs.Add(Resources.Load<GameObject>("Prefabs/Forest/ForestWall3"));
         wallPrefabs.Add(Resources.Load<GameObject>("Prefabs/Forest/ForestWall4"));
 
+        var grassPrefabs = new List<GameObject>();
+        grassPrefabs.Add(Resources.Load<GameObject>("Prefabs/Forest/Grass1"));
 
 
         int mapWidth = Tiles.GetLength(0), mapHeight = Tiles.GetLength(1);
@@ -94,7 +96,9 @@ public class WorldMap
             for(int y = 0; y < mapHeight; y++) {
                 int index = x * ((int)Size[0]) + y;
                 var tile = Tiles[x, y];
-                var pos = new Vector3(x * TileWidth, 0, y * TileWidth);
+
+                // Add half of a tile, so it will be centered
+                var pos = new Vector3(x * TileWidth + TileWidth/2, 0, y * TileWidth + TileWidth/2);
 
                 Vector3 p0 = new(TileWidth * x,     0, TileWidth * y);
                 Vector3 p1 = new(TileWidth * x,     0, TileWidth * (y+1));
@@ -119,15 +123,15 @@ public class WorldMap
                 trianglesFloor.Add(index * 4 + 2);
                 trianglesFloor.Add(index * 4 + 3);
 
-                if(tile == TileType.WALL)
-                {
-                    var wall = wallPrefabs[Random.Range(0, wallPrefabs.Count - 1)];
-                    var tileInstance = GameObject.Instantiate(wall, pos, Quaternion.identity);
+                GameObject tilePrefab;
+                if(tile == TileType.WALL) tilePrefab = wallPrefabs[Random.Range(0, wallPrefabs.Count - 1)];
+                else tilePrefab = grassPrefabs[Random.Range(0, grassPrefabs.Count - 1)];
+                
+                var tileInstance = GameObject.Instantiate(tilePrefab, pos, Quaternion.identity);
+                tileInstance.transform.localScale += new Vector3(TileWidth, TileWidth, TileWidth);
 
-                    tileInstance.transform.localScale += new Vector3(TileWidth, TileWidth, TileWidth);
-                    var randomizer = tileInstance.GetComponent<ForestTileRandomizer>();
-                    randomizer.RandomizeTile();
-                }
+                var randomizer = tileInstance.GetComponent<TileRandomizer>();
+                randomizer.RandomizeTile();
             }
         }
 
