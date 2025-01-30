@@ -28,22 +28,22 @@ public class UICanvas : MonoBehaviour
 
     public ItemInfoPanel ItemInfoPanel;
     public SelectedItemUI SelectedItemUI;
+    public InventoryPanel ActiveInventoryPanel;
+
 
     private void Start() {
-        EventBus.OnItemUIHover.AddListener(OnItemUIHover);
-        EventBus.OnItemUIClick.AddListener(OnItemUIClick);
+        EventBus.ItemUIHoverEvent.AddListener(OnItemUIHover);
+        EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
     }
 
     private void OnItemUIHover(InventoryItem item) {
-        ItemInfoPanel.gameObject.SetActive(item != null);
-        ItemInfoPanel.InventoryItem = item;
+        if (SelectedItemUI.InventoryItem != null) return;
+        ItemInfoPanel.ShowItemInfo(item);
     }
 
     private void OnItemUIClick(ItemUI itemUI) {
         SelectedItemUI.gameObject.SetActive(itemUI != null);
         SelectedItemUI.InventoryItem = itemUI.InventoryItem;
     }
-
-    // [SerializeField] 
 
 }

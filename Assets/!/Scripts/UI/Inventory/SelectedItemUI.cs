@@ -14,11 +14,16 @@ public class SelectedItemUI : MonoBehaviour
             _inventoryItem = value;
             gameObject.SetActive(_inventoryItem != null);
             if (_inventoryItem == null) {
+
                 _image.sprite = null;
                 transform.rotation = Quaternion.identity;
                 gameObject.SetActive(false);
+
             } else {
-                transform.rotation = _inventoryItem.Rotated ? Quaternion.Euler(0, 0, 90) : Quaternion.identity; 
+                _uiCanvasParent.ItemInfoPanel.ShowItemInfo(null);
+
+                transform.rotation = _inventoryItem.Rotated ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
+                _goalRotation = transform.rotation; 
                 transform.position = Input.mousePosition;
 
                 gameObject.SetActive(true);
@@ -40,6 +45,9 @@ public class SelectedItemUI : MonoBehaviour
     private Image _image;
     private UICanvas _uiCanvasParent;
 
+    private Quaternion _goalRotation;
+    [SerializeField] private float _rotationSpeed = 10f;
+
 
     private void Awake() {
         _rectTransform = GetComponent<RectTransform>();
@@ -56,16 +64,22 @@ public class SelectedItemUI : MonoBehaviour
             return;
         }
         transform.position = Input.mousePosition;
+        if (transform.rotation != _goalRotation) {
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, _goalRotation, _rotationSpeed * Time.deltaTime);
+        }
+        if (Input.GetMouseButtonUp(0)) {
+            _uiCanvasParent.ActiveInventoryPanel.TryMoveSelectedItem();
+        }
     }
 
     public void Rotate() {
         if(_inventoryItem == null) {
             return;
         }
-        Debug.Log("Rotating");
         InventoryItem.Rotated = !InventoryItem.Rotated;
+        _goalRotation = InventoryItem.Rotated ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
 
-        Debug.Log(InventoryItem.Rotated);
-        _rectTransform.rotation = InventoryItem.Rotated ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
+        if (_uiCanvasParent.ActiveInventoryPanel != null)  
+            _uiCanvasParent.ActiveInventoryPanel.OnInvTileEnter(_uiCanvasParent.ActiveInventoryPanel.SelectedTile);
     }
 }

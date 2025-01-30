@@ -32,30 +32,12 @@ public class InvTile : MonoBehaviour
 
     public void OnPointerEnter() {
         InventoryPanel.OnInvTileEnter(this);
-
-        // InventoryPanel.SelectedTile = this;
-        // if (InventoryPanel.SelectedInventoryItem != null) {
-        //     InventoryPanel.ClearHighlights();
-        //     InventoryUIManager.HighlightNeighbours(Pos, InventoryPanel.SelectedInventoryItem);
-        // } else {
-        //     InventoryPanel.ClearHighlights();
-        // }
         _highlightImage.SetActive(true);
     }
     public void OnPointerExit() {
-        if (InventoryPanel.SelectedTile == this) {
-            InventoryPanel.SelectedTile = null;
-            _highlightImage.SetActive(false);
-        }
-        // StartCoroutine(DeHighlight());
+        InventoryPanel.OnInvTileExit(this);
     }
-    private IEnumerator DeHighlight() {
-        yield return new WaitForSeconds(0.1f);
-        if (InventoryPanel.SelectedTile == this) {
-            InventoryPanel.SelectedTile = null;
-            _highlightImage.SetActive(false);
-        }
-    }
+
 
     public void OnPointerClick() {
         InventoryPanel.TryMoveSelectedItem();

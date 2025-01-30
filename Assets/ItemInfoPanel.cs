@@ -8,32 +8,31 @@ public class ItemInfoPanel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _itemDescription;
 
     private RectTransform _rectTransform;
+    private UICanvas _uiCanvasParent;
 
-    private InventoryItem _inventoryItem;
-    public InventoryItem InventoryItem {set {
-        gameObject.SetActive(value != null);
-        _inventoryItem = value;
-        if (_inventoryItem == null) {
-            return;
-        }
-        _itemName.text = _inventoryItem.ItemData.DisplayName;
-        _itemDescription.text = _inventoryItem.ItemData.Description;
-    } get {
-        return _inventoryItem;
-        } 
-    }
+
+
 
     private void Awake() {
         _rectTransform = GetComponent<RectTransform>();
+        _uiCanvasParent = gameObject.GetComponentInParent<UICanvas>();
     }
     
     private void Update() {
-        if (InventoryItem == null) {
-            return;
-        }
         transform.position = new Vector2(
             Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width), 
             Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height, Screen.height)
         );
+    }
+
+    public void ShowItemInfo(InventoryItem item) {
+        gameObject.SetActive(item != null);
+        transform.position = new Vector2(
+            Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width), 
+            Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height, Screen.height)
+        );
+        if (item == null) return;
+        _itemName.text = item.ItemData.DisplayName;
+        _itemDescription.text = item.ItemData.Description;
     }
 }

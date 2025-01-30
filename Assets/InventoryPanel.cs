@@ -30,13 +30,14 @@ public class InventoryPanel : MonoBehaviour
 
 
     // Inventory variables
-    private static float _tileSize;
-    public static float TileSize { get {return _tileSize;} private set {_tileSize = value;} }
+    private static float _tileSize = 0;
+    public static float TileSize { get {return _tileSize;} set {_tileSize = value;} }
     private InvTile[,] _inventoryTileArray;
     private int _inventoryWidth, _inventoryHeight;
-    public List<InventoryItem> _inventory => _currentEntityInventory.GetItems();
 
-    private InventoryItem _selectedInventoryItem => _uiCanvasParent.SelectedItemUI.InventoryItem;    
+    public List<InventoryItem> _inventory => _currentEntityInventory.GetItems();
+    private InventoryItem _selectedInventoryItem => _uiCanvasParent.SelectedItemUI.InventoryItem;
+    private bool _isActivePanel => _uiCanvasParent.ActiveInventoryPanel == this;
 
     // Grid variables
     public InvTile SelectedTile { get; set; }
@@ -49,17 +50,20 @@ public class InventoryPanel : MonoBehaviour
     }
 
     private void Start() {
-        EventBus.OnInventoryItemChanged.AddListener(UpdateItemUIS);
-        EventBus.OnItemUIClick.AddListener(OnItemUIClick);
-        _uiCanvasParent.PlayerController.OnItemRotateEvent.AddListener(OnItemRotate);
-
-        // _uiCanvasParent.PlayerController.OnInventoryToggleEvent.AddListener(OnToggleInventory);
-        // _uiCanvasParent.PlayerController.OnUICancelEvent.AddListener(OnUICancel);
-        // _uiCanvasParent.PlayerController.OnItemRotateEvent.AddListener(OnItemRotate);
+        EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
+        EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
+        EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
 
         _currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory : OtherEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
 
+        if (_isPlayerInventory) {
+            TileSize = Mathf.Clamp(_rectTransform.rect.width /_currentEntityInventory.Size.x, 0, _rectTransform.rect.height / _currentEntityInventory.Size.y);
+            Debug.Log(TileSize);
+            EventBus.TileSizeSetEvent?.Invoke();
+        } 
+    }
 
+    public void RegenerateInventory() {
         setupGrid();
         UpdateItemUIS();
     }
@@ -70,7 +74,6 @@ public class InventoryPanel : MonoBehaviour
         _inventoryWidth = _currentEntityInventory.Size.x;
         _inventoryHeight = _currentEntityInventory.Size.y;
 
-        TileSize = Mathf.Clamp(_rectTransform.rect.width /_inventoryWidth, 0, _rectTransform.rect.height / _inventoryHeight);
         _gridLayoutGroup.constraintCount = _inventoryWidth;
 
         _gridLayoutGroup.cellSize = new Vector2(TileSize, TileSize);
@@ -157,6 +160,13 @@ public class InventoryPanel : MonoBehaviour
         }
     }
 
+    public void OnInvTileExit(InvTile invTile) {
+        if (SelectedTile == invTile) {
+            SelectedTile = null;
+        }
+        clearHighlights();
+    }
+
 
     // Inventory methods
     public void UpdateItemUIS() {
@@ -188,8 +198,6 @@ public class InventoryPanel : MonoBehaviour
                 Destroy(child.gameObject);
             }
         }
-        Debug.Log("Removing: "+ inventoryItem);
-        Debug.Log("Removed: " + inventoryItem.Position);
         _currentEntityInventory.RemoveItemAt(inventoryItem.Position);
     }
 
@@ -227,7 +235,7 @@ public class InventoryPanel : MonoBehaviour
         }
 
         _uiCanvasParent.SelectedItemUI.InventoryItem.Position = selectedTilePos;
-        _currentEntityInventory.AddItem(_selectedInventoryItem.ItemData, selectedTilePos);
+        _currentEntityInventory.AddItem(_selectedInventoryItem.ItemData, _selectedInventoryItem.Amount, selectedTilePos);
         
         createItemUI(_selectedInventoryItem);
         _uiCanvasParent.SelectedItemUI.InventoryItem = null;
@@ -267,12 +275,13 @@ public class InventoryPanel : MonoBehaviour
 
     public void OnItemUIClick(ItemUI itemUI) {
         destroyItemUI(itemUI.InventoryItem);
-        // Debug.Log("Removing: "+ _currentEntityInventory.RemoveInventoryItem(itemUI.InventoryItem));
     }
 
-    private void OnItemRotate() {
-        Debug.Log("cleariong");
-        clearHighlights();
-        if (SelectedTile != null) highlightNeighbours(SelectedTile.Pos, _selectedInventoryItem);
+    public void OnPointerEnter() {
+        _uiCanvasParent.ActiveInventoryPanel = this;
+    }
+
+    public void OnPointerExit() {
+        _uiCanvasParent.ActiveInventoryPanel = null;
     }
 }

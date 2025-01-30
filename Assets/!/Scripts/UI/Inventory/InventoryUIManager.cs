@@ -79,7 +79,7 @@ public class InventoryUIManager : MonoBehaviour
     }
 
     private void Start() {
-        EventBus.OnInventoryItemChanged.AddListener(UpdateItemUIS);
+        EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
 
         _uiCanvasParent.PlayerController.OnInventoryToggleEvent.AddListener(OnToggleInventory);
         _uiCanvasParent.PlayerController.OnUICancelEvent.AddListener(OnUICancel);

@@ -75,12 +75,12 @@ public class ItemUI : MonoBehaviour
 
     public void OnPointerEnter() {
         _imageRectTransform.localScale = new Vector3(1.1f, 1.1f, 1);
-        EventBus.OnItemUIHover.Invoke(InventoryItem);
+        EventBus.ItemUIHoverEvent.Invoke(InventoryItem);
     }
 
     public void OnPointerExit() {
         _imageRectTransform.localScale = new Vector3(1, 1, 1);
-        EventBus.OnItemUIHover.Invoke(null);
+        EventBus.ItemUIHoverEvent.Invoke(null);
     }
 
     public void OnPointerDown() {
@@ -90,7 +90,7 @@ public class ItemUI : MonoBehaviour
         _image.color = new Color(1, 1, 1, 1);
     }
     public void OnPointerClick() {
-        EventBus.OnItemUIClick.Invoke(this);
+        EventBus.ItemUIClickEvent.Invoke(this);
     }
 
 }
