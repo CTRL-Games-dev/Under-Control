@@ -46,4 +46,5 @@ public class UICanvas : MonoBehaviour
         SelectedItemUI.InventoryItem = itemUI.InventoryItem;
     }
 
+
 }

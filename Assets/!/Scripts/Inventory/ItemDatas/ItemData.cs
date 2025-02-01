@@ -10,4 +10,5 @@ public class ItemData : ScriptableObject
     public Vector2Int Size;
     public int MaxQuantity;
     public GameObject Model;
+    public int Value;
 }

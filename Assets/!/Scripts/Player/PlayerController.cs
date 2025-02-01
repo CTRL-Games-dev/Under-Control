@@ -26,7 +26,8 @@ public class PlayerController : MonoBehaviour
     public GameObject CameraTargetObject;
 
     [Header("Stats")]
-    public DynamicStat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);    
+    public DynamicStat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
+    public int Coins = 100; 
 
     [Header("Events")]
     public UnityEvent OnInventoryToggleEvent;

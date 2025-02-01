@@ -52,7 +52,7 @@ public class SelectedItemUI : MonoBehaviour
     private void Awake() {
         _rectTransform = GetComponent<RectTransform>();
         _image = GetComponentInChildren<Image>();
-        _uiCanvasParent = gameObject.GetComponentInParent<UICanvas>();
+        _uiCanvasParent = FindAnyObjectByType<UICanvas>();
     }
 
     private void Start() {
@@ -67,7 +67,7 @@ public class SelectedItemUI : MonoBehaviour
         if (transform.rotation != _goalRotation) {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, _goalRotation, _rotationSpeed * Time.deltaTime);
         }
-        if (Input.GetMouseButtonUp(0)) {
+        if (Input.GetMouseButtonUp(0) && _uiCanvasParent.ActiveInventoryPanel != null) {
             _uiCanvasParent.ActiveInventoryPanel.TryMoveSelectedItem();
         }
     }

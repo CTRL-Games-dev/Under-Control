@@ -7,7 +7,7 @@ public class InventoryPanel : MonoBehaviour
 {
     [Header("Assign if not player inventory")]
     [SerializeField] private bool _isPlayerInventory = false;
-    public EntityInventory OtherEntityInventory;
+    public EntityInventory TargetEntityInventory;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject _itemPrefab;
@@ -27,6 +27,7 @@ public class InventoryPanel : MonoBehaviour
     private UICanvas _uiCanvasParent;
     private EntityInventory _currentEntityInventory;
     private GridLayoutGroup _gridLayoutGroup;
+    private Image _layoutImage;
 
 
     // Inventory variables
@@ -37,7 +38,6 @@ public class InventoryPanel : MonoBehaviour
 
     public List<InventoryItem> _inventory => _currentEntityInventory.GetItems();
     private InventoryItem _selectedInventoryItem => _uiCanvasParent.SelectedItemUI.InventoryItem;
-    private bool _isActivePanel => _uiCanvasParent.ActiveInventoryPanel == this;
 
     // Grid variables
     public InvTile SelectedTile { get; set; }
@@ -45,7 +45,9 @@ public class InventoryPanel : MonoBehaviour
 
     private void Awake() {
         _rectTransform = GetComponent<RectTransform>();
-        _uiCanvasParent = gameObject.GetComponentInParent<UICanvas>(); 
+        _layoutImage = GetComponent<Image>();
+        _layoutImage.enabled = false;
+        _uiCanvasParent = FindAnyObjectByType<UICanvas>();
         _gridLayoutGroup = _gridHolder.GetComponent<GridLayoutGroup>();
     }
 
@@ -54,7 +56,7 @@ public class InventoryPanel : MonoBehaviour
         EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
         EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
 
-        _currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory : OtherEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
+        _currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory : TargetEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
 
         if (_isPlayerInventory) {
             TileSize = Mathf.Clamp(_rectTransform.rect.width /_currentEntityInventory.Size.x, 0, _rectTransform.rect.height / _currentEntityInventory.Size.y);
@@ -64,6 +66,7 @@ public class InventoryPanel : MonoBehaviour
     }
 
     public void RegenerateInventory() {
+        if ((_currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory : TargetEntityInventory) == null) return; 
         setupGrid();
         UpdateItemUIS();
     }
@@ -152,7 +155,7 @@ public class InventoryPanel : MonoBehaviour
 
     public void OnInvTileEnter(InvTile invTile) {
         SelectedTile = invTile;
-        if (_uiCanvasParent.SelectedItemUI.InventoryItem != null) {
+        if (_uiCanvasParent.SelectedItemUI.InventoryItem != null && invTile != null) {
             clearHighlights();
             highlightNeighbours(invTile.Pos, _selectedInventoryItem);
         } else {
