@@ -27,12 +27,22 @@ public class PlayerController : MonoBehaviour
 
     [Header("Stats")]
     public DynamicStat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
-    public int Coins = 100; 
+    private int _coins = 100;
+    public int Coins { 
+        get{
+            return _coins;
+        } set {
+            CoinsChangeEvent?.Invoke(value - _coins);
+            _coins = value;
+        }  
+    } 
 
     [Header("Events")]
-    public UnityEvent OnInventoryToggleEvent;
-    public UnityEvent OnUICancelEvent;
-    public UnityEvent OnItemRotateEvent;
+    public UnityEvent InventoryToggleEvent;
+    public UnityEvent UICancelEvent;
+    public UnityEvent ItemRotateEvent;
+    public UnityEvent<int> CoinsChangeEvent;
+    // public UnityEvent 
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
@@ -246,15 +256,15 @@ public class PlayerController : MonoBehaviour
     }
 
     void OnToggleInventory(InputValue value) {
-        OnInventoryToggleEvent.Invoke();
+        InventoryToggleEvent?.Invoke();
     }
 
     void OnCancel(InputValue value) {
-        OnUICancelEvent.Invoke();
+        UICancelEvent?.Invoke();
     }
 
     void OnRotateItem(InputValue value) {
-        OnItemRotateEvent.Invoke();
+        ItemRotateEvent?.Invoke();
     }
 
     // Animation events

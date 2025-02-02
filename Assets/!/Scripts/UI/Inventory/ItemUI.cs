@@ -14,6 +14,7 @@ public class ItemUI : MonoBehaviour
     public Image Image { get => _image; }
 
     private TextMeshProUGUI _amountText;
+    public InventoryPanel CurrentInventoryPanel;
     public int Amount { 
         set {
             if (value == 1) {
@@ -43,11 +44,12 @@ public class ItemUI : MonoBehaviour
     }
 
 
-    public void SetupItem(InventoryItem item, float tileSize, List<InvTile> occupiedTiles) {
+    public void SetupItem(InventoryItem item, float tileSize, List<InvTile> occupiedTiles, InventoryPanel inventoryPanel) {
         InventoryItem = item;
         _occupiedTiles = occupiedTiles;
+        CurrentInventoryPanel = inventoryPanel;
 
-        
+
         _containerRectTransform.sizeDelta = new Vector2(tileSize, tileSize);
         _pivotRectTransform.sizeDelta = new Vector2(tileSize, tileSize);
 
@@ -75,7 +77,7 @@ public class ItemUI : MonoBehaviour
 
     public void OnPointerEnter() {
         _imageRectTransform.localScale = new Vector3(1.1f, 1.1f, 1);
-        EventBus.ItemUIHoverEvent.Invoke(InventoryItem);
+        EventBus.ItemUIHoverEvent.Invoke(this);
     }
 
     public void OnPointerExit() {

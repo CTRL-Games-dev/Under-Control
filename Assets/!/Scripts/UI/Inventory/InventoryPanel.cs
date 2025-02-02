@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class InventoryPanel : MonoBehaviour
 {
     [Header("Assign if not player inventory")]
     [SerializeField] private bool _isPlayerInventory = false;
+    public bool IsSellerInventory = false;
     public EntityInventory TargetEntityInventory;
 
     [Header("Prefabs")]
@@ -22,6 +24,9 @@ public class InventoryPanel : MonoBehaviour
     [Header("Interactions")]
     [SerializeField] private Image _redPanel;
 
+    // Events
+    public static UnityEvent ItemPlacedEvent = new();
+    
     // References set in Awake or Start
     private RectTransform _rectTransform;
     private UICanvas _uiCanvasParent;
@@ -55,12 +60,12 @@ public class InventoryPanel : MonoBehaviour
         EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
         EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
         EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
+        ItemPlacedEvent.AddListener(() => setImagesRaycastTarget(true));
 
         _currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory : TargetEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
 
         if (_isPlayerInventory) {
             TileSize = Mathf.Clamp(_rectTransform.rect.width /_currentEntityInventory.Size.x, 0, _rectTransform.rect.height / _currentEntityInventory.Size.y);
-            Debug.Log(TileSize);
             EventBus.TileSizeSetEvent?.Invoke();
         } 
     }
@@ -179,14 +184,16 @@ public class InventoryPanel : MonoBehaviour
         }
     }
 
-    private void createItemUI(InventoryItem inventoryItem){
-        var itemGameObject = Instantiate(_itemPrefab, _itemHolder.transform);
+    private GameObject createItemUI(InventoryItem inventoryItem){
+        GameObject itemGameObject = Instantiate(_itemPrefab, _itemHolder.transform);
         itemGameObject.name = inventoryItem.ItemData.DisplayName;
 
         inventoryItem.RectTransform = itemGameObject.GetComponent<RectTransform>();
 
         inventoryItem.ItemUI = itemGameObject.GetComponent<ItemUI>();
-        inventoryItem.ItemUI.SetupItem(inventoryItem, TileSize, occupyTiles(inventoryItem));
+        inventoryItem.ItemUI.SetupItem(inventoryItem, TileSize, occupyTiles(inventoryItem), this);
+
+        return itemGameObject;
     }
 
     private void destroyItemUI(InventoryItem inventoryItem) {
@@ -201,7 +208,9 @@ public class InventoryPanel : MonoBehaviour
                 Destroy(child.gameObject);
             }
         }
-        _currentEntityInventory.RemoveItemAt(inventoryItem.Position);
+
+        _currentEntityInventory.RemoveInventoryItem(inventoryItem);
+        // _currentEntityInventory.RemoveItemAt(inventoryItem.Position);
     }
 
     public void TryMoveSelectedItem() {
@@ -237,12 +246,15 @@ public class InventoryPanel : MonoBehaviour
             return;
         }
 
-        _uiCanvasParent.SelectedItemUI.InventoryItem.Position = selectedTilePos;
         _currentEntityInventory.AddItem(_selectedInventoryItem.ItemData, _selectedInventoryItem.Amount, selectedTilePos, _selectedInventoryItem.Rotated);
+        GameObject item = createItemUI(_currentEntityInventory.GetInventoryItem(selectedTilePos));
         
-        createItemUI(_selectedInventoryItem);
+        if (item.GetComponent<ItemUI>().CurrentInventoryPanel.IsSellerInventory) {
+            _uiCanvasParent.PlayerController.Coins += (_selectedInventoryItem.ItemData.Value / 2) * _selectedInventoryItem.Amount;
+        }
+
         _uiCanvasParent.SelectedItemUI.InventoryItem = null;
-        setImagesRaycastTarget(true);
+        ItemPlacedEvent?.Invoke();
 
         SelectedTile.SetHighlight(false);
     }
@@ -277,7 +289,13 @@ public class InventoryPanel : MonoBehaviour
     // callbacks
 
     public void OnItemUIClick(ItemUI itemUI) {
-        destroyItemUI(itemUI.InventoryItem);
+        if (_inventory.Contains(itemUI.InventoryItem)) {
+            if (IsSellerInventory) {
+                _uiCanvasParent.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
+            }  
+            destroyItemUI(itemUI.InventoryItem);
+        } 
+        setImagesRaycastTarget(false);
     }
 
     public void OnPointerEnter() {

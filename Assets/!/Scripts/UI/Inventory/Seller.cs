@@ -10,7 +10,7 @@ public class Seller : MonoBehaviour
 
     void OnTriggerEnter(Collider other) {
         if (other.CompareTag("Player")) {
-            _inventoryPanel = Instantiate(_sellerUIPrefab, FindFirstObjectByType<UICanvas>().transform);
+            _inventoryPanel = Instantiate(_sellerUIPrefab, FindFirstObjectByType<UICanvas>().GetComponent<UICanvas>().InventoryBG.transform);
             InventoryPanel inventoryPanel = _inventoryPanel.GetComponentInChildren<InventoryPanel>();
             inventoryPanel.TargetEntityInventory = Inventory;
             inventoryPanel.RegenerateInventory();

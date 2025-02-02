@@ -81,9 +81,9 @@ public class InventoryUIManager : MonoBehaviour
     private void Start() {
         EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
 
-        _uiCanvasParent.PlayerController.OnInventoryToggleEvent.AddListener(OnToggleInventory);
-        _uiCanvasParent.PlayerController.OnUICancelEvent.AddListener(OnUICancel);
-        _uiCanvasParent.PlayerController.OnItemRotateEvent.AddListener(OnItemRotate);
+        // _uiCanvasParent.PlayerController.OnInventoryToggleEvent.AddListener(OnToggleInventory);
+        // _uiCanvasParent.PlayerController.OnUICancelEvent.AddListener(OnUICancel);
+        // _uiCanvasParent.PlayerController.OnItemRotateEvent.AddListener(OnItemRotate);
 
         _currentEntityInventory = OtherEntityInventory ?? _uiCanvasParent.PlayerInventory; // If OtherEntityInventory is null, use PlayerInventory
 
@@ -118,7 +118,7 @@ public class InventoryUIManager : MonoBehaviour
 
         inventoryItem.ItemUI = itemGameObject.GetComponent<ItemUI>();
         // inventoryItem.ItemUI.InventoryUIManager = this;
-        inventoryItem.ItemUI.SetupItem(inventoryItem, TileSize, OccupyTiles(inventoryItem));
+        // inventoryItem.ItemUI.SetupItem(inventoryItem, TileSize, OccupyTiles(inventoryItem));
     }
 
     private void destroyItemUI(InventoryItem inventoryItem) {

@@ -11,6 +11,11 @@ public class SelectedItemUI : MonoBehaviour
     public InventoryItem InventoryItem { 
         get { return _inventoryItem; } 
         set {
+            if (_inventoryItem != null && value != null) {
+                Debug.Log("debil?");
+                return;
+            }
+
             _inventoryItem = value;
             gameObject.SetActive(_inventoryItem != null);
             if (_inventoryItem == null) {
@@ -56,7 +61,7 @@ public class SelectedItemUI : MonoBehaviour
     }
 
     private void Start() {
-        _uiCanvasParent.PlayerController.OnItemRotateEvent.AddListener(Rotate);
+        _uiCanvasParent.PlayerController.ItemRotateEvent.AddListener(OnRotate);
     }
 
     private void Update()  {
@@ -72,7 +77,7 @@ public class SelectedItemUI : MonoBehaviour
         }
     }
 
-    public void Rotate() {
+    public void OnRotate() {
         if(_inventoryItem == null) {
             return;
         }
