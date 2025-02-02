@@ -238,7 +238,7 @@ public class InventoryPanel : MonoBehaviour
         }
 
         _uiCanvasParent.SelectedItemUI.InventoryItem.Position = selectedTilePos;
-        _currentEntityInventory.AddItem(_selectedInventoryItem.ItemData, _selectedInventoryItem.Amount, selectedTilePos);
+        _currentEntityInventory.AddItem(_selectedInventoryItem.ItemData, _selectedInventoryItem.Amount, selectedTilePos, _selectedInventoryItem.Rotated);
         
         createItemUI(_selectedInventoryItem);
         _uiCanvasParent.SelectedItemUI.InventoryItem = null;
