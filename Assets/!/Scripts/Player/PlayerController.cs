@@ -55,6 +55,7 @@ public class PlayerController : MonoBehaviour
     // private int _animationIdSprinting = Animator.StringToHash("sprinting");
     // private int _animationIdJumping = Animator.StringToHash("jumping");
 
+    private InputAction _interactAction;
     void Start()
     {
         CharacterController = GetComponent<CharacterController>();
@@ -64,36 +65,21 @@ public class PlayerController : MonoBehaviour
         
         // _targetDirection = transform.forward;
         _cameraDistance = MinCameraDistance;
+
+        _interactAction = InputSystem.actions.FindAction("Interact");
     }
 
     void Update()
     {
         recalculateStats();
 
-        // if(ApplySpellTest) {
-        //     new TestSpell().Cast(_livingEntity);
-        //     ApplySpellTest = false;
-        // }
-
-        // if(ApplySpellTests) {
-        //     new TestSpell().Cast(_livingEntity);
-        //     ApplySpellTests = false;
-        // }
-
-        // Make use of this once we have proper animations and model
-        // HandleMovement();
-        // HandleTurning();
-        //
-        // Rotate camera target to account for player mouse input 
-        // cameraTargetObject.transform.rotation = Quaternion.FromToRotation(Vector3.forward, targetDirection);
-   
-        // Placeholder for movement logic
-        // I guess in our game we don't need this?
-        // transform.rotation = Quaternion.FromToRotation(Vector3.forward, _targetDirection);
-     
         var movementVector = Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
-
         CharacterController.SimpleMove(movementVector * LivingEntity.MovementSpeed);
+
+        if(_interactAction.WasPressedThisFrame())
+        {
+            InteractWith();
+        }
     }
 
     // Handles animator movement logic
@@ -268,5 +254,18 @@ public class PlayerController : MonoBehaviour
 
     void OnPlayerDeath() {
         Debug.Log("Player died");
+    }
+
+    private void InteractWith()
+    {
+        float interactRange = 2f;
+        Collider[] colliderArray = Physics.OverlapSphere(transform.position, interactRange);
+        foreach(Collider c in colliderArray)
+        {
+            if(c.TryGetComponent(out IInteractable i))
+            {
+                i.Interact(this);
+            }
+        }
     }
 }
