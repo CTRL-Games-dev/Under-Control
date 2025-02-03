@@ -94,6 +94,18 @@ public class ItemContainer
     }
 
     // Returns true if the item was added
+    public bool AddItem(ItemData itemData, int amount, Vector2Int position, bool rotated) {
+        if(!IsWithinBounds(position)) {
+            throw new Exception("Position is out of bounds");
+        }
+
+        // if(!CanBeAdded(itemData, amount, position)) { // TODO: check if can be added when rotated
+        //     return false;
+        // }
+
+        return addItem(itemData, amount, position, rotated);
+    }
+
     public bool AddItem(ItemData itemData, int amount, Vector2Int position) {
         if(!IsWithinBounds(position)) {
             throw new Exception("Position is out of bounds");
@@ -130,7 +142,7 @@ public class ItemContainer
         return AddItem(itemData, 1);
     }
 
-    private bool addItem(ItemData itemData, int amount, Vector2Int position) {
+    private bool addItem(ItemData itemData, int amount, Vector2Int position, bool rotated = false) {
         var inventoryItem = GetInventoryItem(position);
         if(inventoryItem != null) {
             if(!inventoryItem.ItemData.Equals(itemData)) {
@@ -149,7 +161,8 @@ public class ItemContainer
         inventoryItem = new InventoryItem {
             ItemData = itemData,
             Amount = amount,
-            Position = position
+            Position = position,
+            Rotated = rotated
         };
 
         _items.Add(inventoryItem);

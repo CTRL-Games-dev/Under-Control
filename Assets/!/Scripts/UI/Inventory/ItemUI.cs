@@ -10,12 +10,11 @@ public class ItemUI : MonoBehaviour
     [SerializeField] private RectTransform _imageRectTransform;
     [SerializeField] private GameObject _quantityGameObject;
 
-    public InventoryUIManager InventoryUIManager;
-
     private Image _image;
     public Image Image { get => _image; }
 
     private TextMeshProUGUI _amountText;
+    public InventoryPanel CurrentInventoryPanel;
     public int Amount { 
         set {
             if (value == 1) {
@@ -45,11 +44,12 @@ public class ItemUI : MonoBehaviour
     }
 
 
-    public void SetupItem(InventoryItem item, float tileSize, List<InvTile> occupiedTiles) {
+    public void SetupItem(InventoryItem item, float tileSize, List<InvTile> occupiedTiles, InventoryPanel inventoryPanel) {
         InventoryItem = item;
         _occupiedTiles = occupiedTiles;
+        CurrentInventoryPanel = inventoryPanel;
 
-        
+
         _containerRectTransform.sizeDelta = new Vector2(tileSize, tileSize);
         _pivotRectTransform.sizeDelta = new Vector2(tileSize, tileSize);
 
@@ -60,8 +60,6 @@ public class ItemUI : MonoBehaviour
 
         _imageRectTransform.sizeDelta = new Vector2(tileSize * InventoryItem.Size.x, tileSize * InventoryItem.Size.y);
         _image.sprite = InventoryItem.ItemData.Icon;
-
-        
 
         _quantityGameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(tileSize, tileSize / 2);
         _amountText = _quantityGameObject.GetComponent<TextMeshProUGUI>();
@@ -79,12 +77,12 @@ public class ItemUI : MonoBehaviour
 
     public void OnPointerEnter() {
         _imageRectTransform.localScale = new Vector3(1.1f, 1.1f, 1);
-        InventoryUIManager.DisplayItemInfo(InventoryItem);
+        EventBus.ItemUIHoverEvent.Invoke(this);
     }
 
     public void OnPointerExit() {
         _imageRectTransform.localScale = new Vector3(1, 1, 1);
-        InventoryUIManager.DisplayItemInfo(null);
+        EventBus.ItemUIHoverEvent.Invoke(null);
     }
 
     public void OnPointerDown() {
@@ -94,7 +92,7 @@ public class ItemUI : MonoBehaviour
         _image.color = new Color(1, 1, 1, 1);
     }
     public void OnPointerClick() {
-        InventoryUIManager.SetSelectedInventoryItem(InventoryItem);
+        EventBus.ItemUIClickEvent.Invoke(this);
     }
 
 }

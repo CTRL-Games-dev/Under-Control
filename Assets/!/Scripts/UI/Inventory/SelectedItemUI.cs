@@ -4,25 +4,37 @@ using UnityEngine.UI;
 
 public class SelectedItemUI : MonoBehaviour
 {
+    [SerializeField] private RectTransform _imageRectTransform;
     [SerializeField] private TextMeshProUGUI _amountText;
 
     private InventoryItem _inventoryItem = null;
     public InventoryItem InventoryItem { 
         get { return _inventoryItem; } 
         set {
+            if (_inventoryItem != null && value != null) {
+                Debug.Log("debil?");
+                return;
+            }
+
             _inventoryItem = value;
+            gameObject.SetActive(_inventoryItem != null);
             if (_inventoryItem == null) {
+
                 _image.sprite = null;
                 transform.rotation = Quaternion.identity;
                 gameObject.SetActive(false);
+
             } else {
-                transform.rotation = _inventoryItem.Rotated ? Quaternion.Euler(0, 0, 90) : Quaternion.identity; 
+                _uiCanvasParent.ItemInfoPanel.ShowItemInfo(null);
+
+                transform.rotation = _inventoryItem.Rotated ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
+                _goalRotation = transform.rotation; 
                 transform.position = Input.mousePosition;
 
                 gameObject.SetActive(true);
 
-                _rectTransform.sizeDelta = new Vector2(InventoryUIManager.TileSize, InventoryUIManager.TileSize);
-                _imageRectTransform.sizeDelta = new Vector2(InventoryUIManager.TileSize * _inventoryItem.Size.x, InventoryUIManager.TileSize * _inventoryItem.Size.y);
+                _rectTransform.sizeDelta = new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize);
+                _imageRectTransform.sizeDelta = new Vector2(InventoryPanel.TileSize * _inventoryItem.Size.x, InventoryPanel.TileSize * _inventoryItem.Size.y);
 
                 _image.sprite = _inventoryItem.ItemData.Icon;
                 if (_inventoryItem.Amount == 1) {
@@ -35,13 +47,21 @@ public class SelectedItemUI : MonoBehaviour
     }
 
     private RectTransform _rectTransform;
-    [SerializeField] private RectTransform _imageRectTransform;
     private Image _image;
+    private UICanvas _uiCanvasParent;
+
+    private Quaternion _goalRotation;
+    [SerializeField] private float _rotationSpeed = 10f;
 
 
     private void Awake() {
         _rectTransform = GetComponent<RectTransform>();
         _image = GetComponentInChildren<Image>();
+        _uiCanvasParent = FindAnyObjectByType<UICanvas>();
+    }
+
+    private void Start() {
+        _uiCanvasParent.PlayerController.ItemRotateEvent.AddListener(OnRotate);
     }
 
     private void Update()  {
@@ -49,12 +69,22 @@ public class SelectedItemUI : MonoBehaviour
             return;
         }
         transform.position = Input.mousePosition;
+        if (transform.rotation != _goalRotation) {
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, _goalRotation, _rotationSpeed * Time.deltaTime);
+        }
+        if (Input.GetMouseButtonUp(0) && _uiCanvasParent.ActiveInventoryPanel != null) {
+            _uiCanvasParent.ActiveInventoryPanel.TryMoveSelectedItem();
+        }
     }
 
-    public void Rotate(bool val) {
+    public void OnRotate() {
         if(_inventoryItem == null) {
             return;
         }
-        transform.rotation = val ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
+        InventoryItem.Rotated = !InventoryItem.Rotated;
+        _goalRotation = InventoryItem.Rotated ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
+
+        if (_uiCanvasParent.ActiveInventoryPanel != null)  
+            _uiCanvasParent.ActiveInventoryPanel.OnInvTileEnter(_uiCanvasParent.ActiveInventoryPanel.SelectedTile);
     }
 }

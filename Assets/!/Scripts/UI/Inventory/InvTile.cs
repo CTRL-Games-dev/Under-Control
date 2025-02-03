@@ -7,7 +7,7 @@ public class InvTile : MonoBehaviour
     private GameObject _highlightImage;
 
     private Image _image;
-    public InventoryUIManager InventoryUIManager;
+    public InventoryPanel InventoryPanel;
     
     private bool _isEmpty = true;
     public bool IsEmpty {
@@ -31,44 +31,22 @@ public class InvTile : MonoBehaviour
     }
 
     public void OnPointerEnter() {
-        InventoryUIManager.SelectedTile = this;
-        if (InventoryUIManager.SelectedInventoryItem != null) {
-            InventoryUIManager.ClearHighlights();
-            InventoryUIManager.HighlightNeighbours(Pos, InventoryUIManager.SelectedInventoryItem);
-        } else {
-            InventoryUIManager.ClearHighlights();
-        }
+        InventoryPanel.OnInvTileEnter(this);
         _highlightImage.SetActive(true);
-        
     }
     public void OnPointerExit() {
-        if (InventoryUIManager.SelectedTile == this) {
-            InventoryUIManager.SelectedTile = null;
-            _highlightImage.SetActive(false);
-        }
-        // StartCoroutine(DeHighlight());
-    }
-    private IEnumerator DeHighlight() {
-        yield return new WaitForSeconds(0.1f);
-        if (InventoryUIManager.SelectedTile == this) {
-            InventoryUIManager.SelectedTile = null;
-            _highlightImage.SetActive(false);
-        }
+        InventoryPanel.OnInvTileExit(this);
     }
 
+
     public void OnPointerClick() {
-        InventoryUIManager.TryMoveSelectedItem();
+        InventoryPanel.TryMoveSelectedItem();
     }
     public void OnDrop() {
-        InventoryUIManager.TryMoveSelectedItem();
+        InventoryPanel.TryMoveSelectedItem();
     }
 
     public void SetHighlight(bool value) {
-        // if (!IsEmpty) {
-        //     _highlightImage.GetComponent<Image>().color = Color.red;
-        // } else {
-        //     _highlightImage.GetComponent<Image>().color = Color.green;
-        // }
         _highlightImage.SetActive(value);
     }
 }
