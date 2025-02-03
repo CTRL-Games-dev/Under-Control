@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviour
     private bool _isTurning;
     private float _cameraDistance { get => _cinemachinePositionComposer.CameraDistance; set => _cinemachinePositionComposer.CameraDistance = value; }
     private bool _lightAttack;
+    private bool _chargeAttack;
     private int _comboCounter;
 
     // References
@@ -200,6 +201,12 @@ public class PlayerController : MonoBehaviour
             print("Knockback attack");
             _comboCounter = 0;
         }
+
+        if (_chargeAttack && _comboCounter == 0) 
+        {
+            print("Charge attack");
+            _chargeAttack = false;
+        }
     }
 
     public IEnumerator ResetCombo() {
@@ -269,6 +276,7 @@ public class PlayerController : MonoBehaviour
 
     void OnChargeAttack(InputValue value) {
         //_animator.SetTrigger("chargeAttack");
+        _chargeAttack = value.isPressed;        
     }
 
     void OnDodge(InputValue value) {
