@@ -38,6 +38,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
                 break;
             }
         }
+        CloseUI();
     }
     public void OpenUI()
     {
