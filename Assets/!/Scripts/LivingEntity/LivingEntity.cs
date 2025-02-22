@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(ModifierSystem))]
-[RequireComponent(typeof(IEntityInventory))]
+[RequireComponent(typeof(EntityInventory))]
 public class LivingEntity : MonoBehaviour
 {
     private struct EffectData {
@@ -16,10 +16,6 @@ public class LivingEntity : MonoBehaviour
     public Guild Guild;
     public bool DropItemsOnDeath = true;
     public float TimeToRegenAfterDamage = 2;
-
-    [SerializeField]
-    private IEntityInventory _inventory;
-    public IEntityInventory Inventory { get => _inventory; private set => _inventory = value; }
 
     public int Exp = 0;
     public float Level { get => 1 + Exp / 100f; }
@@ -45,11 +41,11 @@ public class LivingEntity : MonoBehaviour
 
     // References
     public ModifierSystem ModifierSystem { get; private set; }
+    public EntityInventory Inventory { get; private set; }
 
-    void Start()
-    {
+    void Awake() {
         ModifierSystem = GetComponent<ModifierSystem>();
-        _inventory = GetComponent<IEntityInventory>();
+        Inventory = GetComponent<EntityInventory>();
     }
 
     void Update() {

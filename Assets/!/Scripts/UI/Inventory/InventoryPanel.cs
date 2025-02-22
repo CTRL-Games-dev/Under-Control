@@ -9,7 +9,7 @@ public class InventoryPanel : MonoBehaviour
     [Header("Assign if not player inventory")]
     [SerializeField] private bool _isPlayerInventory = false;
     public bool IsSellerInventory = false;
-    public HumanoidInventory TargetEntityInventory;
+    public ItemContainer TargetEntityInventory;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject _itemPrefab;
@@ -30,7 +30,7 @@ public class InventoryPanel : MonoBehaviour
     // References set in Awake or Start
     private RectTransform _rectTransform;
     private UICanvas _uiCanvasParent;
-    private HumanoidInventory _currentEntityInventory;
+    private ItemContainer _currentEntityInventory;
     private GridLayoutGroup _gridLayoutGroup;
     private Image _layoutImage;
 
@@ -62,7 +62,7 @@ public class InventoryPanel : MonoBehaviour
         EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
         ItemPlacedEvent.AddListener(() => setImagesRaycastTarget(true));
 
-        _currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory : TargetEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
+        _currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory.itemContainer : TargetEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
 
         if (_isPlayerInventory) {
             TileSize = Mathf.Clamp(_rectTransform.rect.width / _currentEntityInventory.Size.x, 0, _rectTransform.rect.height / _currentEntityInventory.Size.y);
@@ -71,7 +71,7 @@ public class InventoryPanel : MonoBehaviour
     }
 
     public void RegenerateInventory() {
-        if ((_currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory : TargetEntityInventory) == null) return; 
+        if ((_currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory.itemContainer : TargetEntityInventory) == null) return; 
         setupGrid();
         UpdateItemUIS();
     }
