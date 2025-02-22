@@ -16,6 +16,7 @@ public class Portal : MonoBehaviour
             PlayerEnteredPortal.Invoke(_dimension);
         }
     }
+    
     public void ChangeDimension(Dimension d) {
         Debug.Log("Changed dimension to: " + d.ToString());
         _dimension = d;

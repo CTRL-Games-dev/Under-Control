@@ -2,8 +2,7 @@ using UnityEngine;
 
 // Jeszcze nie wiem jak to zrobimy
 // Placeholder
-public class ItemManager : MonoBehaviour
-{
+public class ItemManager : MonoBehaviour {
     public ItemData TestItem;
     public ItemData TestItem2;
 

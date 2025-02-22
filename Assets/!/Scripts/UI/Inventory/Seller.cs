@@ -3,8 +3,8 @@ using UnityEngine;
 public class Seller : MonoBehaviour, IInteractable
 {
     [SerializeField] private GameObject _sellerUIPrefab; 
-    [SerializeField] private EntityInventory _inventory = new EntityInventory();
-    public EntityInventory Inventory { get => _inventory; private set => _inventory = value; }
+    [SerializeField] private ItemContainer _inventory;
+    public ItemContainer Inventory { get => _inventory; private set => _inventory = value; }
     public GameObject _inventoryPanel;
 
     // void OnTriggerEnter(Collider other) {

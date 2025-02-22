@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 
-public class ItemEntity : MonoBehaviour
+public class ItemEntity : MonoBehaviour, IInteractable
 {
     public int Amount;
     public ItemData ItemData;
@@ -13,14 +13,8 @@ public class ItemEntity : MonoBehaviour
         _title.text = ItemData.DisplayName;
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        var livingEntity = other.GetComponent<LivingEntity>();
-        if(livingEntity == null) {
-            return;
-        }
-
-        if(!livingEntity.Inventory.AddItem(ItemData, Amount)) {
+    public void Interact(PlayerController player) {
+        if(!player.LivingEntity.Inventory.AddItem(ItemData, Amount)) {
             return;
         }
 

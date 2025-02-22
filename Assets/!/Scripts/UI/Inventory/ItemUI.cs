@@ -27,26 +27,16 @@ public class ItemUI : MonoBehaviour
     } 
 
     public InventoryItem InventoryItem;
-    private List<InvTile> _occupiedTiles = new List<InvTile>();
-    public List<InvTile> OccupiedTiles { 
-        get { 
-            return _occupiedTiles; 
-        }
-        set {
-            _occupiedTiles = value;
-        } 
-    }
-
+    public List<InvTile> OccupiedTiles = new List<InvTile>();
 
     private void Awake() {
         _containerRectTransform = GetComponent<RectTransform>();
         _image = GetComponentInChildren<Image>();
     }
 
-
     public void SetupItem(InventoryItem item, float tileSize, List<InvTile> occupiedTiles, InventoryPanel inventoryPanel) {
         InventoryItem = item;
-        _occupiedTiles = occupiedTiles;
+        OccupiedTiles = occupiedTiles;
         CurrentInventoryPanel = inventoryPanel;
 
 

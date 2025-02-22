@@ -2,17 +2,15 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(LivingEntity))]
 public class ModifierSystem : MonoBehaviour
 {
     [Serializable]
-    private struct _modifierData {
+    private struct ModifierData {
         public Modifier Modifier;
         public float Expiration;
     }
 
-
-    [SerializeField] private List<_modifierData> _activeModifiers = new List<_modifierData>();
+    [SerializeField] private List<ModifierData> _activeModifiers = new List<ModifierData>();
 
     void Update() {
         for(int i = 0; i < _activeModifiers.Count; i++) {
@@ -25,14 +23,14 @@ public class ModifierSystem : MonoBehaviour
     }
 
     public void ApplyIndefiniteModifier(Modifier modifier) {
-        _activeModifiers.Add(new _modifierData {
+        _activeModifiers.Add(new ModifierData {
             Modifier = modifier,
             Expiration = Mathf.Infinity
         });
     }
 
     public void ApplyTemporaryModifier(Modifier modifier, float duration) {
-        _activeModifiers.Add(new _modifierData {
+        _activeModifiers.Add(new ModifierData {
             Modifier = modifier,
             Expiration = Time.time + duration
         });

@@ -9,7 +9,7 @@ public class InventoryPanel : MonoBehaviour
     [Header("Assign if not player inventory")]
     [SerializeField] private bool _isPlayerInventory = false;
     public bool IsSellerInventory = false;
-    public EntityInventory TargetEntityInventory;
+    public ItemContainer TargetEntityInventory;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject _itemPrefab;
@@ -30,7 +30,7 @@ public class InventoryPanel : MonoBehaviour
     // References set in Awake or Start
     private RectTransform _rectTransform;
     private UICanvas _uiCanvasParent;
-    private EntityInventory _currentEntityInventory;
+    private ItemContainer _currentEntityInventory;
     private GridLayoutGroup _gridLayoutGroup;
     private Image _layoutImage;
 
@@ -38,6 +38,8 @@ public class InventoryPanel : MonoBehaviour
     // Inventory variables
     private static float _tileSize = 0;
     public static float TileSize { get {return _tileSize;} set {_tileSize = value;} }
+    
+    [SerializeField]
     private InvTile[,] _inventoryTileArray;
     private int _inventoryWidth, _inventoryHeight;
 
@@ -62,16 +64,16 @@ public class InventoryPanel : MonoBehaviour
         EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
         ItemPlacedEvent.AddListener(() => setImagesRaycastTarget(true));
 
-        _currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory : TargetEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
+        _currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory.itemContainer : TargetEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
 
         if (_isPlayerInventory) {
-            TileSize = Mathf.Clamp(_rectTransform.rect.width /_currentEntityInventory.Size.x, 0, _rectTransform.rect.height / _currentEntityInventory.Size.y);
+            TileSize = Mathf.Clamp(_rectTransform.rect.width / _currentEntityInventory.Size.x, 0, _rectTransform.rect.height / _currentEntityInventory.Size.y);
             EventBus.TileSizeSetEvent?.Invoke();
         } 
     }
 
     public void RegenerateInventory() {
-        if ((_currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory : TargetEntityInventory) == null) return; 
+        if ((_currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory.itemContainer : TargetEntityInventory) == null) return; 
         setupGrid();
         UpdateItemUIS();
     }

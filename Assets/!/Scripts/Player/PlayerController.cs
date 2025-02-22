@@ -17,7 +17,6 @@ public class PlayerController : MonoBehaviour
     public float MaxSprintingSpeed = 2f;
     public float MouseSensitivity = 0.1f;
     public float WalkingTurnSpeed = 1f;
-    // public float SprintingTurnSpeed = 2.5f;
     public float MinCameraDistance = 10f;
     public float MaxCameraDistance = 30f;
     public float CameraDistanceSpeed = 1f;
@@ -42,15 +41,9 @@ public class PlayerController : MonoBehaviour
     public UnityEvent UICancelEvent;
     public UnityEvent ItemRotateEvent;
     public UnityEvent<int> CoinsChangeEvent;
-    // public UnityEvent 
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
-    // private Vector3 _targetDirection;
-    // private bool _sprinting = false;
-    // private float _velocitySide = 0;
-    // private float _velocityFront = 0;
-    // private bool _isTurning;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
 
     // References
@@ -59,14 +52,6 @@ public class PlayerController : MonoBehaviour
     public LivingEntity LivingEntity { get; private set; }
     public CinemachinePositionComposer CinemachinePositionComposer { get; private set; }
     
-    // Animation IDs
-    // private int _animationIdVelocitySide = Animator.StringToHash("velocitySide");
-    // private int _animationIdVelocityFront = Animator.StringToHash("velocityFront");
-    // private int _animationIdMoving = Animator.StringToHash("moving");
-    // private int _animationIdSprinting = Animator.StringToHash("sprinting");
-    // private int _animationIdJumping = Animator.StringToHash("jumping");
-
-    private InputAction _interactAction;
     void Start()
     {
         CharacterController = GetComponent<CharacterController>();
@@ -76,8 +61,6 @@ public class PlayerController : MonoBehaviour
         
         // _targetDirection = transform.forward;
         _cameraDistance = MinCameraDistance;
-
-        _interactAction = InputSystem.actions.FindAction("Interact");
     }
 
     void Update()
@@ -87,17 +70,7 @@ public class PlayerController : MonoBehaviour
         recalculateStats();
 
         var movementVector = Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
-        // CharacterController.SimpleMove(movementVector * LivingEntity.MovementSpeed); // nie dziala???
-        CharacterController.Move(movementVector * Acceleration * Time.deltaTime);
-
-        // temporary 
-        if (movementVector != Vector3.zero) 
-            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(movementVector), WalkingTurnSpeed * Time.deltaTime);
-
-        if(_interactAction.WasPressedThisFrame())
-        {
-            InteractWith();
-        }
+        CharacterController.SimpleMove(movementVector * LivingEntity.MovementSpeed);
     }
 
     private void recalculateStats() {
@@ -160,6 +133,20 @@ public class PlayerController : MonoBehaviour
         ItemRotateEvent?.Invoke();
     }
 
+    // Totalnie do zmiany, potrzebujemy interakcji myszka
+    void OnInteract(InputValue value)
+    {
+        float interactRange = 2f;
+        Collider[] colliderArray = Physics.OverlapSphere(transform.position, interactRange);
+        foreach(Collider c in colliderArray)
+        {
+            if(c.TryGetComponent(out IInteractable i))
+            {
+                i.Interact(this);
+            }
+        }
+    }
+
     // Animation events
 
     void OnFootstep() {
@@ -172,18 +159,5 @@ public class PlayerController : MonoBehaviour
 
     void OnPlayerDeath() {
         Debug.Log("Player died");
-    }
-
-    private void InteractWith()
-    {
-        float interactRange = 2f;
-        Collider[] colliderArray = Physics.OverlapSphere(transform.position, interactRange);
-        foreach(Collider c in colliderArray)
-        {
-            if(c.TryGetComponent(out IInteractable i))
-            {
-                i.Interact(this);
-            }
-        }
     }
 }

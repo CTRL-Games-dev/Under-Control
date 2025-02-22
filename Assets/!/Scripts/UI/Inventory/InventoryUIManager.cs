@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class InventoryUIManager : MonoBehaviour
 {
     [Header("Assign if not player inventory")]
-    public EntityInventory OtherEntityInventory;
+    public HumanoidInventory OtherEntityInventory;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject _itemPrefab;
@@ -34,7 +34,7 @@ public class InventoryUIManager : MonoBehaviour
     
     // References set in Awake
     private UICanvas _uiCanvasParent;
-    private EntityInventory _currentEntityInventory;
+    private HumanoidInventory _currentEntityInventory;
     private GridLayoutGroup _gridLayoutGroup;
 
     private Animator _animator;
@@ -79,7 +79,7 @@ public class InventoryUIManager : MonoBehaviour
     }
 
     private void Start() {
-        EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
+        EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIs);
 
         // _uiCanvasParent.PlayerController.OnInventoryToggleEvent.AddListener(OnToggleInventory);
         // _uiCanvasParent.PlayerController.OnUICancelEvent.AddListener(OnUICancel);
@@ -89,7 +89,7 @@ public class InventoryUIManager : MonoBehaviour
 
         setupGrid();
         _inventory = _currentEntityInventory.GetItems();
-        UpdateItemUIS();
+        UpdateItemUIs();
     }
 
     private void LateUpdate() {
@@ -103,7 +103,7 @@ public class InventoryUIManager : MonoBehaviour
 
 
     // ItemUI methods
-    public void UpdateItemUIS() {
+    public void UpdateItemUIs() {
         foreach (InventoryItem inventoryItem in _inventory) {
             destroyItemUI(inventoryItem);
             createItemUI(inventoryItem);
@@ -125,9 +125,11 @@ public class InventoryUIManager : MonoBehaviour
         if (inventoryItem.ItemUI == null) {
             return;
         }
+
         foreach (InvTile tile in inventoryItem.ItemUI.OccupiedTiles) {
             tile.IsEmpty = true;
         }
+
         foreach (Transform child in _itemHolder.transform) {
             if (child.GetComponent<ItemUI>().InventoryItem == inventoryItem) {
                 Destroy(child.gameObject);
@@ -295,11 +297,14 @@ public class InventoryUIManager : MonoBehaviour
                 StartCoroutine(redPanelShow());
                 return false;
         }
+
         _itemInfoPanel.SetActive(false);
         SelectedInventoryItem = inventoryItem;
         _selectedItemUI.InventoryItem = _selectedInventoryItem;
+
         destroyItemUI(inventoryItem);
         SetImagesRaycastTarget(false);
+
         return true;
     }
 
@@ -308,11 +313,11 @@ public class InventoryUIManager : MonoBehaviour
         if (SelectedInventoryItem != null) {
             return;
         }
+
         if (inventoryItem == null) {
             _itemInfoPanel.SetActive(false);
             return;
         }
-
         
         _itemName.text = inventoryItem.ItemData.DisplayName;
         _itemDescription.text = inventoryItem.ItemData.Description;
@@ -326,6 +331,7 @@ public class InventoryUIManager : MonoBehaviour
             }   
             SelectedInventoryItem = null;
         }
+        
         SetImagesRaycastTarget(true);
     }
 
@@ -333,6 +339,7 @@ public class InventoryUIManager : MonoBehaviour
         if (SelectedInventoryItem == null) {
             return;
         }
+        
         _itemEntityManager.SpawnItemEntity(SelectedInventoryItem.ItemData, SelectedInventoryItem.Amount, _uiCanvasParent.PlayerController.transform.position + new Vector3(Random.Range(1f, 5f), 1, Random.Range(1f, 5f)));
         destroyItemUI(SelectedInventoryItem);
         _currentEntityInventory.RemoveInventoryItem(SelectedInventoryItem);
@@ -373,6 +380,7 @@ public class InventoryUIManager : MonoBehaviour
         if (SelectedInventoryItem == null) {
             return;
         }
+
         SelectedInventoryItem.Rotated = !SelectedInventoryItem.Rotated;
 
         ClearHighlights();

@@ -40,7 +40,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
         _mesh = GetComponent<MeshFilter>();
 
         // Get game manager
-        _gm = GameManager.Gm;
+        _gm = GameManager.instance;
 
         // Generate map and render it
         _map = MapGenerator.GetMap(width, height, iterations, DefaultTileWidth);
@@ -65,12 +65,12 @@ public class AdventureManager : MonoBehaviour, ILevelManager
 
     public void SpawnPlayer()
     {
-        GameObject player = GameObject.Instantiate(_player, _map.SpawnLocation, Quaternion.identity);
+        GameObject player = Instantiate(_player, _map.SpawnLocation, Quaternion.identity);
         GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
         player.GetComponent<PlayerController>().CameraObject = camera;
         camera.GetComponent<CinemachineCamera>().Follow = player.transform;
         
-        GameObject.Instantiate(_portal, _map.SpawnLocation + new Vector3(-3.5f, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
+        Instantiate(_portal, _map.SpawnLocation + new Vector3(-3.5f, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
         // GameObject player = GameObject.FindGameObjectWithTag("Player");
         // _cameraManager.Target = player.transform;
     }

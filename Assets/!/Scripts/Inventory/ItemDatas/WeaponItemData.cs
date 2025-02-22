@@ -1,4 +1,3 @@
-public abstract class WeaponItemData : ItemData
-{
+public abstract class WeaponItemData : ItemData {
     public bool Twohanded;
 }

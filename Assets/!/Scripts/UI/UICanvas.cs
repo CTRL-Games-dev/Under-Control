@@ -27,7 +27,7 @@ public class UICanvas : MonoBehaviour
             return _livingEntity;
         }
     }
-    public EntityInventory PlayerInventory { get => PlayerLivingEntity.Inventory; }
+    public HumanoidInventory PlayerInventory { get => PlayerLivingEntity.Inventory as HumanoidInventory; }
 
     public ItemInfoPanel ItemInfoPanel;
     public SelectedItemUI SelectedItemUI;
@@ -84,7 +84,7 @@ public class UICanvas : MonoBehaviour
     }
 
     private void OnCoinsChange(int change) {
-        _coinsText.text = "×" + (PlayerController.Coins + change).ToString();
+        _coinsText.text = $"x{PlayerController.Coins + change}";
         StartCoroutine(animateCoins(change > 0));
     }
 
@@ -102,7 +102,9 @@ public class UICanvas : MonoBehaviour
     private IEnumerator animateCoins(bool increase) {
         _coinsText.color = increase ? Color.green : Color.red;
         _coinsHolder.transform.localScale = increase ? new Vector3(1.2f, 1f, 1f) : new Vector3(0.8f, 1f, 1f);
+        
         yield return new WaitForSeconds(0.25f);
+        
         _coinsText.color = Color.white;
         _coinsHolder.transform.localScale = new Vector3(1f, 1f, 1f);
     }

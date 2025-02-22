@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(ModifierSystem))]
+[RequireComponent(typeof(EntityInventory))]
 public class LivingEntity : MonoBehaviour
 {
     private struct EffectData {
@@ -12,14 +13,15 @@ public class LivingEntity : MonoBehaviour
 
     [Header("Properties")]
     public string DisplayName;
+    public Guild Guild;
+    public bool DropItemsOnDeath = true;
     public float TimeToRegenAfterDamage = 2;
-
-    [SerializeField]
-    private EntityInventory _inventory = new EntityInventory();
-    public EntityInventory Inventory { get => _inventory; private set => _inventory = value; }
 
     public int Exp = 0;
     public float Level { get => 1 + Exp / 100f; }
+
+    [Range(0, 2)]
+    public int DroppedExpMultiplier = 1;
 
     [Header("Stats")]
     public DynamicStat Health = new DynamicStat(StatType.HEALTH, 100);
@@ -39,10 +41,11 @@ public class LivingEntity : MonoBehaviour
 
     // References
     public ModifierSystem ModifierSystem { get; private set; }
+    public EntityInventory Inventory { get; private set; }
 
-    void Start()
-    {
+    void Awake() {
         ModifierSystem = GetComponent<ModifierSystem>();
+        Inventory = GetComponent<EntityInventory>();
     }
 
     void Update() {
@@ -58,7 +61,21 @@ public class LivingEntity : MonoBehaviour
         }
     }
 
-    public void TakeDamage(Damage damage)
+    public void DropItem(InventoryItem item) {
+        dropItem(item.ItemData, item.Amount);
+        Inventory.RemoveInventoryItem(item);
+    }
+
+    // Spawns item on the ground
+    private void dropItem(ItemData itemData, int amount) {
+        ItemEntityManager.Instance.SpawnItemEntity(itemData, amount, transform.position);
+    }
+
+    protected void Attack(Damage damage, LivingEntity target) {
+        target.TakeDamage(damage, this);
+    }
+
+    public void TakeDamage(Damage damage, LivingEntity source = null)
     {
         _lastDamageTime = Time.time;
 
@@ -83,8 +100,59 @@ public class LivingEntity : MonoBehaviour
             ActualDamageAmount = actualDamageAmount
         });
 
-        if (Health == 0)
-        {
+        if (Health == 0) {
+            if(source != null) {
+                source.Exp += Exp * DroppedExpMultiplier;
+            }
+
+            // Drop items
+            if(DropItemsOnDeath) {
+                // Drop common slots
+                List<InventoryItem> items = Inventory.GetItems();
+                foreach(InventoryItem item in items) {
+                    dropItem(item.ItemData, item.Amount);
+                    Inventory.RemoveInventoryItem(item);
+                }
+
+                // Drop equipment
+                if(Inventory is HumanoidInventory humanoidInventory) {
+                    if(humanoidInventory.Helmet != null) {
+                        dropItem(humanoidInventory.Helmet, 1);
+                        humanoidInventory.Helmet = null;
+                    }
+
+                    if(humanoidInventory.Chestplate != null) {
+                        dropItem(humanoidInventory.Chestplate, 1);
+                        humanoidInventory.Chestplate = null;
+                    }
+
+                    if(humanoidInventory.Boots != null) {
+                        dropItem(humanoidInventory.Boots, 1);
+                        humanoidInventory.Boots = null;
+                    }
+
+                    if(humanoidInventory.Amulet != null) {
+                        dropItem(humanoidInventory.Amulet, 1);
+                        humanoidInventory.Amulet = null;
+                    }
+
+                    if(humanoidInventory.Ring != null) {
+                        dropItem(humanoidInventory.Ring, 1);
+                        humanoidInventory.Ring = null;
+                    }
+
+                    if(humanoidInventory.LeftHand != null) {
+                        dropItem(humanoidInventory.LeftHand, 1);
+                        humanoidInventory.UnequipLeftHand();
+                    }
+
+                    if(humanoidInventory.RightHand != null) {
+                        dropItem(humanoidInventory.RightHand, 1);
+                        humanoidInventory.UnequipRightHand();
+                    }
+                }
+            }
+
             OnDeath.Invoke();
         }
     }
