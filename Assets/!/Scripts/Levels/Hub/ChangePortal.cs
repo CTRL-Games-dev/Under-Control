@@ -11,10 +11,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
         _panelStartingPosition = _panel.transform.position;
     }
 
-    private void Update()
-    {
-        
-    }
+
     public void Interact(PlayerController player)
     {
         if(_opened) CloseUI();

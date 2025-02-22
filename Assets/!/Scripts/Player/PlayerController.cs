@@ -82,10 +82,17 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+
+
         recalculateStats();
 
         var movementVector = Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
-        CharacterController.SimpleMove(movementVector * LivingEntity.MovementSpeed);
+        // CharacterController.SimpleMove(movementVector * LivingEntity.MovementSpeed); // nie dziala???
+        CharacterController.Move(movementVector * Acceleration * Time.deltaTime);
+
+        // temporary 
+        if (movementVector != Vector3.zero) 
+            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(movementVector), WalkingTurnSpeed * Time.deltaTime);
 
         if(_interactAction.WasPressedThisFrame())
         {

@@ -1,4 +1,5 @@
 using System.Collections;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
@@ -31,19 +32,43 @@ public class UICanvas : MonoBehaviour
     public ItemInfoPanel ItemInfoPanel;
     public SelectedItemUI SelectedItemUI;
     public InventoryPanel ActiveInventoryPanel;
-    public bool IsInventoryOpen = false;
+    private bool _isInventoryOpen = false;
+    public bool IsInventoryOpen {
+        get => _isInventoryOpen;
+        set {
+            _isInventoryOpen = value;
+            _inventoryBGCanvasGroup.DOKill();
+            if (_isInventoryOpen) {
+                InventoryBG.SetActive(true);
+                _inventoryBGCanvasGroup.DOFade(1, 0.25f);
+                _inventoryBGCanvasGroup.interactable = true;
+                _inventoryBGCanvasGroup.blocksRaycasts = true;
+            } else {
+                _inventoryBGCanvasGroup.DOFade(0, 0.25f).OnComplete(() => InventoryBG.SetActive(false));
+                _inventoryBGCanvasGroup.interactable = false;
+                _inventoryBGCanvasGroup.blocksRaycasts = false;
+            }
+        }
+    }
+
     public GameObject InventoryBG;
+    private CanvasGroup _inventoryBGCanvasGroup;
 
     // serialized fields
     [SerializeField] private GameObject _AlwayOnTopCanvas;
+    [SerializeField] private GameObject _;
     [SerializeField] private TextMeshProUGUI _coinsText;
     [SerializeField] private GameObject _coinsHolder;
 
     private void Start() {
         EventBus.ItemUIHoverEvent.AddListener(OnItemUIHover);
         EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
-        PlayerController.CoinsChangeEvent.AddListener(OnCoinsChange);
         PlayerController.InventoryToggleEvent.AddListener(OnInventoryToggle);
+        PlayerController.UICancelEvent.AddListener(OnUICancel);
+
+        PlayerController.CoinsChangeEvent.AddListener(OnCoinsChange);
+
+        _inventoryBGCanvasGroup = InventoryBG.GetComponent<CanvasGroup>();
 
         OnCoinsChange(0);
     }
@@ -65,8 +90,12 @@ public class UICanvas : MonoBehaviour
 
     private void OnInventoryToggle() {
         IsInventoryOpen = !IsInventoryOpen;
-        // InventoryBG.SetActive(IsInventoryOpen);
-        // _AlwayOnTopCanvas.SetActive(IsInventoryOpen);
+    }
+
+    private void OnUICancel() {
+        if (IsInventoryOpen) {
+            IsInventoryOpen = false;
+        }
     }
 
 
