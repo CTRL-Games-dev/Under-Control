@@ -10,7 +10,6 @@ public class ModifierSystem : MonoBehaviour
         public float Expiration;
     }
 
-
     [SerializeField] private List<ModifierData> _activeModifiers = new List<ModifierData>();
 
     void Update() {
