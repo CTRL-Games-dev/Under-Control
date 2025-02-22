@@ -68,10 +68,13 @@ public class SelectedItemUI : MonoBehaviour
         if(_inventoryItem == null) {
             return;
         }
+        
         transform.position = Input.mousePosition;
+
         if (transform.rotation != _goalRotation) {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, _goalRotation, _rotationSpeed * Time.deltaTime);
         }
+
         if (Input.GetMouseButtonUp(0) && _uiCanvasParent.ActiveInventoryPanel != null) {
             _uiCanvasParent.ActiveInventoryPanel.TryMoveSelectedItem();
         }
@@ -81,6 +84,7 @@ public class SelectedItemUI : MonoBehaviour
         if(_inventoryItem == null) {
             return;
         }
+
         InventoryItem.Rotated = !InventoryItem.Rotated;
         _goalRotation = InventoryItem.Rotated ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
 

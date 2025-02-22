@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class ItemContainer
 {
     [SerializeField] private Vector2Int _size;
@@ -221,5 +222,9 @@ public class ItemContainer
         }
 
         return outOfBoundsItems;
+    }
+
+    public void Clear() {
+        _items.Clear();
     }
 }

@@ -9,7 +9,7 @@ public class Cooldown
     
     public Cooldown(float cooldownTime)
     {
-        this.CooldownTime = cooldownTime;
+        CooldownTime = cooldownTime;
     }
 
     // Returns true if the cooldown is ready to execute

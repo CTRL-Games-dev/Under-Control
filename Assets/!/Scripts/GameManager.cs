@@ -8,7 +8,8 @@ public class GameManager : MonoBehaviour
     public const string AdventureSceneName = "Adventure";
     public static Vector3 StartingPos = new(10, 10, 10);
     [SerializeField] private GameContext _context;
-    public static GameManager Gm;
+    public static GameManager instance;
+    
     private void Awake() 
     {
         DontDestroyOnLoad(this);
@@ -16,15 +17,12 @@ public class GameManager : MonoBehaviour
 
         // We need to check if there is already existing manager
         // Manager don't destoy itself on load, but since it needs to be defined in every scene
-        // singelton pattern must be used.
-        if(Gm == null)
+        // singleton pattern must be used.
+        if(instance == null)
         {
-            Gm = this;
-        }
-        else
-        {
+            instance = this;
+        } else{
             Destroy(gameObject);
-            
         }
     }
     private void Start()
@@ -32,24 +30,21 @@ public class GameManager : MonoBehaviour
         // For some reason "scene change" is being called, even if it is the first scene?
         ConnectPortals();
     }
+
     private void ChangeDimension(Dimension dimension)
     {
         _context.CurrentDimension = dimension;
 
         Debug.Log("Loading new scene: " + _context.CurrentDimension);
-        if(_context.CurrentDimension == Dimension.MAIN_MENU)
-        {
+        if(_context.CurrentDimension == Dimension.MAIN_MENU) {
             SceneManager.LoadScene(MainMenuSceneName);
-        }
-        else if(_context.CurrentDimension == Dimension.HUB)
-        {
+        } else if(_context.CurrentDimension == Dimension.HUB) {
             SceneManager.LoadScene(HubSceneName);
-        }
-        else 
-        {
+        } else {
             SceneManager.LoadScene(AdventureSceneName);
         }
     }
+
     private void ConnectPortals()
     {
         GameObject[] portals = GameObject.FindGameObjectsWithTag("Portal");
@@ -60,6 +55,7 @@ public class GameManager : MonoBehaviour
         }
         Debug.Log("Connected portals. This message will appear twice");
     }
+
     private void OnLevelChange(Scene scene, LoadSceneMode mode)
     {
         // Connect portals

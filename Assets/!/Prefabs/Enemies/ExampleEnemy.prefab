@@ -208,10 +208,11 @@ GameObject:
   - component: {fileID: 6238726878941344721}
   - component: {fileID: 774350751942770471}
   - component: {fileID: 7162287103752310826}
+  - component: {fileID: 6757635868213603758}
   - component: {fileID: 8974613204039339173}
   - component: {fileID: 5814925836689036330}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: ExampleEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -263,20 +264,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a23e42751b3623c4a938cdd3448ecea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DisplayName: Enemy
+  DisplayName: Example Enemy
+  Guild: {fileID: 11400000, guid: 734b0a650a008d14ab9d8696640c3a05, type: 2}
+  TimeToRegenAfterDamage: 2
+  Exp: 0
+  DroppedExpMultiplier: 1
   Health:
-    StatType: 0
     _raw: 100
     _adjusted: 100
   MaxHealth:
-    StatType: 1
     _raw: 100
     _adjusted: 100
   RegenRate:
-    StatType: 2
     _raw: 1
     _adjusted: 1
-  TimeToRegenAfterDamage: 2
+  Armor:
+    _raw: 0
+    _adjusted: 0
+  ElementalArmor:
+    _raw: 0
+    _adjusted: 0
+  MovementSpeed:
+    _raw: 1
+    _adjusted: 1
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -296,6 +306,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _activeModifiers: []
+--- !u!114 &6757635868213603758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3366227734027736264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c9097430a8b5ec47a16a886e836b7ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!195 &8974613204039339173
 NavMeshAgent:
   m_ObjectHideFlags: 0

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class EntityInventory : ItemContainer
+public class HumanoidInventory : SimpleInventory
 {
     public HelmetItemData Helmet;
     public ChestplateItemData Chestplate;
@@ -17,10 +17,6 @@ public class EntityInventory : ItemContainer
     [SerializeField]
     private WeaponItemData rightHand;
     public WeaponItemData RightHand { get => rightHand; }
-
-    public EntityInventory() : base(4, 4) {}
-
-    public EntityInventory(int width, int height) : base(width, height) {}
 
     #region Weapon
 
@@ -101,6 +97,7 @@ public class EntityInventory : ItemContainer
         }
        
         leftHand = item;
+
         return true;
     }
 
@@ -132,6 +129,7 @@ public class EntityInventory : ItemContainer
         }
      
         rightHand = item;
+
         return true;
     }
 
@@ -175,6 +173,7 @@ public class EntityInventory : ItemContainer
 
         leftHand = item;
         rightHand = item;
+
         return true;
     }
 
