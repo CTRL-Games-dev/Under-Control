@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(LivingEntity))]
 public class ModifierSystem : MonoBehaviour
 {
     [Serializable]
