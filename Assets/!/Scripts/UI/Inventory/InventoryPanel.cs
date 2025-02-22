@@ -38,6 +38,8 @@ public class InventoryPanel : MonoBehaviour
     // Inventory variables
     private static float _tileSize = 0;
     public static float TileSize { get {return _tileSize;} set {_tileSize = value;} }
+    
+    [SerializeField]
     private InvTile[,] _inventoryTileArray;
     private int _inventoryWidth, _inventoryHeight;
 
