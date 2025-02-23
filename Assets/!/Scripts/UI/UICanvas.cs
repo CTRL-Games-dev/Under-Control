@@ -6,6 +6,7 @@ using UnityEngine;
 public class UICanvas : MonoBehaviour
 {
     [Header("References for children")]
+    public static UICanvas Instance;
     public GameObject Player;
     private PlayerController _playerController;
     public PlayerController PlayerController {
@@ -35,17 +36,7 @@ public class UICanvas : MonoBehaviour
         get => _isInventoryOpen;
         set {
             _isInventoryOpen = value;
-            _inventoryBGCanvasGroup.DOKill();
-            if (_isInventoryOpen) {
-                _inventoryCanvas.SetActive(true);
-                _inventoryBGCanvasGroup.DOFade(1, 0.25f);
-                _inventoryBGCanvasGroup.interactable = true;
-                _inventoryBGCanvasGroup.blocksRaycasts = true;
-            } else {
-                _inventoryBGCanvasGroup.DOFade(0, 0.25f).OnComplete(() => _inventoryCanvas.SetActive(false));
-                _inventoryBGCanvasGroup.interactable = false;
-                _inventoryBGCanvasGroup.blocksRaycasts = false;
-            }
+            openInventory(_isInventoryOpen);
         }
     }
 
@@ -63,7 +54,15 @@ public class UICanvas : MonoBehaviour
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI _coinsText;
     [SerializeField] private GameObject _coinsHolder;
-    private CanvasGroup _inventoryBGCanvasGroup;
+    private CanvasGroup _inventoryCanvasGroup;
+
+    private void Awake() {
+        if (Instance != null) {
+            Destroy(this);
+            return;
+        }
+        Instance = this;
+    }
 
     private void Start() {
         EventBus.ItemUIHoverEvent.AddListener(OnItemUIHover);
@@ -73,7 +72,7 @@ public class UICanvas : MonoBehaviour
 
         PlayerController.CoinsChangeEvent.AddListener(OnCoinsChange);
 
-        _inventoryBGCanvasGroup = _inventoryCanvas.GetComponent<CanvasGroup>();
+        _inventoryCanvasGroup = _inventoryCanvas.GetComponent<CanvasGroup>();
 
         OnCoinsChange(0);
     }
@@ -94,13 +93,42 @@ public class UICanvas : MonoBehaviour
     }
 
     private void OnInventoryToggle() {
-        IsInventoryOpen = !IsInventoryOpen;
+        openInventory(!IsInventoryOpen);
     }
 
     private void OnUICancel() {
-        if (IsInventoryOpen) {
-            IsInventoryOpen = false;
+        openInventory(false);
+    }
+
+    private void openInventory(bool value) {
+        _isInventoryOpen = value;
+
+        _inventoryCanvasGroup.DOKill();
+        if (_isInventoryOpen) {
+            _inventoryCanvas.SetActive(true);
+            _inventoryCanvasGroup.DOFade(1, 0.25f);
+            _inventoryCanvasGroup.interactable = true;
+            _inventoryCanvasGroup.blocksRaycasts = true;
+        } else {
+            if (SelectedItemUI.InventoryItem != null) {
+                DropItem(Player.transform.position + Player.transform.forward * 2);
+            }
+
+            _inventoryCanvasGroup.DOFade(0, 0.25f).OnComplete(() => _inventoryCanvas.SetActive(false));
+            _inventoryCanvasGroup.interactable = false;
+            _inventoryCanvasGroup.blocksRaycasts = false;
         }
+    }
+
+    public void DropItem() {
+        DropItem(Player.transform.position + Player.transform.forward * 2);
+    }
+
+    public void DropItem(Vector3 position) {
+        if (SelectedItemUI.InventoryItem == null) return;
+        ItemEntityManager.Instance.SpawnItemEntity(SelectedItemUI.InventoryItem.ItemData, SelectedItemUI.InventoryItem.Amount, position);
+        SelectedItemUI.InventoryItem = null;
+        EventBus.ItemPlacedEvent?.Invoke();
     }
 
 

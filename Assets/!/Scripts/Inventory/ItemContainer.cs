@@ -90,11 +90,20 @@ public class ItemContainer
             //     return inventoryItem;
             // }
 
+            var minX = inventoryItem.Position.x;
+            var maxX = inventoryItem.Position.x + (inventoryItem.Rotated ? inventoryItem.ItemData.Size.y : inventoryItem.ItemData.Size.x);
 
-            // Nie dziala z powodu rotacji
-            if(inventoryItem.Position == position) {
+            var minY = inventoryItem.Position.y;
+            var maxY = inventoryItem.Position.y + (inventoryItem.Rotated ? inventoryItem.ItemData.Size.x : inventoryItem.ItemData.Size.y);
+
+            if(position.x >= minX && position.x < maxX && position.y >= minY && position.y < maxY) {
                 return inventoryItem;
             }
+
+            // // Nie dziala z powodu rotacji
+            // if(inventoryItem.Position == position) {
+            //     return inventoryItem;
+            // }
         }
 
         return null;

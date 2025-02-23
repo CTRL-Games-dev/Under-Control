@@ -18,8 +18,8 @@ public class InvTileEquipment : InvTile {
         EventBus.TileSizeSetEvent.AddListener(OnTileSizeSetEvent);
         EventBus.ItemUIClickEvent.AddListener(OnItemUIClickEvent);
 
+        _uiCanvas = UICanvas.Instance;
         _rectTransform = GetComponent<RectTransform>();
-        _uiCanvas = FindFirstObjectByType<UICanvas>();
         // EventBus.InvTileClickEvent.AddListener(OnTileClick);
         OnTileSizeSetEvent();
     }
@@ -29,7 +29,7 @@ public class InvTileEquipment : InvTile {
     }
 
     private void OnItemUIClickEvent(ItemUI itemUI) {
-        if (itemUI == null) return;
+        if (itemUI == null || SelectedInventoryItem != null) return;
         if (itemUI == _itemUI) {
             switch (WantedItemType) {
                 case ItemType.Helmet:
@@ -65,6 +65,8 @@ public class InvTileEquipment : InvTile {
     }
 
     public void OnPointerClickEquipment() {
+        if (SelectedInventoryItem == null && _itemUI == null || SelectedInventoryItem != null && _itemUI != null) return;
+
         if (WantedItemType == SelectedInventoryItem.ItemData.ItemType && IsEmpty) {
             switch (WantedItemType) {
                 case ItemType.Helmet:

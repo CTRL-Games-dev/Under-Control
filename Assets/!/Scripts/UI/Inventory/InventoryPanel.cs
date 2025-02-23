@@ -29,7 +29,7 @@ public class InventoryPanel : MonoBehaviour
     
     // References set in Awake or Start
     private RectTransform _rectTransform;
-    private UICanvas _uiCanvasParent;
+    private UICanvas _uiCanvas;
     private ItemContainer _currentEntityInventory;
     private GridLayoutGroup _gridLayoutGroup;
     private Image _layoutImage;
@@ -44,7 +44,7 @@ public class InventoryPanel : MonoBehaviour
     private int _inventoryWidth, _inventoryHeight;
 
     public List<InventoryItem> _inventory => _currentEntityInventory.GetItems();
-    private InventoryItem _selectedInventoryItem => _uiCanvasParent.SelectedItemUI.InventoryItem;
+    private InventoryItem _selectedInventoryItem => _uiCanvas.SelectedItemUI.InventoryItem;
 
     // Grid variables
     public InvTile SelectedTile { get; set; }
@@ -54,7 +54,6 @@ public class InventoryPanel : MonoBehaviour
         _rectTransform = GetComponent<RectTransform>();
         _layoutImage = GetComponent<Image>();
         _layoutImage.enabled = false;
-        _uiCanvasParent = FindAnyObjectByType<UICanvas>();
         _gridLayoutGroup = _gridHolder.GetComponent<GridLayoutGroup>();
     }
 
@@ -63,8 +62,10 @@ public class InventoryPanel : MonoBehaviour
         EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
         EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
         EventBus.ItemPlacedEvent.AddListener(() => setImagesRaycastTarget(true));
+        _uiCanvas = UICanvas.Instance;
 
-        _currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory.itemContainer : TargetEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
+
+        _currentEntityInventory = _isPlayerInventory ? _uiCanvas.PlayerInventory.itemContainer : TargetEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
 
         if (_isPlayerInventory) {
             TileSize = Mathf.Clamp(_rectTransform.rect.width / _currentEntityInventory.Size.x, 0, _rectTransform.rect.height / _currentEntityInventory.Size.y);
@@ -73,7 +74,7 @@ public class InventoryPanel : MonoBehaviour
     }
 
     public void RegenerateInventory() {
-        if ((_currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory.itemContainer : TargetEntityInventory) == null) return; 
+        if ((_currentEntityInventory = _isPlayerInventory ? _uiCanvas.PlayerInventory.itemContainer : TargetEntityInventory) == null) return; 
         setupGrid();
         UpdateItemUIS();
     }
@@ -162,7 +163,7 @@ public class InventoryPanel : MonoBehaviour
 
     public void OnInvTileEnter(InvTile invTile) {
         SelectedTile = invTile;
-        if (_uiCanvasParent.SelectedItemUI.InventoryItem != null && invTile != null) {
+        if (_uiCanvas.SelectedItemUI.InventoryItem != null && invTile != null) {
             clearHighlights();
             highlightNeighbours(invTile.Pos, _selectedInventoryItem);
         } else {
@@ -248,10 +249,10 @@ public class InventoryPanel : MonoBehaviour
         GameObject item = createItemUI(_currentEntityInventory.GetInventoryItem(selectedTilePos));
         
         if (item.GetComponent<ItemUI>().CurrentInventoryPanel.IsSellerInventory) {
-            _uiCanvasParent.PlayerController.Coins += (_selectedInventoryItem.ItemData.Value / 2) * _selectedInventoryItem.Amount;
+            _uiCanvas.PlayerController.Coins += (_selectedInventoryItem.ItemData.Value / 2) * _selectedInventoryItem.Amount;
         }
 
-        _uiCanvasParent.SelectedItemUI.InventoryItem = null;
+        _uiCanvas.SelectedItemUI.InventoryItem = null;
         EventBus.ItemPlacedEvent?.Invoke();
 
         SelectedTile.SetHighlight(false);
@@ -289,7 +290,7 @@ public class InventoryPanel : MonoBehaviour
     public void OnItemUIClick(ItemUI itemUI) {
         if (_inventory.Contains(itemUI.InventoryItem)) {
             if (IsSellerInventory) {
-                _uiCanvasParent.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
+                _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
             }  
             destroyItemUI(itemUI.InventoryItem);
         } 
@@ -297,10 +298,10 @@ public class InventoryPanel : MonoBehaviour
     }
 
     public void OnPointerEnter() {
-        _uiCanvasParent.ActiveInventoryPanel = this;
+        _uiCanvas.ActiveInventoryPanel = this;
     }
 
     public void OnPointerExit() {
-        _uiCanvasParent.ActiveInventoryPanel = null;
+        _uiCanvas.ActiveInventoryPanel = null;
     }
 }
