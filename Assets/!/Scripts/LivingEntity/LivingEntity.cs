@@ -126,6 +126,11 @@ public class LivingEntity : MonoBehaviour
                         humanoidInventory.Chestplate = null;
                     }
 
+                    if(humanoidInventory.Leggings != null) {
+                        dropItem(humanoidInventory.Leggings, 1);
+                        humanoidInventory.Leggings = null;
+                    }
+
                     if(humanoidInventory.Boots != null) {
                         dropItem(humanoidInventory.Boots, 1);
                         humanoidInventory.Boots = null;

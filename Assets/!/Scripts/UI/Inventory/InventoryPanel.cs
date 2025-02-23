@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
+
+
+
 public class InventoryPanel : MonoBehaviour
 {
     [Header("Assign if not player inventory")]
@@ -23,9 +26,6 @@ public class InventoryPanel : MonoBehaviour
 
     [Header("Interactions")]
     [SerializeField] private Image _redPanel;
-
-    // Events
-    public static UnityEvent ItemPlacedEvent = new();
     
     // References set in Awake or Start
     private RectTransform _rectTransform;
@@ -62,7 +62,7 @@ public class InventoryPanel : MonoBehaviour
         EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
         EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
         EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
-        ItemPlacedEvent.AddListener(() => setImagesRaycastTarget(true));
+        EventBus.ItemPlacedEvent.AddListener(() => setImagesRaycastTarget(true));
 
         _currentEntityInventory = _isPlayerInventory ? _uiCanvasParent.PlayerInventory.itemContainer : TargetEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
 
@@ -219,12 +219,10 @@ public class InventoryPanel : MonoBehaviour
         clearHighlights();
 
         if (SelectedTile == null) {
-            Debug.Log("No tile selected");
             return;
         }
 
         if (_selectedInventoryItem == null) {
-            Debug.Log("No item selected");
             return;
         }
 
@@ -236,14 +234,12 @@ public class InventoryPanel : MonoBehaviour
         Vector2Int size = _selectedInventoryItem.Rotated ? new Vector2Int(_selectedInventoryItem.Size.y, _selectedInventoryItem.Size.x) : _selectedInventoryItem.Size;
 
         if (!_currentEntityInventory.FitsWithinBounds(selectedTilePos, size)) {
-            Debug.Log("Doesn't fit within");
             StartCoroutine(redPanelShow());
             return;
         }
 
 
         if (!canBePlaced(selectedTilePos, size)) {
-            Debug.Log("Can't be placed");
             StartCoroutine(redPanelShow());
             return;
         }
@@ -256,7 +252,7 @@ public class InventoryPanel : MonoBehaviour
         }
 
         _uiCanvasParent.SelectedItemUI.InventoryItem = null;
-        ItemPlacedEvent?.Invoke();
+        EventBus.ItemPlacedEvent?.Invoke();
 
         SelectedTile.SetHighlight(false);
     }

@@ -80,13 +80,19 @@ public class ItemContainer
     // Use IsWithinBounds to check if the position is valid
     public InventoryItem GetInventoryItem(Vector2Int position) {
         foreach(var inventoryItem in _items) {
-            var minX = inventoryItem.Position.x;
-            var maxX = inventoryItem.Position.x + inventoryItem.ItemData.Size.x;
+            // var minX = inventoryItem.Position.x;
+            // var maxX = inventoryItem.Position.x + inventoryItem.ItemData.Size.x;
 
-            var minY = inventoryItem.Position.y;
-            var maxY = inventoryItem.Position.y + inventoryItem.ItemData.Size.y;
+            // var minY = inventoryItem.Position.y;
+            // var maxY = inventoryItem.Position.y + inventoryItem.ItemData.Size.y;
 
-            if(position.x >= minX && position.x < maxX && position.y >= minY && position.y < maxY) {
+            // if(position.x >= minX && position.x < maxX && position.y >= minY && position.y < maxY) {
+            //     return inventoryItem;
+            // }
+
+
+            // Nie dziala z powodu rotacji
+            if(inventoryItem.Position == position) {
                 return inventoryItem;
             }
         }

@@ -1,19 +1,13 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum InvTileType {
-    Inventory,
-    Equipment
-}
+
 
 public class InvTile : MonoBehaviour
 {
-    private GameObject _highlightImage;
+    protected GameObject _highlightImage;
 
-    public InvTileType Type;
-
-    private Image _image;
+    protected Image _image;
     public InventoryPanel InventoryPanel;
     
     private bool _isEmpty = true;
@@ -32,14 +26,13 @@ public class InvTile : MonoBehaviour
     public Vector2Int Pos { get; set; }
 
 
-    void Awake() {
+    protected void Awake() {
         _image = GetComponent<Image>();
         _highlightImage = transform.GetChild(0).gameObject;
     }
 
     public void OnPointerEnter() {
         if (InventoryPanel == null) {
-            Debug.Log("InventoryPanel is null");
             return;
         }
         InventoryPanel.OnInvTileEnter(this);
@@ -47,7 +40,6 @@ public class InvTile : MonoBehaviour
     }
     public void OnPointerExit() {
         if (InventoryPanel == null) {
-            Debug.Log("InventoryPanel is null");
             return;
         }
         InventoryPanel.OnInvTileExit(this);
@@ -56,7 +48,6 @@ public class InvTile : MonoBehaviour
 
     public void OnPointerClick() {
         if (InventoryPanel == null) {
-            Debug.Log("InventoryPanel is null");
             return;
         }
         InventoryPanel.TryMoveSelectedItem();

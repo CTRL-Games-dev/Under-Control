@@ -29,9 +29,7 @@ public class UICanvas : MonoBehaviour
     }
     public HumanoidInventory PlayerInventory { get => PlayerLivingEntity.Inventory as HumanoidInventory; }
 
-    public ItemInfoPanel ItemInfoPanel;
-    public SelectedItemUI SelectedItemUI;
-    public InventoryPanel ActiveInventoryPanel;
+    // UI elements
     private bool _isInventoryOpen = false;
     public bool IsInventoryOpen {
         get => _isInventoryOpen;
@@ -39,26 +37,33 @@ public class UICanvas : MonoBehaviour
             _isInventoryOpen = value;
             _inventoryBGCanvasGroup.DOKill();
             if (_isInventoryOpen) {
-                InventoryBG.SetActive(true);
+                _inventoryCanvas.SetActive(true);
                 _inventoryBGCanvasGroup.DOFade(1, 0.25f);
                 _inventoryBGCanvasGroup.interactable = true;
                 _inventoryBGCanvasGroup.blocksRaycasts = true;
             } else {
-                _inventoryBGCanvasGroup.DOFade(0, 0.25f).OnComplete(() => InventoryBG.SetActive(false));
+                _inventoryBGCanvasGroup.DOFade(0, 0.25f).OnComplete(() => _inventoryCanvas.SetActive(false));
                 _inventoryBGCanvasGroup.interactable = false;
                 _inventoryBGCanvasGroup.blocksRaycasts = false;
             }
         }
     }
 
-    public GameObject InventoryBG;
-    private CanvasGroup _inventoryBGCanvasGroup;
+    [HideInInspector] public InventoryPanel ActiveInventoryPanel;
+
+    public ItemInfoPanel ItemInfoPanel;
+    public SelectedItemUI SelectedItemUI;
 
     // serialized fields
-    [SerializeField] private GameObject _AlwayOnTopCanvas;
-    [SerializeField] private GameObject _;
+    [Header("Canvases")]
+    [SerializeField] private GameObject _HUDCanvas;
+    [SerializeField] private GameObject _inventoryCanvas;
+    [SerializeField] private GameObject _alwayOnTopCanvas;
+
+    [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI _coinsText;
     [SerializeField] private GameObject _coinsHolder;
+    private CanvasGroup _inventoryBGCanvasGroup;
 
     private void Start() {
         EventBus.ItemUIHoverEvent.AddListener(OnItemUIHover);
@@ -68,7 +73,7 @@ public class UICanvas : MonoBehaviour
 
         PlayerController.CoinsChangeEvent.AddListener(OnCoinsChange);
 
-        _inventoryBGCanvasGroup = InventoryBG.GetComponent<CanvasGroup>();
+        _inventoryBGCanvasGroup = _inventoryCanvas.GetComponent<CanvasGroup>();
 
         OnCoinsChange(0);
     }
