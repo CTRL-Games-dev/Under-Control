@@ -6,6 +6,7 @@ public class HumanoidInventory : SimpleInventory
 {
     public HelmetItemData Helmet;
     public ChestplateItemData Chestplate;
+    public LeggingsItemData Leggings;
     public BootsItemData Boots;
     public AmuletItemData Amulet;
     public RingItemData Ring;

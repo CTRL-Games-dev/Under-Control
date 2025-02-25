@@ -8,11 +8,11 @@ public class PlayerBarsHolder : MonoBehaviour
     [SerializeField] private Image _manaBarImg;
     [SerializeField] private Image _controlBarImg;
 
-    private UICanvas _uiCanvasParent;
-    private LivingEntity _livingEntity { get => _uiCanvasParent.PlayerLivingEntity; }
+    private UICanvas _uiCanvas;
+    private LivingEntity _livingEntity { get => _uiCanvas.PlayerLivingEntity; }
 
-    private void Awake() {
-        _uiCanvasParent = gameObject.GetComponentInParent<UICanvas>();
+    private void Start() {
+        _uiCanvas = UICanvas.Instance;   
     }
 
     private void Update() {

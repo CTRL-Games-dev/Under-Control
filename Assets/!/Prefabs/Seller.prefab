@@ -663,8 +663,8 @@ GameObject:
   - component: {fileID: 2039555505422918082}
   - component: {fileID: 4459575071360382741}
   - component: {fileID: 4181038474974698532}
-  - component: {fileID: 7270621546080865168}
   - component: {fileID: 6646598065809406118}
+  - component: {fileID: 8450239347219920575}
   m_Layer: 0
   m_Name: Seller
   m_TagString: Untagged
@@ -744,8 +744,32 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &7270621546080865168
-CapsuleCollider:
+--- !u!114 &6646598065809406118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3049481714862784304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc98cf5d5b7923448b1025a31424b217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sellerUIPrefab: {fileID: 4045902477692341137, guid: 857660af3460fb040b18bfd943dffc32, type: 3}
+  _inventory:
+    _size: {x: 4, y: 4}
+    _items: []
+    Helmet: {fileID: 0}
+    Chestplate: {fileID: 0}
+    Boots: {fileID: 0}
+    Amulet: {fileID: 0}
+    Ring: {fileID: 0}
+    leftHand: {fileID: 0}
+    rightHand: {fileID: 0}
+  _inventoryPanel: {fileID: 0}
+--- !u!65 &8450239347219920575
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -762,71 +786,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 1.509295
-  m_Height: 3.01859
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: -1.009295}
---- !u!114 &6646598065809406118
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3049481714862784304}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc98cf5d5b7923448b1025a31424b217, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _inventoryPanelPrefab: {fileID: 6529641954120491736, guid: 033d47c62739e6c4fb8e1e8baec445a6, type: 3}
-  _inventory:
-    _inventorySize: {x: 5, y: 5}
-    _inventory:
-    - ItemData: {fileID: 11400000, guid: 830420dc3f4ccf840bdfabd5c15a5c45, type: 2}
-      Amount: 4
-      Position: {x: 0, y: 0}
-      Rotated: 0
-    - ItemData: {fileID: 11400000, guid: 770ef801cfc551d4aa3e0ba9d84b5bdb, type: 2}
-      Amount: 1
-      Position: {x: 0, y: 1}
-      Rotated: 0
-    Helmet:
-      ItemData: {fileID: 0}
-      Amount: 0
-      Position: {x: 0, y: 0}
-      Rotated: 0
-    Chestplate:
-      ItemData: {fileID: 0}
-      Amount: 0
-      Position: {x: 0, y: 0}
-      Rotated: 0
-    Boots:
-      ItemData: {fileID: 0}
-      Amount: 0
-      Position: {x: 0, y: 0}
-      Rotated: 0
-    Amulet:
-      ItemData: {fileID: 0}
-      Amount: 0
-      Position: {x: 0, y: 0}
-      Rotated: 0
-    Ring:
-      ItemData: {fileID: 0}
-      Amount: 0
-      Position: {x: 0, y: 0}
-      Rotated: 0
-    LeftHand:
-      ItemData: {fileID: 0}
-      Amount: 0
-      Position: {x: 0, y: 0}
-      Rotated: 0
-    RightHand:
-      ItemData: {fileID: 0}
-      Amount: 0
-      Position: {x: 0, y: 0}
-      Rotated: 0
-  _inventoryPanel: {fileID: 0}
+  serializedVersion: 3
+  m_Size: {x: 2.0000093, y: 2, z: 2.1828513}
+  m_Center: {x: -0.011865497, y: 0, z: -0.59142566}
 --- !u!1 &3684471366402881749
 GameObject:
   m_ObjectHideFlags: 0

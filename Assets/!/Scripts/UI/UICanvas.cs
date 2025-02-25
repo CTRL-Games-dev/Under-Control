@@ -1,10 +1,12 @@
 using System.Collections;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
 public class UICanvas : MonoBehaviour
 {
     [Header("References for children")]
+    public static UICanvas Instance;
     public GameObject Player;
     private PlayerController _playerController;
     public PlayerController PlayerController {
@@ -28,22 +30,49 @@ public class UICanvas : MonoBehaviour
     }
     public HumanoidInventory PlayerInventory { get => PlayerLivingEntity.Inventory as HumanoidInventory; }
 
+    // UI elements
+    private bool _isInventoryOpen = false;
+    public bool IsInventoryOpen {
+        get => _isInventoryOpen;
+        set {
+            _isInventoryOpen = value;
+            openInventory(_isInventoryOpen);
+        }
+    }
+
+    [HideInInspector] public InventoryPanel ActiveInventoryPanel;
+
     public ItemInfoPanel ItemInfoPanel;
     public SelectedItemUI SelectedItemUI;
-    public InventoryPanel ActiveInventoryPanel;
-    public bool IsInventoryOpen = false;
-    public GameObject InventoryBG;
 
     // serialized fields
-    [SerializeField] private GameObject _AlwayOnTopCanvas;
+    [Header("Canvases")]
+    [SerializeField] private GameObject _HUDCanvas;
+    [SerializeField] private GameObject _inventoryCanvas;
+    [SerializeField] private GameObject _alwayOnTopCanvas;
+
+    [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI _coinsText;
     [SerializeField] private GameObject _coinsHolder;
+    private CanvasGroup _inventoryCanvasGroup;
+
+    private void Awake() {
+        if (Instance != null) {
+            Destroy(this);
+            return;
+        }
+        Instance = this;
+    }
 
     private void Start() {
         EventBus.ItemUIHoverEvent.AddListener(OnItemUIHover);
         EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
-        PlayerController.CoinsChangeEvent.AddListener(OnCoinsChange);
         PlayerController.InventoryToggleEvent.AddListener(OnInventoryToggle);
+        PlayerController.UICancelEvent.AddListener(OnUICancel);
+
+        PlayerController.CoinsChangeEvent.AddListener(OnCoinsChange);
+
+        _inventoryCanvasGroup = _inventoryCanvas.GetComponent<CanvasGroup>();
 
         OnCoinsChange(0);
     }
@@ -64,9 +93,42 @@ public class UICanvas : MonoBehaviour
     }
 
     private void OnInventoryToggle() {
-        IsInventoryOpen = !IsInventoryOpen;
-        // InventoryBG.SetActive(IsInventoryOpen);
-        // _AlwayOnTopCanvas.SetActive(IsInventoryOpen);
+        openInventory(!IsInventoryOpen);
+    }
+
+    private void OnUICancel() {
+        openInventory(false);
+    }
+
+    private void openInventory(bool value) {
+        _isInventoryOpen = value;
+
+        _inventoryCanvasGroup.DOKill();
+        if (_isInventoryOpen) {
+            _inventoryCanvas.SetActive(true);
+            _inventoryCanvasGroup.DOFade(1, 0.25f);
+            _inventoryCanvasGroup.interactable = true;
+            _inventoryCanvasGroup.blocksRaycasts = true;
+        } else {
+            if (SelectedItemUI.InventoryItem != null) {
+                DropItem(Player.transform.position + Player.transform.forward * 2);
+            }
+
+            _inventoryCanvasGroup.DOFade(0, 0.25f).OnComplete(() => _inventoryCanvas.SetActive(false));
+            _inventoryCanvasGroup.interactable = false;
+            _inventoryCanvasGroup.blocksRaycasts = false;
+        }
+    }
+
+    public void DropItem() {
+        DropItem(Player.transform.position + Player.transform.forward * 2);
+    }
+
+    public void DropItem(Vector3 position) {
+        if (SelectedItemUI.InventoryItem == null) return;
+        ItemEntityManager.Instance.SpawnItemEntity(SelectedItemUI.InventoryItem.ItemData, SelectedItemUI.InventoryItem.Amount, position);
+        SelectedItemUI.InventoryItem = null;
+        EventBus.ItemPlacedEvent?.Invoke();
     }
 
 
