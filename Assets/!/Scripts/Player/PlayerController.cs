@@ -65,6 +65,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+
+
         recalculateStats();
 
         var movementVector = Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
