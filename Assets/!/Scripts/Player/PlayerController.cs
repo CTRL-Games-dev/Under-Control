@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
@@ -24,6 +25,22 @@ public class PlayerController : MonoBehaviour
     public GameObject CameraObject;
     public GameObject CameraTargetObject;
 
+    // Attack 
+    public static float LightAttackDamage = 10f;
+    public float ChargeAttackDamage = LightAttackDamage * 3;
+    public float ComboGapTime = 1.0f;
+
+    // State
+    private Vector2 _movementInputVector = Vector2.zero;
+    private Vector3 _targetDirection;
+    private bool _sprinting = false;
+    private float _velocitySide = 0;
+    private float _velocityFront = 0;
+    private bool _isTurning;
+    private float _cameraDistance { get => _cinemachinePositionComposer.CameraDistance; set => _cinemachinePositionComposer.CameraDistance = value; }
+    private bool _lightAttack;
+    private bool _chargeAttack;
+    private int _comboCounter;
     [Header("Stats")]
     public DynamicStat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
     private int _coins = 100;
@@ -75,6 +92,44 @@ public class PlayerController : MonoBehaviour
         VekhtarControl.Recalculate(LivingEntity.ModifierSystem);
     }
 
+    // Handle attack logic
+    private void handleAttack() {
+        if (_lightAttack)
+        {
+            StartCoroutine(ResetCombo());
+            if (_comboCounter < 3) {
+                print("Light attack" + _comboCounter);
+            }            
+            _comboCounter++;    
+            _lightAttack = false;                    
+        }
+
+        if (_comboCounter == 4)
+        {
+            print("Knockback attack");
+            _comboCounter = 0;
+        }
+
+        if (_chargeAttack && _comboCounter == 0) 
+        {
+            print("Charge attack");
+            _chargeAttack = false;
+        }
+    }
+
+    public IEnumerator ResetCombo() {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < ComboGapTime) {
+            if (_lightAttack) {
+                elapsedTime = 0f;
+            }
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        _comboCounter = 0;
+    }
+
     // Input events
 
     void OnMove(InputValue value) {
@@ -107,7 +162,31 @@ public class PlayerController : MonoBehaviour
             pointerVectorPos.y
         );
     }
-    
+
+    void OnSprint(InputValue value) {
+        _sprinting = value.isPressed;
+        _animator.SetBool("sprinting", _sprinting);
+    }
+
+    /*void OnAttack(InputValue value) {
+        _animator.SetTrigger("punch");
+    }*/
+
+    void OnLightAttack(InputValue value) {
+        //_animator.SetTrigger("lightAttack");
+        _lightAttack = value.isPressed;
+
+    }
+
+    void OnChargeAttack(InputValue value) {
+        //_animator.SetTrigger("chargeAttack");
+        _chargeAttack = value.isPressed;        
+    }
+
+    void OnDodge(InputValue value) {
+        //_animator.SetTrigger("dodge");
+    }
+
     void OnScrollWheel(InputValue value) {
         var delta = value.Get<Vector2>();
         _cameraDistance -= delta.y * CameraDistanceSpeed;
