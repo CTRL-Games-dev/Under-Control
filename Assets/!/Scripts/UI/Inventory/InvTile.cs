@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,7 +7,7 @@ public class InvTile : MonoBehaviour
     private GameObject _highlightImage;
 
     private Image _image;
-    public InventoryUIManager InventoryUIManager;
+    public InventoryPanel InventoryPanel;
     
     private bool _isEmpty = true;
     public bool IsEmpty {
@@ -30,30 +31,22 @@ public class InvTile : MonoBehaviour
     }
 
     public void OnPointerEnter() {
-        InventoryUIManager.SelectedTile = this;
-        if (InventoryUIManager.SelectedInventoryItem != null) {
-            InventoryUIManager.HighlightNeighbours(Pos, InventoryUIManager.SelectedInventoryItem.Size);
-        }
-        
+        InventoryPanel.OnInvTileEnter(this);
         _highlightImage.SetActive(true);
     }
     public void OnPointerExit() {
-        InventoryUIManager.SelectedTile = null;
-        InventoryUIManager.ClearHighlights();
+        InventoryPanel.OnInvTileExit(this);
     }
+
+
     public void OnPointerClick() {
-        InventoryUIManager.TryMoveSelectedItem();
+        InventoryPanel.TryMoveSelectedItem();
     }
     public void OnDrop() {
-        InventoryUIManager.TryMoveSelectedItem();
+        InventoryPanel.TryMoveSelectedItem();
     }
 
     public void SetHighlight(bool value) {
-        // if (!IsEmpty) {
-        //     _highlightImage.GetComponent<Image>().color = Color.red;
-        // } else {
-        //     _highlightImage.GetComponent<Image>().color = Color.green;
-        // }
         _highlightImage.SetActive(value);
     }
 }

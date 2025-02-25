@@ -1,5 +1,3 @@
-using NUnit.Framework;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -7,15 +5,20 @@ using UnityEngine.Events;
 public class Portal : MonoBehaviour
 {
     public bool IsOpen = true;
-    public Dimension Dimension = Dimension.HUB;
+    private Dimension _dimension = Dimension.HUB;
     public UnityEvent<Dimension> PlayerEnteredPortal;
 
     void OnTriggerEnter(Collider other)
     {
         if(IsOpen) 
         {
-            Debug.Log("Player entered portal to: " + Dimension);
-            PlayerEnteredPortal.Invoke(Dimension);
+            Debug.Log("Player entered portal to: " + _dimension);
+            PlayerEnteredPortal.Invoke(_dimension);
         }
+    }
+    
+    public void ChangeDimension(Dimension d) {
+        Debug.Log("Changed dimension to: " + d.ToString());
+        _dimension = d;
     }
 }

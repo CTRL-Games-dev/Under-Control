@@ -1,29 +1,24 @@
 using UnityEngine;
 using TMPro;
 
-public class ItemEntity : MonoBehaviour
+public class ItemEntity : MonoBehaviour, IInteractable
 {
     public int Amount;
-    public Item Item;
+    public ItemData ItemData;
 
     [SerializeField] private TMP_Text _title;
 
     void Start()
     {
-        _title.text = Item.DisplayName;
+        _title.text = ItemData.DisplayName;
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        var livingEntity = other.GetComponent<LivingEntity>();
-        if(livingEntity == null) {
+    public void Interact(PlayerController player) {
+        if(!player.LivingEntity.Inventory.AddItem(ItemData, Amount)) {
             return;
         }
 
-        if(!livingEntity.InventorySystem.AddItem(Item, Amount)) {
-            return;
-        }
-
+        EventBus.InventoryItemChangedEvent?.Invoke();
         Destroy(gameObject);
     }
 }

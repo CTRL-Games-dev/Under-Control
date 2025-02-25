@@ -4,39 +4,21 @@ using UnityEngine.UI;
 public class PlayerBarsHolder : MonoBehaviour
 
 {
-    [SerializeField] Image _healthBarImg;
-    [SerializeField] Image _manaBarImg;
-    [SerializeField] Image _controlBarImg;
+    [SerializeField] private Image _healthBarImg;
+    [SerializeField] private Image _manaBarImg;
+    [SerializeField] private Image _controlBarImg;
 
+    private UICanvas _uiCanvasParent;
+    private LivingEntity _livingEntity { get => _uiCanvasParent.PlayerLivingEntity; }
 
-    public GameObject Player;
-    public PlayerController PlayerController;
-    public LivingEntity PlayerEntity;
-
-
-    public float HealthBarFillAmount { set { 
-        _healthBarImg.fillAmount = value; 
-        } 
+    private void Awake() {
+        _uiCanvasParent = gameObject.GetComponentInParent<UICanvas>();
     }
-    public float ManaBarFillAmount { set { 
-        _manaBarImg.fillAmount = value; 
-        } 
-    }
-    public float ControlBarFillAmount { set {
-        _controlBarImg.fillAmount = value; 
-        } 
-    }
-
-
-    private void Start() {
-    }
-
 
     private void Update() {
         // Temporary solution to update bars
-
-        HealthBarFillAmount = PlayerEntity.Health / PlayerEntity.MaxHealth;
-        // ManaBarFillAmount = _manaBarFillAmount;
-        // ControlBarFillAmount = _controlBarFillAmount;
+        _healthBarImg.fillAmount = _livingEntity.Health / _livingEntity.MaxHealth;
+        _manaBarImg.fillAmount = 1;
+        _controlBarImg.fillAmount = 1;
     }
 }

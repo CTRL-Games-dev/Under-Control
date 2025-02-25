@@ -36,7 +36,7 @@ public class TopdownState : ICameraState
     public Vector3 Rotation = new(70, 180, 0);
     public void RunCameraLogic(CameraManager camera)
     {
-        camera.transform.localPosition = (camera.Target.position + Offset);
+        camera.transform.localPosition = camera.Target.position + Offset;
         camera.transform.eulerAngles = Rotation;
     }
 }

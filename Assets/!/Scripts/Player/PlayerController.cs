@@ -11,20 +11,17 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(LivingEntity))]
 public class PlayerController : MonoBehaviour
 {
-    // Movement
+    [Header("Properties")]
     public float Acceleration = 2f;
     public float Deceleration = 2f;
     public float MaxWalkingSpeed = 1f;
     public float MaxSprintingSpeed = 2f;
     public float MouseSensitivity = 0.1f;
     public float WalkingTurnSpeed = 1f;
-    public float SprintingTurnSpeed = 2.5f;
     public float MinCameraDistance = 10f;
     public float MaxCameraDistance = 30f;
     public float CameraDistanceSpeed = 1f;
     public Vector2 CameraTargetObjectBounds = Vector2.zero;
-    public bool ApplySpellTest = false;
-    public bool ApplySpellTests = false;
     public GameObject CameraObject;
     public GameObject CameraTargetObject;
 
@@ -44,144 +41,55 @@ public class PlayerController : MonoBehaviour
     private bool _lightAttack;
     private bool _chargeAttack;
     private int _comboCounter;
+    [Header("Stats")]
+    public DynamicStat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
+    private int _coins = 100;
+    public int Coins { 
+        get{
+            return _coins;
+        } set {
+            CoinsChangeEvent?.Invoke(value - _coins);
+            _coins = value;
+        }  
+    } 
+
+    [Header("Events")]
+    public UnityEvent InventoryToggleEvent;
+    public UnityEvent UICancelEvent;
+    public UnityEvent ItemRotateEvent;
+    public UnityEvent<int> CoinsChangeEvent;
+
+    // State
+    private Vector2 _movementInputVector = Vector2.zero;
+    private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
 
     // References
-    private CharacterController _controller;
-    private Animator _animator;
-    private LivingEntity _livingEntity;
-    private CinemachinePositionComposer _cinemachinePositionComposer;
-
-    public LivingEntity LivingEntity { get => _livingEntity; }
+    public CharacterController CharacterController { get; private set; }
+    public Animator Animator { get; private set; }
+    public LivingEntity LivingEntity { get; private set; }
+    public CinemachinePositionComposer CinemachinePositionComposer { get; private set; }
     
-    // Animation IDs
-    private int _animationIdVelocitySide = Animator.StringToHash("velocitySide");
-    private int _animationIdVelocityFront = Animator.StringToHash("velocityFront");
-    private int _animationIdMoving = Animator.StringToHash("moving");
-    private int _animationIdSprinting = Animator.StringToHash("sprinting");
-    private int _animationIdJumping = Animator.StringToHash("jumping");
-
     void Start()
     {
-        _controller = GetComponent<CharacterController>();
-        _animator = GetComponent<Animator>();
-        _livingEntity = GetComponent<LivingEntity>();
-        _cinemachinePositionComposer = CameraObject.GetComponent<CinemachinePositionComposer>();
+        CharacterController = GetComponent<CharacterController>();
+        Animator = GetComponent<Animator>();
+        LivingEntity = GetComponent<LivingEntity>();
+        CinemachinePositionComposer = CameraObject.GetComponent<CinemachinePositionComposer>();
         
-        _targetDirection = transform.forward;
+        // _targetDirection = transform.forward;
         _cameraDistance = MinCameraDistance;
     }
 
     void Update()
     {
-        if(ApplySpellTest) {
-            new TestSpell().Cast(_livingEntity);
-            ApplySpellTest = false;
-        }
+        recalculateStats();
 
-        if(ApplySpellTests) {
-            new TestSpell().Cast(_livingEntity);
-            ApplySpellTests = false;
-        }
-
-        // Make use of this once we have proper animations and model
-        // HandleMovement();
-        // HandleTurning();
-        handleAttack();
-        //
-        // Rotate camera target to account for player mouse input 
-        // cameraTargetObject.transform.rotation = Quaternion.FromToRotation(Vector3.forward, targetDirection);
-   
-        // Placeholder for movement logic
-        // I guess in our game we don't need this?
-        // transform.rotation = Quaternion.FromToRotation(Vector3.forward, _targetDirection);
-     
         var movementVector = Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
-
-
-        _controller.SimpleMove(movementVector * 5);
+        CharacterController.SimpleMove(movementVector * LivingEntity.MovementSpeed);
     }
 
-    // Handles animator movement logic
-    private void handleMovement() {
-        float currentMaxVelocity = _sprinting ? MaxSprintingSpeed : MaxWalkingSpeed;
-
-        bool isVelocityXOverMax = _velocitySide > currentMaxVelocity || _velocitySide < -currentMaxVelocity;
-        bool isVelocityYOverMax = _velocityFront > currentMaxVelocity || _velocityFront < -currentMaxVelocity;
-
-        if(_movementInputVector.x != 0 && !isVelocityXOverMax) {
-            _velocitySide += Acceleration * Time.deltaTime * _movementInputVector.x;
-            if(_velocitySide > currentMaxVelocity) {
-                _velocitySide = currentMaxVelocity;
-            } else if(_velocitySide < -currentMaxVelocity) {
-                _velocitySide = -currentMaxVelocity;
-            }
-        } else {
-            if (_velocitySide > 0) {
-                _velocitySide -= Deceleration * Time.deltaTime;
-                if (_velocitySide < 0) {
-                    _velocitySide = 0;
-                }
-            } else {
-                _velocitySide += Deceleration * Time.deltaTime;
-                if (_velocitySide > 0) {
-                    _velocitySide = 0;
-                }
-            }
-        }
-
-        if(_movementInputVector.y != 0 && !isVelocityYOverMax) {
-            _velocityFront += Acceleration * Time.deltaTime * _movementInputVector.y;
-            if(_velocityFront > currentMaxVelocity) {
-                _velocityFront = currentMaxVelocity;
-            } else if(_velocityFront < -currentMaxVelocity) {
-                _velocityFront = -currentMaxVelocity;
-            } 
-        } else {
-            if (_velocityFront > 0) {
-                _velocityFront -= Deceleration * Time.deltaTime;
-                if (_velocityFront < 0) {
-                    _velocityFront = 0;
-                }
-            } else {
-                _velocityFront += Deceleration * Time.deltaTime;
-                if (_velocityFront > 0) {
-                    _velocityFront = 0;
-                }
-            }
-        }
-
-        _animator.SetFloat(_animationIdVelocitySide, _velocitySide);
-        _animator.SetFloat(_animationIdVelocityFront, _velocityFront);
-
-
-        if (_velocitySide != 0 || _velocityFront != 0) {
-            _animator.SetBool("moving", true);
-        } else {
-            _animator.SetBool("moving", false);
-        }
-    }
-
-    // Handles animator turning logic
-    private void handleTurning() {
-        if(_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) {
-            float x = Vector3.SignedAngle(transform.forward, _targetDirection, Vector3.up);
-            
-            if(!_isTurning) {
-                if(x < -135) {
-                    _animator.SetTrigger("leftTurnFull");
-                } else if(x > 135) {
-                    _animator.SetTrigger("rightTurnFull");
-                } else if(x > 45) {
-                    _animator.SetTrigger("rightTurn");
-                } else if(x < -45) {
-                    _animator.SetTrigger("leftTurn");
-                }
-            }
-        } else if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Walk Blend Tree")) {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(Vector3.forward, _targetDirection), Time.deltaTime * WalkingTurnSpeed);
-        } else if (_animator.GetCurrentAnimatorStateInfo(0).IsName("Sprint Blend Tree")) {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(Vector3.forward, _targetDirection), Time.deltaTime * SprintingTurnSpeed);
-        }
+    private void recalculateStats() {
+        VekhtarControl.Recalculate(LivingEntity.ModifierSystem);
     }
 
     // Handle attack logic
@@ -228,10 +136,6 @@ public class PlayerController : MonoBehaviour
         _movementInputVector = value.Get<Vector2>();
     }
     void OnLook(InputValue value) {
-        // Vector2 turnVector = value.Get<Vector2>();
-
-        // _targetDirection = Quaternion.Euler(0, turnVector.x * MouseSensitivity, 0) * _targetDirection;
-
         Vector2 pointerVector = value.Get<Vector2>();
         pointerVector /= new Vector2(Screen.width, Screen.height);
         if (pointerVector.x < 0) {
@@ -294,6 +198,32 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void OnToggleInventory(InputValue value) {
+        InventoryToggleEvent?.Invoke();
+    }
+
+    void OnCancel(InputValue value) {
+        UICancelEvent?.Invoke();
+    }
+
+    void OnRotateItem(InputValue value) {
+        ItemRotateEvent?.Invoke();
+    }
+
+    // Totalnie do zmiany, potrzebujemy interakcji myszka
+    void OnInteract(InputValue value)
+    {
+        float interactRange = 2f;
+        Collider[] colliderArray = Physics.OverlapSphere(transform.position, interactRange);
+        foreach(Collider c in colliderArray)
+        {
+            if(c.TryGetComponent(out IInteractable i))
+            {
+                i.Interact(this);
+            }
+        }
+    }
+
     // Animation events
 
     void OnFootstep() {
@@ -304,7 +234,7 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Land");
     }
 
-    public void OnDeath() {
+    void OnPlayerDeath() {
         Debug.Log("Player died");
     }
 }
