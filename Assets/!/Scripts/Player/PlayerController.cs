@@ -11,12 +11,16 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [Header("Properties")]
-    public float Acceleration = 2f;
-    public float Deceleration = 2f;
-    public float MaxWalkingSpeed = 1f;
-    public float MaxSprintingSpeed = 2f;
-    public float MouseSensitivity = 0.1f;
-    public float WalkingTurnSpeed = 1f;
+    [SerializeField] private float _acceleration = 2f;
+    [SerializeField] private float _deceleration = 2f;
+    public float _currentSpeed = 0f;
+    [SerializeField] private float _maxWalkingSpeed = 2f;
+    [SerializeField] private float _maxSprintingSpeed = 4f;
+    
+    [SerializeField] private float _turnSpeed = 1f;
+    
+    public float MouseSensitivity = 0.1f; // po co 
+    
     public float MinCameraDistance = 10f;
     public float MaxCameraDistance = 30f;
     public float CameraDistanceSpeed = 1f;
@@ -52,6 +56,12 @@ public class PlayerController : MonoBehaviour
     public LivingEntity LivingEntity { get; private set; }
     public CinemachinePositionComposer CinemachinePositionComposer { get; private set; }
     
+    readonly private int _speedHash = Animator.StringToHash("speed");
+    readonly private int _dodgeHash = Animator.StringToHash("dodge");
+    readonly private int _lightAttackHash = Animator.StringToHash("light_attack");
+    readonly private int _heavyAttackHash = Animator.StringToHash("heavy_attack");
+
+
     void Start()
     {
         CharacterController = GetComponent<CharacterController>();
@@ -65,12 +75,31 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-
-
         recalculateStats();
 
+        float goalSpeed = Input.GetKey(KeyCode.LeftShift) ? _maxSprintingSpeed : _maxWalkingSpeed; // do zmiany
+
         var movementVector = Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
-        CharacterController.SimpleMove(movementVector * LivingEntity.MovementSpeed);
+        if (movementVector.magnitude > 0.1) {
+            _currentSpeed = Mathf.MoveTowards(_currentSpeed, goalSpeed, _acceleration * Time.deltaTime);
+        } else {
+            _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0, _deceleration * Time.deltaTime);
+        }
+
+        handleRotation();
+        CharacterController.Move(transform.forward * _currentSpeed * Time.deltaTime);
+    }
+
+    void FixedUpdate()
+    {
+        Animator.SetFloat(_speedHash, _currentSpeed / _maxSprintingSpeed);
+    }
+
+    private void handleRotation() {
+        if (_movementInputVector.magnitude > 0.1f) {
+            var targetRotation = Quaternion.Euler(0, 45, 0) * Quaternion.LookRotation(new Vector3(_movementInputVector.x, 0, _movementInputVector.y));
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
+        }
     }
 
     private void recalculateStats() {
@@ -159,5 +188,18 @@ public class PlayerController : MonoBehaviour
 
     void OnPlayerDeath() {
         Debug.Log("Player died");
+    }
+
+
+    void OnDodge() {
+        Animator.SetTrigger(_dodgeHash);
+    }
+
+    void OnLightAttack() {
+        Animator.SetTrigger(_lightAttackHash);
+    }
+
+    void OnHeavyAttack() {
+        Animator.SetTrigger(_heavyAttackHash);
     }
 }
