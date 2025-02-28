@@ -26,9 +26,9 @@ public class PlayerController : MonoBehaviour
     public GameObject CameraTargetObject;
 
     // Attack 
-    public static float LightAttackDamage = 10f;
-    public float ChargeAttackDamage = LightAttackDamage * 3;
-    public float ComboGapTime = 1.0f;
+    public float LightAttackDamage = 10f;
+    public float ChargeAttackDamageMultiplier = 3f;
+    public Cooldown ComboCooldown;
 
     [Header("Stats")]
     public DynamicStat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
@@ -50,7 +50,6 @@ public class PlayerController : MonoBehaviour
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
-    private Vector3 _targetDirection;
     private bool _sprinting = false;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
     private bool _lightAttack;
@@ -70,14 +69,11 @@ public class PlayerController : MonoBehaviour
         LivingEntity = GetComponent<LivingEntity>();
         CinemachinePositionComposer = CameraObject.GetComponent<CinemachinePositionComposer>();
         
-        // _targetDirection = transform.forward;
         _cameraDistance = MinCameraDistance;
     }
 
     void Update()
     {
-
-
         recalculateStats();
 
         var movementVector = Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
@@ -89,13 +85,14 @@ public class PlayerController : MonoBehaviour
     }
 
     // Handle attack logic
+    // TODO: Finish attack login soon
     private void handleAttack() {
         if (_lightAttack)
         {
-            StartCoroutine(ResetCombo());
             if (_comboCounter < 3) {
                 print("Light attack" + _comboCounter);
-            }            
+            }
+
             _comboCounter++;    
             _lightAttack = false;                    
         }
@@ -113,24 +110,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public IEnumerator ResetCombo() {
-        float elapsedTime = 0f;
-
-        while (elapsedTime < ComboGapTime) {
-            if (_lightAttack) {
-                elapsedTime = 0f;
-            }
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-        _comboCounter = 0;
-    }
-
     // Input events
 
     void OnMove(InputValue value) {
         _movementInputVector = value.Get<Vector2>();
     }
+
     void OnLook(InputValue value) {
         Vector2 pointerVector = value.Get<Vector2>();
         pointerVector /= new Vector2(Screen.width, Screen.height);
