@@ -12,10 +12,12 @@ public class ChangePortal : MonoBehaviour, IPointerClickHandler, IPointerEnterHa
         _panelStartingPosition = _panel.transform.position;
     }
 
-    private void Update()
+    public void Interact(PlayerController player)
     {
-        
+        if(_opened) CloseUI();
+        else OpenUI();
     }
+    
     public void ChangeDimension(int i)
     {
         Debug.Log(i);
