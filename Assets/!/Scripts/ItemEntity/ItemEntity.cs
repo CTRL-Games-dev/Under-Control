@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
-
-public class ItemEntity : MonoBehaviour, IInteractable
+using UnityEngine.EventSystems;
+public class ItemEntity : MonoBehaviour, IPointerClickHandler
 {
     public int Amount;
     public ItemData ItemData;
@@ -21,4 +21,24 @@ public class ItemEntity : MonoBehaviour, IInteractable
         EventBus.InventoryItemChangedEvent?.Invoke();
         Destroy(gameObject);
     }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        PlayerController player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+
+        if(Vector3.Distance(player.transform.position, transform.position) > 3f) 
+        {
+            return;
+        }
+
+        if(!player.LivingEntity.Inventory.AddItem(ItemData, Amount)) 
+        {
+            return;
+        }
+
+        EventBus.InventoryItemChangedEvent?.Invoke();
+        Destroy(gameObject);
+    }
+
+    
 }
