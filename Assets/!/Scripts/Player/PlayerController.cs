@@ -132,18 +132,19 @@ public class PlayerController : MonoBehaviour
     }
 
     // Totalnie do zmiany, potrzebujemy interakcji myszka
-    void OnInteract(InputValue value)
-    {
-        float interactRange = 2f;
-        Collider[] colliderArray = Physics.OverlapSphere(transform.position, interactRange);
-        foreach(Collider c in colliderArray)
-        {
-            if(c.TryGetComponent(out IInteractable i))
-            {
-                i.Interact(this);
-            }
-        }
-    }
+    // Kyśnij się London
+    // void OnInteract(InputValue value)
+    // {
+    //     float interactRange = 2f;
+    //     Collider[] colliderArray = Physics.OverlapSphere(transform.position, interactRange);
+    //     foreach(Collider c in colliderArray)
+    //     {
+    //         if(c.TryGetComponent(out IInteractable i))
+    //         {
+    //             i.Interact(this);
+    //         }
+    //     }
+    // }
 
     // Animation events
 
