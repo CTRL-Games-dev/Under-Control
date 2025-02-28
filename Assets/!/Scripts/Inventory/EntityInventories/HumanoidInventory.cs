@@ -167,7 +167,7 @@ public class HumanoidInventory : SimpleInventory
         }
     }
 
-    public bool equipTwoHanded(WeaponItemData item) {
+    private bool equipTwoHanded(WeaponItemData item) {
         if(leftHand != null || rightHand != null) {
             return false;
         }
