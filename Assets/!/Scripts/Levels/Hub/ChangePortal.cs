@@ -1,6 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
-public class ChangePortal : MonoBehaviour, IInteractable
+using UnityEngine.EventSystems;
+public class ChangePortal : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private Portal _portal;
     [SerializeField] private GameObject _panel;
@@ -11,15 +12,12 @@ public class ChangePortal : MonoBehaviour, IInteractable
         _panelStartingPosition = _panel.transform.position;
     }
 
-    private void Update()
-    {
-        
-    }
     public void Interact(PlayerController player)
     {
         if(_opened) CloseUI();
         else OpenUI();
     }
+    
     public void ChangeDimension(int i)
     {
         Debug.Log(i);
@@ -52,5 +50,28 @@ public class ChangePortal : MonoBehaviour, IInteractable
         Debug.Log("Kula odmacana");
         _panel.transform.DOLocalMoveY(_panelStartingPosition.y, 0.4f);
         _opened = false;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        PlayerController player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+
+        if(Vector3.Distance(player.transform.position, transform.position) > 3f) 
+        {
+            return;
+        }
+
+        if(_opened) CloseUI();
+        else OpenUI();
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        Debug.Log("Player hovered over ball of power");
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        Debug.Log("Player stopped hovering over ball of power");
     }
 }

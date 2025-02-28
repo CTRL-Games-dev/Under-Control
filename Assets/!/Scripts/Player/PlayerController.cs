@@ -82,6 +82,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+
+
         recalculateStats();
 
         var movementVector = Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
@@ -211,18 +213,19 @@ public class PlayerController : MonoBehaviour
     }
 
     // Totalnie do zmiany, potrzebujemy interakcji myszka
-    void OnInteract(InputValue value)
-    {
-        float interactRange = 2f;
-        Collider[] colliderArray = Physics.OverlapSphere(transform.position, interactRange);
-        foreach(Collider c in colliderArray)
-        {
-            if(c.TryGetComponent(out IInteractable i))
-            {
-                i.Interact(this);
-            }
-        }
-    }
+    // Kyśnij się London
+    // void OnInteract(InputValue value)
+    // {
+    //     float interactRange = 2f;
+    //     Collider[] colliderArray = Physics.OverlapSphere(transform.position, interactRange);
+    //     foreach(Collider c in colliderArray)
+    //     {
+    //         if(c.TryGetComponent(out IInteractable i))
+    //         {
+    //             i.Interact(this);
+    //         }
+    //     }
+    // }
 
     // Animation events
 

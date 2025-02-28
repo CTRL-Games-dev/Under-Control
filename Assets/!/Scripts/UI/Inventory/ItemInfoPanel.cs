@@ -37,7 +37,8 @@ public class ItemInfoPanel : MonoBehaviour
         _itemName.text = item.ItemData.DisplayName;
         _itemDescription.text = item.ItemData.Description;
 
-        int value = itemUI.CurrentInventoryPanel.IsSellerInventory ? item.ItemData.Value : item.ItemData.Value / 2;
+        int value = item.ItemData.Value / 2;
+        if (itemUI.CurrentInventoryPanel != null && itemUI.CurrentInventoryPanel.IsSellerInventory) value *= 2;
 
         _itemValue.text = value + $" ({value * item.Amount})";
         _itemAmount.text = '×' + item.Amount.ToString();

@@ -16,6 +16,7 @@ public class ItemEntityManager : MonoBehaviour
     public ItemEntityManager() {}
 
     public void SpawnItemEntity(ItemData itemData, int amount, Vector3 position) {
+        Debug.Log("Spawning item entity");
         var gameObject = Instantiate(_itemEntityPrefab, position, Quaternion.identity);
 
         var itemEntity = gameObject.GetComponent<ItemEntity>();
