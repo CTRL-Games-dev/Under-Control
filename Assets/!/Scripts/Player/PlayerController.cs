@@ -30,17 +30,6 @@ public class PlayerController : MonoBehaviour
     public float ChargeAttackDamage = LightAttackDamage * 3;
     public float ComboGapTime = 1.0f;
 
-    // State
-    private Vector2 _movementInputVector = Vector2.zero;
-    private Vector3 _targetDirection;
-    private bool _sprinting = false;
-    private float _velocitySide = 0;
-    private float _velocityFront = 0;
-    private bool _isTurning;
-    private float _cameraDistance { get => _cinemachinePositionComposer.CameraDistance; set => _cinemachinePositionComposer.CameraDistance = value; }
-    private bool _lightAttack;
-    private bool _chargeAttack;
-    private int _comboCounter;
     [Header("Stats")]
     public DynamicStat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
     private int _coins = 100;
@@ -61,7 +50,12 @@ public class PlayerController : MonoBehaviour
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
+    private Vector3 _targetDirection;
+    private bool _sprinting = false;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
+    private bool _lightAttack;
+    private bool _chargeAttack;
+    private int _comboCounter;
 
     // References
     public CharacterController CharacterController { get; private set; }
@@ -167,7 +161,7 @@ public class PlayerController : MonoBehaviour
 
     void OnSprint(InputValue value) {
         _sprinting = value.isPressed;
-        _animator.SetBool("sprinting", _sprinting);
+        Animator.SetBool("sprinting", _sprinting);
     }
 
     /*void OnAttack(InputValue value) {
