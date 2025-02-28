@@ -131,7 +131,6 @@ public class UICanvas : MonoBehaviour
         EventBus.ItemPlacedEvent?.Invoke();
     }
 
-
     private IEnumerator animateCoins(bool increase) {
         _coinsText.color = increase ? Color.green : Color.red;
         _coinsHolder.transform.localScale = increase ? new Vector3(1.2f, 1f, 1f) : new Vector3(0.8f, 1f, 1f);
