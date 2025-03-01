@@ -131,6 +131,40 @@ public class UICanvas : MonoBehaviour
         EventBus.ItemPlacedEvent?.Invoke();
     }
 
+    private void OnUICancel() {
+        openInventory(false);
+    }
+
+    private void openInventory(bool value) {
+        _isInventoryOpen = value;
+
+        _inventoryCanvasGroup.DOKill();
+        if (_isInventoryOpen) {
+            _inventoryCanvas.SetActive(true);
+            _inventoryCanvasGroup.DOFade(1, 0.25f);
+            _inventoryCanvasGroup.interactable = true;
+            _inventoryCanvasGroup.blocksRaycasts = true;
+        } else {
+            if (SelectedItemUI.InventoryItem != null) {
+                DropItem(Player.transform.position + Player.transform.forward * 2);
+            }
+
+            _inventoryCanvasGroup.DOFade(0, 0.25f).OnComplete(() => _inventoryCanvas.SetActive(false));
+            _inventoryCanvasGroup.interactable = false;
+            _inventoryCanvasGroup.blocksRaycasts = false;
+        }
+    }
+
+    public void DropItem() {
+        DropItem(Player.transform.position + Player.transform.forward * 2);
+    }
+
+    public void DropItem(Vector3 position) {
+        if (SelectedItemUI.InventoryItem == null) return;
+        ItemEntityManager.Instance.SpawnItemEntity(SelectedItemUI.InventoryItem.ItemData, SelectedItemUI.InventoryItem.Amount, position);
+        SelectedItemUI.InventoryItem = null;
+        EventBus.ItemPlacedEvent?.Invoke();
+    }
 
     private IEnumerator animateCoins(bool increase) {
         _coinsText.color = increase ? Color.green : Color.red;

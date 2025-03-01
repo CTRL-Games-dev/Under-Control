@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Seller : MonoBehaviour, IInteractable
+public class Seller : MonoBehaviour
 {
     [SerializeField] private GameObject _sellerUIPrefab; 
     [SerializeField] private ItemContainer _inventory;

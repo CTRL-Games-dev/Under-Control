@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
@@ -28,6 +29,11 @@ public class PlayerController : MonoBehaviour
     public GameObject CameraObject;
     public GameObject CameraTargetObject;
 
+    // Attack 
+    public float LightAttackDamage = 10f;
+    public float ChargeAttackDamageMultiplier = 3f;
+    public Cooldown ComboCooldown;
+
     [Header("Stats")]
     public DynamicStat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
     private int _coins = 100;
@@ -48,7 +54,11 @@ public class PlayerController : MonoBehaviour
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
+    private bool _sprinting = false;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
+    private bool _lightAttack;
+    private bool _chargeAttack;
+    private int _comboCounter;
 
     // References
     public CharacterController CharacterController { get; private set; }
@@ -69,7 +79,6 @@ public class PlayerController : MonoBehaviour
         LivingEntity = GetComponent<LivingEntity>();
         CinemachinePositionComposer = CameraObject.GetComponent<CinemachinePositionComposer>();
         
-        // _targetDirection = transform.forward;
         _cameraDistance = MinCameraDistance;
     }
 
@@ -106,11 +115,38 @@ public class PlayerController : MonoBehaviour
         VekhtarControl.Recalculate(LivingEntity.ModifierSystem);
     }
 
+    // Handle attack logic
+    // TODO: Finish attack login soon
+    private void handleAttack() {
+        if (_lightAttack)
+        {
+            if (_comboCounter < 3) {
+                print("Light attack" + _comboCounter);
+            }
+
+            _comboCounter++;    
+            _lightAttack = false;                    
+        }
+
+        if (_comboCounter == 4)
+        {
+            print("Knockback attack");
+            _comboCounter = 0;
+        }
+
+        if (_chargeAttack && _comboCounter == 0) 
+        {
+            print("Charge attack");
+            _chargeAttack = false;
+        }
+    }
+
     // Input events
 
     void OnMove(InputValue value) {
         _movementInputVector = value.Get<Vector2>();
     }
+
     void OnLook(InputValue value) {
         Vector2 pointerVector = value.Get<Vector2>();
         pointerVector /= new Vector2(Screen.width, Screen.height);
@@ -138,7 +174,31 @@ public class PlayerController : MonoBehaviour
             pointerVectorPos.y
         );
     }
-    
+
+    void OnSprint(InputValue value) {
+        _sprinting = value.isPressed;
+        Animator.SetBool("sprinting", _sprinting);
+    }
+
+    /*void OnAttack(InputValue value) {
+        _animator.SetTrigger("punch");
+    }*/
+
+    void OnLightAttack(InputValue value) {
+        //_animator.SetTrigger("lightAttack");
+        _lightAttack = value.isPressed;
+
+    }
+
+    void OnChargeAttack(InputValue value) {
+        //_animator.SetTrigger("chargeAttack");
+        _chargeAttack = value.isPressed;        
+    }
+
+    void OnDodge(InputValue value) {
+        //_animator.SetTrigger("dodge");
+    }
+
     void OnScrollWheel(InputValue value) {
         var delta = value.Get<Vector2>();
         _cameraDistance -= delta.y * CameraDistanceSpeed;
@@ -163,18 +223,19 @@ public class PlayerController : MonoBehaviour
     }
 
     // Totalnie do zmiany, potrzebujemy interakcji myszka
-    void OnInteract(InputValue value)
-    {
-        float interactRange = 2f;
-        Collider[] colliderArray = Physics.OverlapSphere(transform.position, interactRange);
-        foreach(Collider c in colliderArray)
-        {
-            if(c.TryGetComponent(out IInteractable i))
-            {
-                i.Interact(this);
-            }
-        }
-    }
+    // Kyśnij się London
+    // void OnInteract(InputValue value)
+    // {
+    //     float interactRange = 2f;
+    //     Collider[] colliderArray = Physics.OverlapSphere(transform.position, interactRange);
+    //     foreach(Collider c in colliderArray)
+    //     {
+    //         if(c.TryGetComponent(out IInteractable i))
+    //         {
+    //             i.Interact(this);
+    //         }
+    //     }
+    // }
 
     // Animation events
 

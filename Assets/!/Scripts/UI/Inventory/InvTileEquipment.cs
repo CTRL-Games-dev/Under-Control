@@ -143,7 +143,6 @@ public class InvTileEquipment : InvTile {
         inventoryItem.ItemUI.SetupItem(inventoryItem, InventoryPanel.TileSize, null, null);
 
         _itemUI = inventoryItem.ItemUI;
-
         return itemGameObject;
     }
 }
