@@ -87,7 +87,7 @@ public class PlayerController : MonoBehaviour
         }
 
         handleRotation();
-        CharacterController.Move(transform.forward * _currentSpeed * Time.deltaTime);
+        // CharacterController.Move(transform.forward * _currentSpeed * Time.deltaTime);
     }
 
     void FixedUpdate()
