@@ -3,8 +3,7 @@ using UnityEngine.UI;
 
 
 
-public class InvTile : MonoBehaviour
-{
+public class InvTile : MonoBehaviour {
     protected GameObject _highlightImage;
 
     protected Image _image;
