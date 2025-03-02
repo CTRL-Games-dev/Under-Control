@@ -24,6 +24,7 @@ public class InventoryPanel : MonoBehaviour
 
     [Header("Interactions")]
     [SerializeField] private Image _redPanel;
+    [SerializeField] private Image _bgImage;
 
     // References set in Awake or Start
     private RectTransform _rectTransform;
@@ -78,7 +79,6 @@ public class InventoryPanel : MonoBehaviour
 
     public void RegenerateInventory() {
         if ((_currentEntityInventory = _isPlayerInventory ? _uiCanvas.PlayerInventory.ItemContainer : TargetEntityInventory) == null) return; 
-        Debug.Log("Regenerating inventory");
         setupGrid();
         UpdateItemUIS();
     }
@@ -86,8 +86,6 @@ public class InventoryPanel : MonoBehaviour
     private void setupGrid() {
         _inventoryWidth = _currentEntityInventory.Size.x;
         _inventoryHeight = _currentEntityInventory.Size.y;
-
-        Debug.Log($"Inventory size: {_inventoryWidth}x{_inventoryHeight}");
 
         _gridLayoutGroup.constraintCount = _inventoryWidth;
 
@@ -187,6 +185,7 @@ public class InventoryPanel : MonoBehaviour
     #region ItemUI Methods
 
     public void UpdateItemUIS() {
+        Debug.Log("Updating Item UIs");
         foreach (InventoryItem inventoryItem in _inventory) {
             destroyItemUI(inventoryItem);
             createItemUI(inventoryItem);
@@ -283,16 +282,6 @@ public class InventoryPanel : MonoBehaviour
 
     public void SetTargetInventory(ItemContainer itemContainer) {
         TargetEntityInventory = itemContainer;
-        if (itemContainer == null) {
-            foreach (Transform child in _itemHolder.transform) {
-                Destroy(child.gameObject);
-            }
-            foreach (Transform child in _gridHolder.transform) {
-                Destroy(child.gameObject);
-            }
-            return;
-
-        }
         RegenerateInventory();
     }
 

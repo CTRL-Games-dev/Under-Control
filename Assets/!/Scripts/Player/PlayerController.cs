@@ -250,7 +250,6 @@ public class PlayerController : MonoBehaviour
 
         // TODO Weźcie to potem dajcie w odpowiednie miejsce czy coś
         // Wrzuciłem to póki co tutaj
-        Debug.Log("Nigger");
         Ray ray = CameraObject.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit)) {
             Transform objectHit = hit.transform;

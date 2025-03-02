@@ -43,7 +43,6 @@ public class UICanvas : MonoBehaviour
     }
 
     [HideInInspector] public InventoryPanel ActiveInventoryPanel;
-    public InventoryPanel OtherInventoryPanel;
     public ItemInfoPanel ItemInfoPanel;
     public SelectedItemUI SelectedItemUI;
 
@@ -56,6 +55,8 @@ public class UICanvas : MonoBehaviour
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI _coinsText;
     [SerializeField] private GameObject _coinsHolder;
+    [SerializeField] private GameObject _otherInventoryHolder;
+    private ItemContainer _currentOtherInventory;
     private CanvasGroup _inventoryCanvasGroup;
 
     #endregion
@@ -114,8 +115,16 @@ public class UICanvas : MonoBehaviour
 
     #region Inventory Methods
 
-    public void SetOtherInventory(ItemContainer itemContainer) {
-        OtherInventoryPanel.SetTargetInventory(itemContainer);
+    public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab) {
+        if (_currentOtherInventory == itemContainer) return;
+        _currentOtherInventory = itemContainer;
+        if (_otherInventoryHolder.transform.childCount > 0)
+            Destroy(_otherInventoryHolder.transform.GetChild(0).gameObject);
+        if (itemContainer != null) {
+            openInventory(true);
+            GameObject gameObject = Instantiate(prefab, _otherInventoryHolder.transform);
+            gameObject.GetComponentInChildren<InventoryPanel>().SetTargetInventory(itemContainer);
+        }
     }
 
     public void DropItem(Vector3 position) {
@@ -146,6 +155,7 @@ public class UICanvas : MonoBehaviour
             _inventoryCanvasGroup.DOFade(0, 0.25f).OnComplete(() => _inventoryCanvas.SetActive(false));
             _inventoryCanvasGroup.interactable = false;
             _inventoryCanvasGroup.blocksRaycasts = false;
+            SetOtherInventory(null, null);
         }
     }
 
