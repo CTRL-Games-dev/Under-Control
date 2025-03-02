@@ -56,9 +56,11 @@ public class UICanvas : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _coinsText;
     [SerializeField] private GameObject _coinsHolder;
     [SerializeField] private GameObject _otherInventoryHolder;
+    [SerializeField] private RectTransform _navBarRectTransform;
     private ItemContainer _currentOtherInventory;
     private InventoryCanvas _inventoryCanvas;
     private CanvasGroup _inventoryCanvasGroup;
+    private IInteractableInventory _lastInteractableInventory;
 
     #endregion
 
@@ -84,6 +86,7 @@ public class UICanvas : MonoBehaviour
         _inventoryCanvasGroup = _inventoryCanvasGO.GetComponent<CanvasGroup>();
         OnCoinsChange(0);
         
+        _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Armor);
         openInventory(false);
     }
 
@@ -118,17 +121,27 @@ public class UICanvas : MonoBehaviour
 
     #region Inventory Methods
 
-    public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab) {
-        _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Other);
+    public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab, IInteractableInventory interactable = null, string title = null) {
+        if (itemContainer != null) _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Other);
+
         if (_currentOtherInventory == itemContainer) return;
+
+        _lastInteractableInventory?.EndInteract();
+        _lastInteractableInventory = interactable;
+
         _currentOtherInventory = itemContainer;
-        if (itemContainer != null) {
+        _inventoryCanvas.SetOtherTabTitle(title);
+
+        if (itemContainer != null) { // animacja zmiany
             _inventoryCanvas.OtherTabExit().OnComplete(() => {
                 if (_otherInventoryHolder.transform.childCount > 0)
                     Destroy(_otherInventoryHolder.transform.GetChild(0).gameObject);
+                
                 openInventory(true);
-                GameObject gameObject = Instantiate(prefab, _otherInventoryHolder.transform);
-                gameObject.GetComponentInChildren<InventoryPanel>().SetTargetInventory(itemContainer);
+
+                InventoryPanel inventoryPanel = Instantiate(prefab, _otherInventoryHolder.transform).GetComponentInChildren<InventoryPanel>();
+                inventoryPanel.SetTargetInventory(itemContainer);
+                // inventoryPanel.ConnectSignals();
                 _inventoryCanvas.OtherTabEnter();
             });
         } else {
@@ -152,11 +165,14 @@ public class UICanvas : MonoBehaviour
         _isInventoryOpen = value;
 
         _inventoryCanvasGroup.DOKill();
+        _navBarRectTransform.DOKill();
+        _navBarRectTransform.DOAnchorPosY(_isInventoryOpen ? 0 : 65, 0.25f);
         if (_isInventoryOpen) {
             _inventoryCanvasGO.SetActive(true);
             _inventoryCanvasGroup.DOFade(1, 0.25f);
             _inventoryCanvasGroup.interactable = true;
             _inventoryCanvasGroup.blocksRaycasts = true;
+            _inventoryCanvas.OpenCurrentTab();
         } else {
             if (SelectedItemUI.InventoryItem != null) {
                 DropItem(Player.transform.position + Player.transform.forward * 2);
@@ -166,6 +182,7 @@ public class UICanvas : MonoBehaviour
             _inventoryCanvasGroup.interactable = false;
             _inventoryCanvasGroup.blocksRaycasts = false;
             SetOtherInventory(null, null);
+            _inventoryCanvas.CloseAllTabs();
         }
     }
 

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using DG.Tweening;
+using System;
 
 public class InventoryCanvas : MonoBehaviour
 {
@@ -24,12 +25,16 @@ public class InventoryCanvas : MonoBehaviour
     [Header("Panel Game Objects")]
     [SerializeField] private GameObject _otherInventoryPanelGO;
     [SerializeField] private GameObject _armorInventoryPanelGO;
+    [SerializeField] private GameObject _abilitiesInventoryPanelGO;
+    [SerializeField] private GameObject _skillsInventoryPanelGO;
+    [SerializeField] private GameObject _questsInventoryPanelGO;
     [SerializeField] private GameObject _playerInventoryPanelGO;
 
     private GameObject[] _tabButtonGameObjects;
     private Button[] _tabButtons;
     private Image[] _tabImages;
     private TextMeshProUGUI[] _tabTexts;
+    private RectTransform[] _tabRectTranforms;
     private Dictionary<InventoryTabs, int> _tabPanelsIndex;
 
     private GameObject _currentTabPanel;
@@ -44,8 +49,6 @@ public class InventoryCanvas : MonoBehaviour
 
     #region Unity Methods
 
-    private void Awake() {
-    }
 
     void Start() {
         _uiCanvas = UICanvas.Instance;
@@ -77,6 +80,13 @@ public class InventoryCanvas : MonoBehaviour
             _skillsTabGO.GetComponentInChildren<TextMeshProUGUI>(),
             _questsTabGO.GetComponentInChildren<TextMeshProUGUI>()
         };
+        _tabRectTranforms = new RectTransform[] {
+            _otherTabGO.GetComponent<RectTransform>(),
+            _armorTabGO.GetComponent<RectTransform>(),
+            _abilitiesTabGO.GetComponent<RectTransform>(),
+            _skillsTabGO.GetComponent<RectTransform>(),
+            _questsTabGO.GetComponent<RectTransform>()
+        };
 
         _tabPanelsIndex = new Dictionary<InventoryTabs, int> {
             { InventoryTabs.Other, 0 },
@@ -85,6 +95,7 @@ public class InventoryCanvas : MonoBehaviour
             { InventoryTabs.Skills, 3 },
             { InventoryTabs.Quests, 4 }
         };
+
     }
 
     #endregion
@@ -105,17 +116,73 @@ public class InventoryCanvas : MonoBehaviour
                 highlightTab(t, false);
             }
         }
+        // KillAllTweens(); TODO
+ 
 
         switch (_currentTab) {
             case InventoryTabs.Other:
+                abilitiesTabExit();
+                skillsTabExit();
+                questsTabExit();
                 armorTabExit().OnComplete(() => otherTabEnter());
                 playerTabEnter();
                 break;
             case InventoryTabs.Armor:
+                abilitiesTabExit();
+                skillsTabExit();
+                questsTabExit();
                 otherTabExit().OnComplete(() => armorTabEnter());
                 playerTabEnter();
                 break;
+            case InventoryTabs.Abilities:
+                playerTabExit();
+                armorTabExit();
+                skillsTabExit();
+                questsTabExit();
+                otherTabExit().OnComplete(() => abilitiesTabEnter());
+                break;
+            case InventoryTabs.Skills:
+                playerTabExit();
+                armorTabExit();
+                abilitiesTabExit();
+                questsTabExit();
+                otherTabExit().OnComplete(() => skillsTabEnter());
+                break;
+            case InventoryTabs.Quests:
+                playerTabExit();
+                armorTabExit();
+                abilitiesTabExit();
+                skillsTabExit();
+                otherTabExit().OnComplete(() => questsTabEnter());
+                break;
         }
+    }
+
+    public void OpenCurrentTab() {
+        SetCurrentTab(_currentTab);
+    }
+
+    public void CloseAllTabs() {
+        playerTabExit();
+        armorTabExit();
+        abilitiesTabExit();
+        skillsTabExit();
+        questsTabExit();
+        otherTabExit();
+    }
+
+    public void KillAllTweens() {
+        _otherInventoryPanelGO.GetComponent<RectTransform>().DOKill();
+        _armorInventoryPanelGO.GetComponent<RectTransform>().DOKill();
+        _abilitiesInventoryPanelGO.GetComponent<RectTransform>().DOKill();
+        _skillsInventoryPanelGO.GetComponent<RectTransform>().DOKill();
+        _questsInventoryPanelGO.GetComponent<RectTransform>().DOKill();
+        _playerInventoryPanelGO.GetComponent<RectTransform>().DOKill();
+    }
+
+    public void SetOtherTabTitle(string text) {
+        _tabTexts[_tabPanelsIndex[InventoryTabs.Other]].text = text ?? "-";
+        _tabTexts[_tabPanelsIndex[InventoryTabs.Other]].DOColor(text == null ? Color.gray : Color.white, 0.15f);
     }
 
     public Tween OtherTabExit() {
@@ -169,6 +236,7 @@ public class InventoryCanvas : MonoBehaviour
     }
 
     private Tween otherTabExit() {
+        // if (_otherInventoryPanelGO.GetComponent<RectTransform>().anchoredPosition.x < 0) return DOTween.Sequence().AppendInterval(0).AppendCallback(() => { });
         return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-410, 0.25f).OnComplete(() => _otherInventoryPanelGO.SetActive(false));
     }
 
@@ -178,7 +246,35 @@ public class InventoryCanvas : MonoBehaviour
     }
 
     private Tween armorTabExit() {
+        // if (_armorInventoryPanelGO.GetComponent<RectTransform>().anchoredPosition.x < 0) return DOTween.Sequence().AppendInterval(0).AppendCallback(() => { });
         return _armorInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-580, 0.25f).OnComplete(() => _armorInventoryPanelGO.SetActive(false));
+    }
+
+    private Tween abilitiesTabEnter() {
+        _abilitiesInventoryPanelGO.SetActive(true);
+        return _abilitiesInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-630, 0.25f);
+    }
+
+    private Tween abilitiesTabExit() {
+        return _abilitiesInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f).OnComplete(() => _abilitiesInventoryPanelGO.SetActive(false));
+    }
+
+    private Tween skillsTabEnter() {
+        _skillsInventoryPanelGO.SetActive(true);
+        return _skillsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-630, 0.25f);
+    }
+
+    private Tween skillsTabExit() {
+        return _skillsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f).OnComplete(() => _skillsInventoryPanelGO.SetActive(false));
+    }
+
+    private Tween questsTabEnter() {
+        _questsInventoryPanelGO.SetActive(true);
+        return _questsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-630, 0.25f);
+    }
+
+    private Tween questsTabExit() {
+        return _questsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f).OnComplete(() => _questsInventoryPanelGO.SetActive(false));
     }
 
     #endregion

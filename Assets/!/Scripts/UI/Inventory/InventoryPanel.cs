@@ -51,17 +51,15 @@ public class InventoryPanel : MonoBehaviour
 
     #region Unity Methods
 
-    private void Awake() {
+    public void Awake() {
         _rectTransform = GetComponent<RectTransform>();
         _layoutImage = GetComponent<Image>();
         _layoutImage.enabled = false;
         _gridLayoutGroup = _gridHolder.GetComponent<GridLayoutGroup>();
     }
 
-    private void Start() {
-        EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
-        EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
-        EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
+    public void Start() {
+        ConnectSignals();
         // EventBus.ItemPlacedEvent.AddListener(() => SetImagesRaycastTarget(true));
         _uiCanvas = UICanvas.Instance;
 
@@ -278,6 +276,11 @@ public class InventoryPanel : MonoBehaviour
     #endregion
 
     #region Misc Methods
+    public void ConnectSignals() {
+        EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
+        EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
+        EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
+    }
 
     public void SetTargetInventory(ItemContainer itemContainer) {
         TargetEntityInventory = itemContainer;
@@ -301,6 +304,7 @@ public class InventoryPanel : MonoBehaviour
     #region Callbacks
 
     public void OnItemUIClick(ItemUI itemUI) {
+        
         if (_inventory.Contains(itemUI.InventoryItem)) {
             if (IsSellerInventory) {
                 _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;

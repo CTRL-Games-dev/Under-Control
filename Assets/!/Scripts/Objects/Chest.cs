@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(SimpleInventory))]
-public class Chest : MonoBehaviour, IInteractable
+public class Chest : MonoBehaviour, IInteractableInventory
 {
     [SerializeField] private GameObject _uiPrefab;
     private SimpleInventory _inventory;
@@ -14,6 +14,10 @@ public class Chest : MonoBehaviour, IInteractable
 
     public void Interact(PlayerController player) {
         _animator.SetTrigger("open");
-        UICanvas.Instance.SetOtherInventory(_inventory.ItemContainer, _uiPrefab);
+        UICanvas.Instance.SetOtherInventory(_inventory.ItemContainer, _uiPrefab, this, "Chest");
+    }
+
+    public void EndInteract() {
+        _animator.SetTrigger("close");
     }
 }
