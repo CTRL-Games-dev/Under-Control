@@ -5,54 +5,54 @@ using UnityEngine;
 public class SimpleInventory : EntityInventory
 {
     [SerializeField]
-    public ItemContainer itemContainer;
-    public override Vector2Int Size => itemContainer.Size;
+    public ItemContainer ItemContainer;
+    public override Vector2Int Size => ItemContainer.Size;
 
     public override bool AddItem(ItemData itemData, int amount, Vector2Int position, bool rotated = false) {
-        return itemContainer.AddItem(itemData, amount, position, rotated);
+        return ItemContainer.AddItem(itemData, amount, position, rotated);
     }
 
     public override bool AddItem(ItemData itemData, int amount, Vector2Int position) {
-        return itemContainer.AddItem(itemData, amount, position);
+        return ItemContainer.AddItem(itemData, amount, position);
     }
 
     public override bool AddItem(ItemData itemData, int amount) {
-        return itemContainer.AddItem(itemData, amount);
+        return ItemContainer.AddItem(itemData, amount);
     }
 
     public override bool AddItem(ItemData itemData) {
-        return itemContainer.AddItem(itemData);
+        return ItemContainer.AddItem(itemData);
     }
 
     public override InventoryItem GetInventoryItem(Vector2Int position) {
-        return itemContainer.GetInventoryItem(position);
+        return ItemContainer.GetInventoryItem(position);
     }
 
     public override  List<InventoryItem> GetItems() {
-        return itemContainer.GetItems();
+        return ItemContainer.GetItems();
     }
 
     public override bool IsWithinBounds(Vector2Int position) {
-        return itemContainer.IsWithinBounds(position);
+        return ItemContainer.IsWithinBounds(position);
     }
 
     public override bool FitsWithinBounds(Vector2Int position, Vector2Int size) {
-        return itemContainer.FitsWithinBounds(position, size);
+        return ItemContainer.FitsWithinBounds(position, size);
     }
 
     public override bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position) {
-        return itemContainer.CanBeAdded(itemData, quantity, position);
+        return ItemContainer.CanBeAdded(itemData, quantity, position);
     }
 
     public override bool RemoveInventoryItem(InventoryItem inventoryItem) {
-        return itemContainer.RemoveInventoryItem(inventoryItem);
+        return ItemContainer.RemoveInventoryItem(inventoryItem);
     }
 
     public override bool RemoveItemAt(Vector2Int position) {
-        return itemContainer.RemoveItemAt(position);
+        return ItemContainer.RemoveItemAt(position);
     }
 
     public override void Clear() {
-        itemContainer.Clear();
+        ItemContainer.Clear();
     }
 }

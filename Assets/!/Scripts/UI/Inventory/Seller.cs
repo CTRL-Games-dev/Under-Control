@@ -1,31 +1,30 @@
 using UnityEngine;
 
+
+[RequireComponent(typeof(SimpleInventory))]
+
 public class Seller : MonoBehaviour
 {
     [SerializeField] private GameObject _sellerUIPrefab; 
-    [SerializeField] private ItemContainer _inventory;
-    public ItemContainer Inventory { get => _inventory; private set => _inventory = value; }
-    public GameObject _inventoryPanel;
+    public SimpleInventory Inventory;
+
+
+    void Awake() {
+        Inventory = GetComponent<SimpleInventory>();
+    }
+
 
     void OnTriggerEnter(Collider other) {
-        if (other.CompareTag("Player")) {
+        if (other.GetComponent<PlayerController>()) {
             Debug.Log("Player entered seller trigger");
-            // _inventoryPanel = Instantiate(_sellerUIPrefab, FindFirstObjectByType<UICanvas>().GetComponent<UICanvas>().InventoryBG.transform);
-            // InventoryPanel inventoryPanel = _inventoryPanel.GetComponentInChildren<InventoryPanel>();
-            // inventoryPanel.TargetEntityInventory = Inventory;
-            // inventoryPanel.RegenerateInventory();
+            UICanvas.Instance.SetOtherInventory(Inventory.ItemContainer);
         }
     }
 
     void OnTriggerExit(Collider other) {
-        if (other.CompareTag("Player")) {
-            Debug.Log("Player exited seller trigger");
-
+        if (other.GetComponent<PlayerController>()) {
+            UICanvas.Instance.SetOtherInventory(null);
         }
-        // if (other.CompareTag("Player")) {
-        //     Destroy(_inventoryPanel);
-        //     EventBus.ItemUIHoverEvent.Invoke(null);
-        // }
     }
 
     public void Interact(PlayerController player)

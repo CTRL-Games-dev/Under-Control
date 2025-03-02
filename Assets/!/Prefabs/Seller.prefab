@@ -663,6 +663,7 @@ GameObject:
   - component: {fileID: 2039555505422918082}
   - component: {fileID: 4459575071360382741}
   - component: {fileID: 4181038474974698532}
+  - component: {fileID: 9123171074393625900}
   - component: {fileID: 6646598065809406118}
   - component: {fileID: 8450239347219920575}
   m_Layer: 0
@@ -744,6 +745,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &9123171074393625900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3049481714862784304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9087bc037af0e5a4d81382f2dad09dab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ItemContainer:
+    _size: {x: 0, y: 0}
+    _items: []
 --- !u!114 &6646598065809406118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -757,17 +773,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sellerUIPrefab: {fileID: 4045902477692341137, guid: 857660af3460fb040b18bfd943dffc32, type: 3}
-  _inventory:
-    _size: {x: 4, y: 4}
-    _items: []
-    Helmet: {fileID: 0}
-    Chestplate: {fileID: 0}
-    Boots: {fileID: 0}
-    Amulet: {fileID: 0}
-    Ring: {fileID: 0}
-    leftHand: {fileID: 0}
-    rightHand: {fileID: 0}
-  _inventoryPanel: {fileID: 0}
+  InventoryPanel: {fileID: 0}
+  Inventory: {fileID: 0}
 --- !u!65 &8450239347219920575
 BoxCollider:
   m_ObjectHideFlags: 0

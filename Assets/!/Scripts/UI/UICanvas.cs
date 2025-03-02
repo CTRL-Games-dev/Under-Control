@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class UICanvas : MonoBehaviour
 {
+    #region Fields
+
     [Header("References for children")]
     public static UICanvas Instance;
     public GameObject Player;
@@ -41,7 +43,7 @@ public class UICanvas : MonoBehaviour
     }
 
     [HideInInspector] public InventoryPanel ActiveInventoryPanel;
-
+    public InventoryPanel OtherInventoryPanel;
     public ItemInfoPanel ItemInfoPanel;
     public SelectedItemUI SelectedItemUI;
 
@@ -55,6 +57,10 @@ public class UICanvas : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _coinsText;
     [SerializeField] private GameObject _coinsHolder;
     private CanvasGroup _inventoryCanvasGroup;
+
+    #endregion
+
+    #region Unity Methods
 
     private void Awake() {
         if (Instance != null) {
@@ -76,6 +82,10 @@ public class UICanvas : MonoBehaviour
 
         OnCoinsChange(0);
     }
+
+    #endregion
+
+    #region Callbacks
 
     private void OnItemUIHover(ItemUI itemUI) {
         if (SelectedItemUI.InventoryItem != null) return;
@@ -100,6 +110,25 @@ public class UICanvas : MonoBehaviour
         openInventory(false);
     }
 
+    #endregion
+
+    #region Inventory Methods
+
+    public void SetOtherInventory(ItemContainer itemContainer) {
+        OtherInventoryPanel.SetTargetInventory(itemContainer);
+    }
+
+    public void DropItem(Vector3 position) {
+        if (SelectedItemUI.InventoryItem == null) return;
+        ItemEntityManager.Instance.SpawnItemEntity(SelectedItemUI.InventoryItem.ItemData, SelectedItemUI.InventoryItem.Amount, position);
+        SelectedItemUI.InventoryItem = null;
+        EventBus.ItemPlacedEvent?.Invoke();
+    }
+
+    public void DropItem() {
+        DropItem(Player.transform.position + Player.transform.forward * 2);
+    }
+
     private void openInventory(bool value) {
         _isInventoryOpen = value;
 
@@ -120,17 +149,6 @@ public class UICanvas : MonoBehaviour
         }
     }
 
-    public void DropItem(Vector3 position) {
-        if (SelectedItemUI.InventoryItem == null) return;
-        ItemEntityManager.Instance.SpawnItemEntity(SelectedItemUI.InventoryItem.ItemData, SelectedItemUI.InventoryItem.Amount, position);
-        SelectedItemUI.InventoryItem = null;
-        EventBus.ItemPlacedEvent?.Invoke();
-    }
-
-    public void DropItem() {
-        DropItem(Player.transform.position + Player.transform.forward * 2);
-    }
-
     private IEnumerator animateCoins(bool increase) {
         _coinsText.color = increase ? Color.green : Color.red;
         _coinsHolder.transform.localScale = increase ? new Vector3(1.2f, 1f, 1f) : new Vector3(0.8f, 1f, 1f);
@@ -141,4 +159,5 @@ public class UICanvas : MonoBehaviour
         _coinsHolder.transform.localScale = new Vector3(1f, 1f, 1f);
     }
 
+    #endregion
 }
