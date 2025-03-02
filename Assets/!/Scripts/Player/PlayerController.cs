@@ -21,10 +21,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _turnSpeed = 1f;
     
     public float MouseSensitivity = 0.1f; // po co 
-    
     public float MinCameraDistance = 10f;
     public float MaxCameraDistance = 30f;
     public float CameraDistanceSpeed = 1f;
+    public float MaxInteractionRange = 10f;
     public Vector2 CameraTargetObjectBounds = Vector2.zero;
     public GameObject CameraObject;
     public GameObject CameraTargetObject;
@@ -54,7 +54,6 @@ public class PlayerController : MonoBehaviour
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
-    private bool _sprinting = false;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
     private bool _lightAttack;
     private bool _chargeAttack;
@@ -175,29 +174,15 @@ public class PlayerController : MonoBehaviour
         );
     }
 
-    void OnSprint(InputValue value) {
-        _sprinting = value.isPressed;
-        Animator.SetBool("sprinting", _sprinting);
-    }
+    // void OnLightAttack(InputValue value) {
+    //     //_animator.SetTrigger("lightAttack");
+    //     _lightAttack = value.isPressed;
+    // }
 
-    /*void OnAttack(InputValue value) {
-        _animator.SetTrigger("punch");
-    }*/
-
-    void OnLightAttack(InputValue value) {
-        //_animator.SetTrigger("lightAttack");
-        _lightAttack = value.isPressed;
-
-    }
-
-    void OnChargeAttack(InputValue value) {
-        //_animator.SetTrigger("chargeAttack");
-        _chargeAttack = value.isPressed;        
-    }
-
-    void OnDodge(InputValue value) {
-        //_animator.SetTrigger("dodge");
-    }
+    // void OnChargeAttack(InputValue value) {
+    //     //_animator.SetTrigger("chargeAttack");
+    //     _chargeAttack = value.isPressed;        
+    // }
 
     void OnScrollWheel(InputValue value) {
         var delta = value.Get<Vector2>();
@@ -262,5 +247,24 @@ public class PlayerController : MonoBehaviour
 
     void OnHeavyAttack() {
         Animator.SetTrigger(_heavyAttackHash);
+
+        // TODO Weźcie to potem dajcie w odpowiednie miejsce czy coś
+        // Wrzuciłem to póki co tutaj
+        Debug.Log("Nigger");
+        Ray ray = CameraObject.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit)) {
+            Transform objectHit = hit.transform;
+
+            // Check if object is to farv
+            if(Vector3.Distance(objectHit.position, transform.position) > MaxInteractionRange)
+            {
+                return;
+            }
+
+            if(objectHit.TryGetComponent(out IInteractable i)) 
+            {
+                i.Interact(this);
+            }
+        }
     }
 }

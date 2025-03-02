@@ -1,32 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-
-
-
 public class InventoryPanel : MonoBehaviour
 {
+    #region Fields
+
     [Header("Assign if not player inventory")]
     [SerializeField] private bool _isPlayerInventory = false;
     public bool IsSellerInventory = false;
-    public ItemContainer TargetEntityInventory;
+    public ItemContainer TargetEntityInventory; 
 
     [Header("Prefabs")]
     [SerializeField] private GameObject _itemPrefab;
     [SerializeField] private GameObject _invTilePrefab;
 
-
     [Header("Inventory Stuff")]
     [SerializeField] private GameObject _gridHolder;
     [SerializeField] private GameObject _itemHolder;
 
-
     [Header("Interactions")]
     [SerializeField] private Image _redPanel;
-    
+
     // References set in Awake or Start
     private RectTransform _rectTransform;
     private UICanvas _uiCanvas;
@@ -34,11 +32,10 @@ public class InventoryPanel : MonoBehaviour
     private GridLayoutGroup _gridLayoutGroup;
     private Image _layoutImage;
 
-
     // Inventory variables
     private static float _tileSize = 0;
     public static float TileSize { get {return _tileSize;} set {_tileSize = value;} }
-    
+
     [SerializeField]
     private InvTile[,] _inventoryTileArray;
     private int _inventoryWidth, _inventoryHeight;
@@ -49,6 +46,9 @@ public class InventoryPanel : MonoBehaviour
     // Grid variables
     public InvTile SelectedTile { get; set; }
 
+    #endregion
+
+    #region Unity Methods
 
     private void Awake() {
         _rectTransform = GetComponent<RectTransform>();
@@ -61,11 +61,10 @@ public class InventoryPanel : MonoBehaviour
         EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
         EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
         EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
-        EventBus.ItemPlacedEvent.AddListener(() => setImagesRaycastTarget(true));
+        // EventBus.ItemPlacedEvent.AddListener(() => SetImagesRaycastTarget(true));
         _uiCanvas = UICanvas.Instance;
 
-
-        _currentEntityInventory = _isPlayerInventory ? _uiCanvas.PlayerInventory.itemContainer : TargetEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
+        _currentEntityInventory = _isPlayerInventory ? _uiCanvas.PlayerInventory.ItemContainer : TargetEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
 
         if (_isPlayerInventory) {
             TileSize = Mathf.Clamp(_rectTransform.rect.width / _currentEntityInventory.Size.x, 0, _rectTransform.rect.height / _currentEntityInventory.Size.y);
@@ -73,17 +72,22 @@ public class InventoryPanel : MonoBehaviour
         } 
     }
 
+    #endregion
+
+    #region Grid Methods
+
     public void RegenerateInventory() {
-        if ((_currentEntityInventory = _isPlayerInventory ? _uiCanvas.PlayerInventory.itemContainer : TargetEntityInventory) == null) return; 
+        if ((_currentEntityInventory = _isPlayerInventory ? _uiCanvas.PlayerInventory.ItemContainer : TargetEntityInventory) == null) return; 
+        Debug.Log("Regenerating inventory");
         setupGrid();
         UpdateItemUIS();
     }
 
-
-    // grid methods
     private void setupGrid() {
         _inventoryWidth = _currentEntityInventory.Size.x;
         _inventoryHeight = _currentEntityInventory.Size.y;
+
+        Debug.Log($"Inventory size: {_inventoryWidth}x{_inventoryHeight}");
 
         _gridLayoutGroup.constraintCount = _inventoryWidth;
 
@@ -178,8 +182,10 @@ public class InventoryPanel : MonoBehaviour
         clearHighlights();
     }
 
+    #endregion
 
-    // Inventory methods
+    #region ItemUI Methods
+
     public void UpdateItemUIS() {
         foreach (InventoryItem inventoryItem in _inventory) {
             destroyItemUI(inventoryItem);
@@ -239,7 +245,6 @@ public class InventoryPanel : MonoBehaviour
             return;
         }
 
-
         if (!canBePlaced(selectedTilePos, size)) {
             StartCoroutine(redPanelShow());
             return;
@@ -272,7 +277,26 @@ public class InventoryPanel : MonoBehaviour
         return true;
     }
 
-    public void setImagesRaycastTarget(bool val) {
+    #endregion
+
+    #region Misc Methods
+
+    public void SetTargetInventory(ItemContainer itemContainer) {
+        TargetEntityInventory = itemContainer;
+        if (itemContainer == null) {
+            foreach (Transform child in _itemHolder.transform) {
+                Destroy(child.gameObject);
+            }
+            foreach (Transform child in _gridHolder.transform) {
+                Destroy(child.gameObject);
+            }
+            return;
+
+        }
+        RegenerateInventory();
+    }
+
+    public void SetImagesRaycastTarget(bool val) {
         foreach (Transform child in _itemHolder.transform) {
             child.GetComponent<ItemUI>().Image.raycastTarget = val;
         }
@@ -284,8 +308,9 @@ public class InventoryPanel : MonoBehaviour
         _redPanel.gameObject.SetActive(false);
     }
 
+    #endregion
 
-    // callbacks
+    #region Callbacks
 
     public void OnItemUIClick(ItemUI itemUI) {
         if (_inventory.Contains(itemUI.InventoryItem)) {
@@ -294,7 +319,7 @@ public class InventoryPanel : MonoBehaviour
             }  
             destroyItemUI(itemUI.InventoryItem);
         } 
-        setImagesRaycastTarget(false);
+        // SetImagesRaycastTarget(false);
     }
 
     public void OnPointerEnter() {
@@ -304,4 +329,6 @@ public class InventoryPanel : MonoBehaviour
     public void OnPointerExit() {
         _uiCanvas.ActiveInventoryPanel = null;
     }
+
+    #endregion
 }
