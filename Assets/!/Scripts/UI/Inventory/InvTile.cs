@@ -14,10 +14,10 @@ public class InvTile : MonoBehaviour {
         get { return _isEmpty; }
         set {
             _isEmpty = value;
-            if (_isEmpty) {
+            if (_isEmpty && _image != null) {
                 _image.color = Color.white;
             } else {
-                _image.color = Color.gray;
+                _image.color = Color.yellow;
             }
         }
     }

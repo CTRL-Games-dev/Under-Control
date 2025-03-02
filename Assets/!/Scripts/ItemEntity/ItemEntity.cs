@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
-public class ItemEntity : MonoBehaviour, IPointerClickHandler
+public class ItemEntity : MonoBehaviour, IInteractable
 {
     public int Amount;
     public ItemData ItemData;

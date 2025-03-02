@@ -24,6 +24,7 @@ public class InventoryPanel : MonoBehaviour
 
     [Header("Interactions")]
     [SerializeField] private Image _redPanel;
+    [SerializeField] private Image _bgImage;
 
     // References set in Awake or Start
     private RectTransform _rectTransform;
@@ -50,17 +51,15 @@ public class InventoryPanel : MonoBehaviour
 
     #region Unity Methods
 
-    private void Awake() {
+    public void Awake() {
         _rectTransform = GetComponent<RectTransform>();
         _layoutImage = GetComponent<Image>();
         _layoutImage.enabled = false;
         _gridLayoutGroup = _gridHolder.GetComponent<GridLayoutGroup>();
     }
 
-    private void Start() {
-        EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
-        EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
-        EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
+    public void Start() {
+        ConnectSignals();
         // EventBus.ItemPlacedEvent.AddListener(() => SetImagesRaycastTarget(true));
         _uiCanvas = UICanvas.Instance;
 
@@ -78,7 +77,6 @@ public class InventoryPanel : MonoBehaviour
 
     public void RegenerateInventory() {
         if ((_currentEntityInventory = _isPlayerInventory ? _uiCanvas.PlayerInventory.ItemContainer : TargetEntityInventory) == null) return; 
-        Debug.Log("Regenerating inventory");
         setupGrid();
         UpdateItemUIS();
     }
@@ -86,8 +84,6 @@ public class InventoryPanel : MonoBehaviour
     private void setupGrid() {
         _inventoryWidth = _currentEntityInventory.Size.x;
         _inventoryHeight = _currentEntityInventory.Size.y;
-
-        Debug.Log($"Inventory size: {_inventoryWidth}x{_inventoryHeight}");
 
         _gridLayoutGroup.constraintCount = _inventoryWidth;
 
@@ -280,19 +276,14 @@ public class InventoryPanel : MonoBehaviour
     #endregion
 
     #region Misc Methods
+    public void ConnectSignals() {
+        EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
+        EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
+        EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
+    }
 
     public void SetTargetInventory(ItemContainer itemContainer) {
         TargetEntityInventory = itemContainer;
-        if (itemContainer == null) {
-            foreach (Transform child in _itemHolder.transform) {
-                Destroy(child.gameObject);
-            }
-            foreach (Transform child in _gridHolder.transform) {
-                Destroy(child.gameObject);
-            }
-            return;
-
-        }
         RegenerateInventory();
     }
 
@@ -313,6 +304,7 @@ public class InventoryPanel : MonoBehaviour
     #region Callbacks
 
     public void OnItemUIClick(ItemUI itemUI) {
+        
         if (_inventory.Contains(itemUI.InventoryItem)) {
             if (IsSellerInventory) {
                 _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;

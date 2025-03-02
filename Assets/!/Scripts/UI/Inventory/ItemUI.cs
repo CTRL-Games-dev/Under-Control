@@ -82,7 +82,7 @@ public class ItemUI : MonoBehaviour
         _image.color = new Color(1, 1, 1, 1);
     }
     public void OnPointerClick() {
-        EventBus.ItemUIClickEvent.Invoke(this);
+        EventBus.ItemUIClickEvent?.Invoke(this);
     }
 
 }
