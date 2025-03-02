@@ -185,7 +185,6 @@ public class InventoryPanel : MonoBehaviour
     #region ItemUI Methods
 
     public void UpdateItemUIS() {
-        Debug.Log("Updating Item UIs");
         foreach (InventoryItem inventoryItem in _inventory) {
             destroyItemUI(inventoryItem);
             createItemUI(inventoryItem);

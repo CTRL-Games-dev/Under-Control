@@ -2,10 +2,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using DG.Tweening;
 
 public class InventoryCanvas : MonoBehaviour
 {
-    private enum InventoryTabs {
+    public enum InventoryTabs {
         Other,
         Armor,
         Abilities,
@@ -13,11 +14,17 @@ public class InventoryCanvas : MonoBehaviour
         Quests
     }
 
+    [Header("Tab Buttons")]
     [SerializeField] private GameObject _otherTabGO;
     [SerializeField] private GameObject _armorTabGO;
     [SerializeField] private GameObject _abilitiesTabGO;
     [SerializeField] private GameObject _skillsTabGO;
     [SerializeField] private GameObject _questsTabGO;
+
+    [Header("Panel Game Objects")]
+    [SerializeField] private GameObject _otherInventoryPanelGO;
+    [SerializeField] private GameObject _armorInventoryPanelGO;
+    [SerializeField] private GameObject _playerInventoryPanelGO;
 
     private GameObject[] _tabButtonGameObjects;
     private Button[] _tabButtons;
@@ -25,13 +32,15 @@ public class InventoryCanvas : MonoBehaviour
     private TextMeshProUGUI[] _tabTexts;
     private Dictionary<InventoryTabs, int> _tabPanelsIndex;
 
-    [SerializeField] private InventoryTabs _currentPage;
-    [SerializeField] private GameObject _currentPagePanel;
-    [SerializeField] private Button _currentPageButton;
-    [SerializeField] private Image _currentPageImage;
-    [SerializeField] private TextMeshProUGUI _currentPageText;
+    private GameObject _currentTabPanel;
+    private Button _currentTabButton;
+    private Image _currentTabImage;
+    private TextMeshProUGUI _currentTabText;
+    private InventoryTabs _currentTab;
 
     private UICanvas _uiCanvas;
+
+    private Color _defaultColor = new(102 / 255, 102 / 255, 102 / 255);
 
     #region Unity Methods
 
@@ -82,45 +91,94 @@ public class InventoryCanvas : MonoBehaviour
 
     #region Public Methods
 
-    private void SetCurrentTab(InventoryTabs tab) {
-        _currentPage = tab;
-        _currentPagePanel = _tabButtonGameObjects[_tabPanelsIndex[_currentPage]];
-        _currentPageButton = _tabButtons[_tabPanelsIndex[_currentPage]];
-        _currentPageImage = _tabImages[_tabPanelsIndex[_currentPage]];
-        _currentPageText = _tabTexts[_tabPanelsIndex[_currentPage]];
+    public void SetCurrentTab(InventoryTabs tab) {
+        _currentTab = tab;
+        _currentTabPanel = _tabButtonGameObjects[_tabPanelsIndex[_currentTab]];
+        _currentTabButton = _tabButtons[_tabPanelsIndex[_currentTab]];
+        _currentTabImage = _tabImages[_tabPanelsIndex[_currentTab]];
+        _currentTabText = _tabTexts[_tabPanelsIndex[_currentTab]];
+
+        foreach (InventoryTabs t in _tabPanelsIndex.Keys) {
+            if (t == _currentTab) {
+                highlightTab(t, true);
+            } else {
+                highlightTab(t, false);
+            }
+        }
+
+        switch (_currentTab) {
+            case InventoryTabs.Other:
+                armorTabExit().OnComplete(() => otherTabEnter());
+                playerTabEnter();
+                break;
+            case InventoryTabs.Armor:
+                otherTabExit().OnComplete(() => armorTabEnter());
+                playerTabEnter();
+                break;
+        }
+    }
+
+    public Tween OtherTabExit() {
+        return otherTabExit();
+    }
+    public Tween OtherTabEnter() {
+        return otherTabEnter();
     }
 
     public void OnBackgroundClick() {
         _uiCanvas.DropItem();
     }
 
-    public void OnOpenOtherTab() {
-        _currentPage = InventoryTabs.Other;
-        
-    }
+    public void OnOpenOtherTab() { SetCurrentTab(InventoryTabs.Other); }
 
-    public void OnOpenArmorTab() {
-        _currentPage = InventoryTabs.Armor;
-        // _currentPageButton = _armorTabGO;
-    }
+    public void OnOpenArmorTab() { SetCurrentTab(InventoryTabs.Armor); }
 
-    public void OnOpenAbilitiesTab() {
-        _currentPage = InventoryTabs.Abilities;
-        // _currentPageButton = _abilitiesTabGO;
-    }
+    public void OnOpenAbilitiesTab() { SetCurrentTab(InventoryTabs.Abilities); }
+
+    public void OnOpenSkillsTab() { SetCurrentTab(InventoryTabs.Skills); }
+
+    public void OnOpenQuestsTab() { SetCurrentTab(InventoryTabs.Quests); }
+    
 
     #endregion
 
     #region Private Methods
-    
 
-
-    private void highlightCurrentTab() {
-        foreach (Button button in _tabButtons) {
-            button.interactable = true;
+    private void highlightTab(InventoryTabs tab, bool value) {
+        if (value) {
+            _tabImages[_tabPanelsIndex[tab]].DOColor(Color.white, 0.15f);
+            _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOScaleY(1.2f, 0.15f);
+        } else {
+            _tabImages[_tabPanelsIndex[tab]].DOColor(_defaultColor, 0.15f);
+            _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOScaleY(1f, 0.15f);
         }
+    }
 
-        _currentPageButton.interactable = false;
+    private Tween playerTabEnter() {
+        _playerInventoryPanelGO.SetActive(true);
+        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-10, 0.25f);
+    }
+
+    private Tween playerTabExit() {
+        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(410, 0.25f).OnComplete(() => _playerInventoryPanelGO.SetActive(false));
+    }
+
+    private Tween otherTabEnter() {
+        _otherInventoryPanelGO.SetActive(true);
+        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(10, 0.25f);
+    }
+
+    private Tween otherTabExit() {
+        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-410, 0.25f).OnComplete(() => _otherInventoryPanelGO.SetActive(false));
+    }
+
+    private Tween armorTabEnter() {
+        _armorInventoryPanelGO.SetActive(true);
+        return _armorInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(10, 0.25f);
+    }
+
+    private Tween armorTabExit() {
+        return _armorInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-580, 0.25f).OnComplete(() => _armorInventoryPanelGO.SetActive(false));
     }
 
     #endregion
