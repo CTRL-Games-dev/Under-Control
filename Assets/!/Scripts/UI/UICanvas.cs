@@ -88,7 +88,7 @@ public class UICanvas : MonoBehaviour
     }
 
     private void OnCoinsChange(int change) {
-        _coinsText.text = $"x{PlayerController.Coins + change}";
+        _coinsText.text = $"{PlayerController.Coins + change}";
         StartCoroutine(animateCoins(change > 0));
     }
 

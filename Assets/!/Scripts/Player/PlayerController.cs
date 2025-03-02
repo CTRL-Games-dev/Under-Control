@@ -54,7 +54,6 @@ public class PlayerController : MonoBehaviour
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
-    private bool _sprinting = false;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
     private bool _lightAttack;
     private bool _chargeAttack;
@@ -175,29 +174,16 @@ public class PlayerController : MonoBehaviour
         );
     }
 
-    void OnSprint(InputValue value) {
-        _sprinting = value.isPressed;
-        Animator.SetBool("sprinting", _sprinting);
-    }
+    // void OnLightAttack(InputValue value) {
+    //     //_animator.SetTrigger("lightAttack");
+    //     _lightAttack = value.isPressed;
+    // }
 
-    /*void OnAttack(InputValue value) {
-        _animator.SetTrigger("punch");
-    }*/
+    // void OnChargeAttack(InputValue value) {
+    //     //_animator.SetTrigger("chargeAttack");
+    //     _chargeAttack = value.isPressed;        
+    // }
 
-    void OnLightAttack(InputValue value) {
-        //_animator.SetTrigger("lightAttack");
-        _lightAttack = value.isPressed;
-
-    }
-
-    void OnChargeAttack(InputValue value) {
-        //_animator.SetTrigger("chargeAttack");
-        _chargeAttack = value.isPressed;        
-    }
-
-    void OnDodge(InputValue value) {
-        //_animator.SetTrigger("dodge");
-    }
 
     void OnScrollWheel(InputValue value) {
         var delta = value.Get<Vector2>();

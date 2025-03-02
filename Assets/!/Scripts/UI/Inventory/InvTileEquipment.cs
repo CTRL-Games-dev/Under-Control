@@ -77,57 +77,66 @@ public class InvTileEquipment : InvTile {
         if (SelectedInventoryItem != null && _itemUI != null) return;
         if(!IsEmpty) return;
 
-        if (_tileType == TileType.Helmet) {
-            if (SelectedInventoryItem.ItemData is not HelmetItemData helmetItemData) {
-                return;
-            }
+        Debug.Log("OnPointerClickEquipment");
 
-            _uiCanvas.PlayerInventory.Helmet = helmetItemData;
-        } else if (_tileType == TileType.Chestplate) {
-            if (SelectedInventoryItem.ItemData is not ChestplateItemData chestplateItemData) {
-                return;
-            }
+        try {
+            if (_tileType == TileType.Helmet) {
+                if (SelectedInventoryItem.ItemData is not HelmetItemData helmetItemData) {
+                    return;
+                }
 
-            _uiCanvas.PlayerInventory.Chestplate = chestplateItemData;
-        } else if (_tileType == TileType.Leggings) {
-            if (SelectedInventoryItem.ItemData is not LeggingsItemData leggingsItemData) {
-                return;
-            }
+                _uiCanvas.PlayerInventory.Helmet = helmetItemData;
+            } else if (_tileType == TileType.Chestplate) {
+                if (SelectedInventoryItem.ItemData is not ChestplateItemData chestplateItemData) {
+                    return;
+                }
 
-            _uiCanvas.PlayerInventory.Leggings = leggingsItemData;
-        } else if (_tileType == TileType.Boots) {
-            if (SelectedInventoryItem.ItemData is not BootsItemData bootsItemData) {
-                return;
-            }
+                _uiCanvas.PlayerInventory.Chestplate = chestplateItemData;
+            } else if (_tileType == TileType.Leggings) {
+                if (SelectedInventoryItem.ItemData is not LeggingsItemData leggingsItemData) {
+                    return;
+                }
 
-            _uiCanvas.PlayerInventory.Boots = bootsItemData;
-        } else if (_tileType == TileType.Ring) {
-            if (SelectedInventoryItem.ItemData is not RingItemData ringItemData) {
-                return;
-            }
+                _uiCanvas.PlayerInventory.Leggings = leggingsItemData;
+            } else if (_tileType == TileType.Boots) {
+                if (SelectedInventoryItem.ItemData is not BootsItemData bootsItemData) {
+                    return;
+                }
 
-            _uiCanvas.PlayerInventory.Ring = ringItemData;
-        } else if (_tileType == TileType.Amulet) {
-            if (SelectedInventoryItem.ItemData is not AmuletItemData amuletItemData) {
-                return;
-            }
+                _uiCanvas.PlayerInventory.Boots = bootsItemData;
+            } else if (_tileType == TileType.Ring) {
+                if (SelectedInventoryItem.ItemData is not RingItemData ringItemData) {
+                    return;
+                }
 
-            _uiCanvas.PlayerInventory.Amulet = amuletItemData;
-        } else if (_tileType == TileType.WeaponLeftHand) {
-            if (SelectedInventoryItem.ItemData is not WeaponItemData weaponItemData) {
-                return;
-            }
+                _uiCanvas.PlayerInventory.Ring = ringItemData;
+            } else if (_tileType == TileType.Amulet) {
+                if (SelectedInventoryItem.ItemData is not AmuletItemData amuletItemData) {
+                    return;
+                }
 
-            _uiCanvas.PlayerInventory.EquipLeftHand(weaponItemData);
-        } else if (_tileType == TileType.WeaponRightHand) {
-            if (SelectedInventoryItem.ItemData is not WeaponItemData weaponItemData) {
-                return;
-            }
+                _uiCanvas.PlayerInventory.Amulet = amuletItemData;
+            } else if (_tileType == TileType.WeaponLeftHand) {
+                if (SelectedInventoryItem.ItemData is not WeaponItemData weaponItemData) {
+                    return;
+                }
 
-            _uiCanvas.PlayerInventory.EquipRightHand(weaponItemData);
+                _uiCanvas.PlayerInventory.EquipLeftHand(weaponItemData);
+            } else if (_tileType == TileType.WeaponRightHand) {
+                if (SelectedInventoryItem.ItemData is not WeaponItemData weaponItemData) {
+                    throw new System.Exception("Item is not a weapon");
+                }
+
+                _uiCanvas.PlayerInventory.EquipRightHand(weaponItemData);
+            }
+        } catch (System.Exception e) {
+            Debug.Log(e);
+            return;
         }
 
         createItemUI(SelectedInventoryItem);
+
+
         EventBus.ItemPlacedEvent?.Invoke();
         IsEmpty = false;
         _uiCanvas.SelectedItemUI.InventoryItem = null;

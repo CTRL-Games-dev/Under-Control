@@ -31,6 +31,7 @@ public class InvTile : MonoBehaviour {
     }
 
     public void OnPointerEnter() {
+        _highlightImage.SetActive(true);
         if (InventoryPanel == null) {
             return;
         }
@@ -38,6 +39,7 @@ public class InvTile : MonoBehaviour {
         _highlightImage.SetActive(true);
     }
     public void OnPointerExit() {
+        _highlightImage.SetActive(false);
         if (InventoryPanel == null) {
             return;
         }
