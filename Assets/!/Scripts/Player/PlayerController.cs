@@ -236,9 +236,11 @@ public class PlayerController : MonoBehaviour
     public void OnWeaponHit(LivingEntity target) {
         if(target == LivingEntity) return;
 
+        float damageValue = UnityEngine.Random.Range(CurrentWeapon.DamageMin, CurrentWeapon.DamageMax);
+
         target.TakeDamage(new Damage{
             Type = CurrentWeapon.DamageType,
-            Value = CurrentWeapon.Damage
+            Value = damageValue
         }, LivingEntity);
     }
 
