@@ -14,7 +14,7 @@ public struct Tile
     public int X;
     public int Y;
     public TileType Type;
-
+    public GameObject Instance;
     public readonly Vector2 GetCenter(float tileWidth)
     {
         return new Vector2(X + 0.5f, Y + 0.5f) * tileWidth;
@@ -23,20 +23,21 @@ public struct Tile
 
 public class WorldMap
 {
-    public TileType[,] Tiles;
+    public Tile[,] Tiles;
     public Vector2 Size;
     public List<Location> Locations = new();
     public readonly float TileWidth;
     public Vector3 SpawnLocation = new(0,0);
     public Material Grass, Walls;
-    public WorldMap(TileType[,] tiles, Vector2 size, float tileWidth) {
+    public List<IBiome> biomes = new();
+    public WorldMap(Tile[,] tiles, Vector2 size, float tileWidth) {
         Tiles = tiles;
         Size = size;
         TileWidth = tileWidth;
 
         SpawnLocation = new Vector3(size[0], 1, size[1]) /2*tileWidth;
     }
-    public WorldMap(TileType[,] tiles, int sizeX, int sizeY, float tileWidth) {
+    public WorldMap(Tile[,] tiles, int sizeX, int sizeY, float tileWidth) {
         Tiles = tiles;
         Size = new Vector3(sizeX, 1, sizeY);
         TileWidth = tileWidth;
@@ -51,22 +52,22 @@ public class WorldMap
         {
             l.GenerateLocation(this);
         }
-        GenerateSpawn();
+        //GenerateSpawn();
         GenerateMesh(mr, mf, mc);
     }
 
-    private void GenerateSpawn()
-    {
-        var mapCenter = Size / 2;
+    // private void GenerateSpawn()
+    // {
+    //     var mapCenter = Size / 2;
 
-        for(int ix = -1; ix <= 1; ix++)
-        {
-            for(int iy = -1; iy <= 1; iy++)
-            {
-                Tiles[(int)mapCenter.x+ix, (int)mapCenter.y+iy] = TileType.FLOOR;
-            }
-        }
-    }
+    //     for(int ix = -1; ix <= 1; ix++)
+    //     {
+    //         for(int iy = -1; iy <= 1; iy++)
+    //         {
+    //             Tiles[(int)mapCenter.x+ix, (int)mapCenter.y+iy] = TileType.FLOOR;
+    //         }
+    //     }
+    // }
 
     private void GenerateMesh(MeshRenderer mr, MeshFilter mf, MeshCollider mc)
     {
@@ -105,7 +106,7 @@ public class WorldMap
         {
             for(int y = 0; y < mapHeight; y++) {
                 int index = x * ((int)Size[0]) + y;
-                var tile = Tiles[x, y];
+                Tile tile = Tiles[x, y];
 
                 // Add half of a tile, so it will be centered
                 var pos = new Vector3(x * TileWidth + TileWidth/2, 0, y * TileWidth + TileWidth/2);
@@ -134,14 +135,11 @@ public class WorldMap
                 trianglesFloor.Add(index * 4 + 3);
 
                 GameObject tilePrefab;
-                if(tile == TileType.WALL) tilePrefab = wallPrefabs[Random.Range(0, wallPrefabs.Count - 1)];
+                if(tile.Type == TileType.WALL) tilePrefab = wallPrefabs[Random.Range(0, wallPrefabs.Count - 1)];
                 else tilePrefab = grassPrefabs[Random.Range(0, grassPrefabs.Count - 1)];
                 
-                var tileInstance = GameObject.Instantiate(tilePrefab, pos, Quaternion.identity);
-                tileInstance.transform.localScale += new Vector3(TileWidth, TileWidth, TileWidth);
-
-                var randomizer = tileInstance.GetComponent<TileRandomizer>();
-                randomizer.RandomizeTile();
+                tile.Instance= GameObject.Instantiate(tilePrefab, pos, Quaternion.identity);
+                tile.Instance.transform.localScale += new Vector3(TileWidth, TileWidth, TileWidth);
             }
         }
 

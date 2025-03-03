@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 public class ForestTileRandomizer : MonoBehaviour, TileRandomizer
 {
-    [SerializeField] private List<GameObject> _treePositions; // List of tree position
     [SerializeField] private List<GameObject> _treeVariants; // List of tree variants;
     [SerializeField] private List<GameObject> _stoneVariants;
 
