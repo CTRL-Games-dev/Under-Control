@@ -14,7 +14,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
     public Vector3 PlayerStartingPos = new(3,3,3);
     [SerializeField] private GameObject _player;
     [SerializeField] private GameObject _portal;
-    [SerializeField] private CameraManager _cameraManager;
+    // [SerializeField] private CameraManager _cameraManager;
     private GameManager _gm;
 
     [Range(10, 300)]
@@ -66,9 +66,9 @@ public class AdventureManager : MonoBehaviour, ILevelManager
     public void SpawnPlayer()
     {
         GameObject player = Instantiate(_player, _map.SpawnLocation, Quaternion.identity);
-        GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
-        player.GetComponent<PlayerController>().CameraObject = camera;
-        camera.GetComponent<CinemachineCamera>().Follow = player.transform;
+        // GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
+        // player.GetComponent<PlayerController>().CameraObject = camera;
+        // camera.GetComponent<CinemachineCamera>().Follow = player.transform;
         
         Instantiate(_portal, _map.SpawnLocation + new Vector3(-3.5f, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
         // GameObject player = GameObject.FindGameObjectWithTag("Player");

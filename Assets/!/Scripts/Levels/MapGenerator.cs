@@ -91,6 +91,16 @@ public class WorldMap
 
 
         int mapWidth = Tiles.GetLength(0), mapHeight = Tiles.GetLength(1);
+
+        // Generate terrain height (Londek is not helpful)
+        float[,] th = new float[mapWidth+1, mapHeight+1];
+        for(int x = 0; x < mapWidth; x++)
+        {
+            for(int y = 0; y < mapHeight; y++) {
+                th[x,y] = Random.Range(-0.4f, 0.4f);
+            }
+        }
+
         for(int x = 0; x < mapWidth; x++)
         {
             for(int y = 0; y < mapHeight; y++) {
@@ -100,10 +110,10 @@ public class WorldMap
                 // Add half of a tile, so it will be centered
                 var pos = new Vector3(x * TileWidth + TileWidth/2, 0, y * TileWidth + TileWidth/2);
 
-                Vector3 p0 = new(TileWidth * x,     0, TileWidth * y);
-                Vector3 p1 = new(TileWidth * x,     0, TileWidth * (y+1));
-                Vector3 p2 = new(TileWidth * (x+1), 0, TileWidth * (y+1));
-                Vector3 p3 = new(TileWidth * (x+1), 0, TileWidth * y);
+                Vector3 p0 = new(TileWidth * x,     th[x,y], TileWidth * y);
+                Vector3 p1 = new(TileWidth * x,     th[x,y+1], TileWidth * (y+1));
+                Vector3 p2 = new(TileWidth * (x+1), th[x+1,y+1], TileWidth * (y+1));
+                Vector3 p3 = new(TileWidth * (x+1), th[x+1,y], TileWidth * y);
 
                 vertices.Add(p0);
                 vertices.Add(p1);
