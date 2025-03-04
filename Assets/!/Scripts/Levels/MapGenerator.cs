@@ -173,10 +173,10 @@ public class WorldMap
     }
 }
 
-public interface Location
-{
-    public void GenerateLocation(WorldMap map);
-}
+// public interface Location
+// {
+//     public void GenerateLocation(WorldMap map);
+// }
 public class MapGenerator
 {
     public static WorldMap GetMap(int width, int height, int iterations, float tileWidth)
