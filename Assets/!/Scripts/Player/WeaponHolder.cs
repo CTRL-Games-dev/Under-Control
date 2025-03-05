@@ -19,6 +19,7 @@ public class WeaponHolder : MonoBehaviour
             _currentWeapon = InstantiateUnknownWeapon();
         }
 
+        _currentWeapon.gameObject.layer = gameObject.layer;
         _currentWeapon.OnHit.AddListener(Player.OnWeaponHit);
 
         _currentWeapon.transform.localPosition = new Vector3(0, 0, 0);
