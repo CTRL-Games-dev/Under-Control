@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     public Weapon UnknownWeaponPrefab;
     public GameObject UnknownModelPrefab;
+    public ItemEntity ItemEntityPrefab;
 
     [Header("State")]
     [SerializeField] private GameContext _context;

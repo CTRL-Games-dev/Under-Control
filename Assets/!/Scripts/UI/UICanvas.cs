@@ -152,7 +152,7 @@ public class UICanvas : MonoBehaviour
 
     public void DropItem(Vector3 position) {
         if (SelectedItemUI.InventoryItem == null) return;
-        ItemEntityManager.Instance.SpawnItemEntity(SelectedItemUI.InventoryItem.ItemData, SelectedItemUI.InventoryItem.Amount, position);
+        ItemEntity.Spawn(SelectedItemUI.InventoryItem.ItemData, SelectedItemUI.InventoryItem.Amount, position);
         SelectedItemUI.InventoryItem = null;
         EventBus.ItemPlacedEvent?.Invoke();
     }

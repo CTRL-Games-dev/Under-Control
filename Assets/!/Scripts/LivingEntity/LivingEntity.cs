@@ -73,7 +73,7 @@ public class LivingEntity : MonoBehaviour
 
     // Spawns item on the ground
     private void dropItem(ItemData itemData, int amount) {
-        ItemEntityManager.Instance.SpawnItemEntity(itemData, amount, transform.position);
+        ItemEntity.Spawn(itemData, amount, transform.position);
     }
 
     protected void Attack(Damage damage, LivingEntity target) {
