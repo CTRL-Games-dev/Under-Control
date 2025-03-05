@@ -32,4 +32,14 @@ public class WeaponHolder : MonoBehaviour
     private Weapon InstantiateUnknownWeapon() {
         return Instantiate(UnknownWeaponPrefab, Vector3.zero, Quaternion.identity, transform);
     }
+
+    public void BeginAttack() {
+        if(_currentWeapon == null) return;
+        _currentWeapon.EnableHitbox();
+    }
+
+    public void EndAttack() {
+        if(_currentWeapon == null) return;
+        _currentWeapon.DisableHitbox();
+    }
 }
