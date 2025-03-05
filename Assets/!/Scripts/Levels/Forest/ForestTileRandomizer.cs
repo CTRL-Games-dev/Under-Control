@@ -10,7 +10,7 @@ public class ForestTileRandomizer : MonoBehaviour, TileRandomizer
     // and after prefab of the tile is spawned!
     public void RandomizeTile()
     {
-        float influence = GameManager.instance.GetInfluence();
+        float influence = GameManager.Instance.GetInfluence();
         // Material trunk = Resources.Load<Material>("Materials/Forest/TreeTrunk");
         // Material leaves = Resources.Load<Material>("Materials/Forest/TreeLeaves");
 

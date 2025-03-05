@@ -9,8 +9,7 @@ public class InvTileEquipment : InvTile {
         Boots,
         Amulet,
         Ring,
-        WeaponLeftHand,
-        WeaponRightHand,
+        Weapon,
     }
 
     [SerializeField] private GameObject _itemPrefab;
@@ -61,11 +60,8 @@ public class InvTileEquipment : InvTile {
                 case TileType.Ring:
                     _uiCanvas.PlayerInventory.Ring = null;
                     break;
-                case TileType.WeaponLeftHand:
-                    _uiCanvas.PlayerInventory.UnequipLeftHand();
-                    break;
-                case TileType.WeaponRightHand:
-                    _uiCanvas.PlayerInventory.UnequipRightHand();
+                case TileType.Weapon:
+                    _uiCanvas.PlayerInventory.Weapon = null;
                     break;
             }
 
@@ -117,18 +113,12 @@ public class InvTileEquipment : InvTile {
                 }
 
                 _uiCanvas.PlayerInventory.Amulet = amuletItemData;
-            } else if (_tileType == TileType.WeaponLeftHand) {
+            } else if (_tileType == TileType.Weapon) {
                 if (SelectedInventoryItem.ItemData is not WeaponItemData weaponItemData) {
                     return;
                 }
 
-                _uiCanvas.PlayerInventory.EquipLeftHand(weaponItemData);
-            } else if (_tileType == TileType.WeaponRightHand) {
-                if (SelectedInventoryItem.ItemData is not WeaponItemData weaponItemData) {
-                    throw new System.Exception("Item is not a weapon");
-                }
-
-                _uiCanvas.PlayerInventory.EquipRightHand(weaponItemData);
+                _uiCanvas.PlayerInventory.Weapon = weaponItemData;
             }
         } catch (System.Exception e) {
             Debug.Log(e);
@@ -136,7 +126,6 @@ public class InvTileEquipment : InvTile {
         }
 
         createItemUI(SelectedInventoryItem);
-
 
         EventBus.ItemPlacedEvent?.Invoke();
         IsEmpty = false;
