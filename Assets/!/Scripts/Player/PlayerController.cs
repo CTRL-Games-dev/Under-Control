@@ -239,17 +239,17 @@ public class PlayerController : MonoBehaviour
         if(target == LivingEntity) return;
 
         if(CurrentWeapon.DamageMax <= 0) {
-            Debug.LogWarning("DamageMax is 0. Current weapon is " + CurrentWeapon.DisplayName);
+            Debug.LogWarning($"DamageMax is zero or negative. Current weapon is {CurrentWeapon.DisplayName}");
             return;
         }
 
         if(CurrentWeapon.DamageMin < 0) {
-            Debug.LogWarning("DamageMin is negative. Current weapon is " + CurrentWeapon.DisplayName);
+            Debug.LogWarning($"DamageMin is negative. Current weapon is {CurrentWeapon.DisplayName}");
             return;
         }
 
         if(CurrentWeapon.DamageMax < CurrentWeapon.DamageMin) {
-            Debug.LogWarning("DamageMax is less than DamageMin. Current weapon is " + CurrentWeapon.DisplayName);
+            Debug.LogWarning($"DamageMax ({CurrentWeapon.DamageMax}) is less than DamageMin ({CurrentWeapon.DamageMin}). Current weapon is {CurrentWeapon.DisplayName}");
             return;
         }
 
