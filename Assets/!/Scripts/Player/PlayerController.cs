@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
@@ -66,6 +67,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 _movementInputVector = Vector2.zero;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
     private bool _isAttacking = false;
+    private List<LivingEntity> _hitEntities = new List<LivingEntity>();
 
     private readonly int _speedHash = Animator.StringToHash("speed");
     private readonly int _dodgeHash = Animator.StringToHash("dodge");
@@ -253,12 +255,21 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        if(_hitEntities.Contains(target)) {
+            Debug.LogWarning($"Tried hitting {target.DisplayName} with {CurrentWeapon.DisplayName} but it was already hit");
+            return;
+        }
+
+        Debug.Log($"Hitting {target.DisplayName} with {CurrentWeapon.DisplayName}");
+
         float damageValue = UnityEngine.Random.Range(CurrentWeapon.DamageMin, CurrentWeapon.DamageMax);
 
         target.TakeDamage(new Damage{
             Type = CurrentWeapon.DamageType,
             Value = damageValue
         }, LivingEntity);
+
+        _hitEntities.Add(target);
     }
 
     public void OnInventoryChanged() {
@@ -266,10 +277,12 @@ public class PlayerController : MonoBehaviour
     }
 
     public void OnAttackAnimationStart() {
+        _hitEntities.Clear();
         _isAttacking = true;
     }
 
     public void OnAttackAnimationEnd() {
         _isAttacking = false;
+        _hitEntities.Clear();
     }
 }
