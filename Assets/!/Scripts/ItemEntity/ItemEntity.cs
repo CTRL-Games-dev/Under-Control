@@ -13,11 +13,15 @@ public class ItemEntity : MonoBehaviour, IInteractable
         itemEntity.Amount = amount;
         itemEntity.ItemData = itemData;
 
+        GameObject model;
         if(itemData.Model != null) {
-            Instantiate(itemData.Model, itemEntity.transform);
+            model = Instantiate(itemData.Model, itemEntity.transform);
         } else {
-            Instantiate(GameManager.Instance.UnknownModelPrefab, itemEntity.transform);
+            model = Instantiate(GameManager.Instance.UnknownModelPrefab, itemEntity.transform);
         }
+
+        // Apply item entity layer to model
+        model.layer = itemEntity.gameObject.layer;
 
         return itemEntity;
     }
