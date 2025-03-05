@@ -31,13 +31,13 @@ public class PlayerController : MonoBehaviour
 
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
-    public WeaponItemData FistWeaponData;
+    public WeaponItemData FistsWeaponData;
     public WeaponItemData CurrentWeapon {
         get {
             HumanoidInventory inventory = LivingEntity.Inventory as HumanoidInventory;
 
             if (inventory.Weapon == null) {
-                return FistWeaponData;
+                return FistsWeaponData;
             }
 
             return inventory.Weapon;
