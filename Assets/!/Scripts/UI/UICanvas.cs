@@ -48,9 +48,10 @@ public class UICanvas : MonoBehaviour
 
     // serialized fields
     [Header("Canvases")]
-    [SerializeField] private GameObject _HUDCanvas;
+    [SerializeField] private GameObject _HUDCanvasGO;
     [SerializeField] private GameObject _inventoryCanvasGO;
     [SerializeField] private GameObject _alwayOnTopCanvasGO;
+    [SerializeField] private GameObject _mainMenuCanvasGO;
 
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI _coinsText;
@@ -59,6 +60,7 @@ public class UICanvas : MonoBehaviour
     [SerializeField] private RectTransform _navBarRectTransform;
     private ItemContainer _currentOtherInventory;
     private InventoryCanvas _inventoryCanvas;
+    private MainMenu _mainMenu;
     private CanvasGroup _inventoryCanvasGroup;
     private IInteractableInventory _lastInteractableInventory;
 
@@ -84,6 +86,7 @@ public class UICanvas : MonoBehaviour
 
         _inventoryCanvas = _inventoryCanvasGO.GetComponent<InventoryCanvas>();
         _inventoryCanvasGroup = _inventoryCanvasGO.GetComponent<CanvasGroup>();
+        _mainMenu = _mainMenuCanvasGO.GetComponent<MainMenu>();
         OnCoinsChange(0);
         
         _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Armor);
@@ -114,7 +117,11 @@ public class UICanvas : MonoBehaviour
     }
 
     private void OnUICancel() {
-        openInventory(false);
+        if (IsInventoryOpen) {
+            openInventory(false);
+        } else {
+            OpenMainMenu();
+        }
     }
 
     #endregion
@@ -196,6 +203,22 @@ public class UICanvas : MonoBehaviour
         _coinsText.color = Color.white;
         _coinsHolder.transform.localScale = new Vector3(1f, 1f, 1f);
     }
+
+    public void OpenMainMenu() {
+        PlayerController.InputDisabled = false;
+        _mainMenu.OpenMenu();
+        _HUDCanvasGO.SetActive(false);
+        _alwayOnTopCanvasGO.SetActive(false);
+        _inventoryCanvasGO.SetActive(false);
+    }
+
+    public void CloseMainMenu() {
+        PlayerController.InputDisabled = true;
+        _mainMenu.CloseMenu();
+        _HUDCanvasGO.SetActive(true);
+        _alwayOnTopCanvasGO.SetActive(true);
+    }
+
 
     #endregion
 }

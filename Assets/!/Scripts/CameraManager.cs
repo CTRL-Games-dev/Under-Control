@@ -1,42 +1,54 @@
-
+using System.Collections.Generic;
+using Unity.Cinemachine;
 using UnityEngine;
-public class CameraManager : MonoBehaviour {
-    public Transform Target;
-    public Camera Camera;
 
-    // States
-    public TopdownState Topdown = new();
-    public ICameraState CurrentState;
-
-    private void Start()
-    {
-        // By Default use topdown
-        CurrentState = Topdown;
-
-        Camera = GetComponent<Camera>();
+public class CameraManager : MonoBehaviour
+{
+    public enum CameraType {
+        PlayerTopDown,
+        MainMenu
     }
-    private void LateUpdate()
-    {
-        if(Target != null && CurrentState != null)
-        {
-            CurrentState.RunCameraLogic(this);
+
+    [SerializeField] private List<CinemachineCamera> _cinemachineCameras;
+    [SerializeField] private CinemachineCamera _playerTopDownCamera;
+    [SerializeField] private CinemachineCamera _mainMenuCamera;
+
+    public CinemachineCamera StartCamera;
+    private CinemachineCamera _currentCamera;
+
+    public static CameraManager Instance;
+
+    void Start() {
+        Instance = this;
+        
+        _currentCamera = StartCamera;
+
+        foreach (var camera in _cinemachineCameras) {
+            camera.Priority = camera == _currentCamera ? 20 : 10;
         }
     }
 
-}
+    public void SwitchCamera(CameraType type) {
+        switch (type) {
+            case CameraType.PlayerTopDown:
+                _currentCamera = _playerTopDownCamera;
+                break;
+            case CameraType.MainMenu:
+                _currentCamera = _mainMenuCamera;
+                break;
+        }
 
-public interface ICameraState 
-{
-    public void RunCameraLogic(CameraManager camera);
-}
+        foreach (var camera in _cinemachineCameras) {
+            camera.Priority = camera == _currentCamera ? 20 : 10;
+        }
+    }
 
-public class TopdownState : ICameraState
-{
-    public Vector3 Offset = new(0, 8, 2);
-    public Vector3 Rotation = new(70, 180, 0);
-    public void RunCameraLogic(CameraManager camera)
-    {
-        camera.transform.localPosition = camera.Target.position + Offset;
-        camera.transform.eulerAngles = Rotation;
+    public bool AddCamera(CinemachineCamera camera) {
+        if (_cinemachineCameras.Contains(camera)) {
+            return false;
+        }
+
+        _cinemachineCameras.Add(camera);
+        return true;
     }
 }

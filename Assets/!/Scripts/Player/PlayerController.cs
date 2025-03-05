@@ -26,7 +26,8 @@ public class PlayerController : MonoBehaviour
     public float CameraDistanceSpeed = 1f;
     public float MaxInteractionRange = 10f;
     public Vector2 CameraTargetObjectBounds = Vector2.zero;
-    public GameObject CameraObject;
+    public GameObject MainCameraObject;
+    public GameObject CinemachineObject;
     public GameObject CameraTargetObject;
 
     // Attack 
@@ -58,6 +59,7 @@ public class PlayerController : MonoBehaviour
     private bool _lightAttack;
     private bool _chargeAttack;
     private int _comboCounter;
+    public bool InputDisabled = true;
 
     // References
     public CharacterController CharacterController { get; private set; }
@@ -76,7 +78,7 @@ public class PlayerController : MonoBehaviour
         CharacterController = GetComponent<CharacterController>();
         Animator = GetComponent<Animator>();
         LivingEntity = GetComponent<LivingEntity>();
-        CinemachinePositionComposer = CameraObject.GetComponent<CinemachinePositionComposer>();
+        CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
         
         _cameraDistance = MinCameraDistance;
     }
@@ -84,6 +86,11 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         recalculateStats();
+
+        if (InputDisabled) {
+            _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0, _deceleration * Time.deltaTime);
+            return;
+        }
 
         float goalSpeed = Input.GetKey(KeyCode.LeftShift) ? _maxSprintingSpeed : _maxWalkingSpeed; // do zmiany
 
@@ -250,7 +257,7 @@ public class PlayerController : MonoBehaviour
 
         // TODO Weźcie to potem dajcie w odpowiednie miejsce czy coś
         // Wrzuciłem to póki co tutaj
-        Ray ray = CameraObject.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+        Ray ray = MainCameraObject.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit)) {
             Transform objectHit = hit.transform;
 
