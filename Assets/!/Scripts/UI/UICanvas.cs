@@ -150,15 +150,13 @@ public class UICanvas : MonoBehaviour
         }
     }
 
-    public void DropItem(Vector3 position) {
+    public void DropItem() {
         if (SelectedItemUI.InventoryItem == null) return;
-        ItemEntity.Spawn(SelectedItemUI.InventoryItem.ItemData, SelectedItemUI.InventoryItem.Amount, position);
+
+        PlayerController.LivingEntity.DropItem(SelectedItemUI.InventoryItem);
+
         SelectedItemUI.InventoryItem = null;
         EventBus.ItemPlacedEvent?.Invoke();
-    }
-
-    public void DropItem() {
-        DropItem(Player.transform.position + Player.transform.forward * 2);
     }
 
     private void openInventory(bool value) {
@@ -175,7 +173,7 @@ public class UICanvas : MonoBehaviour
             _inventoryCanvas.OpenCurrentTab();
         } else {
             if (SelectedItemUI.InventoryItem != null) {
-                DropItem(Player.transform.position + Player.transform.forward * 2);
+                DropItem();
             }
 
             _inventoryCanvasGroup.DOFade(0, 0.25f).OnComplete(() => _inventoryCanvasGO.SetActive(false));

@@ -1,12 +1,15 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class ItemEntity : MonoBehaviour, IInteractable
 {
     public int Amount;
     public ItemData ItemData;
 
-    public static ItemEntity Spawn(ItemData itemData, int amount, Vector3 position) {
-        ItemEntity itemEntity = Instantiate(GameManager.Instance.ItemEntityPrefab, position, Quaternion.identity);
+    public Rigidbody Rigidbody { get; private set; }
+
+    public static ItemEntity Spawn(ItemData itemData, int amount, Vector3 position, Quaternion quaternion) {
+        ItemEntity itemEntity = Instantiate(GameManager.Instance.ItemEntityPrefab, position, quaternion);
         itemEntity.Amount = amount;
         itemEntity.ItemData = itemData;
 
@@ -17,6 +20,20 @@ public class ItemEntity : MonoBehaviour, IInteractable
         }
 
         return itemEntity;
+    }
+
+    public static ItemEntity Spawn(ItemData itemData, int amount, Vector3 position) {
+        return Spawn(itemData, amount, position, Quaternion.identity);
+    }
+
+    public static ItemEntity SpawnThrownRelative(ItemData itemData, int amount, Vector3 position, Quaternion quaternion, Vector3 force) {
+        ItemEntity itemEntity = Spawn(itemData, amount, position, quaternion);
+        itemEntity.Rigidbody.AddRelativeForce(force, ForceMode.Impulse);
+        return itemEntity;
+    }
+
+    void Awake() {
+        Rigidbody = GetComponent<Rigidbody>();
     }
 
     public void Interact(PlayerController player) {
