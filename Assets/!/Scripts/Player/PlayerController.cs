@@ -238,6 +238,21 @@ public class PlayerController : MonoBehaviour
         if(!_isAttacking) return;
         if(target == LivingEntity) return;
 
+        if(CurrentWeapon.DamageMax <= 0) {
+            Debug.LogWarning("DamageMax is 0. Current weapon is " + CurrentWeapon.DisplayName);
+            return;
+        }
+
+        if(CurrentWeapon.DamageMin < 0) {
+            Debug.LogWarning("DamageMin is negative. Current weapon is " + CurrentWeapon.DisplayName);
+            return;
+        }
+
+        if(CurrentWeapon.DamageMax < CurrentWeapon.DamageMin) {
+            Debug.LogWarning("DamageMax is less than DamageMin. Current weapon is " + CurrentWeapon.DisplayName);
+            return;
+        }
+
         float damageValue = UnityEngine.Random.Range(CurrentWeapon.DamageMin, CurrentWeapon.DamageMax);
 
         target.TakeDamage(new Damage{
