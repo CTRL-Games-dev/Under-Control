@@ -13,31 +13,23 @@ public class WeaponHolder : MonoBehaviour
             _currentWeapon = null;
         }
 
-        if (weaponData.Model != null) {
-            if(!TryInstantiateWeapon(weaponData, out _currentWeapon)) {
-                InstantiateUnknownWeapon(out _currentWeapon);
-            }
-
-            _currentWeapon.OnHit.AddListener(Player.OnWeaponHit);
-
-            _currentWeapon.transform.localPosition = new Vector3(0, 0, 0);
-            _currentWeapon.transform.localRotation = Quaternion.identity;
-        }
-    }
-
-    private bool TryInstantiateWeapon(WeaponItemData weaponData, out Weapon weapon) {
-        weapon = null;
-
-        if (weaponData.WeaponPrefab == null) {
-            return false;
+        if (weaponData.WeaponPrefab != null) {
+            _currentWeapon = InstantiateWeapon(weaponData);
+        } else {
+            _currentWeapon = InstantiateUnknownWeapon();
         }
 
-        weapon = Instantiate(weaponData.WeaponPrefab, Vector3.zero, Quaternion.identity, transform);
-        
-        return true;
+        _currentWeapon.OnHit.AddListener(Player.OnWeaponHit);
+
+        _currentWeapon.transform.localPosition = new Vector3(0, 0, 0);
+        _currentWeapon.transform.localRotation = Quaternion.identity;
     }
 
-    private void InstantiateUnknownWeapon(out Weapon weapon) {
-        weapon = Instantiate(UnknownWeaponPrefab, Vector3.zero, Quaternion.identity, transform);
+    private Weapon InstantiateWeapon(WeaponItemData weaponData) {
+        return Instantiate(weaponData.WeaponPrefab, Vector3.zero, Quaternion.identity, transform);
+    }
+
+    private Weapon InstantiateUnknownWeapon() {
+        return Instantiate(UnknownWeaponPrefab, Vector3.zero, Quaternion.identity, transform);
     }
 }
