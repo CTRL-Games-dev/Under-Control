@@ -1,41 +1,43 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 public class WeaponHolder : MonoBehaviour
 {
-    public BoxCollider Collider;
+    public static Weapon UnknownWeaponPrefab => GameManager.Instance.UnknownWeaponPrefab;
 
-    private GameObject _currentModelInstance;
+    public PlayerController Player;
+    private Weapon _currentWeapon;
 
-    public UnityEvent<LivingEntity> OnWeaponHit = new();
-
-    void OnTriggerEnter(Collider other)
-    {
-        if(!other.TryGetComponent(out LivingEntity victim)) return;
-
-        OnWeaponHit?.Invoke(victim);
-    }
-
-    public void UpdateWeapon(WeaponItemData weapon) {
-        // Collider.size = new Vector3(weapon.Range, weapon.Range, weapon.Range);
-
-        if (_currentModelInstance != null) {
-            Destroy(_currentModelInstance);
-            _currentModelInstance = null;
+    public void UpdateWeapon(WeaponItemData weaponData) {
+        if (_currentWeapon != null) {
+            Destroy(_currentWeapon.gameObject);
+            _currentWeapon = null;
         }
 
-        if (weapon.Model != null) {
-            _currentModelInstance = Instantiate(weapon.Model, Vector3.zero, Quaternion.identity, transform);
-            _currentModelInstance.transform.localPosition = new Vector3(0, 0, 0);
-            _currentModelInstance.transform.localRotation = Quaternion.identity;
+        if (weaponData.Model != null) {
+            if(!TryInstantiateWeapon(weaponData, out _currentWeapon)) {
+                InstantiateUnknownWeapon(out _currentWeapon);
+            }
+
+            _currentWeapon.OnHit.AddListener(Player.OnWeaponHit);
+
+            _currentWeapon.transform.localPosition = new Vector3(0, 0, 0);
+            _currentWeapon.transform.localRotation = Quaternion.identity;
         }
     }
 
-    public void EnableHit() {
-        Collider.enabled = true;
+    private bool TryInstantiateWeapon(WeaponItemData weaponData, out Weapon weapon) {
+        weapon = null;
+
+        if (weaponData.WeaponPrefab == null) {
+            return false;
+        }
+
+        weapon = Instantiate(weaponData.WeaponPrefab, Vector3.zero, Quaternion.identity, transform);
+        
+        return true;
     }
 
-    public void DisableHit() {
-        Collider.enabled = false;
+    private void InstantiateUnknownWeapon(out Weapon weapon) {
+        weapon = Instantiate(UnknownWeaponPrefab, Vector3.zero, Quaternion.identity, transform);
     }
 }

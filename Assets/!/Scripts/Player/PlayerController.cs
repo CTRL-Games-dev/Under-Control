@@ -65,6 +65,7 @@ public class PlayerController : MonoBehaviour
     // State
     private Vector2 _movementInputVector = Vector2.zero;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
+    private bool _isAttacking = false;
 
     private readonly int _speedHash = Animator.StringToHash("speed");
     private readonly int _dodgeHash = Animator.StringToHash("dodge");
@@ -234,6 +235,7 @@ public class PlayerController : MonoBehaviour
     }
 
     public void OnWeaponHit(LivingEntity target) {
+        if(!_isAttacking) return;
         if(target == LivingEntity) return;
 
         float damageValue = UnityEngine.Random.Range(CurrentWeapon.DamageMin, CurrentWeapon.DamageMax);
@@ -249,10 +251,10 @@ public class PlayerController : MonoBehaviour
     }
 
     public void OnAttackAnimationStart() {
-        WeaponHolder.EnableHit();
+        _isAttacking = true;
     }
 
     public void OnAttackAnimationEnd() {
-        WeaponHolder.DisableHit();
+        _isAttacking = false;
     }
 }

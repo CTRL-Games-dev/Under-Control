@@ -5,4 +5,5 @@ public class WeaponItemData : ItemData {
     public float DamageMin;
     public float DamageMax;
     public DamageType DamageType;
+    public Weapon WeaponPrefab;
 }

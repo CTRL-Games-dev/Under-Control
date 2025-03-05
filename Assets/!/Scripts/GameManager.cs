@@ -7,8 +7,14 @@ public class GameManager : MonoBehaviour
     public const string HubSceneName = "Hub";
     public const string AdventureSceneName = "Adventure";
     public static Vector3 StartingPos = new(10, 10, 10);
+    public static GameManager Instance;
+
+    [Header("References")]
+    public Weapon UnknownWeaponPrefab;
+    public GameObject UnknownModelPrefab;
+
+    [Header("State")]
     [SerializeField] private GameContext _context;
-    public static GameManager instance;
     
     private void Awake() 
     {
@@ -18,9 +24,9 @@ public class GameManager : MonoBehaviour
         // We need to check if there is already existing manager
         // Manager don't destoy itself on load, but since it needs to be defined in every scene
         // singleton pattern must be used.
-        if(instance == null)
+        if(Instance == null)
         {
-            instance = this;
+            Instance = this;
         } else{
             Destroy(gameObject);
         }
