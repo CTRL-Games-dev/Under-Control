@@ -304,7 +304,9 @@ public class InventoryPanel : MonoBehaviour
     #region Callbacks
 
     public void OnItemUIClick(ItemUI itemUI) {
-        
+        if (UICanvas.Instance.SelectedItemUI.InventoryItem != null) return;
+
+
         if (_inventory.Contains(itemUI.InventoryItem)) {
             if (IsSellerInventory) {
                 _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
