@@ -71,9 +71,9 @@ public class LivingEntity : MonoBehaviour
         Inventory.RemoveInventoryItem(item);
     }
 
-    // Spawns item on the ground
+    // Spawns item at torso level and throws item on the ground
     private void dropItem(ItemData itemData, int amount) {
-        ItemEntityManager.Instance.SpawnItemEntity(itemData, amount, transform.position);
+        ItemEntity.SpawnThrownRelative(itemData, amount, transform.position + new Vector3(0, 1.2f, 0), transform.rotation, Vector3.forward * 2);
     }
 
     protected void Attack(Damage damage, LivingEntity target) {

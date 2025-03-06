@@ -72,6 +72,7 @@ public class InvTileEquipment : InvTile {
     }
 
     public void OnPointerClickEquipment() {
+        Debug.Log("OnPointerClickEquipment");
         if (SelectedInventoryItem == null && _itemUI == null) return;        
         if (SelectedInventoryItem != null && _itemUI != null) return;
         if(!IsEmpty) return;

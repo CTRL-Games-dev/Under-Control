@@ -1,16 +1,39 @@
 using UnityEngine;
-using TMPro;
-using UnityEngine.EventSystems;
+
+[RequireComponent(typeof(Rigidbody))]
 public class ItemEntity : MonoBehaviour, IInteractable
 {
     public int Amount;
     public ItemData ItemData;
 
-    [SerializeField] private TMP_Text _title;
+    public Rigidbody Rigidbody { get; private set; }
 
-    void Start()
-    {
-        _title.text = ItemData.DisplayName;
+    public static ItemEntity Spawn(ItemData itemData, int amount, Vector3 position, Quaternion quaternion) {
+        ItemEntity itemEntity = Instantiate(GameManager.Instance.ItemEntityPrefab, position, quaternion);
+        itemEntity.Amount = amount;
+        itemEntity.ItemData = itemData;
+
+        if(itemData.Model != null) {
+            Instantiate(itemData.Model, itemEntity.transform);
+        } else {
+            Instantiate(GameManager.Instance.UnknownModelPrefab, itemEntity.transform);
+        }
+
+        return itemEntity;
+    }
+
+    public static ItemEntity Spawn(ItemData itemData, int amount, Vector3 position) {
+        return Spawn(itemData, amount, position, Quaternion.identity);
+    }
+
+    public static ItemEntity SpawnThrownRelative(ItemData itemData, int amount, Vector3 position, Quaternion quaternion, Vector3 force) {
+        ItemEntity itemEntity = Spawn(itemData, amount, position, quaternion);
+        itemEntity.Rigidbody.AddRelativeForce(force, ForceMode.Impulse);
+        return itemEntity;
+    }
+
+    void Awake() {
+        Rigidbody = GetComponent<Rigidbody>();
     }
 
     public void Interact(PlayerController player) {
@@ -18,27 +41,9 @@ public class ItemEntity : MonoBehaviour, IInteractable
             return;
         }
 
-        EventBus.InventoryItemChangedEvent?.Invoke();
-        Destroy(gameObject);
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        PlayerController player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-
-        if(Vector3.Distance(player.transform.position, transform.position) > 3f) 
-        {
-            return;
-        }
-
-        if(!player.LivingEntity.Inventory.AddItem(ItemData, Amount)) 
-        {
-            return;
-        }
+        // UICanvas.Instance.PlayerInventoryPanel.UpdateItemUIS();
 
         EventBus.InventoryItemChangedEvent?.Invoke();
         Destroy(gameObject);
     }
-
-    
 }

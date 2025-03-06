@@ -12,7 +12,7 @@ public class SelectedItemUI : MonoBehaviour
         get { return _inventoryItem; } 
         set {
             if (_inventoryItem != null && value != null) {
-                Debug.Log("debil?");
+                Debug.Log("SelectedItemUI: InventoryItem is already set");
                 return;
             }
 
