@@ -103,6 +103,8 @@ public class UICanvas : MonoBehaviour
     }
 
     private void OnItemUIClick(ItemUI itemUI) {
+        if (SelectedItemUI.InventoryItem != null) return; 
+
         SelectedItemUI.gameObject.SetActive(itemUI != null);
         SelectedItemUI.InventoryItem = itemUI.InventoryItem;
     }
