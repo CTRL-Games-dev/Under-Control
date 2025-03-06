@@ -172,6 +172,7 @@ public class UICanvas : MonoBehaviour
     }
 
     private void openInventory(bool value) {
+        InventoryPanel.IsItemJustBought = false;
         _isInventoryOpen = value;
 
         _inventoryCanvasGroup.DOKill();

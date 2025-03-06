@@ -43,6 +43,7 @@ public class InventoryPanel : MonoBehaviour
 
     public List<InventoryItem> _inventory => _currentEntityInventory.GetItems();
     private InventoryItem _selectedInventoryItem => _uiCanvas.SelectedItemUI.InventoryItem;
+    [HideInInspector] public static bool IsItemJustBought = false;
 
     // Grid variables
     public InvTile SelectedTile { get; set; }
@@ -259,8 +260,9 @@ public class InventoryPanel : MonoBehaviour
         GameObject item = createItemUI(_currentEntityInventory.GetInventoryItem(selectedTilePos));
         
         if (item.GetComponent<ItemUI>().CurrentInventoryPanel.IsSellerInventory) {
-            _uiCanvas.PlayerController.Coins += (_selectedInventoryItem.ItemData.Value / 2) * _selectedInventoryItem.Amount;
+            _uiCanvas.PlayerController.Coins += (IsItemJustBought ? _selectedInventoryItem.ItemData.Value : _selectedInventoryItem.ItemData.Value / 2) * _selectedInventoryItem.Amount;
         }
+        IsItemJustBought = false;
 
         _uiCanvas.SelectedItemUI.InventoryItem = null;
         EventBus.ItemPlacedEvent?.Invoke();
@@ -319,11 +321,12 @@ public class InventoryPanel : MonoBehaviour
             UICanvas.Instance.SetSelectedItemUI(itemUI);
             if (IsSellerInventory) {
                 _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
+                IsItemJustBought = true;
             }
             destroyAndRemoveItemUI(itemUI.InventoryItem);
         }
-
         // SetImagesRaycastTarget(false);
+        }
     }
 
     public void OnPointerEnter() {
