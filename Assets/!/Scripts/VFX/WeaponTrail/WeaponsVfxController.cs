@@ -1,35 +1,21 @@
 using UnityEngine;
 
-public class VfxController : MonoBehaviour
+public class WeaponsVfxController : MonoBehaviour
 {
     private ParticleSystem _particleSystem;
-    public bool IsEmitting;
 
     void Start()
     {
         _particleSystem = GetComponentInChildren<ParticleSystem>(); 
     }
 
-    void Update()
-    {   
-        if (IsEmitting)
-        {
-            if (!_particleSystem.isEmitting)
-            {
-                _particleSystem.Play();
-            }
-        }
-        else
-        {
-            if (_particleSystem.isEmitting)
-            {
-                _particleSystem.Stop();
-            }
-        }
+    public void StartTrail()
+    {
+        _particleSystem.Play();
     }
 
-    public void ToggleTrail(bool toggle)
+    public void StopTrail()
     {
-        IsEmitting = toggle;
+        _particleSystem.Stop();
     }
 }
