@@ -326,7 +326,6 @@ public class InventoryPanel : MonoBehaviour
             destroyAndRemoveItemUI(itemUI.InventoryItem);
         }
         // SetImagesRaycastTarget(false);
-        }
     }
 
     public void OnPointerEnter() {
