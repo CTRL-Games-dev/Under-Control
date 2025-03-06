@@ -42,6 +42,7 @@ public class UICanvas : MonoBehaviour
             openInventory(_isInventoryOpen);
         }
     }
+    public InventoryPanel PlayerInventoryPanel;
 
     [HideInInspector] public InventoryPanel ActiveInventoryPanel;
     public ItemInfoPanel ItemInfoPanel;
@@ -101,11 +102,11 @@ public class UICanvas : MonoBehaviour
     }
 
     private void OnItemUIClick(ItemUI itemUI) {
-        if (SelectedItemUI.InventoryItem != null) return;
+        if (_currentOtherInventory != null) return;
 
-        SelectedItemUI.gameObject.SetActive(itemUI != null);
-        SelectedItemUI.InventoryItem = itemUI.InventoryItem;
+        SetSelectedItemUI(itemUI);
     }
+
 
     private void OnCoinsChange(int change) {
         _coinsText.text = $"{PlayerController.Coins + change}";
@@ -123,6 +124,14 @@ public class UICanvas : MonoBehaviour
     #endregion
 
     #region Inventory Methods
+
+    public void SetSelectedItemUI(ItemUI itemUI) {
+        if (SelectedItemUI.InventoryItem != null) return;
+
+        SelectedItemUI.gameObject.SetActive(itemUI != null);
+        SelectedItemUI.InventoryItem = itemUI.InventoryItem;
+    }
+
 
     public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab, IInteractableInventory interactable = null, string title = null) {
         if (itemContainer != null) _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Other);
@@ -179,7 +188,8 @@ public class UICanvas : MonoBehaviour
                 DropItem();
             }
 
-            _inventoryCanvasGroup.DOFade(0, 0.25f).OnComplete(() => _inventoryCanvasGO.SetActive(false));
+            // _inventoryCanvasGroup.DOFade(0, 0.25f).OnComplete(() => _inventoryCanvasGO.SetActive(false));
+            _inventoryCanvasGroup.DOFade(0, 0.25f);
             _inventoryCanvasGroup.interactable = false;
             _inventoryCanvasGroup.blocksRaycasts = false;
             SetOtherInventory(null, null);

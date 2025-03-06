@@ -41,6 +41,8 @@ public class ItemEntity : MonoBehaviour, IInteractable
             return;
         }
 
+        // UICanvas.Instance.PlayerInventoryPanel.UpdateItemUIS();
+
         EventBus.InventoryItemChangedEvent?.Invoke();
         Destroy(gameObject);
     }

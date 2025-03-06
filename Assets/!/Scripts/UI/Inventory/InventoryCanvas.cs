@@ -227,7 +227,8 @@ public class InventoryCanvas : MonoBehaviour
     }
 
     private Tween playerTabExit() {
-        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(410, 0.25f).OnComplete(() => _playerInventoryPanelGO.SetActive(false));
+        // return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(410, 0.25f).OnComplete(() => _playerInventoryPanelGO.SetActive(false));
+        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(410, 0.25f);
     }
 
     private Tween otherTabEnter() {
