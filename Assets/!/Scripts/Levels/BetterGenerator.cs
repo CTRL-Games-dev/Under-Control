@@ -67,7 +67,7 @@ public class BetterGenerator
                 for (int iy = 0; iy < l.Height; iy++)
                 {
                     int indexX = (int)(ix + l.X - offset.x);
-                    int indexY = (int)(iy + l.Y - offset.x);
+                    int indexY = (int)(iy + l.Y - offset.y);
                     grid[indexX, indexY] = true;
                 }
             }
@@ -100,11 +100,69 @@ public class BetterGenerator
             t.vC == st.vA || t.vC == st.vB || t.vC == st.vC)
         ).ToList();
 
-        // TODO : dig out the paths
+        // === MSP ===
+
+        List<Edge> uniqueEdges = GetUniqueEdges(triangles);
+        List<Vertex> vertices = new();
+        List<MSPEdge> mspEdges = new();
+
+        // Create new edges
+        // This is nessecary, because we also need to track
+        // which points are visited, so edges will share common points (vertices)
+        foreach(var e in uniqueEdges)
+        {
+            Vertex vA = null, vB = null;
+            // Checking if vertex already exists
+            // if so, assign it
+            foreach(var v in vertices)
+            {
+                if(e.v0 == v.pos) vA = v;
+                if(e.v1 == v.pos) vB = v;
+            }
+            // If vertex doesn't exist, create it
+            vA ??= new Vertex(e.v0);
+            vB ??= new Vertex(e.v1);
+            // Create new edge (so edgy)
+            mspEdges.Add(new MSPEdge(vA, vB));
+        }
     }
 
+    #region MSP helpers
+
+    class Vertex 
+    {
+        public Vector2 pos;
+        private bool _visited;
+        public Vertex(Vector2 pos)
+        {
+            this.pos = pos;
+        }
+        // Returns true, if was never visited
+        public bool SetVisited()
+        {
+            if(_visited) return false;
+            _visited = true;
+            return true;
+        }
+    }
+
+    class MSPEdge
+    {
+        public Vertex vA, vB;
+        public float Value;
+        
+        public MSPEdge(Vertex vA, Vertex vB)
+        {
+            this.vA = vA;
+            this.vB = vB;
+
+            this.Value = Vector2.Distance(vA.pos, vB.pos);
+        }
+    }
+
+    #endregion
+
     #region Triangulation helper functions
-    
     private List<Triangle> AddVertex(Vector2 vertex, List<Triangle> triangles)
     {
         List<Edge> edges = new();
@@ -121,6 +179,28 @@ public class BetterGenerator
         }).ToList();
 
         // Get unique edges
+        List<Edge> uniqueEdges = GetUniqueEdges(edges);
+
+        foreach(var e in edges)
+        {
+            triangles.Add(new Triangle(e.v0, e.v1, vertex));
+        }
+
+        return triangles;
+    }
+
+    private List<Edge> GetUniqueEdges(List<Triangle> triangles)
+    {
+        List<Edge> edges = new();
+        triangles.ForEach(t => {
+            edges.Add(new Edge(t.vA, t.vB));
+            edges.Add(new Edge(t.vB, t.vC));
+            edges.Add(new Edge(t.vC, t.vA));
+        });
+        return GetUniqueEdges(edges);
+    }
+    private List<Edge> GetUniqueEdges(List<Edge> edges)
+    {
         List<Edge> uniqueEdges = new();
         for (var i = 0; i < edges.Count; ++i) {
             var isUnique = true;
@@ -136,13 +216,7 @@ public class BetterGenerator
             // Edge is unique, add to unique edges array
             if(isUnique) uniqueEdges.Add(edges[i]);
         }
-
-        foreach(var e in edges)
-        {
-            triangles.Add(new Triangle(e.v0, e.v1, vertex));
-        }
-
-        return triangles;
+        return uniqueEdges;
     }
 
     #endregion
@@ -154,6 +228,7 @@ public class BetterGenerator
     
     private class Edge
     {
+        // Variables and methods used for triangulation
         public Vector2 v0, v1;
         public Edge(Vector2 v0, Vector2 v1)
         {
@@ -164,6 +239,8 @@ public class BetterGenerator
             return (v0 == other.v0 && v1 == other.v1) || 
                 (v0 == other.v1 && v1 == other.v0);
         }
+
+        // Variables and methods used for MSP
     }
 
     private class Triangle
