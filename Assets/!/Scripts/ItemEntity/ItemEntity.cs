@@ -1,6 +1,8 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
+
+[RequireComponent(typeof(Rigidbody))]
 public class ItemEntity : MonoBehaviour, IInteractable
 {
     public int Amount;
@@ -40,8 +42,6 @@ public class ItemEntity : MonoBehaviour, IInteractable
         if(!player.LivingEntity.Inventory.AddItem(ItemData, Amount)) {
             return;
         }
-
-        // UICanvas.Instance.PlayerInventoryPanel.UpdateItemUIS();
 
         EventBus.InventoryItemChangedEvent?.Invoke();
         Destroy(gameObject);
