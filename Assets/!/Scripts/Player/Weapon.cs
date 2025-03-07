@@ -9,6 +9,13 @@ public class Weapon : MonoBehaviour
     [HideInInspector]
     public UnityEvent<LivingEntity> OnHit = new();
 
+    private WeaponsVfxController _vfxController;
+
+    void Start()
+    {
+        _vfxController = GetComponentInChildren<WeaponsVfxController>();
+    }
+
     public void OnTriggerEnter(Collider other)
     {
         if(!other.TryGetComponent(out LivingEntity victim)) return;
@@ -18,9 +25,11 @@ public class Weapon : MonoBehaviour
 
     public void EnableHitbox() {
         Hitbox.enabled = true;
+        _vfxController?.StartTrail();
     }
 
     public void DisableHitbox() {
         Hitbox.enabled = false;
+        _vfxController?.StopTrail();
     }
 }
