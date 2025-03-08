@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 92475727}
   - component: {fileID: 92475726}
   - component: {fileID: 92475728}
+  - component: {fileID: 92475729}
   m_Layer: 0
   m_Name: AdventureManager
   m_TagString: Untagged
@@ -146,7 +147,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 92475723}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 687e3724e4d01295e9025d7f239c37e3, type: 3}
   m_Name: 
@@ -154,12 +155,9 @@ MonoBehaviour:
   PlayerStartingPos: {x: 3, y: 3, z: 3}
   _player: {fileID: 8272185431068916378, guid: d0a1554a222164d4b997243ccafe1e2a, type: 3}
   _portal: {fileID: 311971552714427789, guid: 9dfa7802d8ef9edb5a2f6d0218c89a03, type: 3}
-  _cameraManager: {fileID: 0}
   width: 30
   height: 30
   iterations: 6
-  _grassMaterial: {fileID: 2100000, guid: 09fdb9bebec64fed2ba9df7264586116, type: 2}
-  _wallMaterial: {fileID: 2100000, guid: 717569b9ef794b0acb446b59f131a172, type: 2}
   _enemyPrefab: {fileID: 3366227734027736264, guid: 72b157fd11edebb43b88aca526b0109b, type: 3}
 --- !u!4 &92475725
 Transform:
@@ -251,6 +249,18 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &92475729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 92475723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab6a2f0f18aeea66fa07c98556d4a836, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1082366592
 PrefabInstance:
   m_ObjectHideFlags: 0

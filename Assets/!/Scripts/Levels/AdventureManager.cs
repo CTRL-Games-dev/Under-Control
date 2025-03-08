@@ -41,7 +41,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
     private void Start()
     {
         var s = new BetterGenerator();
-        s.GenerateMap(BetterGenerator.LevelType.Forest);
+        //s.GenerateMap(BetterGenerator.LevelType.Forest);
     }
 
     private void Update()

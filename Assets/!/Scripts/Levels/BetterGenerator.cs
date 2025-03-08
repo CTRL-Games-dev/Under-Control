@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Burst.Intrinsics;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -43,6 +45,10 @@ public class BetterGenerator : MonoBehaviour
 
         // All locations
         allLocations.Add(new ForestPortal());
+        allLocations.Add(new DummyLocation());
+        allLocations.Add(new DummyLocation());
+        allLocations.Add(new DummyLocation());
+        allLocations.Add(new DummyLocation());
 
         int minX = 0, minY = 0, maxX = 0, maxY = 0;
         foreach(var l in allLocations)
@@ -55,6 +61,8 @@ public class BetterGenerator : MonoBehaviour
             if (l.Y < minY) minY = l.Y;
             if (l.X+l.Width > maxX) maxX = l.X+l.Width;
             if (l.Y+l.Height > maxY) maxY = l.Y+l.Height;
+
+            Debug.Log("Spawned location at x->" + l.X + " y->" + l.Y);
         }
 
         // Grid is used to determine where to spawn trees
@@ -92,6 +100,7 @@ public class BetterGenerator : MonoBehaviour
     {
         // Create "sigma triangle"
         Triangle st = Triangle.GetSuperTriangle(locationCenters);
+        Debug.Log("Created sigma triangle: " + st.vA + " " + st.vB + " " + st.vC);
 
         List<Triangle> triangles = new();
         triangles.Add(st);
@@ -99,8 +108,11 @@ public class BetterGenerator : MonoBehaviour
         // Triangulate each vertex (magic)
         foreach (var vertex in locationCenters)
         {
+            Debug.Log("=== ITERATION ===");
+            Debug.Log("Current vertex = " + vertex);
             triangles = AddVertex(vertex, triangles);
         }
+        Debug.Log("Number of triangles: " + triangles.Count);
 
         // Remove triangles that share edges with sigma triangle (they are not so sigma)
         triangles = triangles.Where(t => 
@@ -111,63 +123,75 @@ public class BetterGenerator : MonoBehaviour
 
         // === MST ===
 
-        List<Edge> uniqueEdges = GetUniqueEdges(triangles);
+        Debug.Log("Number of triangles after removal: " + triangles.Count);
 
-        // foreach(var e in uniqueEdges)
-        // {
-        //     Vertex vA = null, vB = null;
-        //     // Checking if vertex already exists
-        //     // if so, assign it
-        //     foreach(var v in vertices)
-        //     {
-        //         if(e.v0 == v.pos) vA = v;
-        //         if(e.v1 == v.pos) vB = v;
-        //     }
-        //     // If vertex doesn't exist, create it
-        //     vA ??= new Vertex(e.v0);
-        //     vB ??= new Vertex(e.v1);
-        //     // Create new edge (so edgy)
-        //     mstEdges.Add(new MSTEdge(vA, vB));
-        // }
-
-
-        Debug.Log("Nugger " + uniqueEdges.Count);
-        Edge firstEdge = uniqueEdges.Aggregate(uniqueEdges[0], (smallest, next) => {
-            return smallest.Length > next.Length ? next : smallest;
-        });
-        firstEdge.MarkAsUsed();
-
-        // Do this as long as there are unconnected edges
-        // If edge is not connected from both sides, this means that at least one of it's points is not connected
-        while(uniqueEdges.FindAll(e => e.IsFullyConnected(uniqueEdges)).Count > 0)
+        foreach(var t in triangles)
         {
-            // Get all edges that are connected to already used edges 
-            // and set sort them in order (so if one is not okay, we can skip it and go to the next one)
-            List<Edge> connectedEdges = uniqueEdges
-                .FindAll(e => !e.Used || e.IsOnlyPartiallyConnected(uniqueEdges))
-                .OrderBy(e => e.Length).ToList();
-
-            foreach(var shortest in connectedEdges)
-            {
-                // Check if it's points aren't already connected
-                bool flag = true;
-                foreach(var e in uniqueEdges.FindAll(e => shortest.ConnectedWith(e)))
-                {
-                    // If at least one of the other edges connected to this new edge
-                    // this means that new point is already connected, so skip
-                    if(e.Used) {
-                        flag = false;
-                        break;
-                    }
-                }
-
-                // If shortest edge acually connected new point, then mark it as used
-                if(flag) shortest.MarkAsUsed();
-            }
+            Debug.Log("Triangle: " + t.vA + t.vB + t.vC);
         }
+
+        List<Edge> uniqueEdges = RemoveDuplicateEdges(triangles);
+
+        foreach(var e in uniqueEdges)
+        {
+            Debug.Log("Unique edge: " + e.v0 + e.v1);
+        }
+
+        #region MST
+        // Debug.Log("Number of unique edges" + uniqueEdges.Count);
+        // Edge firstEdge = uniqueEdges.Aggregate(uniqueEdges[0], (smallest, next) => {
+        //     return smallest.Length > next.Length ? next : smallest;
+        // });
+        // firstEdge.MarkAsUsed();
+
+        // // Do this as long as there are unconnected edges
+        // // If edge is not connected from both sides, this means that at least one of it's points is not connected
+        // while(uniqueEdges.FindAll(e => e.IsFullyConnected(uniqueEdges)).Count > 0)
+        // {
+        //     // Get all edges that are connected to already used edges 
+        //     // and set sort them in order (so if one is not okay, we can skip it and go to the next one)
+        //     List<Edge> connectedEdges = uniqueEdges
+        //         .FindAll(e => !e.Used || e.IsOnlyPartiallyConnected(uniqueEdges))
+        //         .OrderBy(e => e.Length).ToList();
+
+        //     foreach(var shortest in connectedEdges)
+        //     {
+        //         // Check if it's points aren't already connected
+        //         bool flag = true;
+        //         foreach(var e in uniqueEdges.FindAll(e => shortest.ConnectedWith(e)))
+        //         {
+        //             // If at least one of the other edges connected to this new edge
+        //             // this means that new point is already connected, so skip
+        //             if(e.Used) {
+        //                 flag = false;
+        //                 break;
+        //             }
+        //         }
+
+        //         // If shortest edge acually connected new point, then mark it as used
+        //         if(flag) shortest.MarkAsUsed();
+        //     }
+        // }
+        #endregion
     }
 
     #region MST helpers
+
+    private List<Edge> RemoveDuplicateEdges(List<Edge> edges)
+    {
+        List<Edge> uniqueEdges = new();
+        foreach(var e in edges)
+        {
+            if(uniqueEdges.Find(unique => unique.Equals(e)) == null) uniqueEdges.Add(e);
+        }
+        return uniqueEdges;
+    }
+    private List<Edge> RemoveDuplicateEdges(List<Triangle> triangles)
+    {
+        List<Edge> edges = new();
+        triangles.ForEach(t => edges.AddRange(t.GetEdges()));
+        return RemoveDuplicateEdges(edges);
+    }
 
     // class Vertex 
     // {
@@ -213,7 +237,9 @@ public class BetterGenerator : MonoBehaviour
 
         // Remove triangles with circumcircles containing the vertex
         triangles = triangles.Where(t => {
+            Debug.Log("triangle center: " + t.vCenter);
             if (t.InCircumcircle(vertex)) {
+                Debug.Log("Bad triangle!");
                 edges.Add(new Edge(t.vA, t.vB));
                 edges.Add(new Edge(t.vB, t.vC));
                 edges.Add(new Edge(t.vC, t.vA));
@@ -221,6 +247,7 @@ public class BetterGenerator : MonoBehaviour
             }
             return true;
         }).ToList();
+        Debug.Log("Number of triangles inside iteration: " + triangles.Count);
 
         // Get unique edges
         List<Edge> uniqueEdges = GetUniqueEdges(edges);
@@ -231,17 +258,6 @@ public class BetterGenerator : MonoBehaviour
         }
 
         return triangles;
-    }
-
-    private List<Edge> GetUniqueEdges(List<Triangle> triangles)
-    {
-        List<Edge> edges = new();
-        triangles.ForEach(t => {
-            edges.Add(new Edge(t.vA, t.vB));
-            edges.Add(new Edge(t.vB, t.vC));
-            edges.Add(new Edge(t.vC, t.vA));
-        });
-        return GetUniqueEdges(edges);
     }
     private List<Edge> GetUniqueEdges(List<Edge> edges)
     {
@@ -261,6 +277,16 @@ public class BetterGenerator : MonoBehaviour
             if(isUnique) uniqueEdges.Add(edges[i]);
         }
         return uniqueEdges;
+    }
+    private List<Edge> GetUniqueEdges(List<Triangle> triangles)
+    {
+        List<Edge> edges = new();
+        triangles.ForEach(t => {
+            edges.Add(new Edge(t.vA, t.vB));
+            edges.Add(new Edge(t.vB, t.vC));
+            edges.Add(new Edge(t.vC, t.vA));
+        });
+        return GetUniqueEdges(edges);
     }
 
     #endregion
@@ -335,7 +361,7 @@ public class BetterGenerator : MonoBehaviour
     private class Triangle
     {
         public Vector2 vA, vB, vC;
-        Vector2 vCenter;
+        public Vector2 vCenter;
         public Triangle(Vector2 vA, Vector2 vB, Vector2 vC)
         {
             this.vA = vA; this.vB = vB; this.vC = vC;
@@ -363,6 +389,16 @@ public class BetterGenerator : MonoBehaviour
 
             return new Triangle(v0, v1, v2);
         }
+
+        public List<Edge> GetEdges()
+        {
+            return new()
+            {
+                new Edge(vA, vB),
+                new Edge(vB, vC),
+                new Edge(vC, vA)
+            };
+        }
         public bool InCircumcircle(Vector2 v)
         {
             var dx = vCenter.x - v.x;
@@ -382,23 +418,10 @@ public class BetterGenerator : MonoBehaviour
             Vector2 midPointBC = Vector2.Lerp(vB, vC, 0.5f);
 
             LinearEquation perpendicularAB = lineAB.PerpendicularLineAt(midPointAB);
-            LinearEquation perpendicularBC = lineAB.PerpendicularLineAt(midPointBC);
+            LinearEquation perpendicularBC = lineBC.PerpendicularLineAt(midPointBC);
 
             return GetCrossingPoint(perpendicularAB, perpendicularBC);
         }
-
-        Vector2 GetCrossingPoint(LinearEquation lineA, LinearEquation lineB)
-        {
-            // Cramer's rule
-            float Determinant = lineA._A * lineB._B - lineB._A * lineA._B;
-            float DeterminantX = lineA._C * lineB._B - lineB._C * lineA._B;
-            float DeterminantY = lineA._A * lineB._C - lineB._A * lineA._C;
-
-            float x = DeterminantX / Determinant;
-            float y = DeterminantY / Determinant;
-            return new Vector2(x, y);
-        }
-
         private class LinearEquation 
         {
             public float _A, _B, _C;
@@ -412,14 +435,33 @@ public class BetterGenerator : MonoBehaviour
                 _C = _A * vA.x + _B * vA.y;
             }
 
-            public LinearEquation PerpendicularLineAt(Vector3 v)
+            public LinearEquation PerpendicularLineAt(Vector3 point)
             {
                 LinearEquation newLine = new LinearEquation();
                 newLine._A = -_B;
                 newLine._B = _A;
-                newLine._C = newLine._A * v.x + newLine._B * v.y;
+                newLine._C = newLine._A * point.x + newLine._B * point.y;
                 return newLine;
             }
+        }
+        Vector2 GetCrossingPoint(LinearEquation line1, LinearEquation line2)
+        {
+            float A1 = line1._A;
+            float A2 = line2._A;
+            float B1 = line1._B;
+            float B2 = line2._B;
+            float C1 = line1._C;
+            float C2 = line2._C;
+
+
+            // Cramer's rule
+            float Determinant = A1 * B2 - A2 * B1;
+            float DeterminantX = C1 * B2 - C2 * B1;
+            float DeterminantY = A1 * C2 - A2 * C1;
+
+            float x = DeterminantX / Determinant;
+            float y = DeterminantY / Determinant;
+            return new Vector2(x, y);
         }
     }
 
