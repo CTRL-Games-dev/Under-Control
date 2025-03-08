@@ -6,13 +6,22 @@ using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class BetterGenerator
+public struct Tile
+    {
+        public bool IsWall;
+        public int X, Y;
+    }
+
+[RequireComponent(typeof(MeshCollider))]
+[RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshFilter))]
+public class BetterGenerator : MonoBehaviour
 {
-    // public struct Tile
-    // {
-    //     public bool IsWall;
-    //     public int X, Y;
-    // }
+    public void Start()
+    {
+        Debug.Log("starting deneration");
+        GenerateMap(LevelType.Forest);
+    }
     public enum LevelType
     {
         Forest
@@ -103,93 +112,97 @@ public class BetterGenerator
         // === MST ===
 
         List<Edge> uniqueEdges = GetUniqueEdges(triangles);
-        List<Vertex> vertices = new();
 
-        List<MSTEdge> mstEdges = new(); // All MST edges
+        // foreach(var e in uniqueEdges)
+        // {
+        //     Vertex vA = null, vB = null;
+        //     // Checking if vertex already exists
+        //     // if so, assign it
+        //     foreach(var v in vertices)
+        //     {
+        //         if(e.v0 == v.pos) vA = v;
+        //         if(e.v1 == v.pos) vB = v;
+        //     }
+        //     // If vertex doesn't exist, create it
+        //     vA ??= new Vertex(e.v0);
+        //     vB ??= new Vertex(e.v1);
+        //     // Create new edge (so edgy)
+        //     mstEdges.Add(new MSTEdge(vA, vB));
+        // }
 
-        // Create new edges
-        // This is nessecary, because we also need to track
-        // which points are visited, so edges will share common points (vertices)
-        foreach(var e in uniqueEdges)
-        {
-            Vertex vA = null, vB = null;
-            // Checking if vertex already exists
-            // if so, assign it
-            foreach(var v in vertices)
-            {
-                if(e.v0 == v.pos) vA = v;
-                if(e.v1 == v.pos) vB = v;
-            }
-            // If vertex doesn't exist, create it
-            vA ??= new Vertex(e.v0);
-            vB ??= new Vertex(e.v1);
-            // Create new edge (so edgy)
-            mstEdges.Add(new MSTEdge(vA, vB));
-        }
 
-        // With unique edges sharing common points
-        // We can start MST
-
-        List<MSTEdge> visitedEdges = new(); // Used to store visited edges
-
-        // Get first edge
-        // Get edge with the lowest value (length)
-        MSTEdge currentEdge = mstEdges.Aggregate(mstEdges[0], (smallest, next) => {
-            return smallest.Value > next.Value ? next : smallest;
+        Debug.Log("Nugger " + uniqueEdges.Count);
+        Edge firstEdge = uniqueEdges.Aggregate(uniqueEdges[0], (smallest, next) => {
+            return smallest.Length > next.Length ? next : smallest;
         });
-        // Set vertices as visited
-        currentEdge.vA.SetVisited();
-        currentEdge.vB.SetVisited();
-        visitedEdges.Add(currentEdge);
+        firstEdge.MarkAsUsed();
 
-        while(vertices.Find(v => v.WasVisited()) != null)
+        // Do this as long as there are unconnected edges
+        // If edge is not connected from both sides, this means that at least one of it's points is not connected
+        while(uniqueEdges.FindAll(e => e.IsFullyConnected(uniqueEdges)).Count > 0)
         {
-            List<MSTEdge> connectedEdges = new();
-            List<MSTEdge> newVisitedEdges = new();
-            visitedEdges.ForEach(ev => {
-                newVisitedEdges.AddRange(mstEdges.FindAll(e => e.vA == ev.vA || e.vA == ev.vB || e.vB == ev.vA || e.vB == ev.vB));
-            });
-            visitedEdges.AddRange(newVisitedEdges);
-            visitedEdges.GroupBy(v =>);
+            // Get all edges that are connected to already used edges 
+            // and set sort them in order (so if one is not okay, we can skip it and go to the next one)
+            List<Edge> connectedEdges = uniqueEdges
+                .FindAll(e => !e.Used || e.IsOnlyPartiallyConnected(uniqueEdges))
+                .OrderBy(e => e.Length).ToList();
+
+            foreach(var shortest in connectedEdges)
+            {
+                // Check if it's points aren't already connected
+                bool flag = true;
+                foreach(var e in uniqueEdges.FindAll(e => shortest.ConnectedWith(e)))
+                {
+                    // If at least one of the other edges connected to this new edge
+                    // this means that new point is already connected, so skip
+                    if(e.Used) {
+                        flag = false;
+                        break;
+                    }
+                }
+
+                // If shortest edge acually connected new point, then mark it as used
+                if(flag) shortest.MarkAsUsed();
+            }
         }
     }
 
     #region MST helpers
 
-    class Vertex 
-    {
-        public Vector2 pos;
-        private bool _visited;
-        public Vertex(Vector2 pos)
-        {
-            this.pos = pos;
-        }
-        // Returns true, if was never visited
-        public bool SetVisited()
-        {
-            if(_visited) return false;
-            _visited = true;
-            return true;
-        }
-        public bool WasVisited()
-        {
-            return _visited;
-        }
-    }
+    // class Vertex 
+    // {
+    //     public Vector2 pos;
+    //     private bool _visited;
+    //     public Vertex(Vector2 pos)
+    //     {
+    //         this.pos = pos;
+    //     }
+    //     // Returns true, if was never visited
+    //     public bool SetVisited()
+    //     {
+    //         if(_visited) return false;
+    //         _visited = true;
+    //         return true;
+    //     }
+    //     public bool WasVisited()
+    //     {
+    //         return _visited;
+    //     }
+    // }
 
-    class MSTEdge
-    {
-        public Vertex vA, vB;
-        public float Value;
+    // class MSTEdge
+    // {
+    //     public Vertex vA, vB;
+    //     public float Value;
         
-        public MSTEdge(Vertex vA, Vertex vB)
-        {
-            this.vA = vA;
-            this.vB = vB;
+    //     public MSTEdge(Vertex vA, Vertex vB)
+    //     {
+    //         this.vA = vA;
+    //         this.vB = vB;
 
-            this.Value = Vector2.Distance(vA.pos, vB.pos);
-        }
-    }
+    //         this.Value = Vector2.Distance(vA.pos, vB.pos);
+    //     }
+    // }
 
     #endregion
 
@@ -264,6 +277,7 @@ public class BetterGenerator
         public Edge(Vector2 v0, Vector2 v1)
         {
             this.v0 = v0; this.v1 = v1;
+            this.Length = Vector2.Distance(v0, v1);
         }
         public bool Equals(Edge other)
         {
@@ -271,7 +285,51 @@ public class BetterGenerator
                 (v0 == other.v1 && v1 == other.v0);
         }
 
+        // This function only checks if other edge is connected with this edge
+        public bool ConnectedWith(Edge other)
+        {
+            return v0 == other.v0 || v1 == other.v1 || 
+                v0 == other.v1 || v1 == other.v0;
+        }
+        // This function only checks edge is connected at least from one side
+        public bool IsOnlyPartiallyConnected(List<Edge> otherEdges)
+        {
+            bool vA = false, vB = false;
+            foreach(var other in otherEdges)
+            {
+                if(other.v0 == v0 || other.v1 == v0) vA = true;
+                if(other.v0 == v1 || other.v1 == v1) vB = true;
+            }
+            return vA != vB;
+        }
+        // This function only checks edge is connected from both sides
+        public bool IsFullyConnected(List<Edge> otherEdges)
+        {
+            bool vA = false, vB = false;
+            foreach(var other in otherEdges)
+            {
+                if(other.v0 == v0 || other.v1 == v0) vA = true;
+                if(other.v0 == v1 || other.v1 == v1) vB = true;
+            }
+            return vA && vB;
+        }
+        // This function checks if other edge and marks it, if it is
+        public void MarkAsUsed()
+        {
+            Used = true;
+            NotNeeded = true;
+        }
+
+        public void MarkAsRedudnant()
+        {
+            NotNeeded = true;
+        }
+
         // Variables and methods used for MST
+        public float Length;
+        public bool Used { get; private set; } = false; // Used to say that this edge is being used
+        // Used to mark this path as no longer useful
+        public bool NotNeeded { get; private set; } = false ;
     }
 
     private class Triangle

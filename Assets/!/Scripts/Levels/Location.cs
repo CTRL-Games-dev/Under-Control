@@ -24,7 +24,7 @@ public class ForestPortal : Location
     private GameObject _portalPrefab;
     public override void FindLocation(List<Location> generatedLocations)
     {
-        string portalPath = "Forest/Portal";
+        string portalPath = "Prefabs/Forest/Portal";
 
         _portalPrefab = Resources.Load<GameObject>(portalPath);
         
