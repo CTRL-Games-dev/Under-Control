@@ -100,11 +100,12 @@ public class BetterGenerator
             t.vC == st.vA || t.vC == st.vB || t.vC == st.vC)
         ).ToList();
 
-        // === MSP ===
+        // === MST ===
 
         List<Edge> uniqueEdges = GetUniqueEdges(triangles);
         List<Vertex> vertices = new();
-        List<MSPEdge> mspEdges = new();
+
+        List<MSTEdge> mstEdges = new(); // All MST edges
 
         // Create new edges
         // This is nessecary, because we also need to track
@@ -123,11 +124,37 @@ public class BetterGenerator
             vA ??= new Vertex(e.v0);
             vB ??= new Vertex(e.v1);
             // Create new edge (so edgy)
-            mspEdges.Add(new MSPEdge(vA, vB));
+            mstEdges.Add(new MSTEdge(vA, vB));
+        }
+
+        // With unique edges sharing common points
+        // We can start MST
+
+        List<MSTEdge> visitedEdges = new(); // Used to store visited edges
+
+        // Get first edge
+        // Get edge with the lowest value (length)
+        MSTEdge currentEdge = mstEdges.Aggregate(mstEdges[0], (smallest, next) => {
+            return smallest.Value > next.Value ? next : smallest;
+        });
+        // Set vertices as visited
+        currentEdge.vA.SetVisited();
+        currentEdge.vB.SetVisited();
+        visitedEdges.Add(currentEdge);
+
+        while(vertices.Find(v => v.WasVisited()) != null)
+        {
+            List<MSTEdge> connectedEdges = new();
+            List<MSTEdge> newVisitedEdges = new();
+            visitedEdges.ForEach(ev => {
+                newVisitedEdges.AddRange(mstEdges.FindAll(e => e.vA == ev.vA || e.vA == ev.vB || e.vB == ev.vA || e.vB == ev.vB));
+            });
+            visitedEdges.AddRange(newVisitedEdges);
+            visitedEdges.GroupBy(v =>);
         }
     }
 
-    #region MSP helpers
+    #region MST helpers
 
     class Vertex 
     {
@@ -144,14 +171,18 @@ public class BetterGenerator
             _visited = true;
             return true;
         }
+        public bool WasVisited()
+        {
+            return _visited;
+        }
     }
 
-    class MSPEdge
+    class MSTEdge
     {
         public Vertex vA, vB;
         public float Value;
         
-        public MSPEdge(Vertex vA, Vertex vB)
+        public MSTEdge(Vertex vA, Vertex vB)
         {
             this.vA = vA;
             this.vB = vB;
@@ -240,7 +271,7 @@ public class BetterGenerator
                 (v0 == other.v1 && v1 == other.v0);
         }
 
-        // Variables and methods used for MSP
+        // Variables and methods used for MST
     }
 
     private class Triangle
