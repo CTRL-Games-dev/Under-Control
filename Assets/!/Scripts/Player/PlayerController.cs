@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
     public GameObject MainCameraObject;
     public GameObject CinemachineObject;
     public GameObject CameraTargetObject;
+    public bool InputDisabled = true;
 
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
@@ -68,9 +69,6 @@ public class PlayerController : MonoBehaviour
     // State
     private Vector2 _movementInputVector = Vector2.zero;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
-
-    public bool InputDisabled = true;
-
 
     private readonly int _speedHash = Animator.StringToHash("speed");
     private readonly int _dodgeHash = Animator.StringToHash("dodge");
@@ -114,6 +112,7 @@ public class PlayerController : MonoBehaviour
             _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0, _deceleration * Time.deltaTime);
         }
 
+        handleInteraction();
         handleRotation();
     }
 
@@ -194,12 +193,16 @@ public class PlayerController : MonoBehaviour
         Animator.SetTrigger(_dodgeHash);
     }
 
-    void OnPrimaryInteraction() {
-        interact(true);
-    }
+    private void handleInteraction() {
+        if (EventSystem.current.IsPointerOverGameObject()) {
+            return;
+        }
 
-    void OnSecondaryInteraction() {
-        interact(false);
+        if(Mouse.current.leftButton.isPressed) {
+            interact(true);
+        } else if(Mouse.current.rightButton.isPressed) {
+            interact(false);
+        }
     }
 
     private void interact(bool primary) {
