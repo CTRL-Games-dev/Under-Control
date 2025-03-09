@@ -17,7 +17,7 @@ public class HubManager : MonoBehaviour, ILevelManager
 
     private void SpawnPlayer()
     {
-        GameObject player = Instantiate(_player, PlayerStartingPos, Quaternion.identity);
+        // GameObject player = Instantiate(_player, PlayerStartingPos, Quaternion.identity);
         // GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
         
         // player.GetComponent<PlayerController>().CameraObject = camera;

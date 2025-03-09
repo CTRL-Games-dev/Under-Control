@@ -13,7 +13,7 @@ public class Portal : MonoBehaviour
         if(IsOpen) 
         {
             Debug.Log("Player entered portal to: " + _dimension);
-            PlayerEnteredPortal.Invoke(_dimension);
+            PlayerEnteredPortal?.Invoke(_dimension);
         }
     }
     
