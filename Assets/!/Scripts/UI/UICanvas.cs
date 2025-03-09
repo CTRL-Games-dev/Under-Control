@@ -32,6 +32,7 @@ public class UICanvas : MonoBehaviour
         }
     }
     public HumanoidInventory PlayerInventory { get => PlayerLivingEntity.Inventory as HumanoidInventory; }
+    public Camera MainCamera;
 
     // UI elements
     private bool _isInventoryOpen = false;
@@ -50,9 +51,10 @@ public class UICanvas : MonoBehaviour
 
     // serialized fields
     [Header("Canvases")]
-    [SerializeField] private GameObject _HUDCanvas;
+    [SerializeField] private GameObject _HUDCanvasGO;
     [SerializeField] private GameObject _inventoryCanvasGO;
     [SerializeField] private GameObject _alwayOnTopCanvasGO;
+    [SerializeField] private GameObject _mainMenuCanvasGO;
 
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI _coinsText;
@@ -61,6 +63,7 @@ public class UICanvas : MonoBehaviour
     [SerializeField] private RectTransform _navBarRectTransform;
     private ItemContainer _currentOtherInventory;
     private InventoryCanvas _inventoryCanvas;
+    private MainMenu _mainMenu;
     private CanvasGroup _inventoryCanvasGroup;
     private IInteractableInventory _lastInteractableInventory;
 
@@ -74,6 +77,7 @@ public class UICanvas : MonoBehaviour
             return;
         }
         Instance = this;
+        
     }
 
     private void Start() {
@@ -86,6 +90,8 @@ public class UICanvas : MonoBehaviour
 
         _inventoryCanvas = _inventoryCanvasGO.GetComponent<InventoryCanvas>();
         _inventoryCanvasGroup = _inventoryCanvasGO.GetComponent<CanvasGroup>();
+        _mainMenu = _mainMenuCanvasGO.GetComponent<MainMenu>();
+        Debug.Log(_mainMenu);
         OnCoinsChange(0);
         
         _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Armor);
@@ -102,9 +108,10 @@ public class UICanvas : MonoBehaviour
     }
 
     private void OnItemUIClick(ItemUI itemUI) {
-        if (_currentOtherInventory != null) return;
+        if (SelectedItemUI.InventoryItem != null) return; 
 
-        SetSelectedItemUI(itemUI);
+        SelectedItemUI.gameObject.SetActive(itemUI != null);
+        SelectedItemUI.InventoryItem = itemUI.InventoryItem;
     }
 
 
@@ -118,7 +125,11 @@ public class UICanvas : MonoBehaviour
     }
 
     private void OnUICancel() {
-        openInventory(false);
+        if (IsInventoryOpen) {
+            openInventory(false);
+        } else {
+            OpenMainMenu();
+        }
     }
 
     #endregion
@@ -207,6 +218,23 @@ public class UICanvas : MonoBehaviour
         _coinsText.color = Color.white;
         _coinsHolder.transform.localScale = new Vector3(1f, 1f, 1f);
     }
+
+    public void OpenMainMenu() {
+        PlayerController.InputDisabled = true;
+        _mainMenu.OpenMenu();
+        _HUDCanvasGO.SetActive(false);
+        _alwayOnTopCanvasGO.SetActive(false);
+        _inventoryCanvasGO.SetActive(false);
+    }
+
+    public void CloseMainMenu() {
+        PlayerController.InputDisabled = false;
+        Debug.Log(_mainMenu);
+        _mainMenu.CloseMenu();
+        _HUDCanvasGO.SetActive(true);
+        _alwayOnTopCanvasGO.SetActive(true);
+    }
+
 
     #endregion
 }

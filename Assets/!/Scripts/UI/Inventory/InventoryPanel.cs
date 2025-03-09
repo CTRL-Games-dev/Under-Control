@@ -315,7 +315,7 @@ public class InventoryPanel : MonoBehaviour
     #region Callbacks
 
     public void OnItemUIClick(ItemUI itemUI) {
-        if (UICanvas.Instance.SelectedItemUI.InventoryItem != null) return;
+        if (UICanvas.Instance.SelectedItemUI.InventoryItem != null) return; 
 
         if (_inventory.Contains(itemUI.InventoryItem)) {
             UICanvas.Instance.SetSelectedItemUI(itemUI);
