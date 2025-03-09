@@ -12,8 +12,8 @@ public class HoverTooltip : MonoBehaviour {
     private GameObject _lastHoveredGameObject = null;
     private Camera _camera;
 
-    void Awake() {
-        _camera = PlayerController.CameraObject.GetComponent<Camera>();
+    void Start() {
+        _camera = UICanvas.Instance.MainCamera;
     }
 
     void FixedUpdate() {

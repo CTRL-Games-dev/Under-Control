@@ -28,7 +28,8 @@ public class PlayerController : MonoBehaviour
     public float CameraDistanceSpeed = 1f;
     public float MaxInteractionRange = 10f;
     public Vector2 CameraTargetObjectBounds = Vector2.zero;
-    public GameObject CameraObject;
+    public GameObject MainCameraObject;
+    public GameObject CinemachineObject;
     public GameObject CameraTargetObject;
 
     [Header("Weapon")]
@@ -68,10 +69,14 @@ public class PlayerController : MonoBehaviour
     private Vector2 _movementInputVector = Vector2.zero;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
 
+    public bool InputDisabled = true;
+
+
     private readonly int _speedHash = Animator.StringToHash("speed");
     private readonly int _dodgeHash = Animator.StringToHash("dodge");
     private readonly int _lightAttackHash = Animator.StringToHash("light_attack");
     private readonly int _heavyAttackHash = Animator.StringToHash("heavy_attack");
+
 
     // References
     public CharacterController CharacterController { get; private set; }
@@ -84,7 +89,7 @@ public class PlayerController : MonoBehaviour
         CharacterController = GetComponent<CharacterController>();
         Animator = GetComponent<Animator>();
         LivingEntity = GetComponent<LivingEntity>();
-        CinemachinePositionComposer = CameraObject.GetComponent<CinemachinePositionComposer>();
+        CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
         
         _cameraDistance = MinCameraDistance;
 
@@ -94,6 +99,11 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         recalculateStats();
+
+        if (InputDisabled) {
+            _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0, _deceleration * Time.deltaTime);
+            return;
+        }
 
         float goalSpeed = Input.GetKey(KeyCode.LeftShift) ? _maxSprintingSpeed : _maxWalkingSpeed; // do zmiany
 
@@ -210,7 +220,7 @@ public class PlayerController : MonoBehaviour
     }
 
     private bool tryInteract() {
-        Ray ray = CameraObject.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+        Ray ray = UICanvas.Instance.MainCamera.ScreenPointToRay(Input.mousePosition);
         if (!Physics.Raycast(ray, out RaycastHit hit)) {
             return false;
         }

@@ -67,7 +67,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
     {
         GameObject player = Instantiate(_player, _map.SpawnLocation, Quaternion.identity);
         GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
-        player.GetComponent<PlayerController>().CameraObject = camera;
+        player.GetComponent<PlayerController>().MainCameraObject = camera;
         camera.GetComponent<CinemachineCamera>().Follow = player.transform;
         
         Instantiate(_portal, _map.SpawnLocation + new Vector3(-3.5f, 0, 0), Quaternion.Euler(new Vector3(0, 90, 0)));
