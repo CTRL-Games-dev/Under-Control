@@ -11,5 +11,4 @@ public class ItemData : ScriptableObject
     public int MaxQuantity;
     public GameObject Model;
     public int Value;
-    public ItemType ItemType;
 }

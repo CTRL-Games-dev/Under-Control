@@ -1,6 +1,7 @@
 using System.Collections;
 using DG.Tweening;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class UICanvas : MonoBehaviour
@@ -41,6 +42,7 @@ public class UICanvas : MonoBehaviour
             openInventory(_isInventoryOpen);
         }
     }
+    public InventoryPanel PlayerInventoryPanel;
 
     [HideInInspector] public InventoryPanel ActiveInventoryPanel;
     public ItemInfoPanel ItemInfoPanel;
@@ -109,6 +111,7 @@ public class UICanvas : MonoBehaviour
         SelectedItemUI.InventoryItem = itemUI.InventoryItem;
     }
 
+
     private void OnCoinsChange(int change) {
         _coinsText.text = $"{PlayerController.Coins + change}";
         StartCoroutine(animateCoins(change > 0));
@@ -129,6 +132,14 @@ public class UICanvas : MonoBehaviour
     #endregion
 
     #region Inventory Methods
+
+    public void SetSelectedItemUI(ItemUI itemUI) {
+        if (SelectedItemUI.InventoryItem != null) return;
+
+        SelectedItemUI.gameObject.SetActive(itemUI != null);
+        SelectedItemUI.InventoryItem = itemUI.InventoryItem;
+    }
+
 
     public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab, IInteractableInventory interactable = null, string title = null) {
         if (itemContainer != null) _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Other);
@@ -159,15 +170,13 @@ public class UICanvas : MonoBehaviour
         }
     }
 
-    public void DropItem(Vector3 position) {
+    public void DropItem() {
         if (SelectedItemUI.InventoryItem == null) return;
-        ItemEntityManager.Instance.SpawnItemEntity(SelectedItemUI.InventoryItem.ItemData, SelectedItemUI.InventoryItem.Amount, position);
+
+        PlayerController.LivingEntity.DropItem(SelectedItemUI.InventoryItem);
+
         SelectedItemUI.InventoryItem = null;
         EventBus.ItemPlacedEvent?.Invoke();
-    }
-
-    public void DropItem() {
-        DropItem(Player.transform.position + Player.transform.forward * 2);
     }
 
     private void openInventory(bool value) {
@@ -185,10 +194,11 @@ public class UICanvas : MonoBehaviour
             _inventoryCanvas.OpenCurrentTab();
         } else {
             if (SelectedItemUI.InventoryItem != null) {
-                DropItem(Player.transform.position + Player.transform.forward * 2);
+                DropItem();
             }
 
-            _inventoryCanvasGroup.DOFade(0, 0.25f).OnComplete(() => _inventoryCanvasGO.SetActive(false));
+            // _inventoryCanvasGroup.DOFade(0, 0.25f).OnComplete(() => _inventoryCanvasGO.SetActive(false));
+            _inventoryCanvasGroup.DOFade(0, 0.25f);
             _inventoryCanvasGroup.interactable = false;
             _inventoryCanvasGroup.blocksRaycasts = false;
             SetOtherInventory(null, null);

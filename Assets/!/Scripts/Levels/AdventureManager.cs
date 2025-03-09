@@ -40,7 +40,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
         _mesh = GetComponent<MeshFilter>();
 
         // Get game manager
-        _gm = GameManager.instance;
+        _gm = GameManager.Instance;
 
         // Generate map and render it
         _map = MapGenerator.GetMap(width, height, iterations, DefaultTileWidth);

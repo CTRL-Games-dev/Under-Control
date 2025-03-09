@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SimpleInventory : EntityInventory
 {
@@ -8,27 +9,38 @@ public class SimpleInventory : EntityInventory
     public ItemContainer ItemContainer;
     public override Vector2Int Size => ItemContainer.Size;
 
+    // Does not guarantee that inventory WAS indeed changes
+    public UnityEvent OnInventoryChanged;
+
     public override bool AddItem(ItemData itemData, int amount, Vector2Int position, bool rotated = false) {
-        return ItemContainer.AddItem(itemData, amount, position, rotated);
+        bool wasAdded = ItemContainer.AddItem(itemData, amount, position, rotated);
+        if (wasAdded) OnInventoryChanged?.Invoke();
+        return wasAdded;
     }
 
     public override bool AddItem(ItemData itemData, int amount, Vector2Int position) {
-        return ItemContainer.AddItem(itemData, amount, position);
+        bool wasAdded = ItemContainer.AddItem(itemData, amount, position);
+        if (wasAdded) OnInventoryChanged?.Invoke();
+        return wasAdded;
     }
 
     public override bool AddItem(ItemData itemData, int amount) {
-        return ItemContainer.AddItem(itemData, amount);
+        bool wasAdded = ItemContainer.AddItem(itemData, amount);
+        if (wasAdded) OnInventoryChanged?.Invoke();
+        return wasAdded;
     }
 
     public override bool AddItem(ItemData itemData) {
-        return ItemContainer.AddItem(itemData);
+        bool wasAdded = ItemContainer.AddItem(itemData);
+        if (wasAdded) OnInventoryChanged?.Invoke();
+        return wasAdded;
     }
 
     public override InventoryItem GetInventoryItem(Vector2Int position) {
         return ItemContainer.GetInventoryItem(position);
     }
 
-    public override  List<InventoryItem> GetItems() {
+    public override List<InventoryItem> GetItems() {
         return ItemContainer.GetItems();
     }
 
@@ -45,14 +57,19 @@ public class SimpleInventory : EntityInventory
     }
 
     public override bool RemoveInventoryItem(InventoryItem inventoryItem) {
-        return ItemContainer.RemoveInventoryItem(inventoryItem);
+        bool wasRemoved = ItemContainer.RemoveInventoryItem(inventoryItem);
+        if (wasRemoved) OnInventoryChanged?.Invoke();
+        return wasRemoved;
     }
 
     public override bool RemoveItemAt(Vector2Int position) {
-        return ItemContainer.RemoveItemAt(position);
+        bool wasRemoved = ItemContainer.RemoveItemAt(position);
+        if (wasRemoved) OnInventoryChanged?.Invoke();
+        return wasRemoved;
     }
 
     public override void Clear() {
         ItemContainer.Clear();
+        OnInventoryChanged?.Invoke();
     }
 }
