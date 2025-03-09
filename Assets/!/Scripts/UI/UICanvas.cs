@@ -55,6 +55,7 @@ public class UICanvas : MonoBehaviour
     [SerializeField] private GameObject _inventoryCanvasGO;
     [SerializeField] private GameObject _alwayOnTopCanvasGO;
     [SerializeField] private GameObject _mainMenuCanvasGO;
+    [SerializeField] private GameObject _deathScreenCanvasGO;
 
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI _coinsText;
@@ -64,6 +65,7 @@ public class UICanvas : MonoBehaviour
     private ItemContainer _currentOtherInventory;
     private InventoryCanvas _inventoryCanvas;
     private MainMenu _mainMenu;
+    private DeathScreen _deathScreen;
     private CanvasGroup _inventoryCanvasGroup;
     private IInteractableInventory _lastInteractableInventory;
 
@@ -91,6 +93,7 @@ public class UICanvas : MonoBehaviour
         _inventoryCanvas = _inventoryCanvasGO.GetComponent<InventoryCanvas>();
         _inventoryCanvasGroup = _inventoryCanvasGO.GetComponent<CanvasGroup>();
         _mainMenu = _mainMenuCanvasGO.GetComponent<MainMenu>();
+        _deathScreen = _deathScreenCanvasGO.GetComponent<DeathScreen>();
         OnCoinsChange(0);
         
         _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Armor);
@@ -231,6 +234,14 @@ public class UICanvas : MonoBehaviour
         _mainMenu.CloseMenu();
         _HUDCanvasGO.SetActive(true);
         _alwayOnTopCanvasGO.SetActive(true);
+    }
+
+    public void OpenDeathScreen() {
+        PlayerController.InputDisabled = true;
+        _deathScreen.ShowDeathScreen();
+        _HUDCanvasGO.SetActive(false);
+        _alwayOnTopCanvasGO.SetActive(false);
+        _inventoryCanvasGO.SetActive(false);
     }
 
 
