@@ -32,6 +32,7 @@ public class UICanvas : MonoBehaviour
         }
     }
     public HumanoidInventory PlayerInventory { get => PlayerLivingEntity.Inventory as HumanoidInventory; }
+    public Camera MainCamera;
 
     // UI elements
     private bool _isInventoryOpen = false;
@@ -76,6 +77,7 @@ public class UICanvas : MonoBehaviour
             return;
         }
         Instance = this;
+        
     }
 
     private void Start() {
@@ -89,6 +91,7 @@ public class UICanvas : MonoBehaviour
         _inventoryCanvas = _inventoryCanvasGO.GetComponent<InventoryCanvas>();
         _inventoryCanvasGroup = _inventoryCanvasGO.GetComponent<CanvasGroup>();
         _mainMenu = _mainMenuCanvasGO.GetComponent<MainMenu>();
+        Debug.Log(_mainMenu);
         OnCoinsChange(0);
         
         _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Armor);
@@ -226,6 +229,7 @@ public class UICanvas : MonoBehaviour
 
     public void CloseMainMenu() {
         PlayerController.InputDisabled = false;
+        Debug.Log(_mainMenu);
         _mainMenu.CloseMenu();
         _HUDCanvasGO.SetActive(true);
         _alwayOnTopCanvasGO.SetActive(true);

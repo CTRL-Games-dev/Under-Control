@@ -26,11 +26,10 @@ public class MainMenu : MonoBehaviour
     }
 
     public void PlayGame() {
-        CloseMenu();
+        UICanvas.Instance.CloseMainMenu();
     }
 
     public void QuitGame() {
-        Debug.Log("Quit Game");
         Application.Quit();
     }
 
@@ -48,6 +47,7 @@ public class MainMenu : MonoBehaviour
     }
 
     public void CloseMenu() {
+        Debug.Log("Close Menu");
         killTweens();
         CameraManager.Instance.SwitchCamera(CameraManager.Instance.PlayerTopDownCamera);
         _quitBtnRect.DOAnchorPosY(-150, 0.25f).OnComplete(() => {

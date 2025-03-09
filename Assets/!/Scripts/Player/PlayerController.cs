@@ -215,7 +215,7 @@ public class PlayerController : MonoBehaviour
     }
 
     private bool tryInteract() {
-        Ray ray = CameraObject.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+        Ray ray = UICanvas.Instance.MainCamera.ScreenPointToRay(Input.mousePosition);
         if (!Physics.Raycast(ray, out RaycastHit hit)) {
             return false;
         }
