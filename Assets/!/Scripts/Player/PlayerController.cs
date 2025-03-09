@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
@@ -66,7 +67,6 @@ public class PlayerController : MonoBehaviour
     // State
     private Vector2 _movementInputVector = Vector2.zero;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
-    private List<LivingEntity> _hitEntities = new List<LivingEntity>();
 
     private readonly int _speedHash = Animator.StringToHash("speed");
     private readonly int _dodgeHash = Animator.StringToHash("dodge");
@@ -193,6 +193,10 @@ public class PlayerController : MonoBehaviour
     }
 
     private void interact(bool primary) {
+        if(EventSystem.current.IsPointerOverGameObject()) {
+            return;
+        }
+
         bool interacted = tryInteract();
         
         if(interacted) return;
@@ -235,52 +239,15 @@ public class PlayerController : MonoBehaviour
         Animator.SetTrigger(_heavyAttackHash);
     }
 
-    public void OnWeaponHit(LivingEntity target) {
-        if(target == LivingEntity) return;
-
-        if(CurrentWeapon.DamageMax <= 0) {
-            Debug.LogWarning($"DamageMax is zero or negative. Current weapon is {CurrentWeapon.DisplayName}");
-            return;
-        }
-
-        if(CurrentWeapon.DamageMin < 0) {
-            Debug.LogWarning($"DamageMin is negative. Current weapon is {CurrentWeapon.DisplayName}");
-            return;
-        }
-
-        if(CurrentWeapon.DamageMax < CurrentWeapon.DamageMin) {
-            Debug.LogWarning($"DamageMax ({CurrentWeapon.DamageMax}) is less than DamageMin ({CurrentWeapon.DamageMin}). Current weapon is {CurrentWeapon.DisplayName}");
-            return;
-        }
-
-        if(_hitEntities.Contains(target)) {
-            Debug.LogWarning($"Tried hitting {target.DisplayName} with {CurrentWeapon.DisplayName} but it was already hit");
-            return;
-        }
-
-        // Debug.Log($"Hitting {target.DisplayName} with {CurrentWeapon.DisplayName}");
-
-        float damageValue = UnityEngine.Random.Range(CurrentWeapon.DamageMin, CurrentWeapon.DamageMax);
-
-        target.TakeDamage(new Damage{
-            Type = CurrentWeapon.DamageType,
-            Value = damageValue
-        }, LivingEntity);
-
-        _hitEntities.Add(target);
-    }
-
     public void OnInventoryChanged() {
         WeaponHolder.UpdateWeapon(CurrentWeapon);
     }
 
     public void OnAttackAnimationStart() {
-        _hitEntities.Clear();
         WeaponHolder.BeginAttack();
     }
 
     public void OnAttackAnimationEnd() {
         WeaponHolder.EndAttack();
-        _hitEntities.Clear();
     }
 }
