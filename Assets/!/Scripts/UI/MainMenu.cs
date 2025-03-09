@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,8 +7,10 @@ public class MainMenu : MonoBehaviour
 {
     private CanvasGroup _canvasGroup;
     [SerializeField] private GameObject _titleImg, _playBtn, _quitBtn;
+    [SerializeField] private CinemachineCamera _mainMenuCamera;
     private RectTransform _titleImgRect, _playBtnRect, _quitBtnRect;
     private Image _img;
+    
 
     private void Awake() {
         _canvasGroup = GetComponent<CanvasGroup>();   
@@ -15,6 +18,11 @@ public class MainMenu : MonoBehaviour
         _playBtnRect = _playBtn.GetComponent<RectTransform>();
         _quitBtnRect = _quitBtn.GetComponent<RectTransform>();
         _img = _titleImg.GetComponent<Image>();
+    }
+
+    private void Start() {
+        CameraManager.Instance.StartCamera = _mainMenuCamera;
+
     }
 
     public void PlayGame() {
@@ -28,7 +36,7 @@ public class MainMenu : MonoBehaviour
 
     public void OpenMenu() {
         killTweens();
-        CameraManager.Instance.SwitchCamera(CameraManager.CameraType.MainMenu);
+        CameraManager.Instance.SwitchCamera(_mainMenuCamera);
         gameObject.SetActive(true);
         _canvasGroup.DOFade(1, 2f);
         _playBtnRect.DOAnchorPosY(330, 0.25f).OnComplete(() => {
@@ -41,7 +49,7 @@ public class MainMenu : MonoBehaviour
 
     public void CloseMenu() {
         killTweens();
-        CameraManager.Instance.SwitchCamera(CameraManager.CameraType.PlayerTopDown);
+        CameraManager.Instance.SwitchCamera(CameraManager.Instance.PlayerTopDownCamera);
         _quitBtnRect.DOAnchorPosY(-150, 0.25f).OnComplete(() => {
             _playBtnRect.DOAnchorPosY(0, 0.25f);
         });

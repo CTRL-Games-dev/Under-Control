@@ -207,7 +207,7 @@ public class UICanvas : MonoBehaviour
     }
 
     public void OpenMainMenu() {
-        PlayerController.InputDisabled = false;
+        PlayerController.InputDisabled = true;
         _mainMenu.OpenMenu();
         _HUDCanvasGO.SetActive(false);
         _alwayOnTopCanvasGO.SetActive(false);
@@ -215,7 +215,7 @@ public class UICanvas : MonoBehaviour
     }
 
     public void CloseMainMenu() {
-        PlayerController.InputDisabled = true;
+        PlayerController.InputDisabled = false;
         _mainMenu.CloseMenu();
         _HUDCanvasGO.SetActive(true);
         _alwayOnTopCanvasGO.SetActive(true);

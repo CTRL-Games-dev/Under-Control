@@ -4,51 +4,42 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    public enum CameraType {
-        PlayerTopDown,
-        MainMenu
-    }
-
-    [SerializeField] private List<CinemachineCamera> _cinemachineCameras;
-    [SerializeField] private CinemachineCamera _playerTopDownCamera;
-    [SerializeField] private CinemachineCamera _mainMenuCamera;
+    private List<CinemachineCamera> _cinemachineCameras;
+    public CinemachineCamera PlayerTopDownCamera;
 
     public CinemachineCamera StartCamera;
     private CinemachineCamera _currentCamera;
 
     public static CameraManager Instance;
 
-    void Start() {
+    private void Awake() {
+        if (Instance != null) {
+            Destroy(this);
+            return;
+        }
         Instance = this;
+    }
+
+    private void Start() {
+        _cinemachineCameras = new List<CinemachineCamera>(FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None));
         
+        StartCamera = (StartCamera == null) ? PlayerTopDownCamera : StartCamera;
         _currentCamera = StartCamera;
 
-        foreach (var camera in _cinemachineCameras) {
-            camera.Priority = camera == _currentCamera ? 20 : 10;
-        }
+        setCamerasPriority();
     }
 
-    public void SwitchCamera(CameraType type) {
-        switch (type) {
-            case CameraType.PlayerTopDown:
-                _currentCamera = _playerTopDownCamera;
-                break;
-            case CameraType.MainMenu:
-                _currentCamera = _mainMenuCamera;
-                break;
-        }
+    public void SwitchCamera(CinemachineCamera camera) {
+        _currentCamera = camera;
 
-        foreach (var camera in _cinemachineCameras) {
-            camera.Priority = camera == _currentCamera ? 20 : 10;
-        }
+        setCamerasPriority();
     }
 
-    public bool AddCamera(CinemachineCamera camera) {
-        if (_cinemachineCameras.Contains(camera)) {
-            return false;
-        }
+    private void setCamerasPriority() {
+        CinemachineCamera[] cameras = _cinemachineCameras.ToArray();
 
-        _cinemachineCameras.Add(camera);
-        return true;
+        for (int i = 0; i < cameras.Length; i++) {
+            cameras[i].Priority = (cameras[i] == _currentCamera) ? 20 : 10;
+        }
     }
 }
