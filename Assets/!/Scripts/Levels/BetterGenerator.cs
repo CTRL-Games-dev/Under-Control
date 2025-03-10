@@ -62,15 +62,20 @@ public class BetterGenerator : MonoBehaviour
             Debug.Log("Spawned location at x->" + l.X + " y->" + l.Y);
         }
 
+
+
         // Grid is used to determine where to spawn trees
-        int gridWidth = (int)Vector2.Distance(new(minX,0), new(maxX,0));
-        int gridHeight = (int)Vector2.Distance(new(0,minY), new(0,maxY));
-        bool[,] grid = new bool[gridWidth, gridHeight];
+        int gridPadding = 5;
+        int gridWidth = (int)Vector2.Distance(new(minX,0), new(maxX,0)) + (gridPadding*2);
+        int gridHeight = gridWidth;
+        // int gridHeight = (int)Vector2.Distance(new(0,minY), new(0,maxY));
+        
+        bool[,] grid = new bool[gridWidth + (gridPadding*2), gridHeight + (gridPadding*2)];
         List<Vector2> locationCenters = new();
 
         // Since coordinates can be negative and we use an array
         // we need to have some kind of an offset to index this array
-        Vector2 offset = new(minX, minY);
+        Vector2 offset = new(minX-gridPadding, minY-gridPadding);
 
         // Remove trees from places where locations are
         // and calculate their centers in the meantime
@@ -93,22 +98,24 @@ public class BetterGenerator : MonoBehaviour
         DigOutPaths(locationCenters, grid, offset);
 
         // Load forest tile
-        GameObject[] tile = Resources.LoadAll("Prefabs/Forest/ForestTiles") as GameObject[];
-         Debug.Log("TIles: " + tile.Length);
+        GameObject[] tile = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestTiles");
+        int num = 0;
         for(int x = 0; x < gridWidth; x++)
         {
             for(int y = 0; y < gridHeight; y++)
             {
+                if(grid[x,y]) {num++; continue;}
                 GameObject.Instantiate(tile[0], new(x + 0.5f, 0, y + 0.5f), Quaternion.identity);
             }
         }
+        Debug.Log("Number of not used tiles: " + num);
     }
 
     private void DigOutPaths(List<Vector2> locationCenters, bool[,] grid, Vector2 gridOffset) 
     {
         // Create "sigma triangle"
         Triangle st = Triangle.GetSuperTriangle(locationCenters);
-        Debug.Log("Created sigma triangle: " + st.vA + " " + st.vB + " " + st.vC);
+        // Debug.Log("Created sigma triangle: " + st.vA + " " + st.vB + " " + st.vC);
 
         List<Triangle> triangles = new();
         triangles.Add(st);
@@ -116,11 +123,11 @@ public class BetterGenerator : MonoBehaviour
         // Triangulate each vertex (magic)
         foreach (var vertex in locationCenters)
         {
-            Debug.Log("=== ITERATION ===");
-            Debug.Log("Current vertex = " + vertex);
+            // Debug.Log("=== ITERATION ===");
+            // Debug.Log("Current vertex = " + vertex);
             triangles = AddVertex(vertex, triangles);
         }
-        Debug.Log("Number of triangles: " + triangles.Count);
+        // Debug.Log("Number of triangles: " + triangles.Count);
 
         // Remove triangles that share edges with sigma triangle (they are not so sigma)
         triangles = triangles.Where(t => 
@@ -131,22 +138,10 @@ public class BetterGenerator : MonoBehaviour
 
         // === MST ===
 
-        Debug.Log("Number of triangles after removal: " + triangles.Count);
-
-        foreach(var t in triangles)
-        {
-            Debug.Log("Triangle: " + t.vA + t.vB + t.vC);
-        }
-
         List<Edge> uniqueEdges = RemoveDuplicateEdges(triangles);
 
-        foreach(var e in uniqueEdges)
-        {
-            Debug.Log("Unique edge: " + e.v0 + e.v1);
-        }
-
         #region MST
-        Debug.Log("Number of unique edges" + uniqueEdges.Count);
+        // Debug.Log("Number of unique edges" + uniqueEdges.Count);
         Edge firstEdge = uniqueEdges.Aggregate(uniqueEdges[0], (smallest, next) => {
             return smallest.Length > next.Length ? next : smallest;
         });
@@ -169,7 +164,7 @@ public class BetterGenerator : MonoBehaviour
             {
                 if(!shortest.IsFullyConnected(usedEdges)) {
                     shortest.MarkAsUsed();
-                    Debug.Log(":3");
+                    // Debug.Log(":3");
                     break;
                 }
                 //Debug.Log(":( " + num);
@@ -178,50 +173,71 @@ public class BetterGenerator : MonoBehaviour
         Debug.Log("Fully connected edges: " + uniqueEdges.Where(e => e.Used).Count());
         foreach(var e in uniqueEdges.Where(e => e.Used))
         {
-            Debug.Log("Final edge: " + e.v0 + e.v1);
+            Debug.LogFormat("vector({0},{1})", e.v0, e.v1);
         }
         #endregion
 
         // Small chance for other edges also to be used
-        foreach(var e in uniqueEdges.Where(e => !e.Used))
-        {
-            if(UnityEngine.Random.Range(0, 2) == 1)
-                e.MarkAsUsed();
-        }
+        // foreach(var e in uniqueEdges.Where(e => !e.Used))
+        // {
+        //     if(UnityEngine.Random.Range(0, 2) == 1) {
+        //         e.MarkAsUsed();
+        //         Debug.LogFormat("Random edge added: ({0})-({1})", e.v0, e.v1);
+        //     }
+        // }
 
         #region Rasterization
 
-        Debug.Log("Dimensions of grid: x" + grid.GetLength(0));
-        Debug.Log("Dimensions of grid: y" + grid.GetLength(1));
+        // Debug.Log("Dimensions of grid: x" + grid.GetLength(0));
+        // Debug.Log("Dimensions of grid: y" + grid.GetLength(1));
 
+        int num = 0;
         foreach(var line in uniqueEdges.Where(e => e.Used))
         {
+            num++;
             Vector2 point1 = line.v0.x < line.v1.x ? line.v0 : line.v1;
             Vector2 point2 = line.v0.x > line.v1.x ? line.v0 : line.v1;
 
-            // int y1 = (int)Math.Floor(line.v0.y < line.v1.y ? line.v0.y : line.v1.y);
-            // int y2 = (int)Math.Floor(line.v0.y > line.v1.y ? line.v0.y : line.v1.y);
-        
+            Debug.Log("=== LINE " + num + " ===");
+            Debug.Log("First point " + point1);
+            Debug.Log("Second point " + point2);
 
             float a = (point2.y - point1.y)/(point2.x - point1.x);
             // y = ax + b ----> b = y - ax
             float b = point1.y-(a * point1.x);
-            for(int i = (int)Math.Floor(point1.x); i < (int)Math.Floor(point2.x)+1; i++)
+
+            int yLength = (int)Math.Abs(Math.Ceiling(a));
+            int ySymbol = a > 0 ? 1 : -1;
+
+            Debug.LogFormat("yLen = {0}, a = {1}, b = {2}", yLength, a, b);
+
+            for(int ix = (int)Math.Floor(point1.x); ix < (int)Math.Floor(point2.x); ix++)
             {
-                int x = i;
-                int y = (int)Math.Floor(a*x + b);
+                int x = ix;
+                int indexX = x - (int)gridOffset.x;
 
-                // int indexX = x - (int)gridOffset.x;
-                // int indexY = y - (int)gridOffset.y;
+                for(int iy = 0; iy < yLength; iy++)
+                {
+                    int y = (int)Math.Floor(a*x + b)+(iy*ySymbol);
+                    int indexY = y - (int)gridOffset.y;
 
-                int indexX = 6 + (int)gridOffset.x;
-                int indexY = 6 + (int)gridOffset.y;
-
-                Debug.Log("Current x " + x + ", index x " + indexX);
-                Debug.Log("Current y " + y + ", index y " + indexY);
-                grid[indexX,indexY] = true;
+                    // Debug.Log("Current x " + x + ", index x " + indexX);
+                    Debug.LogFormat("Actual coordinates: [{0},{1}]", x, y);
+                    Debug.LogFormat("Index: [{0},{1}]", indexX, indexY);
+                    grid[indexX,indexY] = true;
+                }
             }
         }
+
+        num = 0;
+        for(int x = 0; x < grid.GetLength(0); x++)
+        {
+            for(int y = 0; y < grid.GetLength(1); y++)
+            {
+                if(grid[x,y]) {num++; continue;}
+            }
+        }
+        Debug.Log("Number of not used tiles (inside mst): " + num);
 
         #endregion
     }
@@ -244,41 +260,6 @@ public class BetterGenerator : MonoBehaviour
         return RemoveDuplicateEdges(edges);
     }
 
-    // class Vertex 
-    // {
-    //     public Vector2 pos;
-    //     private bool _visited;
-    //     public Vertex(Vector2 pos)
-    //     {
-    //         this.pos = pos;
-    //     }
-    //     // Returns true, if was never visited
-    //     public bool SetVisited()
-    //     {
-    //         if(_visited) return false;
-    //         _visited = true;
-    //         return true;
-    //     }
-    //     public bool WasVisited()
-    //     {
-    //         return _visited;
-    //     }
-    // }
-
-    // class MSTEdge
-    // {
-    //     public Vertex vA, vB;
-    //     public float Value;
-        
-    //     public MSTEdge(Vertex vA, Vertex vB)
-    //     {
-    //         this.vA = vA;
-    //         this.vB = vB;
-
-    //         this.Value = Vector2.Distance(vA.pos, vB.pos);
-    //     }
-    // }
-
     #endregion
 
     #region Triangulation helper functions
@@ -288,9 +269,9 @@ public class BetterGenerator : MonoBehaviour
 
         // Remove triangles with circumcircles containing the vertex
         triangles = triangles.Where(t => {
-            Debug.Log("triangle center: " + t.vCenter);
+            // Debug.Log("triangle center: " + t.vCenter);
             if (t.InCircumcircle(vertex)) {
-                Debug.Log("Bad triangle!");
+                // Debug.Log("Bad triangle!");
                 edges.Add(new Edge(t.vA, t.vB));
                 edges.Add(new Edge(t.vB, t.vC));
                 edges.Add(new Edge(t.vC, t.vA));
@@ -298,7 +279,7 @@ public class BetterGenerator : MonoBehaviour
             }
             return true;
         }).ToList();
-        Debug.Log("Number of triangles inside iteration: " + triangles.Count);
+        // Debug.Log("Number of triangles inside iteration: " + triangles.Count);
 
         // Get unique edges
         List<Edge> uniqueEdges = GetUniqueEdges(edges);
