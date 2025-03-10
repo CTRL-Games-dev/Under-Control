@@ -56,6 +56,7 @@ public class WeaponHolder : MonoBehaviour
 
     public void OnHit(LivingEntity victim) {
         if(PreventSelfDamage && victim == Self) return;
+        if(!victim.Guild.IsHostileTowards(Self.Guild)) return;
 
         if(_currentWeaponData.DamageMax <= 0) {
             Debug.LogWarning($"{Self.DebugName}: DamageMax is zero or negative. Current weapon is {_currentWeaponData.DisplayName}");

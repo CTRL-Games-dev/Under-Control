@@ -8,13 +8,13 @@ using Unity.Properties;
 using UnityEngine.AI;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Go To Random Spot In Radius", story: "[Agent] goes to random spot in radius [Radius]", category: "Action/Navigation", id: "93b1e61da4728c05a0a1887b06ceb284")]
+[NodeDescription(name: "Go To Random Spot In Radius", story: "[Agent] goes to random spot in radius [Radius]", category: "Action/Fixed Navigation", id: "93b1e61da4728c05a0a1887b06ceb284")]
 public partial class GoToRandomSpotInRadiusAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Agent;
     [SerializeReference] public BlackboardVariable<float> Radius = new BlackboardVariable<float>(1.0f);
     [SerializeReference] public BlackboardVariable<float> Speed = new BlackboardVariable<float>(1.0f);
-    [SerializeReference] public BlackboardVariable<float> DistanceThreshold = new BlackboardVariable<float>(0.2f);
+    [SerializeReference] public BlackboardVariable<float> StoppingDistance = new BlackboardVariable<float>(0.2f);
 
     private float _previousStoppingDistance;
     private NavMeshAgent _navMeshAgent;
@@ -32,7 +32,7 @@ public partial class GoToRandomSpotInRadiusAction : Action
             return Status.Failure;
         }
 
-        if (_navMeshAgent.remainingDistance <= DistanceThreshold.Value) {
+        if (_navMeshAgent.remainingDistance <= StoppingDistance.Value) {
             return Status.Success;
         }
 
@@ -73,7 +73,7 @@ public partial class GoToRandomSpotInRadiusAction : Action
 
         Vector3 locationPosition = hit.position;
 
-        if (GetDistanceToLocation(locationPosition) <= DistanceThreshold) {
+        if (GetDistanceToLocation(locationPosition) <= StoppingDistance) {
             return Status.Success;
         }
 
@@ -83,7 +83,7 @@ public partial class GoToRandomSpotInRadiusAction : Action
 
         _navMeshAgent.speed = Speed;
         _previousStoppingDistance = _navMeshAgent.stoppingDistance;
-        _navMeshAgent.stoppingDistance = DistanceThreshold;
+        _navMeshAgent.stoppingDistance = StoppingDistance;
         _navMeshAgent.SetDestination(locationPosition);
 
         return Status.Running;
