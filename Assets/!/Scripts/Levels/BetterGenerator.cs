@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Burst.Intrinsics;
 using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
-using UnityEditorInternal;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.InputSystem.LowLevel;
 
 public struct Tile
     {
@@ -93,10 +90,21 @@ public class BetterGenerator : MonoBehaviour
         }
 
         // Create Passageways between locations
-        DigOutPaths(locationCenters);
+        DigOutPaths(locationCenters, grid, offset);
+
+        // Load forest tile
+        GameObject[] tile = Resources.LoadAll("Prefabs/Forest/ForestTiles") as GameObject[];
+         Debug.Log("TIles: " + tile.Length);
+        for(int x = 0; x < gridWidth; x++)
+        {
+            for(int y = 0; y < gridHeight; y++)
+            {
+                GameObject.Instantiate(tile[0], new(x + 0.5f, 0, y + 0.5f), Quaternion.identity);
+            }
+        }
     }
 
-    private void DigOutPaths(List<Vector2> locationCenters) 
+    private void DigOutPaths(List<Vector2> locationCenters, bool[,] grid, Vector2 gridOffset) 
     {
         // Create "sigma triangle"
         Triangle st = Triangle.GetSuperTriangle(locationCenters);
@@ -138,40 +146,83 @@ public class BetterGenerator : MonoBehaviour
         }
 
         #region MST
-        // Debug.Log("Number of unique edges" + uniqueEdges.Count);
-        // Edge firstEdge = uniqueEdges.Aggregate(uniqueEdges[0], (smallest, next) => {
-        //     return smallest.Length > next.Length ? next : smallest;
-        // });
-        // firstEdge.MarkAsUsed();
+        Debug.Log("Number of unique edges" + uniqueEdges.Count);
+        Edge firstEdge = uniqueEdges.Aggregate(uniqueEdges[0], (smallest, next) => {
+            return smallest.Length > next.Length ? next : smallest;
+        });
+        firstEdge.MarkAsUsed();
 
-        // // Do this as long as there are unconnected edges
-        // // If edge is not connected from both sides, this means that at least one of it's points is not connected
-        // while(uniqueEdges.FindAll(e => e.IsFullyConnected(uniqueEdges)).Count > 0)
-        // {
-        //     // Get all edges that are connected to already used edges 
-        //     // and set sort them in order (so if one is not okay, we can skip it and go to the next one)
-        //     List<Edge> connectedEdges = uniqueEdges
-        //         .FindAll(e => !e.Used || e.IsOnlyPartiallyConnected(uniqueEdges))
-        //         .OrderBy(e => e.Length).ToList();
+        // Do this as long as there are unconnected edges
+        // If edge is not connected from both sides, this means that at least one of it's points is not connected
+        List<Edge> usedEdges = uniqueEdges.Where(e => e.Used).ToList(); // Used in some later computations
+        while(uniqueEdges.FindAll(e => !e.IsConnected(usedEdges)).Count > 0)
+        {
+            usedEdges = uniqueEdges.Where(e => e.Used).ToList(); // Used in some later computations
 
-        //     foreach(var shortest in connectedEdges)
-        //     {
-        //         // Check if it's points aren't already connected
-        //         bool flag = true;
-        //         foreach(var e in uniqueEdges.FindAll(e => shortest.ConnectedWith(e)))
-        //         {
-        //             // If at least one of the other edges connected to this new edge
-        //             // this means that new point is already connected, so skip
-        //             if(e.Used) {
-        //                 flag = false;
-        //                 break;
-        //             }
-        //         }
+            // Get all edges that are connected to already used edges 
+            // and set sort them in order (so if one is not okay, we can skip it and go to the next one)
+            List<Edge> connectedEdges = uniqueEdges
+                .FindAll(e => !e.Used && e.IsOnlyPartiallyConnected(usedEdges))
+                .OrderBy(e => e.Length).ToList();
 
-        //         // If shortest edge acually connected new point, then mark it as used
-        //         if(flag) shortest.MarkAsUsed();
-        //     }
-        // }
+            foreach(var shortest in connectedEdges)
+            {
+                if(!shortest.IsFullyConnected(usedEdges)) {
+                    shortest.MarkAsUsed();
+                    Debug.Log(":3");
+                    break;
+                }
+                //Debug.Log(":( " + num);
+            }
+        }
+        Debug.Log("Fully connected edges: " + uniqueEdges.Where(e => e.Used).Count());
+        foreach(var e in uniqueEdges.Where(e => e.Used))
+        {
+            Debug.Log("Final edge: " + e.v0 + e.v1);
+        }
+        #endregion
+
+        // Small chance for other edges also to be used
+        foreach(var e in uniqueEdges.Where(e => !e.Used))
+        {
+            if(UnityEngine.Random.Range(0, 2) == 1)
+                e.MarkAsUsed();
+        }
+
+        #region Rasterization
+
+        Debug.Log("Dimensions of grid: x" + grid.GetLength(0));
+        Debug.Log("Dimensions of grid: y" + grid.GetLength(1));
+
+        foreach(var line in uniqueEdges.Where(e => e.Used))
+        {
+            Vector2 point1 = line.v0.x < line.v1.x ? line.v0 : line.v1;
+            Vector2 point2 = line.v0.x > line.v1.x ? line.v0 : line.v1;
+
+            // int y1 = (int)Math.Floor(line.v0.y < line.v1.y ? line.v0.y : line.v1.y);
+            // int y2 = (int)Math.Floor(line.v0.y > line.v1.y ? line.v0.y : line.v1.y);
+        
+
+            float a = (point2.y - point1.y)/(point2.x - point1.x);
+            // y = ax + b ----> b = y - ax
+            float b = point1.y-(a * point1.x);
+            for(int i = (int)Math.Floor(point1.x); i < (int)Math.Floor(point2.x)+1; i++)
+            {
+                int x = i;
+                int y = (int)Math.Floor(a*x + b);
+
+                // int indexX = x - (int)gridOffset.x;
+                // int indexY = y - (int)gridOffset.y;
+
+                int indexX = 6 + (int)gridOffset.x;
+                int indexY = 6 + (int)gridOffset.y;
+
+                Debug.Log("Current x " + x + ", index x " + indexX);
+                Debug.Log("Current y " + y + ", index y " + indexY);
+                grid[indexX,indexY] = true;
+            }
+        }
+
         #endregion
     }
 
@@ -311,21 +362,49 @@ public class BetterGenerator : MonoBehaviour
                 (v0 == other.v1 && v1 == other.v0);
         }
 
+        // public void MarkAsRedudnant()
+        // {
+        //     NotNeeded = true;
+        // }
+
+        // Variables and methods used for MST
+        public float Length;
+        public bool Used { get; private set; } = false; // Used to say that this edge is being used
+
+        // Used to mark this path as no longer useful
+        // public bool NotNeeded { get; private set; } = false ;
+
         // This function only checks if other edge is connected with this edge
         public bool ConnectedWith(Edge other)
         {
             return v0 == other.v0 || v1 == other.v1 || 
                 v0 == other.v1 || v1 == other.v0;
         }
+
         // This function only checks edge is connected at least from one side
+        public bool IsConnected(List<Edge> otherEdges)
+        {
+            bool vA = false, vB = false;
+            foreach(var other in otherEdges)
+            {
+                if(this == other ) continue;
+                if(other.v0 == v0 || other.v0 == v1) vA = true;
+                if(other.v1 == v0 || other.v1 == v1) vB = true;
+            }
+            // Debug.Log("vA = " + vA + ", vB = " + vB);
+            return vA || vB;
+        }
+        // This function only checks edge is connected only from one side
         public bool IsOnlyPartiallyConnected(List<Edge> otherEdges)
         {
             bool vA = false, vB = false;
             foreach(var other in otherEdges)
             {
-                if(other.v0 == v0 || other.v1 == v0) vA = true;
-                if(other.v0 == v1 || other.v1 == v1) vB = true;
+                if(this == other ) continue;
+                if(other.v0 == v0 || other.v0 == v1) vA = true;
+                if(other.v1 == v0 || other.v1 == v1) vB = true;
             }
+            // Debug.Log("vA = " + vA + ", vB = " + vB);
             return vA != vB;
         }
         // This function only checks edge is connected from both sides
@@ -334,6 +413,7 @@ public class BetterGenerator : MonoBehaviour
             bool vA = false, vB = false;
             foreach(var other in otherEdges)
             {
+                if(this == other) continue;
                 if(other.v0 == v0 || other.v1 == v0) vA = true;
                 if(other.v0 == v1 || other.v1 == v1) vB = true;
             }
@@ -343,19 +423,8 @@ public class BetterGenerator : MonoBehaviour
         public void MarkAsUsed()
         {
             Used = true;
-            NotNeeded = true;
+            // NotNeeded = true;
         }
-
-        public void MarkAsRedudnant()
-        {
-            NotNeeded = true;
-        }
-
-        // Variables and methods used for MST
-        public float Length;
-        public bool Used { get; private set; } = false; // Used to say that this edge is being used
-        // Used to mark this path as no longer useful
-        public bool NotNeeded { get; private set; } = false ;
     }
 
     private class Triangle
