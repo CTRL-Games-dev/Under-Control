@@ -65,13 +65,14 @@ public class PauseScreen : MonoBehaviour
         });
     }
 
-    public void HidePauseMenu() {
+    public Tween HidePauseMenu() {
+        gameObject.SetActive(true);
         StopCoroutine(slowdownTime());
         StartCoroutine(speedupTime());
         killTweens();
 
         _bgImage.DOFade(0f, 1f).SetUpdate(true);
-        _blackBarRect.DOAnchorPosY(0, 1).SetEase(Ease.InQuint).SetUpdate(true).OnComplete(() => {
+        return _blackBarRect.DOAnchorPosY(0, 1).SetEase(Ease.InQuint).SetUpdate(true).OnComplete(() => {
             resetBtnPositions();
             resetBtnAlphas();
             gameObject.SetActive(false);
@@ -152,7 +153,9 @@ public class PauseScreen : MonoBehaviour
     }
 
     public void OnExitBtnClick() {
-        Debug.Log("Exit button clicked");
+        HidePauseMenu().OnComplete(() => {
+            UICanvas.Instance.OpenUIState(UIState.MainMenu);
+        });
     }
 
 #endregion

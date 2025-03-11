@@ -175,6 +175,7 @@ public class UICanvas : MonoBehaviour
 
     public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab, IInteractableInventory interactable = null, string title = null) {
         if (itemContainer != null) _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Other);
+        else _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Armor);
 
         if (_currentOtherInventory == itemContainer) return;
 
@@ -265,15 +266,12 @@ public class UICanvas : MonoBehaviour
         PlayerController.InputDisabled = true;
         _mainMenu.OpenMenu();
         _HUDCanvasGO.SetActive(false);
-        _alwayOnTopCanvasGO.SetActive(false);
-        _inventoryCanvasGO.SetActive(false);
     }
 
     private void closeMainMenu() {
         PlayerController.InputDisabled = false;
         _mainMenu.CloseMenu();
         _HUDCanvasGO.SetActive(true);
-        _alwayOnTopCanvasGO.SetActive(true);
     }
 
     private void openPauseScreen() {

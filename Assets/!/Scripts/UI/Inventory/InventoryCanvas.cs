@@ -40,7 +40,7 @@ public class InventoryCanvas : MonoBehaviour
     private Button _currentTabButton;
     private Image _currentTabImage;
     private TextMeshProUGUI _currentTabText;
-    private InventoryTabs _currentTab;
+    private InventoryTabs _currentTab = InventoryTabs.Armor;
 
     private UICanvas _uiCanvas;
 
@@ -127,6 +127,10 @@ public class InventoryCanvas : MonoBehaviour
         }
 
         // KillAllTweens(); TODO
+        if (previousTab == _currentTab) {
+            openTab(_currentTab);
+            return;
+        }
         switch (previousTab) {
             case InventoryTabs.Other:
                 if (!(_currentTab == InventoryTabs.Other || _currentTab == InventoryTabs.Armor)) playerTabExit();
@@ -244,22 +248,20 @@ public class InventoryCanvas : MonoBehaviour
 
     private Tween playerTabEnter() {
         _playerInventoryPanelGO.SetActive(true);
-        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-50, 0.25f).SetEase(Ease.InBack);
+        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-50, 0.5f).SetEase(Ease.OutExpo);
     }
 
     private Tween playerTabExit() {
-        // return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(410, 0.25f).OnComplete(() => _playerInventoryPanelGO.SetActive(false));
-        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(565, 0.25f).SetEase(Ease.InBack);
+        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(565, 0.5f).SetEase(Ease.OutExpo);
     }
 
     private Tween otherTabEnter() {
         _otherInventoryPanelGO.SetActive(true);
-        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(50, 0.25f).SetEase(Ease.InBack);
+        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(50, 0.5f).SetEase(Ease.OutExpo);
     }
 
     private Tween otherTabExit() {
-        // if (_otherInventoryPanelGO.GetComponent<RectTransform>().anchoredPosition.x < 0) return DOTween.Sequence().AppendInterval(0).AppendCallback(() => { });
-        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-565, 0.25f).SetEase(Ease.InBack);
+        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-565, 0.5f).SetEase(Ease.OutExpo);
     }
 
     private Tween armorTabEnter() {
@@ -326,9 +328,7 @@ public class InventoryCanvas : MonoBehaviour
                             _armorSlotsCanvasGroups[5].DOFade(0, fadeSpeed);
                             _armorSlotsRects[5].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
                                 _armorSlotsCanvasGroups[6].DOFade(0, fadeSpeed);
-                                _armorSlotsRects[6].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
-                                    _armorInventoryPanelGO.SetActive(false);
-                                });
+                                _armorSlotsRects[6].DOScale(0, scaleSpeed).SetEase(Ease.InBack);
                             });
                         });
                     });
