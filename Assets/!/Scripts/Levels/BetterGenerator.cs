@@ -42,10 +42,10 @@ public class BetterGenerator : MonoBehaviour
 
         // All locations
         allLocations.Add(new ForestPortal());
-        allLocations.Add(new DummyLocation());
-        allLocations.Add(new DummyLocation());
-        allLocations.Add(new DummyLocation());
-        allLocations.Add(new DummyLocation());
+        allLocations.Add(new DummyLocation(new(1,1), new(3,3)));
+        allLocations.Add(new DummyLocation(new(1,1), new(3,-3)));
+        allLocations.Add(new DummyLocation(new(1,1), new(-3,-3)));
+        allLocations.Add(new DummyLocation(new(1,1), new(-3,3)));
 
         int minX = 0, minY = 0, maxX = 0, maxY = 0;
         foreach(var l in allLocations)
@@ -141,10 +141,16 @@ public class BetterGenerator : MonoBehaviour
         List<Edge> uniqueEdges = RemoveDuplicateEdges(triangles);
 
         #region MST
-        // Debug.Log("Number of unique edges" + uniqueEdges.Count);
+        Debug.Log("Number of unique edges" + uniqueEdges.Count);
+        foreach(var e in uniqueEdges)
+        {
+            Debug.LogFormat("Unique edge: {0}-{1}, {2}", e.v0, e.v1, e.Length);
+        }
+
         Edge firstEdge = uniqueEdges.Aggregate(uniqueEdges[0], (smallest, next) => {
             return smallest.Length > next.Length ? next : smallest;
         });
+        Debug.LogFormat("First shortest edge: {0}-{1}, {2}", firstEdge.v0, firstEdge.v1, firstEdge.Length);
         firstEdge.MarkAsUsed();
 
         // Do this as long as there are unconnected edges
@@ -160,16 +166,23 @@ public class BetterGenerator : MonoBehaviour
                 .FindAll(e => !e.Used && e.IsOnlyPartiallyConnected(usedEdges))
                 .OrderBy(e => e.Length).ToList();
 
-            foreach(var shortest in connectedEdges)
+            Debug.Log("=== List of connected edges after sorting ===");
+            foreach(var ce in connectedEdges)
             {
+                Debug.LogFormat("Connected edge: {0}-{1}, {2}", ce.v0, ce.v1, ce.Length);
+            }
+
+            foreach(var shortest in connectedEdges)
+            {   
+                Debug.LogFormat("Next shortest edge: {0}-{1}, {2}", shortest.v0, shortest.v1, shortest.Length);
                 if(!shortest.IsFullyConnected(usedEdges)) {
                     shortest.MarkAsUsed();
-                    // Debug.Log(":3");
                     break;
                 }
-                //Debug.Log(":( " + num);
+                Debug.Log("Edge was rejected!");
             }
         }
+
         Debug.Log("Fully connected edges: " + uniqueEdges.Where(e => e.Used).Count());
         foreach(var e in uniqueEdges.Where(e => e.Used))
         {
@@ -178,13 +191,13 @@ public class BetterGenerator : MonoBehaviour
         #endregion
 
         // Small chance for other edges also to be used
-        // foreach(var e in uniqueEdges.Where(e => !e.Used))
-        // {
-        //     if(UnityEngine.Random.Range(0, 2) == 1) {
-        //         e.MarkAsUsed();
-        //         Debug.LogFormat("Random edge added: ({0})-({1})", e.v0, e.v1);
-        //     }
-        // }
+        foreach(var e in uniqueEdges.Where(e => !e.Used))
+        {
+            if(UnityEngine.Random.Range(0, 3) == 1) {
+                e.MarkAsUsed();
+                Debug.LogFormat("Random edge added: ({0})-({1})", e.v0, e.v1);
+            }
+        }
 
         #region Rasterization
 
@@ -207,6 +220,7 @@ public class BetterGenerator : MonoBehaviour
             float b = point1.y-(a * point1.x);
 
             int yLength = (int)Math.Abs(Math.Ceiling(a));
+            yLength = yLength < 1 ? 1 : yLength; // yLength cannot be smaller than 1
             int ySymbol = a > 0 ? 1 : -1;
 
             Debug.LogFormat("yLen = {0}, a = {1}, b = {2}", yLength, a, b);
@@ -369,8 +383,8 @@ public class BetterGenerator : MonoBehaviour
             foreach(var other in otherEdges)
             {
                 if(this == other ) continue;
-                if(other.v0 == v0 || other.v0 == v1) vA = true;
-                if(other.v1 == v0 || other.v1 == v1) vB = true;
+                if(v0 == other.v0 || v0 == other.v1) vA = true;
+                if(v1 == other.v0 || v1 == other.v1) vB = true;
             }
             // Debug.Log("vA = " + vA + ", vB = " + vB);
             return vA || vB;
@@ -382,8 +396,8 @@ public class BetterGenerator : MonoBehaviour
             foreach(var other in otherEdges)
             {
                 if(this == other ) continue;
-                if(other.v0 == v0 || other.v0 == v1) vA = true;
-                if(other.v1 == v0 || other.v1 == v1) vB = true;
+                if(v0 == other.v0 || v0 == other.v1) vA = true;
+                if(v1 == other.v0 || v1 == other.v1) vB = true;
             }
             // Debug.Log("vA = " + vA + ", vB = " + vB);
             return vA != vB;
@@ -395,8 +409,8 @@ public class BetterGenerator : MonoBehaviour
             foreach(var other in otherEdges)
             {
                 if(this == other) continue;
-                if(other.v0 == v0 || other.v1 == v0) vA = true;
-                if(other.v0 == v1 || other.v1 == v1) vB = true;
+                if(v0 == other.v0 || v0 == other.v1) vA = true;
+                if(v1 == other.v0 || v1 == other.v1) vB = true;
             }
             return vA && vB;
         }

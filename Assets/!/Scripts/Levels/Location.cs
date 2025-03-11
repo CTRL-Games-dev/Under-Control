@@ -43,16 +43,19 @@ public class ForestPortal : Location
 
 public class DummyLocation : Location
 {
+    public DummyLocation(Vector2 dimensions, Vector2 position)
+    {
+        this.Width = (int)dimensions.x;
+        this.Height = (int)dimensions.y;
+
+        this.X = (int)position.x;
+        this.Y = (int)position.y;
+    }
     public override void FindLocation(List<Location> generatedLocations)
     {   
-        // TODO find a way to properly set up width and height
-        Width = 1;
-        Height = 1;
-
-        int minRange = 3;
-        X = Random.Range(minRange, minRange + 4) * (Random.Range(0, 2) == 1 ? 1 : -1);
-        Y = Random.Range(minRange, minRange + 4) * (Random.Range(0, 2) == 1 ? 1 : -1);
+        
     }
+
 
     public override void GenerateLocation()
     {
