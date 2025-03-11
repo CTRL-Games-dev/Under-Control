@@ -14,7 +14,7 @@ public abstract class Location
         }
         return true;
     }
-    public abstract void GenerateLocation();
+    public abstract void GenerateLocation(GameObject parent);
 }
 
 // === Forest ===
@@ -35,9 +35,9 @@ public class ForestPortal : Location
         X = Y = 0;
     }
 
-    public override void GenerateLocation()
+    public override void GenerateLocation(GameObject parent)
     {
-        var gm = GameObject.Instantiate(_portalPrefab, new(X, 0, Y), Quaternion.identity);
+        var gm = GameObject.Instantiate(_portalPrefab, new(X, 0, Y), Quaternion.identity, parent.transform);
     }
 }
 
@@ -57,8 +57,8 @@ public class DummyLocation : Location
     }
 
 
-    public override void GenerateLocation()
+    public override void GenerateLocation(GameObject parent)
     {
-        Debug.Log("Generated dummy location");
+
     }
 }

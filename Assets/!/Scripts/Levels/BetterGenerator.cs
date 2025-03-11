@@ -6,18 +6,28 @@ using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
 
 public struct Tile
-    {
-        public bool IsWall;
-        public int X, Y;
-    }
+{
+    public bool IsWall;
+    public int X, Y;
+}
 
 [RequireComponent(typeof(MeshCollider))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
 public class BetterGenerator : MonoBehaviour
 {
+    private MeshFilter _mf;
+    private MeshCollider _mc;
+    private MeshRenderer _mr;
+    public GameObject TerrainHolder;
     public void Start()
     {
+        _mf = GetComponent<MeshFilter>();
+        _mc = GetComponent<MeshCollider>();
+        _mr = GetComponent<MeshRenderer>();
+
+
+
         Debug.Log("starting deneration");
         GenerateMap(LevelType.Forest);
     }
@@ -51,7 +61,6 @@ public class BetterGenerator : MonoBehaviour
         foreach(var l in allLocations)
         {
             l.FindLocation(generatedLocations);
-            l.GenerateLocation();
             generatedLocations.Add(l);
 
             if (l.X < minX) minX = l.X;
@@ -62,8 +71,6 @@ public class BetterGenerator : MonoBehaviour
             Debug.Log("Spawned location at x->" + l.X + " y->" + l.Y);
         }
 
-
-
         // Grid is used to determine where to spawn trees
         int gridPadding = 5;
         int gridWidth = (int)Vector2.Distance(new(minX,0), new(maxX,0)) + (gridPadding*2);
@@ -71,16 +78,14 @@ public class BetterGenerator : MonoBehaviour
         // int gridHeight = (int)Vector2.Distance(new(0,minY), new(0,maxY));
         
         bool[,] grid = new bool[gridWidth + (gridPadding*2), gridHeight + (gridPadding*2)];
-        List<Vector2> locationCenters = new();
+
 
         // Since coordinates can be negative and we use an array
         // we need to have some kind of an offset to index this array
-        Vector2 offset = new(minX-gridPadding, minY-gridPadding);
-
-        // Remove trees from places where locations are
-        // and calculate their centers in the meantime
-        foreach(var l in generatedLocations)
+        Vector2 offset = new(minX-gridPadding, minY-gridPadding);    
+        foreach(var l in allLocations)
         {
+            // Remove trees
             for (int ix = 0; ix < l.Width; ix++)
             {
                 for (int iy = 0; iy < l.Height; iy++)
@@ -90,6 +95,13 @@ public class BetterGenerator : MonoBehaviour
                     grid[indexX, indexY] = true;
                 }
             }
+            l.GenerateLocation(TerrainHolder);
+        }
+
+        // Calculate location centers
+        List<Vector2> locationCenters = new();
+        foreach(var l in generatedLocations)
+        {
             Vector2 center = new(l.X + (l.Width/2), l.Y + (l.Height / 2));
             locationCenters.Add(center);
         }
@@ -105,11 +117,76 @@ public class BetterGenerator : MonoBehaviour
             for(int y = 0; y < gridHeight; y++)
             {
                 if(grid[x,y]) {num++; continue;}
-                GameObject.Instantiate(tile[0], new(x + 0.5f, 0, y + 0.5f), Quaternion.identity);
+                GameObject.Instantiate(tile[0], new(x + 0.5f, 0, y + 0.5f), Quaternion.identity, TerrainHolder.transform);
             }
         }
-        Debug.Log("Number of not used tiles: " + num);
+        
+        GenerateMesh(gridWidth, gridHeight);
     }
+
+    #region Mesh
+
+    private void GenerateMesh(int gridWidth, int gridHeight)
+    {
+        Mesh newMesh = new();
+        
+        List<Vector3> vertices = new();
+        List<int> trianglesFloor = new();
+        List<Vector2> uv = new();
+
+        // Generate terrain height (Londek is not helpful)
+        float[,] th = new float[gridWidth+1, gridHeight+1];
+        for(int x = 0; x < gridWidth; x++)
+        {
+            for(int y = 0; y < gridHeight; y++) {
+                th[x,y] = UnityEngine.Random.Range(-0.1f, 0.1f);
+            }
+        }
+
+        for(int x = 0; x < gridWidth; x++)
+        {
+            for(int y = 0; y < gridHeight; y++) {
+                int index = x * gridWidth + y;
+
+                Vector3 p0 = new(x,     th[x,y],  y);
+                Vector3 p1 = new(x,     th[x,y+1],  (y+1));
+                Vector3 p2 = new((x+1), th[x+1,y+1],  (y+1));
+                Vector3 p3 = new((x+1), th[x+1,y], y);
+
+                vertices.Add(p0);
+                vertices.Add(p1);
+                vertices.Add(p2);
+                vertices.Add(p3);
+
+                uv.Add(new (0, 0));
+                uv.Add(new (1, 0));
+                uv.Add(new (1, 1));
+                uv.Add(new (0, 1));
+
+                trianglesFloor.Add(index * 4 + 0);
+                trianglesFloor.Add(index * 4 + 1);
+                trianglesFloor.Add(index * 4 + 2);
+                
+                trianglesFloor.Add(index * 4 + 0);
+                trianglesFloor.Add(index * 4 + 2);
+                trianglesFloor.Add(index * 4 + 3);
+            }
+        }
+
+        newMesh.SetVertices(vertices);
+        newMesh.SetTriangles(trianglesFloor, 0);
+        newMesh.SetUVs(0, uv);
+
+        // Get material
+        Material dirt = Resources.Load<Material>("Materials/Forest/Dirt/Dirt");
+        Debug.Log("Dirt: " + dirt);
+
+        _mf.mesh = newMesh;
+        _mr.materials = new Material[] {dirt};
+        _mc.sharedMesh = newMesh;
+    }
+
+    #endregion
 
     private void DigOutPaths(List<Vector2> locationCenters, bool[,] grid, Vector2 gridOffset) 
     {
