@@ -142,9 +142,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DropOnDeath: 1
   PossibleLoot:
-  - Item: {fileID: 11400000, guid: b2527a1ad7e954873ad230d31a1c6965, type: 2}
+  - Item: {fileID: 11400000, guid: 76cc4ac11506f5949ad88e652d5100fb, type: 2}
     MinAmount: 1
-    MaxAmount: 3
+    MaxAmount: 4
+    Chance: 1
+  - Item: {fileID: 11400000, guid: 9df73015bdc274a4394a14e34153ecaf, type: 2}
+    MinAmount: 0
+    MaxAmount: 2
     Chance: 1
 --- !u!195 &8974613204039339173
 NavMeshAgent:
@@ -155,7 +159,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 3366227734027736264}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.4
+  m_Radius: 0.5
   m_Speed: 0
   m_Acceleration: 2
   avoidancePriority: 50
@@ -167,7 +171,7 @@ NavMeshAgent:
   m_Height: 1.5
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 1
+  m_ObstacleAvoidanceType: 4
 --- !u!95 &5814925836689036330
 Animator:
   serializedVersion: 7
@@ -292,10 +296,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpeedSmoothingLength: 0
   CoherenceStrategy: 1
-  MaxPositionError: 0.1
+  MaxPositionError: 0.2
   FollowAgentY: 1
   UseAgentAcceleration: 1
   DecelerationIsAcceleration: 0
+  AngularSpeedMultiplierCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0.0024745278
+      value: 0.2246964
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   _deceleration: 8
   _acceleration: 2
 --- !u!54 &8495430180178546008

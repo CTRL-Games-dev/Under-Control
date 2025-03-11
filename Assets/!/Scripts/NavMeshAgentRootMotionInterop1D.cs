@@ -34,6 +34,7 @@ public class NavMeshAgentRootMotionInterop1D : MonoBehaviour {
     public bool DecelerationIsAcceleration = false;
     public float Acceleration => UseAgentAcceleration ? _navMeshAgent.acceleration : _acceleration;
     public float Deceleration => DecelerationIsAcceleration ? Acceleration : _deceleration;
+    public AnimationCurve AngularSpeedMultiplierCurve = AnimationCurve.Constant(0, 1, 1);
 
     [SerializeField]
     private float _deceleration = 4f;
@@ -78,11 +79,15 @@ public class NavMeshAgentRootMotionInterop1D : MonoBehaviour {
 
         _animator.SetFloat(_speedHash, _speed);
 
-        HandleMotionCoherence();
-       
         if(_velocity != Vector3.zero) {
-            transform.rotation = Quaternion.LookRotation(_velocity);
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation,
+                Quaternion.LookRotation(_velocity),
+                _navMeshAgent.angularSpeed * AngularSpeedMultiplierCurve.Evaluate(_speed) * Time.deltaTime
+            );
         }
+
+        HandleMotionCoherence();
 
         _navMeshAgent.velocity = _velocity;
     }
