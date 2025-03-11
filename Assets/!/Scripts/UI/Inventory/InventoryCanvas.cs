@@ -15,20 +15,19 @@ public class InventoryCanvas : MonoBehaviour
         Quests
     }
 
-    [Header("Tab Buttons")]
-    [SerializeField] private GameObject _otherTabGO;
-    [SerializeField] private GameObject _armorTabGO;
-    [SerializeField] private GameObject _abilitiesTabGO;
-    [SerializeField] private GameObject _skillsTabGO;
-    [SerializeField] private GameObject _questsTabGO;
+
+    [SerializeField] private RectTransform _underlineRect;
+    [SerializeField] private GameObject _armorBtnTabGO, _abilitiesBtnTabGO, _skillsBtnTabGO, _questsBtnTabGO, _otherBtnTabGO;
 
     [Header("Panel Game Objects")]
-    [SerializeField] private GameObject _otherInventoryPanelGO;
-    [SerializeField] private GameObject _armorInventoryPanelGO;
-    [SerializeField] private GameObject _abilitiesInventoryPanelGO;
-    [SerializeField] private GameObject _skillsInventoryPanelGO;
-    [SerializeField] private GameObject _questsInventoryPanelGO;
     [SerializeField] private GameObject _playerInventoryPanelGO;
+    [SerializeField] private GameObject _armorInventoryPanelGO, _abilitiesInventoryPanelGO, _skillsInventoryPanelGO, _questsInventoryPanelGO, _otherInventoryPanelGO;
+
+    [Header("Armor panel parts")]
+    [SerializeField] private GameObject _playerPreviewGO;
+    [SerializeField] private GameObject[] _armorSlotsGO = new GameObject[7];
+    private RectTransform[] _armorSlotsRects = new RectTransform[7];
+    private CanvasGroup[] _armorSlotsCanvasGroups = new CanvasGroup[7];
 
     private GameObject[] _tabButtonGameObjects;
     private Button[] _tabButtons;
@@ -45,57 +44,65 @@ public class InventoryCanvas : MonoBehaviour
 
     private UICanvas _uiCanvas;
 
-    private Color _defaultColor = new(102 / 255, 102 / 255, 102 / 255);
+    private Color _defaultColor = Color.white;
 
     #region Unity Methods
 
-
-    void Start() {
-        _uiCanvas = UICanvas.Instance;
+    void Awake() {
         _tabButtonGameObjects = new GameObject[] {
-            _otherTabGO,
-            _armorTabGO,
-            _abilitiesTabGO,
-            _skillsTabGO,
-            _questsTabGO
+            _armorBtnTabGO,
+            _abilitiesBtnTabGO,
+            _skillsBtnTabGO,
+            _questsBtnTabGO,
+            _otherBtnTabGO
         };
         _tabButtons = new Button[] {
-            _otherTabGO.GetComponent<Button>(),
-            _armorTabGO.GetComponent<Button>(),
-            _abilitiesTabGO.GetComponent<Button>(),
-            _skillsTabGO.GetComponent<Button>(),
-            _questsTabGO.GetComponent<Button>()
+            _armorBtnTabGO.GetComponent<Button>(),
+            _abilitiesBtnTabGO.GetComponent<Button>(),
+            _skillsBtnTabGO.GetComponent<Button>(),
+            _questsBtnTabGO.GetComponent<Button>(),
+            _otherBtnTabGO.GetComponent<Button>()
         };
         _tabImages = new Image[] {
-            _otherTabGO.GetComponent<Image>(),
-            _armorTabGO.GetComponent<Image>(),
-            _abilitiesTabGO.GetComponent<Image>(),
-            _skillsTabGO.GetComponent<Image>(),
-            _questsTabGO.GetComponent<Image>()
+            _armorBtnTabGO.GetComponent<Image>(),
+            _abilitiesBtnTabGO.GetComponent<Image>(),
+            _skillsBtnTabGO.GetComponent<Image>(),
+            _questsBtnTabGO.GetComponent<Image>(),
+            _otherBtnTabGO.GetComponent<Image>(),
         };
         _tabTexts = new TextMeshProUGUI[] {
-            _otherTabGO.GetComponentInChildren<TextMeshProUGUI>(),
-            _armorTabGO.GetComponentInChildren<TextMeshProUGUI>(),
-            _abilitiesTabGO.GetComponentInChildren<TextMeshProUGUI>(),
-            _skillsTabGO.GetComponentInChildren<TextMeshProUGUI>(),
-            _questsTabGO.GetComponentInChildren<TextMeshProUGUI>()
+            _armorBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
+            _abilitiesBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
+            _skillsBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
+            _questsBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
+            _otherBtnTabGO.GetComponentInChildren<TextMeshProUGUI>()
         };
         _tabRectTranforms = new RectTransform[] {
-            _otherTabGO.GetComponent<RectTransform>(),
-            _armorTabGO.GetComponent<RectTransform>(),
-            _abilitiesTabGO.GetComponent<RectTransform>(),
-            _skillsTabGO.GetComponent<RectTransform>(),
-            _questsTabGO.GetComponent<RectTransform>()
+            _armorBtnTabGO.GetComponent<RectTransform>(),
+            _abilitiesBtnTabGO.GetComponent<RectTransform>(),
+            _skillsBtnTabGO.GetComponent<RectTransform>(),
+            _questsBtnTabGO.GetComponent<RectTransform>(),
+            _otherBtnTabGO.GetComponent<RectTransform>(),
         };
 
         _tabPanelsIndex = new Dictionary<InventoryTabs, int> {
-            { InventoryTabs.Other, 0 },
-            { InventoryTabs.Armor, 1 },
-            { InventoryTabs.Abilities, 2 },
-            { InventoryTabs.Skills, 3 },
-            { InventoryTabs.Quests, 4 }
+            { InventoryTabs.Armor, 0 },
+            { InventoryTabs.Abilities, 1 },
+            { InventoryTabs.Skills, 2 },
+            { InventoryTabs.Quests, 3 },
+            { InventoryTabs.Other, 4 }
         };
+    }
 
+    void Start() {
+        _uiCanvas = UICanvas.Instance;
+
+        _currentTab = InventoryTabs.Armor;
+        
+        foreach (GameObject go in _armorSlotsGO) {
+            _armorSlotsRects[Array.IndexOf(_armorSlotsGO, go)] = go.GetComponent<RectTransform>();
+            _armorSlotsCanvasGroups[Array.IndexOf(_armorSlotsGO, go)] = go.GetComponent<CanvasGroup>();
+        }
     }
 
     #endregion
@@ -103,11 +110,13 @@ public class InventoryCanvas : MonoBehaviour
     #region Public Methods
 
     public void SetCurrentTab(InventoryTabs tab) {
+        InventoryTabs previousTab = _currentTab;
         _currentTab = tab;
         _currentTabPanel = _tabButtonGameObjects[_tabPanelsIndex[_currentTab]];
         _currentTabButton = _tabButtons[_tabPanelsIndex[_currentTab]];
         _currentTabImage = _tabImages[_tabPanelsIndex[_currentTab]];
         _currentTabText = _tabTexts[_tabPanelsIndex[_currentTab]];
+        _underlineRect.DOAnchorPosX(_tabRectTranforms[_tabPanelsIndex[_currentTab]].anchoredPosition.x, 0.25f).SetEase(Ease.OutCubic);
 
         foreach (InventoryTabs t in _tabPanelsIndex.Keys) {
             if (t == _currentTab) {
@@ -116,44 +125,47 @@ public class InventoryCanvas : MonoBehaviour
                 highlightTab(t, false);
             }
         }
-        // KillAllTweens(); TODO
- 
 
-        switch (_currentTab) {
+        // KillAllTweens(); TODO
+        switch (previousTab) {
             case InventoryTabs.Other:
-                abilitiesTabExit();
-                skillsTabExit();
-                questsTabExit();
-                armorTabExit().OnComplete(() => otherTabEnter());
+                if (!(_currentTab == InventoryTabs.Other || _currentTab == InventoryTabs.Armor)) playerTabExit();
+                otherTabExit().OnComplete(() => openTab(_currentTab));
+                break;
+            case InventoryTabs.Armor:
+                if (!(_currentTab == InventoryTabs.Other || _currentTab == InventoryTabs.Armor)) playerTabExit();
+                armorTabExit().OnComplete(() => openTab(_currentTab));
+                break;
+            case InventoryTabs.Abilities:
+                abilitiesTabExit().OnComplete(() => openTab(_currentTab));
+                break;
+            case InventoryTabs.Skills:
+                skillsTabExit().OnComplete(() => openTab(_currentTab));
+                break;
+            case InventoryTabs.Quests:
+                questsTabExit().OnComplete(() => openTab(_currentTab));
+                break;
+        }
+    }
+
+    private void openTab(InventoryTabs tab) {
+        switch (tab) {
+            case InventoryTabs.Other:
+                otherTabEnter();
                 playerTabEnter();
                 break;
             case InventoryTabs.Armor:
-                abilitiesTabExit();
-                skillsTabExit();
-                questsTabExit();
-                otherTabExit().OnComplete(() => armorTabEnter());
+                armorTabEnter();
                 playerTabEnter();
                 break;
             case InventoryTabs.Abilities:
-                playerTabExit();
-                armorTabExit();
-                skillsTabExit();
-                questsTabExit();
-                otherTabExit().OnComplete(() => abilitiesTabEnter());
+                abilitiesTabEnter();
                 break;
             case InventoryTabs.Skills:
-                playerTabExit();
-                armorTabExit();
-                abilitiesTabExit();
-                questsTabExit();
-                otherTabExit().OnComplete(() => skillsTabEnter());
+                skillsTabEnter();
                 break;
             case InventoryTabs.Quests:
-                playerTabExit();
-                armorTabExit();
-                abilitiesTabExit();
-                skillsTabExit();
-                otherTabExit().OnComplete(() => questsTabEnter());
+                questsTabEnter();
                 break;
         }
     }
@@ -206,49 +218,125 @@ public class InventoryCanvas : MonoBehaviour
 
     public void OnOpenQuestsTab() { SetCurrentTab(InventoryTabs.Quests); }
     
+    public void HighlightButton(int index) {
+        if (index == _tabPanelsIndex[_currentTab]) return;
+        _tabButtonGameObjects[index].transform.DOScale(1.2f, 0.75f);
+    }
 
+    public void UnhighlightButton(int index) {
+        if (index == _tabPanelsIndex[_currentTab]) return;
+        _tabButtonGameObjects[index].transform.DOScale(1f, 0.75f);
+    }
     #endregion
 
     #region Private Methods
 
     private void highlightTab(InventoryTabs tab, bool value) {
+        _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOKill();
         if (value) {
-            _tabImages[_tabPanelsIndex[tab]].DOColor(Color.white, 0.15f);
-            _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOScaleY(1.2f, 0.15f);
+            _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOScale(1.5f, 0.35f);
+            _tabTexts[_tabPanelsIndex[tab]].fontStyle = FontStyles.Bold;
         } else {
-            _tabImages[_tabPanelsIndex[tab]].DOColor(_defaultColor, 0.15f);
-            _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOScaleY(1f, 0.15f);
-        }
+            _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOScale(1, 0.35f);
+            _tabTexts[_tabPanelsIndex[tab]].fontStyle = FontStyles.Normal;
+        } 
     }
 
     private Tween playerTabEnter() {
         _playerInventoryPanelGO.SetActive(true);
-        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-10, 0.25f);
+        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-50, 0.25f).SetEase(Ease.InBack);
     }
 
     private Tween playerTabExit() {
         // return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(410, 0.25f).OnComplete(() => _playerInventoryPanelGO.SetActive(false));
-        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(410, 0.25f);
+        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(565, 0.25f).SetEase(Ease.InBack);
     }
 
     private Tween otherTabEnter() {
         _otherInventoryPanelGO.SetActive(true);
-        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(10, 0.25f);
+        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(50, 0.25f).SetEase(Ease.InBack);
     }
 
     private Tween otherTabExit() {
         // if (_otherInventoryPanelGO.GetComponent<RectTransform>().anchoredPosition.x < 0) return DOTween.Sequence().AppendInterval(0).AppendCallback(() => { });
-        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-410, 0.25f).OnComplete(() => _otherInventoryPanelGO.SetActive(false));
+        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-565, 0.25f).SetEase(Ease.InBack);
     }
 
     private Tween armorTabEnter() {
+        float fadeSpeed = 0.05f;
+
+        _playerInventoryPanelGO.GetComponent<RawImage>().DOKill();
+        for (int i = 0; i < _armorSlotsGO.Length; i++) {
+            _armorSlotsCanvasGroups[i].DOKill();
+            _armorSlotsRects[i].DOKill();
+        }
+        
         _armorInventoryPanelGO.SetActive(true);
-        return _armorInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(10, 0.25f);
+
+        _playerPreviewGO.GetComponent<RawImage>().DOFade(1, 1.2f);
+
+        float scaleSpeed = 0.2f;
+
+        _armorSlotsRects[0].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
+        
+        _armorSlotsCanvasGroups[0].DOFade(1, fadeSpeed).OnComplete(() => {
+            _armorSlotsRects[1].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
+            _armorSlotsCanvasGroups[1].DOFade(1, fadeSpeed).OnComplete(() => {
+                _armorSlotsRects[2].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
+                _armorSlotsCanvasGroups[2].DOFade(1, fadeSpeed).OnComplete(() => {
+                    _armorSlotsRects[3].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
+                    _armorSlotsCanvasGroups[3].DOFade(1, fadeSpeed).OnComplete(() => {
+                        _armorSlotsRects[4].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
+                        _armorSlotsCanvasGroups[4].DOFade(1, fadeSpeed).OnComplete(() => {
+                            _armorSlotsRects[5].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
+                            _armorSlotsCanvasGroups[5].DOFade(1, fadeSpeed).OnComplete(() => {
+                                _armorSlotsRects[6].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
+                                _armorSlotsCanvasGroups[6].DOFade(1, fadeSpeed);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+        
+        return _armorInventoryPanelGO.transform.DOScale(1, fadeSpeed * 7);
     }
 
     private Tween armorTabExit() {
-        // if (_armorInventoryPanelGO.GetComponent<RectTransform>().anchoredPosition.x < 0) return DOTween.Sequence().AppendInterval(0).AppendCallback(() => { });
-        return _armorInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-580, 0.25f).OnComplete(() => _armorInventoryPanelGO.SetActive(false));
+        _playerInventoryPanelGO.GetComponent<RawImage>().DOKill();
+        for (int i = 0; i < _armorSlotsGO.Length; i++) {
+            _armorSlotsCanvasGroups[i].DOKill();
+            _armorSlotsRects[i].DOKill();
+        }
+        
+        float fadeSpeed = 0.3f;
+        float scaleSpeed = 0.05f;
+
+        _playerPreviewGO.GetComponent<RawImage>().DOFade(0, 0.5f);
+        _armorSlotsCanvasGroups[0].DOFade(0, fadeSpeed);
+        _armorSlotsRects[0].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
+            _armorSlotsCanvasGroups[1].DOFade(0, fadeSpeed);
+            _armorSlotsRects[1].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
+                _armorSlotsCanvasGroups[2].DOFade(0, fadeSpeed);
+                _armorSlotsRects[2].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
+                    _armorSlotsCanvasGroups[3].DOFade(0, fadeSpeed);
+                    _armorSlotsRects[3].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
+                        _armorSlotsCanvasGroups[4].DOFade(0, fadeSpeed);
+                        _armorSlotsRects[4].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
+                            _armorSlotsCanvasGroups[5].DOFade(0, fadeSpeed);
+                            _armorSlotsRects[5].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
+                                _armorSlotsCanvasGroups[6].DOFade(0, fadeSpeed);
+                                _armorSlotsRects[6].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
+                                    _armorInventoryPanelGO.SetActive(false);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });        
+
+        return _armorInventoryPanelGO.transform.DOScale(1, scaleSpeed * 7);
     }
 
     private Tween abilitiesTabEnter() {

@@ -19,7 +19,7 @@ public class MainMenu : MonoBehaviour
     }
 
     public void PlayGame() {
-        UICanvas.Instance.CloseMainMenu();
+        UICanvas.Instance.CloseUIState(UIState.MainMenu);
     }
 
     public void QuitGame() {
@@ -30,13 +30,13 @@ public class MainMenu : MonoBehaviour
         killTweens();
         CameraManager.Instance.SwitchCamera(_mainMenuCamera);
         gameObject.SetActive(true);
-        _blackBarRect.DOAnchorPosY(0, 1);
+        _blackBarRect.DOAnchorPosY(0, 1).SetEase(Ease.InOutBack);
     }
 
     public void CloseMenu() {
         killTweens();
         CameraManager.Instance.SwitchCamera(CameraManager.Instance.PlayerTopDownCamera);
-        _blackBarRect.DOAnchorPosY(720, 1).OnComplete(() => gameObject.SetActive(false));
+        _blackBarRect.DOAnchorPosY(720, 1).SetEase(Ease.InOutBack).OnComplete(() => gameObject.SetActive(false));
     }
 
     private void killTweens() {

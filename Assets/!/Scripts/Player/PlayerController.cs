@@ -135,7 +135,7 @@ public class PlayerController : MonoBehaviour
     }
 
     private void onDeath() {
-        UICanvas.Instance.OpenDeathScreen();
+        UICanvas.Instance.OpenUIState(UIState.DeathScreen);
     }
 
     // Input events
@@ -208,6 +208,7 @@ public class PlayerController : MonoBehaviour
     }
 
     private void interact(bool primary) {
+        if (UICanvas.Instance.CurrentUIState !=  UIState.NotVisible) return;
         bool interacted = tryInteract();
         
         if(interacted) return;
