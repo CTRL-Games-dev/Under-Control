@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewEffect")]
+[CreateAssetMenu(fileName = "SO_Eff_Effect", menuName = "Effect")]
 public class Effect : ScriptableObject {
     public string Name;
     public Sprite Icon;

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Melee Item", menuName = "Items/Melee Item")]
+[CreateAssetMenu(fileName = "SO_Wpn_Weapon", menuName = "Items/Weapon")]
 public class WeaponItemData : ItemData {
     public float DamageMin;
     public float DamageMax;

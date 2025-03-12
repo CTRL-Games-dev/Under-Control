@@ -14,7 +14,7 @@ public enum Dimension
     FOREST,
 }
 
-[CreateAssetMenu(fileName = "GameContext", menuName = "ScriptableObject/GameContext", order = 1)]
+[CreateAssetMenu(fileName = "SO_GameContext", menuName = "GameContext")]
 public class GameContext : ScriptableObject
 {
     public GameDifficulty Difficulty = GameDifficulty.NORMAL;
