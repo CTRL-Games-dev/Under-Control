@@ -114,7 +114,7 @@ public class LivingEntity : MonoBehaviour
             // Drop items
             if(DropItemsOnDeath) {
                 // Drop common slots
-                List<InventoryItem> items = Inventory.GetItems();
+                List<InventoryItem> items = new List<InventoryItem>(Inventory.GetItems());
                 foreach(InventoryItem item in items) {
                     dropItem(item.ItemData, item.Amount);
                     Inventory.RemoveInventoryItem(item);
