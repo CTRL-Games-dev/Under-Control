@@ -1,11 +1,23 @@
+using System;
 using System.Collections;
 using DG.Tweening;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
+
+public enum UIState
+{
+    NotVisible,
+    MainMenu,
+    PauseScreen,
+    Inventory,
+    DeathScreen
+}
+
 
 public class UICanvas : MonoBehaviour
 {
+    public UIState CurrentUIState = UIState.NotVisible;
+
     #region Fields
 
     [Header("References for children")]
@@ -33,16 +45,11 @@ public class UICanvas : MonoBehaviour
     }
     public HumanoidInventory PlayerInventory { get => PlayerLivingEntity.Inventory as HumanoidInventory; }
     public Camera MainCamera;
+    public bool IsGamePaused = false;
+
 
     // UI elements
     private bool _isInventoryOpen = false;
-    public bool IsInventoryOpen {
-        get => _isInventoryOpen;
-        set {
-            _isInventoryOpen = value;
-            openInventory(_isInventoryOpen);
-        }
-    }
     public InventoryPanel PlayerInventoryPanel;
 
     [HideInInspector] public InventoryPanel ActiveInventoryPanel;
@@ -56,6 +63,7 @@ public class UICanvas : MonoBehaviour
     [SerializeField] private GameObject _alwayOnTopCanvasGO;
     [SerializeField] private GameObject _mainMenuCanvasGO;
     [SerializeField] private GameObject _deathScreenCanvasGO;
+    [SerializeField] private GameObject _pauseScreenCanvasGO;
 
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI _coinsText;
@@ -66,6 +74,7 @@ public class UICanvas : MonoBehaviour
     private InventoryCanvas _inventoryCanvas;
     private MainMenu _mainMenu;
     private DeathScreen _deathScreen;
+    private PauseScreen _pauseScreen;
     private CanvasGroup _inventoryCanvasGroup;
     private IInteractableInventory _lastInteractableInventory;
 
@@ -80,6 +89,11 @@ public class UICanvas : MonoBehaviour
         }
         Instance = this;
         
+        _inventoryCanvas = _inventoryCanvasGO.GetComponent<InventoryCanvas>();
+        _inventoryCanvasGroup = _inventoryCanvasGO.GetComponent<CanvasGroup>();
+        _mainMenu = _mainMenuCanvasGO.GetComponent<MainMenu>();
+        _deathScreen = _deathScreenCanvasGO.GetComponent<DeathScreen>();
+        _pauseScreen = _pauseScreenCanvasGO.GetComponent<PauseScreen>();
     }
 
     private void Start() {
@@ -87,17 +101,12 @@ public class UICanvas : MonoBehaviour
         EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
         PlayerController.InventoryToggleEvent.AddListener(OnInventoryToggle);
         PlayerController.UICancelEvent.AddListener(OnUICancel);
-
         PlayerController.CoinsChangeEvent.AddListener(OnCoinsChange);
 
-        _inventoryCanvas = _inventoryCanvasGO.GetComponent<InventoryCanvas>();
-        _inventoryCanvasGroup = _inventoryCanvasGO.GetComponent<CanvasGroup>();
-        _mainMenu = _mainMenuCanvasGO.GetComponent<MainMenu>();
-        _deathScreen = _deathScreenCanvasGO.GetComponent<DeathScreen>();
         OnCoinsChange(0);
         
-        _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Armor);
-        openInventory(false);
+        // _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Armor);
+        OpenUIState(CurrentUIState);
     }
 
     #endregion
@@ -123,14 +132,32 @@ public class UICanvas : MonoBehaviour
     }
 
     private void OnInventoryToggle() {
-        openInventory(!IsInventoryOpen);
+        _isInventoryOpen = !_isInventoryOpen;
+        if (_isInventoryOpen) {
+            OpenUIState(UIState.Inventory);
+        } else {
+            CloseUIState(UIState.Inventory);
+        }
     }
 
     private void OnUICancel() {
-        if (IsInventoryOpen) {
-            openInventory(false);
-        } else {
-            OpenMainMenu();
+        switch (CurrentUIState) {
+            case UIState.Inventory:
+                CloseUIState(UIState.Inventory);
+                break;
+            case UIState.PauseScreen:
+                CloseUIState(UIState.PauseScreen);
+                break;
+            case UIState.MainMenu:
+                break;
+            case UIState.DeathScreen:
+                break;
+            case UIState.NotVisible:
+                OpenUIState(UIState.PauseScreen);
+                break;
+            default:
+                OpenUIState(UIState.PauseScreen);
+                break;
         }
     }
 
@@ -148,6 +175,7 @@ public class UICanvas : MonoBehaviour
 
     public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab, IInteractableInventory interactable = null, string title = null) {
         if (itemContainer != null) _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Other);
+        else _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Armor);
 
         if (_currentOtherInventory == itemContainer) return;
 
@@ -162,12 +190,12 @@ public class UICanvas : MonoBehaviour
                 if (_otherInventoryHolder.transform.childCount > 0)
                     Destroy(_otherInventoryHolder.transform.GetChild(0).gameObject);
                 
-                openInventory(true);
+                OpenUIState(UIState.Inventory);
 
                 InventoryPanel inventoryPanel = Instantiate(prefab, _otherInventoryHolder.transform).GetComponentInChildren<InventoryPanel>();
                 inventoryPanel.SetTargetInventory(itemContainer);
                 // inventoryPanel.ConnectSignals();
-                _inventoryCanvas.OtherTabEnter();
+                _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Other);
             });
         } else {
             if (_otherInventoryHolder.transform.childCount > 0)
@@ -184,33 +212,6 @@ public class UICanvas : MonoBehaviour
         EventBus.ItemPlacedEvent?.Invoke();
     }
 
-    private void openInventory(bool value) {
-        InventoryPanel.IsItemJustBought = false;
-        _isInventoryOpen = value;
-
-        _inventoryCanvasGroup.DOKill();
-        _navBarRectTransform.DOKill();
-        _navBarRectTransform.DOAnchorPosY(_isInventoryOpen ? 0 : 65, 0.25f);
-        if (_isInventoryOpen) {
-            _inventoryCanvasGO.SetActive(true);
-            _inventoryCanvasGroup.DOFade(1, 0.25f);
-            _inventoryCanvasGroup.interactable = true;
-            _inventoryCanvasGroup.blocksRaycasts = true;
-            _inventoryCanvas.OpenCurrentTab();
-        } else {
-            if (SelectedItemUI.InventoryItem != null) {
-                DropItem();
-            }
-
-            // _inventoryCanvasGroup.DOFade(0, 0.25f).OnComplete(() => _inventoryCanvasGO.SetActive(false));
-            _inventoryCanvasGroup.DOFade(0, 0.25f);
-            _inventoryCanvasGroup.interactable = false;
-            _inventoryCanvasGroup.blocksRaycasts = false;
-            SetOtherInventory(null, null);
-            _inventoryCanvas.CloseAllTabs();
-        }
-    }
-
     private IEnumerator animateCoins(bool increase) {
         _coinsText.color = increase ? Color.green : Color.red;
         _coinsHolder.transform.localScale = increase ? new Vector3(1.2f, 1f, 1f) : new Vector3(0.8f, 1f, 1f);
@@ -221,22 +222,103 @@ public class UICanvas : MonoBehaviour
         _coinsHolder.transform.localScale = new Vector3(1f, 1f, 1f);
     }
 
-    public void OpenMainMenu() {
+    #endregion
+    #region Change UI State
+
+    public void OpenUIState(UIState state) {
+        CurrentUIState = state;
+        switch (state) {
+            case UIState.MainMenu:
+                openMainMenu();
+                break;
+            case UIState.PauseScreen:
+                openPauseScreen();
+                break;
+            case UIState.Inventory:
+                openInventoryScreen();
+                break;
+            case UIState.DeathScreen:
+                openDeathScreen();
+                break;
+            case UIState.NotVisible:
+                _HUDCanvasGO.SetActive(true);
+                PlayerController.InputDisabled = false;
+                break;
+        }
+    }
+
+    public void CloseUIState(UIState state) {
+        CurrentUIState = UIState.NotVisible;
+        switch (state) {
+            case UIState.MainMenu:
+                closeMainMenu();
+                break;
+            case UIState.PauseScreen:
+                closePauseScreen();
+                break;
+            case UIState.Inventory:
+                closeInventoryScreen();
+                break;
+        }
+    }
+
+    private void openMainMenu() {
         PlayerController.InputDisabled = true;
         _mainMenu.OpenMenu();
         _HUDCanvasGO.SetActive(false);
-        _alwayOnTopCanvasGO.SetActive(false);
-        _inventoryCanvasGO.SetActive(false);
     }
 
-    public void CloseMainMenu() {
+    private void closeMainMenu() {
         PlayerController.InputDisabled = false;
         _mainMenu.CloseMenu();
         _HUDCanvasGO.SetActive(true);
-        _alwayOnTopCanvasGO.SetActive(true);
     }
 
-    public void OpenDeathScreen() {
+    private void openPauseScreen() {
+        IsGamePaused = true;
+        _pauseScreen.ShowPauseMenu();
+    }
+
+    private void closePauseScreen() {
+        IsGamePaused = false;
+        _pauseScreen.HidePauseMenu();
+    }
+
+    private void openInventoryScreen() {
+        InventoryPanel.IsItemJustBought = false;
+        _isInventoryOpen = true;
+
+        _inventoryCanvasGroup.DOKill();
+        _navBarRectTransform.DOKill();
+        _navBarRectTransform.DOAnchorPosY(_isInventoryOpen ? 0 : 65, 0.25f);
+        _inventoryCanvasGO.SetActive(true);
+        _inventoryCanvasGroup.DOFade(1, 0.25f);
+        _inventoryCanvasGroup.interactable = true;
+        _inventoryCanvasGroup.blocksRaycasts = true;
+        _inventoryCanvas.OpenCurrentTab();
+    }
+
+    private void closeInventoryScreen() {
+        InventoryPanel.IsItemJustBought = false;
+        _isInventoryOpen = false;
+
+        _inventoryCanvasGroup.DOKill();
+        _navBarRectTransform.DOKill();
+        _navBarRectTransform.DOAnchorPosY(_isInventoryOpen ? 0 : 65, 0.25f);
+
+        if (SelectedItemUI.InventoryItem != null) {
+            DropItem();
+        }
+
+        // _inventoryCanvasGroup.DOFade(0, 0.25f).OnComplete(() => _inventoryCanvasGO.SetActive(false));
+        _inventoryCanvasGroup.DOFade(0, 0.25f);
+        _inventoryCanvasGroup.interactable = false;
+        _inventoryCanvasGroup.blocksRaycasts = false;
+        SetOtherInventory(null, null);
+        _inventoryCanvas.CloseAllTabs();
+    }
+
+    private void openDeathScreen() {
         PlayerController.InputDisabled = true;
         _deathScreen.ShowDeathScreen();
         _HUDCanvasGO.SetActive(false);
