@@ -104,17 +104,20 @@ public class BetterGenerator : MonoBehaviour
         DigOutPaths(locationCenters, grid, offset);
 
         // Load forest tile
-        GameObject[] tile = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestTiles");
-        int num = 0;
+        GameObject[] tiles = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestTiles");
+        List<GameObject> instantiatedTiles = new();
         for(int x = 0; x < gridWidth; x++)
         {
             for(int y = 0; y < gridHeight; y++)
             {
-                if(grid[x,y]) {num++; continue;}
-                GameObject.Instantiate(tile[0], new(x + 0.5f, 0, y + 0.5f), Quaternion.identity, TerrainHolder.transform);
+                if(grid[x,y]) { continue; }
+                var tile = Instantiate(tiles[0], new(x + 0.5f, 0, y + 0.5f), Quaternion.identity, TerrainHolder.transform);
+                tile.isStatic = true;
+                instantiatedTiles.Add(tile);
             }
         }
-        
+        StaticBatchingUtility.Combine(instantiatedTiles.ToArray(), TerrainHolder);
+
         GenerateMesh(gridWidth, gridHeight);
     }
 
@@ -122,8 +125,6 @@ public class BetterGenerator : MonoBehaviour
     {
         // Place portal
         locations.Add(new ForestPortal(0, 0));
-
-        // Place medows
 
         // Medow 
         int mCount = UnityEngine.Random.Range(2, 4);
@@ -177,7 +178,7 @@ public class BetterGenerator : MonoBehaviour
         for(int x = 0; x < gridWidth; x++)
         {
             for(int y = 0; y < gridHeight; y++) {
-                int index = x * gridWidth + y;
+                int index = x * gridHeight + y;
 
                 Vector3 p0 = new(x,     th[x,y],  y);
                 Vector3 p1 = new(x,     th[x,y+1],  (y+1));
@@ -204,13 +205,13 @@ public class BetterGenerator : MonoBehaviour
             }
         }
 
+
         newMesh.SetVertices(vertices);
         newMesh.SetTriangles(trianglesFloor, 0);
         newMesh.SetUVs(0, uv);
 
         // Get material
         Material dirt = Resources.Load<Material>("Materials/Forest/Dirt/Dirt");
-        Debug.Log("Dirt: " + dirt);
 
         _mf.mesh = newMesh;
         _mr.materials = new Material[] {dirt};
