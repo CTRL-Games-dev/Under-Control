@@ -66,8 +66,6 @@ public class UICanvas : MonoBehaviour
     [SerializeField] private GameObject _pauseScreenCanvasGO;
 
     [Header("UI Elements")]
-    [SerializeField] private TextMeshProUGUI _coinsText;
-    [SerializeField] private GameObject _coinsHolder;
     [SerializeField] private GameObject _otherInventoryHolder;
     [SerializeField] private RectTransform _navBarRectTransform;
     private ItemContainer _currentOtherInventory;
@@ -101,9 +99,7 @@ public class UICanvas : MonoBehaviour
         // EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
         PlayerController.InventoryToggleEvent.AddListener(OnInventoryToggle);
         PlayerController.UICancelEvent.AddListener(OnUICancel);
-        PlayerController.CoinsChangeEvent.AddListener(OnCoinsChange);
 
-        OnCoinsChange(0);
         
         // _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Armor);
         OpenUIState(CurrentUIState);
@@ -126,10 +122,7 @@ public class UICanvas : MonoBehaviour
     }
 
 
-    private void OnCoinsChange(int change) {
-        _coinsText.text = $"{PlayerController.Coins + change}";
-        StartCoroutine(animateCoins(change > 0));
-    }
+    
 
     private void OnInventoryToggle() {
         _isInventoryOpen = !_isInventoryOpen;
@@ -210,16 +203,6 @@ public class UICanvas : MonoBehaviour
 
         SelectedItemUI.InventoryItem = null;
         EventBus.ItemPlacedEvent?.Invoke();
-    }
-
-    private IEnumerator animateCoins(bool increase) {
-        _coinsText.color = increase ? Color.green : Color.red;
-        _coinsHolder.transform.localScale = increase ? new Vector3(1.2f, 1f, 1f) : new Vector3(0.8f, 1f, 1f);
-        
-        yield return new WaitForSeconds(0.25f);
-        
-        _coinsText.color = Color.white;
-        _coinsHolder.transform.localScale = new Vector3(1f, 1f, 1f);
     }
 
     #endregion
