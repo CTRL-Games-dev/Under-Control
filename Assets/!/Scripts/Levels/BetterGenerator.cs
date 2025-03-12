@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
@@ -48,21 +49,13 @@ public class BetterGenerator : MonoBehaviour
     private void GenerateForest()
     {
         List<Location> allLocations = new();
-        List<Location> generatedLocations = new();
+
+        PlaceLocations(allLocations);
 
         // All locations
-        allLocations.Add(new ForestPortal());
-        allLocations.Add(new DummyLocation(new(1,1), new(3,3)));
-        allLocations.Add(new DummyLocation(new(1,1), new(3,-3)));
-        allLocations.Add(new DummyLocation(new(1,1), new(-3,-3)));
-        allLocations.Add(new DummyLocation(new(1,1), new(-3,3)));
-
         int minX = 0, minY = 0, maxX = 0, maxY = 0;
         foreach(var l in allLocations)
         {
-            l.FindLocation(generatedLocations);
-            generatedLocations.Add(l);
-
             if (l.X < minX) minX = l.X;
             if (l.Y < minY) minY = l.Y;
             if (l.X+l.Width > maxX) maxX = l.X+l.Width;
@@ -74,7 +67,7 @@ public class BetterGenerator : MonoBehaviour
         // Grid is used to determine where to spawn trees
         int gridPadding = 5;
         int gridWidth = (int)Vector2.Distance(new(minX,0), new(maxX,0)) + (gridPadding*2);
-        int gridHeight = gridWidth;
+        int gridHeight = (int)Vector2.Distance(new(minY,0), new(maxY,0)) + (gridPadding*2);;
         // int gridHeight = (int)Vector2.Distance(new(0,minY), new(0,maxY));
         
         bool[,] grid = new bool[gridWidth + (gridPadding*2), gridHeight + (gridPadding*2)];
@@ -100,8 +93,9 @@ public class BetterGenerator : MonoBehaviour
 
         // Calculate location centers
         List<Vector2> locationCenters = new();
-        foreach(var l in generatedLocations)
+        foreach(var l in allLocations)
         {
+            Debug.Log("Generated location");
             Vector2 center = new(l.X + (l.Width/2), l.Y + (l.Height / 2));
             locationCenters.Add(center);
         }
@@ -122,6 +116,43 @@ public class BetterGenerator : MonoBehaviour
         }
         
         GenerateMesh(gridWidth, gridHeight);
+    }
+
+    private void PlaceLocations(List<Location> locations)
+    {
+        // Place portal
+        locations.Add(new ForestPortal(0, 0));
+
+        // Place medows
+
+        // Medow 
+        int mCount = UnityEngine.Random.Range(2, 4);
+        for(int i = 0; i < mCount; i++)
+        {
+            Location medow = new Medow();
+
+            int minRange = 12;
+            int maxRange = 55;
+            
+            int indexX = UnityEngine.Random.Range(minRange, maxRange + 1);
+            int indexY = UnityEngine.Random.Range(minRange, maxRange + 1);
+
+            indexX *= UnityEngine.Random.Range(0, 2) == 0 ? 1 : -1;
+            indexY *= UnityEngine.Random.Range(0, 2) == 0 ? 1 : -1;
+
+            bool flag = false;
+            for(int t = 0; t < 5; t++)
+            {
+                medow.SetCenter(new(indexX, indexY));
+                if(medow.CheckLocation(locations)) {
+                    flag = true;
+                    Debug.Log("Added a");
+                    break;
+                };
+            }
+
+            if(flag) locations.Add(medow);
+        }
     }
 
     #region Mesh
@@ -192,19 +223,20 @@ public class BetterGenerator : MonoBehaviour
     {
         // Create "sigma triangle"
         Triangle st = Triangle.GetSuperTriangle(locationCenters);
-        // Debug.Log("Created sigma triangle: " + st.vA + " " + st.vB + " " + st.vC);
+        Debug.Log("Created sigma triangle: " + st.vA + " " + st.vB + " " + st.vC);
 
         List<Triangle> triangles = new();
         triangles.Add(st);
 
         // Triangulate each vertex (magic)
+        Debug.Log($"Number of centers: {locationCenters.Count}");
         foreach (var vertex in locationCenters)
         {
-            // Debug.Log("=== ITERATION ===");
-            // Debug.Log("Current vertex = " + vertex);
+            Debug.Log("=== ITERATION ===");
+            Debug.Log("Current vertex = " + vertex);
             triangles = AddVertex(vertex, triangles);
         }
-        // Debug.Log("Number of triangles: " + triangles.Count);
+        Debug.Log("Number of triangles: " + triangles.Count);
 
         // Remove triangles that share edges with sigma triangle (they are not so sigma)
         triangles = triangles.Where(t => 

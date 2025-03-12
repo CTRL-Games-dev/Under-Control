@@ -4,8 +4,8 @@ public abstract class Location
 {
     public int Width, Height;
     public int X, Y;
-    public abstract void FindLocation(List<Location> generatedLocations);
-    private bool CheckLocation(List<Location> generatedLocations)
+    public abstract void GenerateLocation(GameObject parent);
+    public bool CheckLocation(List<Location> generatedLocations)
     {
         foreach(var l in generatedLocations)
         {
@@ -14,7 +14,16 @@ public abstract class Location
         }
         return true;
     }
-    public abstract void GenerateLocation(GameObject parent);
+
+    public Vector2 GetCenter()
+    {
+        return new(X + (Width/2), Y + (Height/2));
+    }
+    public void SetCenter(Vector2 center)
+    {
+        X = (int)(center.x) - (Width/2);
+        Y = (int)(center.y) - (Width/2);
+    }
 }
 
 // === Forest ===
@@ -22,17 +31,17 @@ public abstract class Location
 public class ForestPortal : Location
 {
     private GameObject _portalPrefab;
-    public override void FindLocation(List<Location> generatedLocations)
+    public ForestPortal(int x, int y)
     {
         string portalPath = "Prefabs/Forest/Portal";
 
         _portalPrefab = Resources.Load<GameObject>(portalPath);
+
+        this.X = x;
+        this.Y = y;
         
-        // TODO find a way to properly set up width and height
         Width = 1;
         Height = 1;
-
-        X = Y = 0;
     }
 
     public override void GenerateLocation(GameObject parent)
@@ -51,14 +60,23 @@ public class DummyLocation : Location
         this.X = (int)position.x;
         this.Y = (int)position.y;
     }
-    public override void FindLocation(List<Location> generatedLocations)
-    {   
-        
-    }
-
 
     public override void GenerateLocation(GameObject parent)
     {
 
+    }
+}
+
+public class Medow : Location
+{
+    public Medow()
+    {
+        Width = Random.Range(5, 12);
+        Height = Random.Range(7, 12);
+    }
+
+    public override void GenerateLocation(GameObject parent)
+    {
+        // throw new System.NotImplementedException();
     }
 }
