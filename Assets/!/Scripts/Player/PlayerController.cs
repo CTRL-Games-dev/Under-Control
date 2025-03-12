@@ -98,6 +98,7 @@ public class PlayerController : MonoBehaviour
     {
         recalculateStats();
 
+        // Nie mozna playerinputa wylaczyc?
         if (InputDisabled) {
             _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0, _deceleration * Time.deltaTime);
             return;
@@ -124,7 +125,7 @@ public class PlayerController : MonoBehaviour
     private void handleRotation() {
         if (_movementInputVector.magnitude > 0.1f) {
             var targetRotation = Quaternion.Euler(0, 45, 0) * Quaternion.LookRotation(new Vector3(_movementInputVector.x, 0, _movementInputVector.y));
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
         }
     }
 
