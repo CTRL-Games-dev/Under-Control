@@ -318,6 +318,8 @@ public class InventoryPanel : MonoBehaviour
         // if (UICanvas.Instance.SelectedItemUI.InventoryItem != null) return; 
 
         if (_inventory.Contains(itemUI.InventoryItem)) {
+            
+            if (UICanvas.Instance.SelectedItemUI.InventoryItem != null) return; 
             UICanvas.Instance.SetSelectedItemUI(itemUI);
             if (IsSellerInventory) {
                 _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;

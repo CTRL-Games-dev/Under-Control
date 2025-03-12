@@ -98,7 +98,7 @@ public class UICanvas : MonoBehaviour
 
     private void Start() {
         EventBus.ItemUIHoverEvent.AddListener(OnItemUIHover);
-        EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
+        // EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
         PlayerController.InventoryToggleEvent.AddListener(OnInventoryToggle);
         PlayerController.UICancelEvent.AddListener(OnUICancel);
         PlayerController.CoinsChangeEvent.AddListener(OnCoinsChange);
@@ -121,7 +121,7 @@ public class UICanvas : MonoBehaviour
     private void OnItemUIClick(ItemUI itemUI) {
         if (SelectedItemUI.InventoryItem != null) return; 
 
-        SelectedItemUI.gameObject.SetActive(itemUI != null);
+        // SelectedItemUI.gameObject.SetActive(itemUI != null);
         SelectedItemUI.InventoryItem = itemUI.InventoryItem;
     }
 

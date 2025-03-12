@@ -37,6 +37,8 @@ public class PauseScreen : MonoBehaviour
 
     #region Public Methods
     public void ShowPauseMenu() {
+        float fadeSpeed = 0.2f;
+        float moveSpeed = 0.4f;
         
         gameObject.SetActive(true);
         killTweens();
@@ -47,17 +49,17 @@ public class PauseScreen : MonoBehaviour
         _canvasGroup.alpha = 1;
         _bgImage.DOFade(1f, 1f).SetUpdate(true);
 
-        _blackBarRect.DOAnchorPosY(-1080, 1).SetEase(Ease.OutQuint).SetUpdate(true).OnComplete(() => {
-            _resumeRect.DOAnchorPosY(_resumeBtnStartingY + 20, 1).SetAs(_tweenParams);
-            _resumeGroup.DOFade(1, 0.2f).SetAs(_tweenParams).OnComplete(() => {
-                _saveRect.DOAnchorPosY(_saveBtnStartingY + 20, 1).SetAs(_tweenParams);
-                _saveGroup.DOFade(1, 0.2f).SetAs(_tweenParams).OnComplete(() => {
-                    _loadRect.DOAnchorPosY(_loadBtnStartingY + 20, 1).SetAs(_tweenParams);
-                    _loadGroup.DOFade(1, 0.2f).SetAs(_tweenParams).OnComplete(() => {
-                        _optionsRect.DOAnchorPosY(_optionsBtnStartingY + 20, 1).SetAs(_tweenParams);
-                        _optionsGroup.DOFade(1, 0.2f).SetAs(_tweenParams).OnComplete(() => {
-                            _exitRect.DOAnchorPosY(_exitBtnStartingY + 20, 1).SetAs(_tweenParams);
-                            _exitGroup.DOFade(1, 0.2f).SetAs(_tweenParams);
+        _blackBarRect.DOAnchorPosY(-1080, 0.3f).SetEase(Ease.OutQuint).SetUpdate(true).OnComplete(() => {
+            _resumeRect.DOAnchorPosY(_resumeBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
+            _resumeGroup.DOFade(1, fadeSpeed).SetAs(_tweenParams).OnComplete(() => {
+                _saveRect.DOAnchorPosY(_saveBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
+                _saveGroup.DOFade(1, fadeSpeed).SetAs(_tweenParams).OnComplete(() => {
+                    _loadRect.DOAnchorPosY(_loadBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
+                    _loadGroup.DOFade(1, fadeSpeed).SetAs(_tweenParams).OnComplete(() => {
+                        _optionsRect.DOAnchorPosY(_optionsBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
+                        _optionsGroup.DOFade(1, fadeSpeed).SetAs(_tweenParams).OnComplete(() => {
+                            _exitRect.DOAnchorPosY(_exitBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
+                            _exitGroup.DOFade(1, fadeSpeed).SetAs(_tweenParams);
                         });
                     });
                 });

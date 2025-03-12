@@ -66,8 +66,11 @@ public class InvTileEquipment : InvTile {
             }
 
             IsEmpty = true;
-            Destroy(_itemUI.gameObject);
-            _itemUI = null;
+            if (_itemUI != null) {
+                UICanvas.Instance.SetSelectedItemUI(_itemUI);
+                Destroy(_itemUI.gameObject);
+                _itemUI = null;
+            }
         }
     }
 

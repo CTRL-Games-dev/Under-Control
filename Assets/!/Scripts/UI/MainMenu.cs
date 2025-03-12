@@ -38,7 +38,7 @@ public class MainMenu : MonoBehaviour
     private void Start() {
         CameraManager.Instance.StartCamera = _mainMenuCamera;
 
-        animateButtons();
+        // animateButtons();
     }
 
     public void PlayGame() {
@@ -74,22 +74,23 @@ public class MainMenu : MonoBehaviour
 
     private void animateButtons() {
         Ease ease = Ease.OutQuint;
+        float moveSpeed = 0.9f;
+        float fadeSpeed = 0.2f;
 
         killTweens();
         resetBtnAlphas();
         resetBtnPositions();
-        _bgImage.DOFade(245.0f / 255.0f, 1f);
 
-        _logoImage.DOFade(1, 1f).SetEase(Ease.InSine).OnComplete(() => {
-            _continueRect.DOAnchorPosX(_continueBtnStartingX -50, 1).SetEase(ease);
-            _continueGroup.DOFade(1, 0.2f).OnComplete(() => {
-                _newGameRect.DOAnchorPosX(_newGameBtnStartingX -50, 1).SetEase(ease);
-                _newGameGroup.DOFade(1, 0.2f).OnComplete(() => {
-                    _optionsRect.DOAnchorPosX(_optionsBtnStartingX -50, 1).SetEase(ease);
-                    _optionsGroup.DOFade(1, 0.2f).OnComplete(() => {
-                        _creditsRect.DOAnchorPosX(_creditsBtnStartingX -50, 1).SetEase(ease);
-                        _creditsGroup.DOFade(1, 0.2f).OnComplete(() => {
-                            _exitRect.DOAnchorPosX(_exitBtnStartingX -50, 1).SetEase(ease);
+        _logoImage.DOFade(1, 0.6f).SetEase(Ease.InSine).OnComplete(() => {
+            _continueRect.DOAnchorPosX(_continueBtnStartingX -50, moveSpeed).SetEase(ease);
+            _continueGroup.DOFade(1, fadeSpeed).OnComplete(() => {
+                _newGameRect.DOAnchorPosX(_newGameBtnStartingX -50, moveSpeed).SetEase(ease);
+                _newGameGroup.DOFade(1, fadeSpeed).OnComplete(() => {
+                    _optionsRect.DOAnchorPosX(_optionsBtnStartingX -50, moveSpeed).SetEase(ease);
+                    _optionsGroup.DOFade(1, fadeSpeed).OnComplete(() => {
+                        _creditsRect.DOAnchorPosX(_creditsBtnStartingX -50, moveSpeed).SetEase(ease);
+                        _creditsGroup.DOFade(1, fadeSpeed).OnComplete(() => {
+                            _exitRect.DOAnchorPosX(_exitBtnStartingX -50, moveSpeed).SetEase(ease);
                             _exitGroup.DOFade(1, 0.2f);
                         });
                     });
