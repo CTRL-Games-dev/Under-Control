@@ -88,6 +88,8 @@ public class PlayerController : MonoBehaviour
         Animator = GetComponent<Animator>();
         LivingEntity = GetComponent<LivingEntity>();
         CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
+        LivingEntity.OnDeath.AddListener(onDeath);
+
         
         _cameraDistance = MinCameraDistance;
 
@@ -131,6 +133,10 @@ public class PlayerController : MonoBehaviour
 
     private void recalculateStats() {
         VekhtarControl.Recalculate(LivingEntity.ModifierSystem);
+    }
+
+    private void onDeath() {
+        UICanvas.Instance.OpenUIState(UIState.DeathScreen);
     }
 
     // Input events
@@ -207,10 +213,7 @@ public class PlayerController : MonoBehaviour
     }
 
     private void interact(bool primary) {
-        if(EventSystem.current.IsPointerOverGameObject()) {
-            return;
-        }
-
+        if (UICanvas.Instance.CurrentUIState !=  UIState.NotVisible) return;
         bool interacted = tryInteract();
         
         if(interacted) return;
