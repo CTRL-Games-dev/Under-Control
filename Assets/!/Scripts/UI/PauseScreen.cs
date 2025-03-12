@@ -47,7 +47,7 @@ public class PauseScreen : MonoBehaviour
 
         StartCoroutine(slowdownTime());
         _canvasGroup.alpha = 1;
-        _bgImage.DOFade(1f, 1f).SetUpdate(true);
+        _bgImage.DOFade(1f, 0.8f).SetUpdate(true);
 
         _blackBarRect.DOAnchorPosY(-1080, 0.3f).SetEase(Ease.OutQuint).SetUpdate(true).OnComplete(() => {
             _resumeRect.DOAnchorPosY(_resumeBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
@@ -73,10 +73,12 @@ public class PauseScreen : MonoBehaviour
         StartCoroutine(speedupTime());
         killTweens();
 
-        _bgImage.DOFade(0f, 1f).SetUpdate(true);
-        return _blackBarRect.DOAnchorPosY(0, 1).SetEase(Ease.InQuint).SetUpdate(true).OnComplete(() => {
+        _bgImage.DOFade(0f, 0.8f).SetUpdate(true);
+        return _blackBarRect.DOAnchorPosY(0, 0.6f).SetEase(Ease.InQuint).SetUpdate(true).OnComplete(() => {
             resetBtnPositions();
             resetBtnAlphas();
+            StopCoroutine(speedupTime());
+            Time.timeScale = 1;
             gameObject.SetActive(false);
         });
     }
@@ -120,7 +122,7 @@ public class PauseScreen : MonoBehaviour
     private IEnumerator slowdownTime() {
         Time.timeScale = 1;
         for (int i = 0; i < 100; i++) {
-            Time.timeScale -= 0.005f;
+            Time.timeScale = Mathf.Clamp(Time.timeScale - 0.01f, 0f, 1f);
             yield return new WaitForSecondsRealtime(0.005f);
         }
         Time.timeScale = 0;
@@ -129,7 +131,7 @@ public class PauseScreen : MonoBehaviour
     private IEnumerator speedupTime() {
         Time.timeScale = 0.01f;
         for (int i = 0; i < 100; i++) {
-            Time.timeScale += 0.005f;
+            Time.timeScale = Mathf.Clamp(Time.timeScale + 0.01f, 0f, 1f);
             yield return new WaitForSecondsRealtime(0.005f);
         }
         Time.timeScale = 1;
