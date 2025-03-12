@@ -16,6 +16,7 @@ public class LivingEntity : MonoBehaviour
     public Guild Guild;
     public bool DropItemsOnDeath = true;
     public float TimeToRegenAfterDamage = 2;
+    public string DebugName => $"{DisplayName} ({Guild.Name}. {gameObject.name})";
 
     public int Exp = 0;
     public float Level { get => 1 + Exp / 100f; }
@@ -159,6 +160,8 @@ public class LivingEntity : MonoBehaviour
             }
 
             OnDeath.Invoke();
+
+            Destroy(gameObject);
         }
     }
 

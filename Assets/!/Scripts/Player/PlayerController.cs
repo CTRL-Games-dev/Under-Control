@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
@@ -30,6 +31,7 @@ public class PlayerController : MonoBehaviour
     public GameObject MainCameraObject;
     public GameObject CinemachineObject;
     public GameObject CameraTargetObject;
+    public bool InputDisabled = true;
 
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
@@ -68,9 +70,6 @@ public class PlayerController : MonoBehaviour
     private Vector2 _movementInputVector = Vector2.zero;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
 
-    public bool InputDisabled = true;
-    private List<LivingEntity> _hitEntities = new List<LivingEntity>();
-
     private readonly int _speedHash = Animator.StringToHash("speed");
     private readonly int _dodgeHash = Animator.StringToHash("dodge");
     private readonly int _lightAttackHash = Animator.StringToHash("light_attack");
@@ -101,6 +100,7 @@ public class PlayerController : MonoBehaviour
     {
         recalculateStats();
 
+        // Nie mozna playerinputa wylaczyc?
         if (InputDisabled) {
             _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0, _deceleration * Time.deltaTime);
             return;
@@ -115,6 +115,7 @@ public class PlayerController : MonoBehaviour
             _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0, _deceleration * Time.deltaTime);
         }
 
+        handleInteraction();
         handleRotation();
     }
 
@@ -126,7 +127,7 @@ public class PlayerController : MonoBehaviour
     private void handleRotation() {
         if (_movementInputVector.magnitude > 0.1f) {
             var targetRotation = Quaternion.Euler(0, 45, 0) * Quaternion.LookRotation(new Vector3(_movementInputVector.x, 0, _movementInputVector.y));
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
         }
     }
 
@@ -199,12 +200,16 @@ public class PlayerController : MonoBehaviour
         Animator.SetTrigger(_dodgeHash);
     }
 
-    void OnPrimaryInteraction() {
-        interact(true);
-    }
+    private void handleInteraction() {
+        if (EventSystem.current.IsPointerOverGameObject()) {
+            return;
+        }
 
-    void OnSecondaryInteraction() {
-        interact(false);
+        if(Mouse.current.leftButton.isPressed) {
+            interact(true);
+        } else if(Mouse.current.rightButton.isPressed) {
+            interact(false);
+        }
     }
 
     private void interact(bool primary) {
@@ -251,52 +256,15 @@ public class PlayerController : MonoBehaviour
         Animator.SetTrigger(_heavyAttackHash);
     }
 
-    public void OnWeaponHit(LivingEntity target) {
-        if(target == LivingEntity) return;
-
-        if(CurrentWeapon.DamageMax <= 0) {
-            Debug.LogWarning($"DamageMax is zero or negative. Current weapon is {CurrentWeapon.DisplayName}");
-            return;
-        }
-
-        if(CurrentWeapon.DamageMin < 0) {
-            Debug.LogWarning($"DamageMin is negative. Current weapon is {CurrentWeapon.DisplayName}");
-            return;
-        }
-
-        if(CurrentWeapon.DamageMax < CurrentWeapon.DamageMin) {
-            Debug.LogWarning($"DamageMax ({CurrentWeapon.DamageMax}) is less than DamageMin ({CurrentWeapon.DamageMin}). Current weapon is {CurrentWeapon.DisplayName}");
-            return;
-        }
-
-        if(_hitEntities.Contains(target)) {
-            Debug.LogWarning($"Tried hitting {target.DisplayName} with {CurrentWeapon.DisplayName} but it was already hit");
-            return;
-        }
-
-        // Debug.Log($"Hitting {target.DisplayName} with {CurrentWeapon.DisplayName}");
-
-        float damageValue = UnityEngine.Random.Range(CurrentWeapon.DamageMin, CurrentWeapon.DamageMax);
-
-        target.TakeDamage(new Damage{
-            Type = CurrentWeapon.DamageType,
-            Value = damageValue
-        }, LivingEntity);
-
-        _hitEntities.Add(target);
-    }
-
     public void OnInventoryChanged() {
         WeaponHolder.UpdateWeapon(CurrentWeapon);
     }
 
     public void OnAttackAnimationStart() {
-        _hitEntities.Clear();
         WeaponHolder.BeginAttack();
     }
 
     public void OnAttackAnimationEnd() {
         WeaponHolder.EndAttack();
-        _hitEntities.Clear();
     }
 }
