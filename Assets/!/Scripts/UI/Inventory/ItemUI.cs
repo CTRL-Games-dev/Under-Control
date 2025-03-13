@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class ItemUI : MonoBehaviour
@@ -64,6 +65,10 @@ public class ItemUI : MonoBehaviour
         Amount = InventoryItem.Amount;
     }
 
+    public void UpdateAmount() {
+        Amount = InventoryItem.Amount;
+    }
+
 
     public void OnPointerEnter() {
         _imageRectTransform.localScale = new Vector3(1.1f, 1.1f, 1);
@@ -82,7 +87,7 @@ public class ItemUI : MonoBehaviour
         _image.color = new Color(1, 1, 1, 1);
     }
     public void OnPointerClick() {
-        EventBus.ItemUIClickEvent?.Invoke(this);
-    }
 
+        // EventBus.ItemUIClickEvent?.Invoke(this);
+    }
 }

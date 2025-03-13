@@ -23,7 +23,8 @@ public class InvTileEquipment : InvTile {
 
     private void Start() {
         EventBus.TileSizeSetEvent.AddListener(OnTileSizeSetEvent);
-        EventBus.ItemUIClickEvent.AddListener(OnItemUIClickEvent);
+        EventBus.ItemUILeftClickEvent.AddListener(OnItemUIClickEvent);
+        EventBus.ItemUIRightClickEvent.AddListener(OnItemUIClickEvent);
 
         _uiCanvas = UICanvas.Instance;
         _rectTransform = GetComponent<RectTransform>();

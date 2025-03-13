@@ -49,7 +49,6 @@ public class UICanvas : MonoBehaviour
 
 
     // UI elements
-    private bool _isInventoryOpen = false;
     public InventoryPanel PlayerInventoryPanel;
 
     [HideInInspector] public InventoryPanel ActiveInventoryPanel;
@@ -66,10 +65,9 @@ public class UICanvas : MonoBehaviour
     [SerializeField] private GameObject _pauseScreenCanvasGO;
 
     [Header("UI Elements")]
-    [SerializeField] private TextMeshProUGUI _coinsText;
-    [SerializeField] private GameObject _coinsHolder;
     [SerializeField] private GameObject _otherInventoryHolder;
     [SerializeField] private RectTransform _navBarRectTransform;
+    [SerializeField] private ActionNotifierManager _actionNotifierManager;
     private ItemContainer _currentOtherInventory;
     private InventoryCanvas _inventoryCanvas;
     private MainMenu _mainMenu;
@@ -98,14 +96,9 @@ public class UICanvas : MonoBehaviour
 
     private void Start() {
         EventBus.ItemUIHoverEvent.AddListener(OnItemUIHover);
-        // EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
         PlayerController.InventoryToggleEvent.AddListener(OnInventoryToggle);
         PlayerController.UICancelEvent.AddListener(OnUICancel);
-        PlayerController.CoinsChangeEvent.AddListener(OnCoinsChange);
-
-        OnCoinsChange(0);
         
-        // _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Armor);
         OpenUIState(CurrentUIState);
     }
 
@@ -116,27 +109,13 @@ public class UICanvas : MonoBehaviour
     private void OnItemUIHover(ItemUI itemUI) {
         if (SelectedItemUI.InventoryItem != null) return;
         ItemInfoPanel.ShowItemInfo(itemUI);
-    }
-
-    private void OnItemUIClick(ItemUI itemUI) {
-        if (SelectedItemUI.InventoryItem != null) return; 
-
-        // SelectedItemUI.gameObject.SetActive(itemUI != null);
-        SelectedItemUI.InventoryItem = itemUI.InventoryItem;
-    }
-
-
-    private void OnCoinsChange(int change) {
-        _coinsText.text = $"{PlayerController.Coins + change}";
-        StartCoroutine(animateCoins(change > 0));
-    }
+    }    
 
     private void OnInventoryToggle() {
-        _isInventoryOpen = !_isInventoryOpen;
-        if (_isInventoryOpen) {
-            OpenUIState(UIState.Inventory);
-        } else {
+        if (CurrentUIState == UIState.Inventory) {
             CloseUIState(UIState.Inventory);
+        } else if (CurrentUIState == UIState.NotVisible) {
+            OpenUIState(UIState.Inventory);
         }
     }
 
@@ -170,6 +149,13 @@ public class UICanvas : MonoBehaviour
 
         SelectedItemUI.gameObject.SetActive(itemUI != null);
         SelectedItemUI.InventoryItem = itemUI.InventoryItem;
+    }
+
+    public void SetSelectedInventoryItem(InventoryItem inventoryItem) {
+        if (SelectedItemUI.InventoryItem != null) return;
+
+        SelectedItemUI.gameObject.SetActive(inventoryItem != null);
+        SelectedItemUI.InventoryItem = inventoryItem;
     }
 
 
@@ -212,14 +198,8 @@ public class UICanvas : MonoBehaviour
         EventBus.ItemPlacedEvent?.Invoke();
     }
 
-    private IEnumerator animateCoins(bool increase) {
-        _coinsText.color = increase ? Color.green : Color.red;
-        _coinsHolder.transform.localScale = increase ? new Vector3(1.2f, 1f, 1f) : new Vector3(0.8f, 1f, 1f);
-        
-        yield return new WaitForSeconds(0.25f);
-        
-        _coinsText.color = Color.white;
-        _coinsHolder.transform.localScale = new Vector3(1f, 1f, 1f);
+    public void PickupItemNotify(ItemData itemData, int amount) {
+        _actionNotifierManager.SpawnActionNotifier(itemData.Icon, itemData.DisplayName, Color.white, amount);
     }
 
     #endregion
@@ -286,11 +266,10 @@ public class UICanvas : MonoBehaviour
 
     private void openInventoryScreen() {
         InventoryPanel.IsItemJustBought = false;
-        _isInventoryOpen = true;
 
         _inventoryCanvasGroup.DOKill();
         _navBarRectTransform.DOKill();
-        _navBarRectTransform.DOAnchorPosY(_isInventoryOpen ? 0 : 65, 0.25f);
+        _navBarRectTransform.DOAnchorPosY(0, 0.25f);
         _inventoryCanvasGO.SetActive(true);
         _inventoryCanvasGroup.DOFade(1, 0.25f);
         _inventoryCanvasGroup.interactable = true;
@@ -300,11 +279,10 @@ public class UICanvas : MonoBehaviour
 
     private void closeInventoryScreen() {
         InventoryPanel.IsItemJustBought = false;
-        _isInventoryOpen = false;
 
         _inventoryCanvasGroup.DOKill();
         _navBarRectTransform.DOKill();
-        _navBarRectTransform.DOAnchorPosY(_isInventoryOpen ? 0 : 65, 0.25f);
+        _navBarRectTransform.DOAnchorPosY(65, 0.25f);
 
         if (SelectedItemUI.InventoryItem != null) {
             DropItem();
