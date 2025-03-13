@@ -15,6 +15,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
     [SerializeField] private GameObject player;
     private void Start()
     {
+        
         _gm = GameManager.instance;
         
         var generator = GetComponent<BetterGenerator>();
