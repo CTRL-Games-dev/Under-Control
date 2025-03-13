@@ -10,19 +10,25 @@ using UnityEngine;
 [RequireComponent(typeof(BetterGenerator))]
 public class AdventureManager : MonoBehaviour, ILevelManager
 {
-
-    private GameManager _gm;
-    [SerializeField] private GameObject player;
+    private GameManager _gameManager;
+    [SerializeField] private CameraManager _cameraManager;
+    [SerializeField] private GameObject _player;
     private void Start()
     {
-        _gm = GameManager.Instance;
+        _gameManager = GameManager.Instance;
         
         var generator = GetComponent<BetterGenerator>();
         generator.GenerateMap(BetterGenerator.LevelType.Forest);
         
         Location portal = generator.Getlocation<ForestPortal>();
-        Vector2 spawn = portal.GetCenter();
-        Instantiate(player, new(spawn.x, 0.2f, spawn.y - 0.8f), Quaternion.identity);
+        Vector2 spawn = portal.GetAbsoluteCenter();
+
+        var _pi = Instantiate(_player, new(spawn.x, 0.2f, spawn.y - 3f), Quaternion.identity);
+
+        _cameraManager.StartCamera = _pi.transform.Find("PlayerCamera").GetComponent<CinemachineCamera>();
+        _cameraManager.PlayerTopDownCamera = _pi.transform.Find("PlayerCamera").GetComponent<CinemachineCamera>();
+
+        _cameraManager.SwitchCamera(_cameraManager.PlayerTopDownCamera);
     }
 
     private void Update()

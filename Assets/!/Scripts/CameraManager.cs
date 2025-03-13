@@ -31,6 +31,7 @@ public class CameraManager : MonoBehaviour
     }
 
     public void SwitchCamera(CinemachineCamera camera) {
+        if (!_cinemachineCameras.Contains(camera)) _cinemachineCameras.Add(camera);
         _currentCamera = camera;
 
         setCamerasPriority();
