@@ -4,6 +4,7 @@ public abstract class Location
 {
     public int Width, Height;
     public int X, Y;
+    public Vector2 Offset { get; protected set; } = new(0,0);
     public abstract void GenerateLocation(GameObject parent, Vector2 offset);
     public bool CheckLocation(List<Location> generatedLocations)
     {
@@ -17,12 +18,12 @@ public abstract class Location
 
     public Vector2 GetCenter()
     {
-        return new(X + (Width/2), Y + (Height/2));
+        return new Vector2(X + (Width/2), Y + (Height/2)) - Offset;
     }
     public void SetCenter(Vector2 center)
     {
-        X = (int)(center.x) - (Width/2);
-        Y = (int)(center.y) - (Width/2);
+        X = (int)(center.x) - (Width/2) - (int)Offset.x;
+        Y = (int)(center.y) - (Width/2) - (int)Offset.y;
     }
 }
 
@@ -37,14 +38,16 @@ public class ForestPortal : Location
 
         _portalPrefab = Resources.Load<GameObject>(portalPath);
         
-        Width = 1;
-        Height = 1;
+        Width = 3;
+        Height = 3;
     }
 
     public override void GenerateLocation(GameObject parent, Vector2 offset)
     {
-        Debug.Log($"Offset: {offset}");
-        var gm = GameObject.Instantiate(_portalPrefab, new(X-offset.x, 0, Y-offset.y), Quaternion.identity, parent.transform);
+        Offset = offset;
+        Vector2 center = GetCenter();
+        
+        var gm = GameObject.Instantiate(_portalPrefab, new(center.x + 0.5f, 0.5f, center.y + 0.5f), Quaternion.identity, parent.transform);
     }
 }
 
