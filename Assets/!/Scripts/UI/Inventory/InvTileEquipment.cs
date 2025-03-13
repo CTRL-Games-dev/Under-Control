@@ -9,8 +9,7 @@ public class InvTileEquipment : InvTile {
         Boots,
         Amulet,
         Ring,
-        WeaponLeftHand,
-        WeaponRightHand,
+        Weapon,
     }
 
     [SerializeField] private GameObject _itemPrefab;
@@ -24,7 +23,8 @@ public class InvTileEquipment : InvTile {
 
     private void Start() {
         EventBus.TileSizeSetEvent.AddListener(OnTileSizeSetEvent);
-        EventBus.ItemUIClickEvent.AddListener(OnItemUIClickEvent);
+        EventBus.ItemUILeftClickEvent.AddListener(OnItemUIClickEvent);
+        EventBus.ItemUIRightClickEvent.AddListener(OnItemUIClickEvent);
 
         _uiCanvas = UICanvas.Instance;
         _rectTransform = GetComponent<RectTransform>();
@@ -61,17 +61,17 @@ public class InvTileEquipment : InvTile {
                 case TileType.Ring:
                     _uiCanvas.PlayerInventory.Ring = null;
                     break;
-                case TileType.WeaponLeftHand:
-                    _uiCanvas.PlayerInventory.UnequipLeftHand();
-                    break;
-                case TileType.WeaponRightHand:
-                    _uiCanvas.PlayerInventory.UnequipRightHand();
+                case TileType.Weapon:
+                    _uiCanvas.PlayerInventory.Weapon = null;
                     break;
             }
 
             IsEmpty = true;
-            Destroy(_itemUI.gameObject);
-            _itemUI = null;
+            if (_itemUI != null) {
+                UICanvas.Instance.SetSelectedItemUI(_itemUI);
+                Destroy(_itemUI.gameObject);
+                _itemUI = null;
+            }
         }
     }
 
@@ -117,18 +117,12 @@ public class InvTileEquipment : InvTile {
                 }
 
                 _uiCanvas.PlayerInventory.Amulet = amuletItemData;
-            } else if (_tileType == TileType.WeaponLeftHand) {
+            } else if (_tileType == TileType.Weapon) {
                 if (SelectedInventoryItem.ItemData is not WeaponItemData weaponItemData) {
                     return;
                 }
 
-                _uiCanvas.PlayerInventory.EquipLeftHand(weaponItemData);
-            } else if (_tileType == TileType.WeaponRightHand) {
-                if (SelectedInventoryItem.ItemData is not WeaponItemData weaponItemData) {
-                    throw new System.Exception("Item is not a weapon");
-                }
-
-                _uiCanvas.PlayerInventory.EquipRightHand(weaponItemData);
+                _uiCanvas.PlayerInventory.Weapon = weaponItemData;
             }
         } catch (System.Exception e) {
             Debug.Log(e);
@@ -136,7 +130,6 @@ public class InvTileEquipment : InvTile {
         }
 
         createItemUI(SelectedInventoryItem);
-
 
         EventBus.ItemPlacedEvent?.Invoke();
         IsEmpty = false;

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,13 +7,14 @@ public class SelectedItemUI : MonoBehaviour
 {
     [SerializeField] private RectTransform _imageRectTransform;
     [SerializeField] private TextMeshProUGUI _amountText;
+    [SerializeField] private RectTransform _amountRectTransform;
 
     private InventoryItem _inventoryItem = null;
     public InventoryItem InventoryItem { 
         get { return _inventoryItem; } 
         set {
             if (_inventoryItem != null && value != null) {
-                Debug.Log("debil?");
+                Debug.Log("SelectedItemUI: InventoryItem is already set");
                 return;
             }
 
@@ -41,7 +43,8 @@ public class SelectedItemUI : MonoBehaviour
                     _amountText.text = "";
                     return;
                 }
-                _amountText.text = _inventoryItem.Amount.ToString(); 
+                _amountText.text = _inventoryItem.Amount.ToString();
+                _amountRectTransform.anchoredPosition = new Vector2((_inventoryItem.Size.x -1) * InventoryPanel.TileSize, (_inventoryItem.Size.y - 1) * -InventoryPanel.TileSize);
             }
         }
     }
@@ -90,5 +93,18 @@ public class SelectedItemUI : MonoBehaviour
 
         if (_uiCanvas.ActiveInventoryPanel != null)  
             _uiCanvas.ActiveInventoryPanel.OnInvTileEnter(_uiCanvas.ActiveInventoryPanel.SelectedTile);
+    }
+
+    public void UpdateAmount() {
+        if (_inventoryItem == null) return;
+        if (_inventoryItem.Amount == 0) {
+            InventoryItem = null;
+            return;
+        }
+        if (_inventoryItem.Amount == 1) {
+            _amountText.text = "";
+            return;
+        }
+        _amountText.text = _inventoryItem.Amount.ToString(); 
     }
 }

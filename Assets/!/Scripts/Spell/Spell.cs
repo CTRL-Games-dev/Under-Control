@@ -1,4 +1,9 @@
-public abstract class Spell {
-    public abstract string Name { get; }
+using UnityEngine;
+
+public abstract class Spell : ScriptableObject {
+    public string Name;
+    public string Description;
+    public Sprite Icon;
+
     public abstract void Cast(LivingEntity caster);
 }

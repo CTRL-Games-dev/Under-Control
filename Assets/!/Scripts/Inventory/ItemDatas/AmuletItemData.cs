@@ -1,4 +1,4 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Amulet Item", menuName = "Items/Amulet Item")]
+[CreateAssetMenu(fileName = "SO_Itm_Amulet", menuName = "Items/Amulet")]
 public class AmuletItemData : ItemData {}

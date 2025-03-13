@@ -1,4 +1,4 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Chestplate Item", menuName = "Items/Armor/Chestplate Item")]
+[CreateAssetMenu(fileName = "SO_Itm_Chestplate", menuName = "Items/Armor/Chestplate")]
 public class ChestplateItemData : ArmorItemData {}

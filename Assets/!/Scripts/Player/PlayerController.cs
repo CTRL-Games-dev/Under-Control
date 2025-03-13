@@ -1,14 +1,14 @@
-using System;
-using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(PlayerInput))]
 [RequireComponent(typeof(LivingEntity))]
+[RequireComponent(typeof(HumanoidInventory))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Properties")]
@@ -20,19 +20,30 @@ public class PlayerController : MonoBehaviour
     
     [SerializeField] private float _turnSpeed = 1f;
     
-    public float MouseSensitivity = 0.1f; // po co 
     public float MinCameraDistance = 10f;
     public float MaxCameraDistance = 30f;
     public float CameraDistanceSpeed = 1f;
     public float MaxInteractionRange = 10f;
     public Vector2 CameraTargetObjectBounds = Vector2.zero;
-    public GameObject CameraObject;
+    public GameObject MainCameraObject;
+    public GameObject CinemachineObject;
     public GameObject CameraTargetObject;
+    public bool InputDisabled = true;
 
-    // Attack 
-    public float LightAttackDamage = 10f;
-    public float ChargeAttackDamageMultiplier = 3f;
-    public Cooldown ComboCooldown;
+    [Header("Weapon")]
+    public WeaponHolder WeaponHolder;
+    public WeaponItemData FistsWeaponData;
+    public WeaponItemData CurrentWeapon {
+        get {
+            HumanoidInventory inventory = LivingEntity.Inventory as HumanoidInventory;
+
+            if (inventory.Weapon == null) {
+                return FistsWeaponData;
+            }
+
+            return inventory.Weapon;
+        }
+    }
 
     [Header("Stats")]
     public DynamicStat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
@@ -55,35 +66,42 @@ public class PlayerController : MonoBehaviour
     // State
     private Vector2 _movementInputVector = Vector2.zero;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
-    private bool _lightAttack;
-    private bool _chargeAttack;
-    private int _comboCounter;
+
+    private readonly int _speedHash = Animator.StringToHash("speed");
+    private readonly int _dodgeHash = Animator.StringToHash("dodge");
+    private readonly int _lightAttackHash = Animator.StringToHash("light_attack");
+    private readonly int _heavyAttackHash = Animator.StringToHash("heavy_attack");
+
 
     // References
     public CharacterController CharacterController { get; private set; }
     public Animator Animator { get; private set; }
     public LivingEntity LivingEntity { get; private set; }
     public CinemachinePositionComposer CinemachinePositionComposer { get; private set; }
-    
-    readonly private int _speedHash = Animator.StringToHash("speed");
-    readonly private int _dodgeHash = Animator.StringToHash("dodge");
-    readonly private int _lightAttackHash = Animator.StringToHash("light_attack");
-    readonly private int _heavyAttackHash = Animator.StringToHash("heavy_attack");
-
 
     void Start()
     {
         CharacterController = GetComponent<CharacterController>();
         Animator = GetComponent<Animator>();
         LivingEntity = GetComponent<LivingEntity>();
-        CinemachinePositionComposer = CameraObject.GetComponent<CinemachinePositionComposer>();
+        CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
+        LivingEntity.OnDeath.AddListener(onDeath);
+
         
         _cameraDistance = MinCameraDistance;
+
+        WeaponHolder.UpdateWeapon(CurrentWeapon);
     }
 
     void Update()
     {
         recalculateStats();
+
+        // Nie mozna playerinputa wylaczyc?
+        if (InputDisabled) {
+            _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0, _deceleration * Time.deltaTime);
+            return;
+        }
 
         float goalSpeed = Input.GetKey(KeyCode.LeftShift) ? _maxSprintingSpeed : _maxWalkingSpeed; // do zmiany
 
@@ -94,8 +112,8 @@ public class PlayerController : MonoBehaviour
             _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0, _deceleration * Time.deltaTime);
         }
 
+        handleInteraction();
         handleRotation();
-        // CharacterController.Move(transform.forward * _currentSpeed * Time.deltaTime);
     }
 
     void FixedUpdate()
@@ -106,7 +124,7 @@ public class PlayerController : MonoBehaviour
     private void handleRotation() {
         if (_movementInputVector.magnitude > 0.1f) {
             var targetRotation = Quaternion.Euler(0, 45, 0) * Quaternion.LookRotation(new Vector3(_movementInputVector.x, 0, _movementInputVector.y));
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
         }
     }
 
@@ -114,30 +132,8 @@ public class PlayerController : MonoBehaviour
         VekhtarControl.Recalculate(LivingEntity.ModifierSystem);
     }
 
-    // Handle attack logic
-    // TODO: Finish attack login soon
-    private void handleAttack() {
-        if (_lightAttack)
-        {
-            if (_comboCounter < 3) {
-                print("Light attack" + _comboCounter);
-            }
-
-            _comboCounter++;    
-            _lightAttack = false;                    
-        }
-
-        if (_comboCounter == 4)
-        {
-            print("Knockback attack");
-            _comboCounter = 0;
-        }
-
-        if (_chargeAttack && _comboCounter == 0) 
-        {
-            print("Charge attack");
-            _chargeAttack = false;
-        }
+    private void onDeath() {
+        UICanvas.Instance.OpenUIState(UIState.DeathScreen);
     }
 
     // Input events
@@ -174,16 +170,6 @@ public class PlayerController : MonoBehaviour
         );
     }
 
-    // void OnLightAttack(InputValue value) {
-    //     //_animator.SetTrigger("lightAttack");
-    //     _lightAttack = value.isPressed;
-    // }
-
-    // void OnChargeAttack(InputValue value) {
-    //     //_animator.SetTrigger("chargeAttack");
-    //     _chargeAttack = value.isPressed;        
-    // }
-
     void OnScrollWheel(InputValue value) {
         var delta = value.Get<Vector2>();
         _cameraDistance -= delta.y * CameraDistanceSpeed;
@@ -207,63 +193,75 @@ public class PlayerController : MonoBehaviour
         ItemRotateEvent?.Invoke();
     }
 
-    // Totalnie do zmiany, potrzebujemy interakcji myszka
-    // Kyśnij się London
-    // void OnInteract(InputValue value)
-    // {
-    //     float interactRange = 2f;
-    //     Collider[] colliderArray = Physics.OverlapSphere(transform.position, interactRange);
-    //     foreach(Collider c in colliderArray)
-    //     {
-    //         if(c.TryGetComponent(out IInteractable i))
-    //         {
-    //             i.Interact(this);
-    //         }
-    //     }
-    // }
-
-    // Animation events
-
-    void OnFootstep() {
-        Debug.Log("Footstep");
-    }
-
-    void OnLand() {
-        Debug.Log("Land");
-    }
-
-    void OnPlayerDeath() {
-        Debug.Log("Player died");
-    }
-
-
     void OnDodge() {
         Animator.SetTrigger(_dodgeHash);
     }
 
-    void OnLightAttack() {
+    private void handleInteraction() {
+        if (EventSystem.current.IsPointerOverGameObject()) {
+            return;
+        }
+
+        if(Mouse.current.leftButton.isPressed) {
+            interact(true);
+        } else if(Mouse.current.rightButton.isPressed) {
+            interact(false);
+        }
+    }
+
+    private void interact(bool primary) {
+        if (UICanvas.Instance.CurrentUIState !=  UIState.NotVisible) return;
+        bool interacted = tryInteract();
+        
+        if(interacted) return;
+
+        // Default to attacking if no interaction was commited
+        if(primary) {
+            performLightAttack();
+        } else {
+            performHeavyAttack();
+        }
+    }
+
+    private bool tryInteract() {
+        Ray ray = UICanvas.Instance.MainCamera.ScreenPointToRay(Input.mousePosition);
+        if (!Physics.Raycast(ray, out RaycastHit hit)) {
+            return false;
+        }
+
+        Transform objectHit = hit.transform;
+
+        // Check if object is to far
+        if(Vector3.Distance(objectHit.position, transform.position) > MaxInteractionRange) {
+            return false;
+        }
+
+        if(!objectHit.TryGetComponent(out IInteractable i)) {
+            return false;
+        }
+
+        i.Interact(this);
+
+        return true;
+    }
+
+    private void performLightAttack() {
         Animator.SetTrigger(_lightAttackHash);
     }
 
-    void OnHeavyAttack() {
+    private void performHeavyAttack() {
         Animator.SetTrigger(_heavyAttackHash);
+    }
 
-        // TODO Weźcie to potem dajcie w odpowiednie miejsce czy coś
-        // Wrzuciłem to póki co tutaj
-        Ray ray = CameraObject.GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit)) {
-            Transform objectHit = hit.transform;
+    public void OnInventoryChanged() {
+        WeaponHolder.UpdateWeapon(CurrentWeapon);
+    }
 
-            // Check if object is to farv
-            if(Vector3.Distance(objectHit.position, transform.position) > MaxInteractionRange)
-            {
-                return;
-            }
+    public void OnAttackAnimationStart() {
+        WeaponHolder.BeginAttack();
+    }
 
-            if(objectHit.TryGetComponent(out IInteractable i)) 
-            {
-                i.Interact(this);
-            }
-        }
+    public void OnAttackAnimationEnd() {
+        WeaponHolder.EndAttack();
     }
 }

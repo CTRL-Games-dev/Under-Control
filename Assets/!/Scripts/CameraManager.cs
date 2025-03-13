@@ -1,42 +1,48 @@
-
+using System.Collections.Generic;
+using DG.Tweening;
+using Unity.Cinemachine;
 using UnityEngine;
-public class CameraManager : MonoBehaviour {
-    public Transform Target;
-    public Camera Camera;
 
-    // States
-    public TopdownState Topdown = new();
-    public ICameraState CurrentState;
+public class CameraManager : MonoBehaviour
+{
+    private List<CinemachineCamera> _cinemachineCameras;
+    public CinemachineCamera PlayerTopDownCamera;
 
-    private void Start()
-    {
-        // By Default use topdown
-        CurrentState = Topdown;
+    public CinemachineCamera StartCamera;
+    private CinemachineCamera _currentCamera;
 
-        Camera = GetComponent<Camera>();
-    }
-    private void LateUpdate()
-    {
-        if(Target != null && CurrentState != null)
-        {
-            CurrentState.RunCameraLogic(this);
+    public static CameraManager Instance;
+
+    private void Awake() {
+        if (Instance != null) {
+            Destroy(this);
+            return;
         }
+        Instance = this;
     }
 
-}
+    private void Start() {
+        _cinemachineCameras = new List<CinemachineCamera>(FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None));
+        
+        StartCamera = (StartCamera == null) ? PlayerTopDownCamera : StartCamera;
+        _currentCamera = StartCamera;
 
-public interface ICameraState 
-{
-    public void RunCameraLogic(CameraManager camera);
-}
+        setCamerasPriority();
+    }
 
-public class TopdownState : ICameraState
-{
-    public Vector3 Offset = new(0, 8, 2);
-    public Vector3 Rotation = new(70, 180, 0);
-    public void RunCameraLogic(CameraManager camera)
-    {
-        camera.transform.localPosition = camera.Target.position + Offset;
-        camera.transform.eulerAngles = Rotation;
+    public void SwitchCamera(CinemachineCamera camera) {
+        _currentCamera = camera;
+
+        setCamerasPriority();
+    }
+
+    private void setCamerasPriority() {
+        if (_cinemachineCameras == null) return;
+
+        CinemachineCamera[] cameras = _cinemachineCameras.ToArray();
+
+        for (int i = 0; i < cameras.Length; i++) {
+            cameras[i].Priority = (cameras[i] == _currentCamera) ? 20 : 10;
+        }
     }
 }

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Guild", menuName = "Guild")]
+[CreateAssetMenu(fileName = "SO_Gld_Guild", menuName = "Guild")]
 public class Guild : ScriptableObject {
     public string Name;
     public List<Guild> HostileTowards;

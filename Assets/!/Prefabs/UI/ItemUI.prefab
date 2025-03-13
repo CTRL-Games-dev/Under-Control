@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 1283984169169354170}
   - component: {fileID: 7682720752098568735}
   - component: {fileID: 2356831239008836518}
+  - component: {fileID: 2593056732083611411}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -129,7 +130,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 2632749301031601903}
+        - m_Target: {fileID: 307119531633189807}
           m_TargetAssemblyTypeName: ItemUI, Assembly-CSharp
           m_MethodName: OnPointerEnter
           m_Mode: 1
@@ -145,25 +146,9 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 2632749301031601903}
+        - m_Target: {fileID: 307119531633189807}
           m_TargetAssemblyTypeName: ItemUI, Assembly-CSharp
           m_MethodName: OnPointerExit
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 4
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 2632749301031601903}
-          m_TargetAssemblyTypeName: ItemUI, Assembly-CSharp
-          m_MethodName: OnPointerClick
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -177,7 +162,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 2632749301031601903}
+        - m_Target: {fileID: 307119531633189807}
           m_TargetAssemblyTypeName: ItemUI, Assembly-CSharp
           m_MethodName: OnPointerDown
           m_Mode: 1
@@ -193,7 +178,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 2632749301031601903}
+        - m_Target: {fileID: 307119531633189807}
           m_TargetAssemblyTypeName: ItemUI, Assembly-CSharp
           m_MethodName: OnPointerUp
           m_Mode: 1
@@ -208,19 +193,20 @@ MonoBehaviour:
   - eventID: 5
     callback:
       m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 2632749301031601903}
-          m_TargetAssemblyTypeName: ItemUI, Assembly-CSharp
-          m_MethodName: OnPointerClick
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+        m_Calls: []
+--- !u!114 &2593056732083611411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4794393700937026323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b78075f5f8128bc418ad59637b271af3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _itemUI: {fileID: 307119531633189807}
 --- !u!1 &6613476470598274674
 GameObject:
   m_ObjectHideFlags: 0
@@ -290,8 +276,8 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 48a91833edfdc0344983507ce4fe43c7, type: 2}
+  m_sharedMaterial: {fileID: -8382581547824461542, guid: 48a91833edfdc0344983507ce4fe43c7, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -315,7 +301,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 41.95
+  m_fontSize: 35.3
   m_fontSizeBase: 33.333332
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -368,7 +354,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6077340175028027887}
-  - component: {fileID: 2632749301031601903}
+  - component: {fileID: 307119531633189807}
   m_Layer: 5
   m_Name: ItemUI
   m_TagString: Untagged
@@ -397,7 +383,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
---- !u!114 &2632749301031601903
+--- !u!114 &307119531633189807
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -413,9 +399,10 @@ MonoBehaviour:
   _pivotRectTransform: {fileID: 2923745312813947718}
   _imageRectTransform: {fileID: 3267665394021316051}
   _quantityGameObject: {fileID: 6613476470598274674}
-  InventoryUIManager: {fileID: 0}
+  CurrentInventoryPanel: {fileID: 0}
   InventoryItem:
-    Item: {fileID: 0}
+    ItemData: {fileID: 0}
     Amount: 0
     Position: {x: 0, y: 0}
     Rotated: 0
+  OccupiedTiles: []

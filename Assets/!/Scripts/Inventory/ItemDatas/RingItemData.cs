@@ -1,4 +1,4 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Ring Item", menuName = "Items/Ring Item")]
+[CreateAssetMenu(fileName = "SO_Itm_Ring", menuName = "Items/Ring")]
 public class RingItemData : ItemData {}

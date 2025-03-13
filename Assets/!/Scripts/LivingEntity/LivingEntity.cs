@@ -16,6 +16,7 @@ public class LivingEntity : MonoBehaviour
     public Guild Guild;
     public bool DropItemsOnDeath = true;
     public float TimeToRegenAfterDamage = 2;
+    public string DebugName => $"{DisplayName} ({Guild.Name}. {gameObject.name})";
 
     public int Exp = 0;
     public float Level { get => 1 + Exp / 100f; }
@@ -38,6 +39,11 @@ public class LivingEntity : MonoBehaviour
     // State
     private float _lastDamageTime = 0;
     private List<EffectData> _activeEffects = new List<EffectData>();
+
+    private readonly int _speedHash = Animator.StringToHash("speed");
+    private readonly int _dodgeHash = Animator.StringToHash("dodge");
+    private readonly int _lightAttackHash = Animator.StringToHash("light_attack");
+    private readonly int _heavyAttackHash = Animator.StringToHash("heavy_attack");
 
     // References
     public ModifierSystem ModifierSystem { get; private set; }
@@ -66,9 +72,9 @@ public class LivingEntity : MonoBehaviour
         Inventory.RemoveInventoryItem(item);
     }
 
-    // Spawns item on the ground
+    // Spawns item at torso level and throws item on the ground
     private void dropItem(ItemData itemData, int amount) {
-        ItemEntityManager.Instance.SpawnItemEntity(itemData, amount, transform.position);
+        ItemEntity.SpawnThrownRelative(itemData, amount, transform.position + new Vector3(0, 1.2f, 0), transform.rotation, Vector3.forward * 2);
     }
 
     protected void Attack(Damage damage, LivingEntity target) {
@@ -108,7 +114,7 @@ public class LivingEntity : MonoBehaviour
             // Drop items
             if(DropItemsOnDeath) {
                 // Drop common slots
-                List<InventoryItem> items = Inventory.GetItems();
+                List<InventoryItem> items = new List<InventoryItem>(Inventory.GetItems());
                 foreach(InventoryItem item in items) {
                     dropItem(item.ItemData, item.Amount);
                     Inventory.RemoveInventoryItem(item);
@@ -146,19 +152,16 @@ public class LivingEntity : MonoBehaviour
                         humanoidInventory.Ring = null;
                     }
 
-                    if(humanoidInventory.LeftHand != null) {
-                        dropItem(humanoidInventory.LeftHand, 1);
-                        humanoidInventory.UnequipLeftHand();
-                    }
-
-                    if(humanoidInventory.RightHand != null) {
-                        dropItem(humanoidInventory.RightHand, 1);
-                        humanoidInventory.UnequipRightHand();
+                    if(humanoidInventory.Weapon != null) {
+                        dropItem(humanoidInventory.Weapon, 1);
+                        humanoidInventory.Weapon = null;
                     }
                 }
             }
 
             OnDeath.Invoke();
+
+            Destroy(gameObject);
         }
     }
 
