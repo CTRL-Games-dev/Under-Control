@@ -21,7 +21,7 @@ public class DeepForestBiome : IBiome
         {
             int treeNumber = Random.Range(3,6);
             int rockNumber = Random.Range(2,9);
-            float influence = GameManager.instance.GetInfluence();
+            float influence = GameManager.Instance.GetInfluence();
 
             for (int t = 0; t < treeNumber; t++)
             {
