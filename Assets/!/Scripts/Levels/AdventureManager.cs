@@ -15,8 +15,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
     [SerializeField] private GameObject player;
     private void Start()
     {
-        
-        _gm = GameManager.instance;
+        _gm = GameManager.Instance;
         
         var generator = GetComponent<BetterGenerator>();
         generator.GenerateMap(BetterGenerator.LevelType.Forest);
