@@ -267,7 +267,7 @@ public class InventoryCanvas : MonoBehaviour
     private Tween armorTabEnter() {
         float fadeSpeed = 0.05f;
 
-        _playerInventoryPanelGO.GetComponent<RawImage>().DOKill();
+        _playerInventoryPanelGO.GetComponent<RawImage>().DOComplete();
         for (int i = 0; i < _armorSlotsGO.Length; i++) {
             _armorSlotsCanvasGroups[i].DOKill();
             _armorSlotsRects[i].DOKill();
@@ -275,7 +275,7 @@ public class InventoryCanvas : MonoBehaviour
         
         _armorInventoryPanelGO.SetActive(true);
 
-        _playerPreviewGO.GetComponent<RawImage>().DOFade(1, 1.2f);
+        _playerPreviewGO.GetComponent<RawImage>().DOFade(1, 0.5f);
 
         float scaleSpeed = 0.2f;
 
@@ -305,7 +305,7 @@ public class InventoryCanvas : MonoBehaviour
     }
 
     private Tween armorTabExit() {
-        _playerInventoryPanelGO.GetComponent<RawImage>().DOKill();
+        _playerInventoryPanelGO.GetComponent<RawImage>().DOComplete();
         for (int i = 0; i < _armorSlotsGO.Length; i++) {
             _armorSlotsCanvasGroups[i].DOKill();
             _armorSlotsRects[i].DOKill();
