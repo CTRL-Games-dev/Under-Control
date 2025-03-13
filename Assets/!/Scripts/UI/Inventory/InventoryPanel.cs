@@ -289,7 +289,8 @@ public class InventoryPanel : MonoBehaviour
     #region Misc Methods
     public void ConnectSignals() {
         EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
-        EventBus.ItemUIClickEvent.AddListener(OnItemUIClick);
+        EventBus.ItemUILeftClickEvent.AddListener(OnItemUILeftClick);
+        EventBus.ItemUIRightClickEvent.AddListener(OnItemUIRightClick);
         EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
     }
 
@@ -316,9 +317,7 @@ public class InventoryPanel : MonoBehaviour
 
     public void OnItemUIClick(ItemUI itemUI) {
         // if (UICanvas.Instance.SelectedItemUI.InventoryItem != null) return; 
-
         if (_inventory.Contains(itemUI.InventoryItem)) {
-            
             if (UICanvas.Instance.SelectedItemUI.InventoryItem != null) return; 
             UICanvas.Instance.SetSelectedItemUI(itemUI);
             if (IsSellerInventory) {
@@ -329,6 +328,91 @@ public class InventoryPanel : MonoBehaviour
         }
         // SetImagesRaycastTarget(false);
     }
+
+    public void OnItemUILeftClick(ItemUI itemUI) {
+        if (itemUI == null) return;
+
+        if (_inventory.Contains(itemUI.InventoryItem)) {
+            if (UICanvas.Instance.SelectedItemUI.InventoryItem == null) {
+                UICanvas.Instance.SetSelectedItemUI(itemUI);
+                if (IsSellerInventory) {
+                    _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
+                    IsItemJustBought = true;
+                }
+                destroyAndRemoveItemUI(itemUI.InventoryItem);
+            } else {
+                if (UICanvas.Instance.SelectedItemUI.InventoryItem.ItemData == itemUI.InventoryItem.ItemData) {
+                    if (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount >= UICanvas.Instance.SelectedItemUI.InventoryItem.Amount) {
+                        itemUI.InventoryItem.Amount += UICanvas.Instance.SelectedItemUI.InventoryItem.Amount;
+                        if (IsSellerInventory) {
+                            _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * UICanvas.Instance.SelectedItemUI.InventoryItem.Amount;
+                            IsItemJustBought = true;
+                        }
+                        itemUI.UpdateAmount();
+                        UICanvas.Instance.SelectedItemUI.InventoryItem = null;
+                    } else {
+                        UICanvas.Instance.SelectedItemUI.InventoryItem.Amount = UICanvas.Instance.SelectedItemUI.InventoryItem.Amount - (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount);
+                        itemUI.InventoryItem.Amount = itemUI.InventoryItem.ItemData.MaxQuantity;
+                        itemUI.UpdateAmount();
+                        UICanvas.Instance.SelectedItemUI.UpdateAmount();
+                        if (IsSellerInventory) {
+                            _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount);
+                            IsItemJustBought = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void OnItemUIRightClick(ItemUI itemUI) {
+        if (itemUI == null) return;
+
+        if (_inventory.Contains(itemUI.InventoryItem)) {
+            if (UICanvas.Instance.SelectedItemUI.InventoryItem == null) {
+                if (itemUI.InventoryItem.Amount > 1) {
+                    int half = itemUI.InventoryItem.Amount / 2;
+                    
+                    InventoryItem inventoryItem = new(){
+                        ItemData = itemUI.InventoryItem.ItemData,
+                        Amount = half + itemUI.InventoryItem.Amount % 2,
+                        Position = itemUI.InventoryItem.Position,
+                        Rotated = itemUI.InventoryItem.Rotated
+                    };
+                    UICanvas.Instance.SetSelectedInventoryItem(inventoryItem);
+                    UICanvas.Instance.SelectedItemUI.UpdateAmount();
+
+                    itemUI.InventoryItem.Amount = half;
+                    itemUI.UpdateAmount();
+                    if (IsSellerInventory) {
+                        _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * (half + itemUI.InventoryItem.Amount % 2);
+                        IsItemJustBought = true;
+                    }
+                } else {
+                    UICanvas.Instance.SetSelectedItemUI(itemUI);
+                    if (IsSellerInventory) {
+                        _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
+                        IsItemJustBought = true;
+                    }
+                    destroyAndRemoveItemUI(itemUI.InventoryItem);
+                }
+            } else {
+                if (UICanvas.Instance.SelectedItemUI.InventoryItem.ItemData == itemUI.InventoryItem.ItemData) {
+                    if (itemUI.InventoryItem.Amount + 1 <= itemUI.InventoryItem.ItemData.MaxQuantity && UICanvas.Instance.SelectedItemUI.InventoryItem.Amount - 1 >= 0) {
+                        itemUI.InventoryItem.Amount = itemUI.InventoryItem.Amount + 1;
+                        itemUI.UpdateAmount();
+                        UICanvas.Instance.SelectedItemUI.InventoryItem.Amount = UICanvas.Instance.SelectedItemUI.InventoryItem.Amount - 1;
+                        UICanvas.Instance.SelectedItemUI.UpdateAmount();
+                        if (IsSellerInventory) {
+                            _uiCanvas.PlayerController.Coins += itemUI.InventoryItem.ItemData.Value;
+                            IsItemJustBought = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     public void OnPointerEnter() {
         _uiCanvas.ActiveInventoryPanel = this;

@@ -151,6 +151,13 @@ public class UICanvas : MonoBehaviour
         SelectedItemUI.InventoryItem = itemUI.InventoryItem;
     }
 
+    public void SetSelectedInventoryItem(InventoryItem inventoryItem) {
+        if (SelectedItemUI.InventoryItem != null) return;
+
+        SelectedItemUI.gameObject.SetActive(inventoryItem != null);
+        SelectedItemUI.InventoryItem = inventoryItem;
+    }
+
 
     public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab, IInteractableInventory interactable = null, string title = null) {
         if (itemContainer != null) _inventoryCanvas.SetCurrentTab(InventoryCanvas.InventoryTabs.Other);
