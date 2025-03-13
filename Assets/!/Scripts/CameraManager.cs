@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -36,6 +37,8 @@ public class CameraManager : MonoBehaviour
     }
 
     private void setCamerasPriority() {
+        if (_cinemachineCameras == null) return;
+
         CinemachineCamera[] cameras = _cinemachineCameras.ToArray();
 
         for (int i = 0; i < cameras.Length; i++) {

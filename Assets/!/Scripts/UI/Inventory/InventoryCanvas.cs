@@ -248,26 +248,26 @@ public class InventoryCanvas : MonoBehaviour
 
     private Tween playerTabEnter() {
         _playerInventoryPanelGO.SetActive(true);
-        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-50, 0.5f).SetEase(Ease.OutExpo);
+        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-180, 0.5f).SetEase(Ease.OutExpo);
     }
 
     private Tween playerTabExit() {
-        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(565, 0.5f).SetEase(Ease.OutExpo);
+        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(470, 0.5f).SetEase(Ease.OutExpo);
     }
 
     private Tween otherTabEnter() {
         _otherInventoryPanelGO.SetActive(true);
-        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(50, 0.5f).SetEase(Ease.OutExpo);
+        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(120, 0.5f).SetEase(Ease.OutExpo);
     }
 
     private Tween otherTabExit() {
-        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-565, 0.5f).SetEase(Ease.OutExpo);
+        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-760, 0.5f).SetEase(Ease.OutExpo);
     }
 
     private Tween armorTabEnter() {
         float fadeSpeed = 0.05f;
 
-        _playerInventoryPanelGO.GetComponent<RawImage>().DOKill();
+        _playerInventoryPanelGO.GetComponent<RawImage>().DOComplete();
         for (int i = 0; i < _armorSlotsGO.Length; i++) {
             _armorSlotsCanvasGroups[i].DOKill();
             _armorSlotsRects[i].DOKill();
@@ -275,7 +275,7 @@ public class InventoryCanvas : MonoBehaviour
         
         _armorInventoryPanelGO.SetActive(true);
 
-        _playerPreviewGO.GetComponent<RawImage>().DOFade(1, 1.2f);
+        _playerPreviewGO.GetComponent<RawImage>().DOFade(1, 0.5f);
 
         float scaleSpeed = 0.2f;
 
@@ -305,7 +305,7 @@ public class InventoryCanvas : MonoBehaviour
     }
 
     private Tween armorTabExit() {
-        _playerInventoryPanelGO.GetComponent<RawImage>().DOKill();
+        _playerInventoryPanelGO.GetComponent<RawImage>().DOComplete();
         for (int i = 0; i < _armorSlotsGO.Length; i++) {
             _armorSlotsCanvasGroups[i].DOKill();
             _armorSlotsRects[i].DOKill();
