@@ -5,11 +5,25 @@ using Unity.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.UIElements;
 
 public struct Tile
 {
     public bool IsWall;
     public int X, Y;
+}
+
+public struct WorldData
+{
+    public Vector2 Offset;
+    public float Scale;
+    public int Width, Height;
+
+    // public WorldData(Vector2 os, float sc)
+    // {
+    //     Offset = os;
+    //     Scale = sc;
+    // }
 }
 
 [RequireComponent(typeof(MeshCollider))]
@@ -18,6 +32,7 @@ public struct Tile
 public class BetterGenerator : MonoBehaviour
 {
     List<Location> allLocations = new();
+    public WorldData wd;
     private MeshFilter _mf;
     private MeshCollider _mc;
     private MeshRenderer _mr;
@@ -73,8 +88,8 @@ public class BetterGenerator : MonoBehaviour
         {
             if (l.X < minX) minX = l.X;
             if (l.Y < minY) minY = l.Y;
-            if (l.X+l.Width > maxX) maxX = l.X+l.Width;
-            if (l.Y+l.Height > maxY) maxY = l.Y+l.Height;
+            if (l.X+l.TileWidth > maxX) maxX = l.X+l.TileWidth;
+            if (l.Y+l.TileHeight > maxY) maxY = l.Y+l.TileHeight;
 
             Debug.Log("Spawned location at x->" + l.X + " y->" + l.Y);
         }
@@ -90,46 +105,50 @@ public class BetterGenerator : MonoBehaviour
 
         // Since coordinates can be negative and we use an array
         // we need to have some kind of an offset to index this array
-        Vector2 offset = new(minX-gridPadding, minY-gridPadding);    
+        Vector2 offset = new(minX-gridPadding, minY-gridPadding);
+
+        // Set world data
+        wd.Offset = offset;
+        wd.Scale = 9;
+        wd.Width = gridWidth;
+        wd.Height = gridHeight;
+
         foreach(var l in allLocations)
         {
             // Remove trees
-            for (int ix = 0; ix < l.Width; ix++)
+            for (int ix = 0; ix < l.TileWidth; ix++)
             {
-                for (int iy = 0; iy < l.Height; iy++)
+                for (int iy = 0; iy < l.TileHeight; iy++)
                 {
                     int indexX = (int)(ix + l.X - offset.x);
                     int indexY = (int)(iy + l.Y - offset.y);
                     grid[indexX, indexY] = true;
                 }
             }
-            l.GenerateLocation(TerrainHolder, offset);
+            l.GenerateLocation(TerrainHolder, wd);
         }
 
         // Calculate location centers
         List<Vector2> locationCenters = new();
         foreach(var l in allLocations)
         {
-            Debug.Log("Generated location");
-            Vector2 center = new(l.X + (l.Width/2), l.Y + (l.Height / 2));
+            Vector2 center = new Vector2(l.X + (l.TileWidth/2), l.Y + (l.TileHeight / 2));
             locationCenters.Add(center);
         }
 
         // Create Passageways between locations
-        DigOutPaths(locationCenters, grid, offset);
+        DigOutPaths(locationCenters, grid);
 
         // Load forest tile
         GameObject[] tiles = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestTiles");
-
-
-        Debug.Log($"Size = {gridWidth},{gridHeight}. Offset = {offset}");
 
         for(int x = 0; x < gridWidth; x++)
         {
             for(int y = 0; y < gridHeight; y++)
             {
                 if(grid[x,y]) { continue; }
-                var tile = Instantiate(tiles[0], new(x + 0.5f, 0, y + 0.5f), Quaternion.identity, TerrainHolder.transform);
+                Vector3 pos = new Vector3(x + 0.5f, 0, y + 0.5f) * wd.Scale;
+                var tile = Instantiate(tiles[0], pos, Quaternion.identity, TerrainHolder.transform);
                 
                 // MeshRenderer[] meshRenderers = tile.GetComponentsInChildren<MeshRenderer>() ;
                 // GameObject[] gameObjects = new GameObject[meshRenderers.Length];
@@ -148,7 +167,7 @@ public class BetterGenerator : MonoBehaviour
     {
         // Place portal
         Location portal = new ForestPortal();
-        portal.SetCenter(new(0,0)); // Set it to center
+        portal.SetTileCenter(new(0,0)); // Set it to center
         locations.Add(portal);
 
         // Medow 
@@ -157,8 +176,8 @@ public class BetterGenerator : MonoBehaviour
         {
             Location medow = new Medow();
 
-            int minRange = 12;
-            int maxRange = 55;
+            int minRange = 30;
+            int maxRange = 60;
             
             int indexX = UnityEngine.Random.Range(minRange, maxRange + 1);
             int indexY = UnityEngine.Random.Range(minRange, maxRange + 1);
@@ -169,14 +188,16 @@ public class BetterGenerator : MonoBehaviour
             bool flag = false;
             for(int t = 0; t < 5; t++)
             {
-                medow.SetCenter(new(indexX, indexY));
+                medow.SetTileCenter(new(indexX, indexY));
                 if(medow.CheckLocation(locations)) {
                     flag = true;
+                    Debug.Log("Found location");
                     break;
                 };
             }
 
             if(flag) locations.Add(medow);
+            else Debug.Log("Didnt found location!");
         }
     }
 
@@ -204,10 +225,10 @@ public class BetterGenerator : MonoBehaviour
             for(int y = 0; y < gridHeight; y++) {
                 int index = x * gridHeight + y;
 
-                Vector3 p0 = new(x,     th[x,y],  y);
-                Vector3 p1 = new(x,     th[x,y+1],  (y+1));
-                Vector3 p2 = new((x+1), th[x+1,y+1],  (y+1));
-                Vector3 p3 = new((x+1), th[x+1,y], y);
+                Vector3 p0 = new Vector3(x,     th[x,y],  y) * wd.Scale;
+                Vector3 p1 = new Vector3(x,     th[x,y+1],  (y+1)) * wd.Scale;
+                Vector3 p2 = new Vector3((x+1), th[x+1,y+1],  (y+1)) * wd.Scale;
+                Vector3 p3 = new Vector3((x+1), th[x+1,y], y) * wd.Scale;
 
                 vertices.Add(p0);
                 vertices.Add(p1);
@@ -244,7 +265,7 @@ public class BetterGenerator : MonoBehaviour
 
     #endregion
 
-    private void DigOutPaths(List<Vector2> locationCenters, bool[,] grid, Vector2 gridOffset) 
+    private void DigOutPaths(List<Vector2> locationCenters, bool[,] grid) 
     {
         List<Edge> uniqueEdges = new();
 
@@ -364,12 +385,12 @@ public class BetterGenerator : MonoBehaviour
             for(int ix = (int)Math.Floor(point1.x); ix < (int)Math.Floor(point2.x); ix++)
             {
                 int x = ix;
-                int indexX = x - (int)gridOffset.x;
+                int indexX = x - (int)wd.Offset.x;
 
                 for(int iy = 0; iy < yLength; iy++)
                 {
                     int y = (int)Math.Floor(a*x + b)+(iy*ySymbol);
-                    int indexY = y - (int)gridOffset.y;
+                    int indexY = y - (int)wd.Offset.y;
 
                     // Debug.Log("Current x " + x + ", index x " + indexX);
                     // Debug.LogFormat("Actual coordinates: [{0},{1}]", x, y);

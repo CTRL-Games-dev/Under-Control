@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     private void Awake() 
     {
         DontDestroyOnLoad(this);
-        SceneManager.sceneLoaded += OnLevelChange;
+        // SceneManager.sceneLoaded += OnLevelChange;
 
         // We need to check if there is already existing manager
         // Manager don't destoy itself on load, but since it needs to be defined in every scene
@@ -35,10 +35,10 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         // For some reason "scene change" is being called, even if it is the first scene?
-        ConnectPortals();
+        // ConnectPortals();
     }
 
-    private void ChangeDimension(Dimension dimension)
+    public void ChangeDimension(Dimension dimension)
     {
         _context.CurrentDimension = dimension;
 
@@ -52,22 +52,22 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void ConnectPortals()
-    {
-        GameObject[] portals = GameObject.FindGameObjectsWithTag("Portal");
-        foreach(GameObject p in portals) 
-        {
-            var portal = p.GetComponent<Portal>();
-            portal.PlayerEnteredPortal.AddListener(ChangeDimension);
-        }
-        Debug.Log("Connected portals. This message will appear twice");
-    }
+    // public void ConnectPortals()
+    // {
+    //     GameObject[] portals = GameObject.FindGameObjectsWithTag("Portal");
+    //     foreach(GameObject p in portals) 
+    //     {
+    //         var portal = p.GetComponent<Portal>();
+    //         portal.PlayerEnteredPortal.AddListener(ChangeDimension);
+    //     }
+    //     Debug.Log("Connected new portal");
+    // }
 
-    private void OnLevelChange(Scene scene, LoadSceneMode mode)
-    {
-        // Connect portals
-        ConnectPortals();
-    }
+    // private void OnLevelChange(Scene scene, LoadSceneMode mode)
+    // {
+    //     // Connect portals
+    //     ConnectPortals();
+    // }
 
     public float GetInfluence()
     {
