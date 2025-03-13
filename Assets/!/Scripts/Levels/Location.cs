@@ -4,7 +4,7 @@ public abstract class Location
 {
     public int Width, Height;
     public int X, Y;
-    public abstract void GenerateLocation(GameObject parent);
+    public abstract void GenerateLocation(GameObject parent, Vector2 offset);
     public bool CheckLocation(List<Location> generatedLocations)
     {
         foreach(var l in generatedLocations)
@@ -31,22 +31,20 @@ public abstract class Location
 public class ForestPortal : Location
 {
     private GameObject _portalPrefab;
-    public ForestPortal(int x, int y)
+    public ForestPortal()
     {
         string portalPath = "Prefabs/Forest/Portal";
 
         _portalPrefab = Resources.Load<GameObject>(portalPath);
-
-        this.X = x;
-        this.Y = y;
         
         Width = 1;
         Height = 1;
     }
 
-    public override void GenerateLocation(GameObject parent)
+    public override void GenerateLocation(GameObject parent, Vector2 offset)
     {
-        var gm = GameObject.Instantiate(_portalPrefab, new(X, 0, Y), Quaternion.identity, parent.transform);
+        Debug.Log($"Offset: {offset}");
+        var gm = GameObject.Instantiate(_portalPrefab, new(X-offset.x, 0, Y-offset.y), Quaternion.identity, parent.transform);
     }
 }
 
@@ -61,7 +59,7 @@ public class DummyLocation : Location
         this.Y = (int)position.y;
     }
 
-    public override void GenerateLocation(GameObject parent)
+    public override void GenerateLocation(GameObject parent, Vector2 offset)
     {
 
     }
@@ -75,7 +73,7 @@ public class Medow : Location
         Height = Random.Range(7, 12);
     }
 
-    public override void GenerateLocation(GameObject parent)
+    public override void GenerateLocation(GameObject parent, Vector2 offset)
     {
         // throw new System.NotImplementedException();
     }

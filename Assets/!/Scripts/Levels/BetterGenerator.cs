@@ -88,7 +88,7 @@ public class BetterGenerator : MonoBehaviour
                     grid[indexX, indexY] = true;
                 }
             }
-            l.GenerateLocation(TerrainHolder);
+            l.GenerateLocation(TerrainHolder, offset);
         }
 
         // Calculate location centers
@@ -105,18 +105,26 @@ public class BetterGenerator : MonoBehaviour
 
         // Load forest tile
         GameObject[] tiles = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestTiles");
-        List<GameObject> instantiatedTiles = new();
+
+        gridWidth = 50;
+        gridHeight = 50;
+
         for(int x = 0; x < gridWidth; x++)
         {
             for(int y = 0; y < gridHeight; y++)
             {
                 if(grid[x,y]) { continue; }
                 var tile = Instantiate(tiles[0], new(x + 0.5f, 0, y + 0.5f), Quaternion.identity, TerrainHolder.transform);
-                tile.isStatic = true;
-                instantiatedTiles.Add(tile);
+                
+                // MeshRenderer[] meshRenderers = tile.GetComponentsInChildren<MeshRenderer>() ;
+                // GameObject[] gameObjects = new GameObject[meshRenderers.Length];
+                // for (int i = 0; i < meshRenderers.Length; i++) {
+                //     gameObjects[i] = meshRenderers[i].gameObject;
+                // }
+
+                // StaticBatchingUtility.Combine(gameObjects, TerrainHolder);
             }
         }
-        StaticBatchingUtility.Combine(instantiatedTiles.ToArray(), TerrainHolder);
 
         GenerateMesh(gridWidth, gridHeight);
     }
@@ -124,7 +132,9 @@ public class BetterGenerator : MonoBehaviour
     private void PlaceLocations(List<Location> locations)
     {
         // Place portal
-        locations.Add(new ForestPortal(0, 0));
+        Location portal = new ForestPortal();
+        portal.SetCenter(new(0,0)); // Set it to center
+        locations.Add(portal);
 
         // Medow 
         int mCount = UnityEngine.Random.Range(2, 4);
@@ -147,7 +157,6 @@ public class BetterGenerator : MonoBehaviour
                 medow.SetCenter(new(indexX, indexY));
                 if(medow.CheckLocation(locations)) {
                     flag = true;
-                    Debug.Log("Added a");
                     break;
                 };
             }
