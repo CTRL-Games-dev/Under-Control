@@ -16,7 +16,7 @@ public class ItemInfoPanel : MonoBehaviour
     }
     
     private void Update() {
-        Vector2 scale = new(Screen.width / 1280f, Screen.height / 720f);
+        Vector2 scale = new(Screen.width / 1920f, Screen.height / 1080f);
 
         transform.position = new Vector2(
             Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width * scale.x), 

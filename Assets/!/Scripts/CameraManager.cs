@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    private List<CinemachineCamera> _cinemachineCameras;
+    private List<CinemachineCamera> _cinemachineCameras = new();
     public CinemachineCamera PlayerTopDownCamera;
 
     public CinemachineCamera StartCamera;
