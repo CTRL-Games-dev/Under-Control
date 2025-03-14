@@ -66,6 +66,7 @@ public class PlayerController : MonoBehaviour
     // State
     private Vector2 _movementInputVector = Vector2.zero;
     private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
+    private InteractionType? _queuedInteraction;
 
     private readonly int _speedHash = Animator.StringToHash("speed");
     private readonly int _dodgeHash = Animator.StringToHash("dodge");
@@ -170,6 +171,14 @@ public class PlayerController : MonoBehaviour
         );
     }
 
+    void OnPrimaryInteraction(InputValue value) {
+        _queuedInteraction = InteractionType.Primary;
+    }
+
+    void OnSecondaryInteraction(InputValue value) {
+        _queuedInteraction = InteractionType.Secondary;
+    }
+
     void OnScrollWheel(InputValue value) {
         var delta = value.Get<Vector2>();
         _cameraDistance -= delta.y * CameraDistanceSpeed;
@@ -198,32 +207,36 @@ public class PlayerController : MonoBehaviour
     }
 
     private void handleInteraction() {
-        if (EventSystem.current.IsPointerOverGameObject()) {
+        if(_queuedInteraction == null) return;
+
+        interact(_queuedInteraction.Value);
+
+        _queuedInteraction = null;
+    }
+
+    private void interact(InteractionType interactionType) {
+        if(EventSystem.current.IsPointerOverGameObject()) {
             return;
         }
 
-        if(Mouse.current.leftButton.isPressed) {
-            interact(true);
-        } else if(Mouse.current.rightButton.isPressed) {
-            interact(false);
-        }
-    }
+        if(UICanvas.Instance.CurrentUIState !=  UIState.NotVisible) return;
 
-    private void interact(bool primary) {
-        if (UICanvas.Instance.CurrentUIState !=  UIState.NotVisible) return;
-        bool interacted = tryInteract();
+        bool interacted = tryInteract(interactionType);
         
         if(interacted) return;
 
         // Default to attacking if no interaction was commited
-        if(primary) {
-            performLightAttack();
-        } else {
-            performHeavyAttack();
+        switch(interactionType) {
+            case InteractionType.Primary:
+                performLightAttack();
+                break;
+            case InteractionType.Secondary:
+                performHeavyAttack();
+                break;
         }
     }
 
-    private bool tryInteract() {
+    private bool tryInteract(InteractionType interactionType) {
         Ray ray = UICanvas.Instance.MainCamera.ScreenPointToRay(Input.mousePosition);
         if (!Physics.Raycast(ray, out RaycastHit hit)) {
             return false;

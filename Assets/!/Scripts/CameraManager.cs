@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using DG.Tweening;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -23,7 +23,7 @@ public class CameraManager : MonoBehaviour
 
     private void Start() {
         _cinemachineCameras = new List<CinemachineCamera>(FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None));
-        
+    
         StartCamera = (StartCamera == null) ? PlayerTopDownCamera : StartCamera;
         _currentCamera = StartCamera;
 
@@ -31,6 +31,10 @@ public class CameraManager : MonoBehaviour
     }
 
     public void SwitchCamera(CinemachineCamera camera) {
+        if(camera == null) {
+            throw new ArgumentNullException("Camera cannot be null");
+        }
+
         if (!_cinemachineCameras.Contains(camera)) _cinemachineCameras.Add(camera);
         _currentCamera = camera;
 
