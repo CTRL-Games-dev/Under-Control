@@ -55,7 +55,8 @@ public class PlayerController : MonoBehaviour
             CoinsChangeEvent?.Invoke(value - _coins);
             _coins = value;
         }  
-    } 
+    }
+    private bool _isAttacking = false;
 
     [Header("Events")]
     public UnityEvent InventoryToggleEvent;
@@ -72,7 +73,8 @@ public class PlayerController : MonoBehaviour
     private readonly int _dodgeHash = Animator.StringToHash("dodge");
     private readonly int _lightAttackHash = Animator.StringToHash("light_attack");
     private readonly int _heavyAttackHash = Animator.StringToHash("heavy_attack");
-
+    private readonly int _playerAttackLightHash = Animator.StringToHash("player_attack_light");
+    private readonly int _playerAttackHeavyHash = Animator.StringToHash("player_attack_heavy");
 
     // References
     public CharacterController CharacterController { get; private set; }
@@ -226,6 +228,8 @@ public class PlayerController : MonoBehaviour
         if(interacted) return;
 
         // Default to attacking if no interaction was commited
+        if(_isAttacking) return;
+
         switch(interactionType) {
             case InteractionType.Primary:
                 performLightAttack();
@@ -271,10 +275,12 @@ public class PlayerController : MonoBehaviour
     }
 
     public void OnAttackAnimationStart() {
+        _isAttacking = true;
         WeaponHolder.BeginAttack();
     }
 
     public void OnAttackAnimationEnd() {
         WeaponHolder.EndAttack();
+        _isAttacking = false;
     }
 }
