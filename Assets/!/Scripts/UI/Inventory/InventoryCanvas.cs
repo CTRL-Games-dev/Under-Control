@@ -197,8 +197,9 @@ public class InventoryCanvas : MonoBehaviour
     }
 
     public void SetOtherTabTitle(string text) {
-        _tabTexts[_tabPanelsIndex[InventoryTabs.Other]].text = text ?? "-";
+        _tabTexts[_tabPanelsIndex[InventoryTabs.Other]].text = text ?? "";
         _tabTexts[_tabPanelsIndex[InventoryTabs.Other]].DOColor(text == null ? Color.gray : Color.white, 0.15f);
+        _tabButtonGameObjects[_tabPanelsIndex[InventoryTabs.Other]].GetComponent<Button>().interactable = text != null;
     }
 
     public Tween OtherTabExit() {

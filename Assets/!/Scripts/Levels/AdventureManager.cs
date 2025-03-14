@@ -23,17 +23,9 @@ public class AdventureManager : MonoBehaviour, ILevelManager
         Location portal = generator.Getlocation<ForestPortal>();
         Vector2 spawn = portal.GetAbsoluteCenter();
 
-        var _pi = Instantiate(_player, new(spawn.x, 0.2f, spawn.y - 3f), Quaternion.identity);
+        Instantiate(_player, new(spawn.x, 0.2f, spawn.y - 3f), Quaternion.identity);
 
-        _cameraManager.StartCamera = _pi.transform.Find("PlayerCamera").GetComponent<CinemachineCamera>();
-        _cameraManager.PlayerTopDownCamera = _pi.transform.Find("PlayerCamera").GetComponent<CinemachineCamera>();
-
-        _cameraManager.SwitchCamera(_cameraManager.PlayerTopDownCamera);
-    }
-
-    private void Update()
-    {
-        
+        _cameraManager.SwitchCamera(UICanvas.Instance.PlayerController.PlayerTopDownCamera);
     }
 
     // public void SpawnPlayer()

@@ -5,10 +5,7 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    private List<CinemachineCamera> _cinemachineCameras = new();
-    public CinemachineCamera PlayerTopDownCamera;
-
-    public CinemachineCamera StartCamera;
+    public CinemachineCamera PlayerTopDownCamera => UICanvas.Instance.PlayerController.PlayerTopDownCamera;
     private CinemachineCamera _currentCamera;
 
     public static CameraManager Instance;
@@ -21,32 +18,21 @@ public class CameraManager : MonoBehaviour
         Instance = this;
     }
 
-    private void Start() {
-        _cinemachineCameras = new List<CinemachineCamera>(FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None));
-    
-        StartCamera = (StartCamera == null) ? PlayerTopDownCamera : StartCamera;
-        _currentCamera = StartCamera;
-
-        setCamerasPriority();
-    }
 
     public void SwitchCamera(CinemachineCamera camera) {
         if(camera == null) {
             throw new ArgumentNullException("Camera cannot be null");
         }
 
-        if (!_cinemachineCameras.Contains(camera)) _cinemachineCameras.Add(camera);
         _currentCamera = camera;
 
         setCamerasPriority();
     }
 
     private void setCamerasPriority() {
-        if (_cinemachineCameras == null) return;
+        List<CinemachineCamera> cameras = new List<CinemachineCamera>(FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None));
 
-        CinemachineCamera[] cameras = _cinemachineCameras.ToArray();
-
-        for (int i = 0; i < cameras.Length; i++) {
+        for (int i = 0; i < cameras.Count; i++) {
             cameras[i].Priority = (cameras[i] == _currentCamera) ? 20 : 10;
         }
     }

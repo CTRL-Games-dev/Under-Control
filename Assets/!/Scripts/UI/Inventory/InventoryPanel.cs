@@ -34,8 +34,7 @@ public class InventoryPanel : MonoBehaviour
     private Image _layoutImage;
 
     // Inventory variables
-    private static float _tileSize = 0;
-    public static float TileSize { get {return _tileSize;} set {_tileSize = value;} }
+    public static float TileSize = 94;
 
     [SerializeField]
     private InvTile[,] _inventoryTileArray;
@@ -61,15 +60,8 @@ public class InventoryPanel : MonoBehaviour
 
     public void Start() {
         ConnectSignals();
-        // EventBus.ItemPlacedEvent.AddListener(() => SetImagesRaycastTarget(true));
         _uiCanvas = UICanvas.Instance;
-
-        _currentEntityInventory = _isPlayerInventory ? _uiCanvas.PlayerInventory.ItemContainer : TargetEntityInventory; // If OtherEntityInventory is null, use PlayerInventory
-
-        if (_isPlayerInventory) {
-            TileSize = Mathf.Clamp(_rectTransform.rect.width / _currentEntityInventory.Size.x, 0, _rectTransform.rect.height / _currentEntityInventory.Size.y);
-            EventBus.TileSizeSetEvent?.Invoke();
-        } 
+        RegenerateInventory();
     }
 
     #endregion
@@ -291,12 +283,11 @@ public class InventoryPanel : MonoBehaviour
         EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
         EventBus.ItemUILeftClickEvent.AddListener(OnItemUILeftClick);
         EventBus.ItemUIRightClickEvent.AddListener(OnItemUIRightClick);
-        EventBus.TileSizeSetEvent.AddListener(RegenerateInventory);
     }
 
     public void SetTargetInventory(ItemContainer itemContainer) {
         TargetEntityInventory = itemContainer;
-        RegenerateInventory();
+        // RegenerateInventory();
     }
 
     public void SetImagesRaycastTarget(bool val) {
