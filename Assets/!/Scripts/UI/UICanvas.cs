@@ -60,6 +60,7 @@ public class UICanvas : MonoBehaviour
     [SerializeField] private GameObject _mainMenuCanvasGO;
     [SerializeField] private GameObject _deathScreenCanvasGO;
     [SerializeField] private GameObject _pauseScreenCanvasGO;
+    [SerializeField] private GameObject _settingsScreenCanvasGO;
 
     [Header("UI Elements")]
     [SerializeField] private GameObject _otherInventoryHolder;
@@ -70,8 +71,10 @@ public class UICanvas : MonoBehaviour
     private MainMenu _mainMenu;
     private DeathScreen _deathScreen;
     private PauseScreen _pauseScreen;
+    private SettingsScreen _settingsScreen;
     private CanvasGroup _inventoryCanvasGroup;
     private IInteractableInventory _lastInteractableInventory;
+    private bool _isSettingsOpen = false;
 
     #endregion
 
@@ -89,6 +92,7 @@ public class UICanvas : MonoBehaviour
         _mainMenu = _mainMenuCanvasGO.GetComponent<MainMenu>();
         _deathScreen = _deathScreenCanvasGO.GetComponent<DeathScreen>();
         _pauseScreen = _pauseScreenCanvasGO.GetComponent<PauseScreen>();
+        _settingsScreen = _settingsScreenCanvasGO.GetComponent<SettingsScreen>();
     }
 
     private void Start() {
@@ -117,6 +121,11 @@ public class UICanvas : MonoBehaviour
     }
 
     private void OnUICancel() {
+        if (_isSettingsOpen) {
+            CloseSettingsScreen();
+            return;
+        }
+
         switch (CurrentUIState) {
             case UIState.Inventory:
                 CloseUIState(UIState.Inventory);
@@ -135,6 +144,7 @@ public class UICanvas : MonoBehaviour
                 OpenUIState(UIState.PauseScreen);
                 break;
         }
+
     }
 
     #endregion
@@ -299,6 +309,16 @@ public class UICanvas : MonoBehaviour
         _HUDCanvasGO.SetActive(false);
         _alwayOnTopCanvasGO.SetActive(false);
         _inventoryCanvasGO.SetActive(false);
+    }
+
+    public void OpenSettingsScreen() {
+        _isSettingsOpen = true;
+        _settingsScreen.OpenSettings();
+    }
+
+    public void CloseSettingsScreen() {
+        _isSettingsOpen = false;
+        _settingsScreen.CloseSettings();
     }
 
 

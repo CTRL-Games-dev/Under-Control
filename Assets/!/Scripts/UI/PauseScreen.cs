@@ -140,8 +140,8 @@ public class PauseScreen : MonoBehaviour
 #endregion
 #region Button Clicks
     public void OnResumeBtnClick() {
-        UICanvas.Instance.IsGamePaused = false;
-        HidePauseMenu();
+        UICanvas.Instance.CloseUIState(UIState.PauseScreen);
+        UICanvas.Instance.OpenUIState(UIState.NotVisible);
     }  
 
     public void OnSaveBtnClick() {
@@ -152,14 +152,22 @@ public class PauseScreen : MonoBehaviour
         Debug.Log("Load button clicked");
     }
 
-    public void OnOptionsBtnClick() {
-        Debug.Log("Options button clicked");
+    public void OnSettingsBtnClick() {
+        UICanvas.Instance.OpenSettingsScreen();
     }
 
     public void OnExitBtnClick() {
         HidePauseMenu().OnComplete(() => {
             UICanvas.Instance.OpenUIState(UIState.MainMenu);
         });
+    }
+
+    public void OnPointerEnter(GameObject button) {
+        button.GetComponent<RectTransform>().DOScale(1.05f, 0.4f).SetEase(Ease.OutSine).SetUpdate(true);
+    }
+
+    public void OnPointerExit(GameObject button) {
+        button.GetComponent<RectTransform>().DOScale(1, 0.4f).SetEase(Ease.OutSine).SetUpdate(true);
     }
 
 #endregion
