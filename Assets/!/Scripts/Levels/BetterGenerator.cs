@@ -10,10 +10,20 @@ public struct Tile
     public int X, Y;
 }
 
+public enum PathBorderType
+{
+    None,
+    Short,
+    Long,
+}
+
 public struct PathData
 {
     public Vector2 Point1, Point2;
     public Quaternion Rotation;
+    public int NumberOfTiles; // Per side
+    public List<bool> BorderTypeLeft; 
+    public List<bool> BorderTypeRight; 
     public int Thickness;
 }
 
@@ -107,65 +117,65 @@ public class BetterGenerator : MonoBehaviour
         wd.Locations = new();
         wd.Paths = new();
 
-        PlaceLocations(wd.Locations);
-
-        // All locations
-        int minX = 0, minY = 0, maxX = 0, maxY = 0;
-        foreach(var l in wd.Locations)
-        {
-            if (l.X < minX) minX = l.X;
-            if (l.Y < minY) minY = l.Y;
-            if (l.X+l.TileWidth > maxX) maxX = l.X+l.TileWidth;
-            if (l.Y+l.TileHeight > maxY) maxY = l.Y+l.TileHeight;
-
-            Debug.Log("Spawned location at x->" + l.X + " y->" + l.Y);
-        }
-
-        // Grid is used to determine where to spawn trees
+        bool[,] grid;
         int gridPadding = 10;
-        int gridWidth = (int)Vector2.Distance(new(minX,0), new(maxX,0)) + (gridPadding*2);
-        int gridHeight = (int)Vector2.Distance(new(minY,0), new(maxY,0)) + (gridPadding*2);;
-        // int gridHeight = (int)Vector2.Distance(new(0,minY), new(0,maxY));
-        
-        bool[,] grid = new bool[gridWidth + (gridPadding), gridHeight + (gridPadding)];
+        int gridWidth;
+        int gridHeight;
 
-
-        // Since coordinates can be negative and we use an array
-        // we need to have some kind of an offset to index this array
-        Vector2 offset = new(minX-gridPadding, minY-gridPadding);
-
-        // Set world data
-        wd.Offset = offset;
-        wd.Scale = 9;
-        wd.Width = gridWidth;
-        wd.Height = gridHeight;
-        wd.Grid = grid;
-
-        foreach(var l in wd.Locations)
+        while(true)
         {
-            // Remove trees
-            for (int ix = 0; ix < l.TileWidth; ix++)
+            PlaceLocations(wd.Locations);
+
+            // All locations
+            int minX = 0, minY = 0, maxX = 0, maxY = 0;
+            foreach(var l in wd.Locations)
             {
-                for (int iy = 0; iy < l.TileHeight; iy++)
-                {
-                    int indexX = (int)(ix + l.X - offset.x);
-                    int indexY = (int)(iy + l.Y - offset.y);
-                    grid[indexX, indexY] = true;
-                }
+                if (l.X < minX) minX = l.X;
+                if (l.Y < minY) minY = l.Y;
+                if (l.X+l.TileWidth > maxX) maxX = l.X+l.TileWidth;
+                if (l.Y+l.TileHeight > maxY) maxY = l.Y+l.TileHeight;
+
+                Debug.Log("Spawned location at x->" + l.X + " y->" + l.Y);
             }
-            l.GenerateLocation(TerrainHolder, wd);
+
+            // Grid is used to determine where to spawn trees
+            gridWidth = (int)Vector2.Distance(new(minX,0), new(maxX,0)) + (gridPadding*2);
+            gridHeight = (int)Vector2.Distance(new(minY,0), new(maxY,0)) + (gridPadding*2);
+            // int gridHeight = (int)Vector2.Distance(new(0,minY), new(0,maxY));
+            
+            grid = new bool[gridWidth + (gridPadding), gridHeight + (gridPadding)];
+
+
+            // Since coordinates can be negative and we use an array
+            // we need to have some kind of an offset to index this array
+            Vector2 offset = new(minX-gridPadding, minY-gridPadding);
+
+            // Set world data
+            wd.Offset = offset;
+            wd.Scale = 9;
+            wd.Width = gridWidth;
+            wd.Height = gridHeight;
+            wd.Grid = grid;
+
+            if(!DigOutPaths(wd.Locations, grid)) continue;
+
+            foreach(var l in wd.Locations)
+            {
+                // Remove trees
+                for (int ix = 0; ix < l.TileWidth; ix++)
+                {
+                    for (int iy = 0; iy < l.TileHeight; iy++)
+                    {
+                        int indexX = (int)(ix + l.X - offset.x);
+                        int indexY = (int)(iy + l.Y - offset.y);
+                        grid[indexX, indexY] = true;
+                    }
+                }
+                l.GenerateLocation(TerrainHolder, wd);
+            }
+            break;
         }
 
-        // Calculate location centers
-        // List<Vector2> locationCenters = new();
-        // foreach(var l in wd.Locations)
-        // {
-        //     Vector2 center = new Vector2(l.X + (l.TileWidth/2), l.Y + (l.TileHeight / 2));
-        //     locationCenters.Add(center);
-        // }
-
-        // Create Passageways between locations
-        DigOutPaths(wd.Locations, grid);
 
         #region Forest around locations
         {
@@ -229,28 +239,25 @@ public class BetterGenerator : MonoBehaviour
             Debug.Log($"Tiles: {tiles}, {Resources.LoadAll("Prefabs/Forest/ForestBorder")}");
             foreach(var p in wd.Paths)
             {
-                // Length of this path
-                float len = Vector2.Distance(p.Point1, p.Point2);
-                
-                int numberOfSideTiles = (int)Math.Floor(len-1); // Number of forest tiles on each side
-                float spacing = wd.Scale;
-
                 GameObject pathTileHolder = new GameObject();
                 pathTileHolder.transform.SetParent(TerrainHolder.transform);
 
                 for(int i = 0; i < numberOfSideTiles; i++)
                 {
-                    Vector3 posLeft = new Vector3(-1f, 0, i) * wd.Scale;
-                    Vector3 posRight = new Vector3(1f, 0, i) * wd.Scale;
+                    Vector3 posLeft = new Vector3(-3f, 0, i) * wd.Scale;
+                    Vector3 posRight = new Vector3(3f, 0, i) * wd.Scale;
 
                     GameObject tileLeft = tiles[UnityEngine.Random.Range(0, tiles.Length)];
                     GameObject tileRight = tiles[UnityEngine.Random.Range(0, tiles.Length)];
 
-                    Instantiate(tileLeft, posLeft, Quaternion.identity, pathTileHolder.transform);
-                    Instantiate(tileRight, posRight, Quaternion.identity, pathTileHolder.transform);
+                    GameObject leftTrees = Instantiate(tileLeft, posLeft, Quaternion.identity, pathTileHolder.transform);
+                    GameObject rightTrees = Instantiate(tileRight, posRight, Quaternion.identity, pathTileHolder.transform);
+
+                    leftTrees.transform.eulerAngles = new Vector3(0,-90,0);
+                    rightTrees.transform.eulerAngles = new Vector3(0,90,0);
 
                 }
-                Vector3 pathPos = new Vector3(p.Point1.x - wd.Offset.x, 0, p.Point1.y - wd.Offset.y) * wd.Scale;
+                Vector3 pathPos = new Vector3(p.Point1.x - wd.Offset.x + 0.5f, 0, p.Point1.y - wd.Offset.y + 0.5f) * wd.Scale;
                 Debug.Log($"Position of the path: {pathPos}");
 
                 
@@ -366,7 +373,7 @@ public class BetterGenerator : MonoBehaviour
 
     #endregion
 
-    private void DigOutPaths(List<Location> locations, bool[,] grid) 
+    private bool DigOutPaths(List<Location> locations, bool[,] grid) 
     {
         List<Edge> uniqueEdges = new();
 
@@ -402,6 +409,10 @@ public class BetterGenerator : MonoBehaviour
 
         #region MST
 
+        if(uniqueEdges.Count == 0) {
+            Debug.Log("Cannot generate world, trying once again!");
+            return false;
+        }
         Debug.Log($"Number of unique edges: {uniqueEdges.Count}");
         Edge firstEdge = uniqueEdges.Aggregate(uniqueEdges[0], (smallest, next) => {
             return smallest.Length > next.Length ? next : smallest;
@@ -489,14 +500,25 @@ public class BetterGenerator : MonoBehaviour
                     int y = (int)Math.Floor(a*x + b)+(iy*ySymbol);
                     int indexY = y - (int)wd.Offset.y;
 
-                    // Debug.Log("Current x " + x + ", index x " + indexX);
-                    // Debug.LogFormat("Actual coordinates: [{0},{1}]", x, y);
-                    // Debug.LogFormat("Index: [{0},{1}]", indexX, indexY);
                     for(int tx = 0; tx < thickness; tx++)
                     {
                         for(int ty = 0; ty < thickness; ty++)
                         {
-                            grid[indexX+tx,indexY+ty] = true;
+                            grid[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = true;
+                        }
+                    }
+
+                    int lenCheck = 5; // How far should algorithm look behind the actual path
+                    int numberOfFreeTiles = 0;
+                    // Left side
+                    for(int tx = 0; tx < lenCheck; tx++)
+                    {
+                        for(int ty = 0; ty < lenCheck; ty++)
+                        {
+                            if(grid[indexX-tx,indexY-ty])
+                            {
+
+                            }
                         }
                     }
                 }
@@ -505,43 +527,62 @@ public class BetterGenerator : MonoBehaviour
 
             Vector2[,] edgesA = point1.LocationOfPoint.GetEdges();
             Vector2 intersectionA = new Vector2(555555,555555); // Funny big vector if an error happens;
+            bool foundA = false;
+            Debug.Log($"Line pA = {point1.Position}, pB = {point2.Position}");
             for(int i = 0; i < 4; i++)
             {
                 Edge locationEdge = new(new(edgesA[i,0],point1.LocationOfPoint), new(edgesA[i,1],point1.LocationOfPoint));
                 Edge pathLine = new(point1, point2);
                 (bool ifFound, Vector2 intersection) = FindIntersection(locationEdge, pathLine);
+                Debug.Log($"Loc1, Edge pA = {locationEdge.v0.Position}, pB = {locationEdge.v1.Position}");
                 if(ifFound)
                 {
                     intersectionA = intersection;
+                    foundA = true;
                     break;
                 }
             }
 
             Vector2[,] edgesB = point2.LocationOfPoint.GetEdges();
             Vector2 intersectionB = new Vector2(555555,555555); // Funny big vector if an error happens
+            bool foundB = false;
             for(int i = 0; i < 4; i++)
             {
                 Edge locationEdge = new(new(edgesB[i,0],point2.LocationOfPoint), new(edgesB[i,1],point2.LocationOfPoint));
                 Edge pathLine = new(point1, point2);
+                Debug.Log($"Loc2, Edge pA = {locationEdge.v0.Position}, pB = {locationEdge.v1.Position}");
+
                 (bool ifFound, Vector2 intersection) = FindIntersection(locationEdge, pathLine);
                 if(ifFound)
                 {
                     intersectionB = intersection;
+                    foundB = true;
                     break;
                 }
+            }
+
+            if(!(foundA && foundB))
+            {
+                throw new Exception("NIE DZIAŁA!");
             }
 
             PathData path;
             path.Point1 = intersectionA;
             path.Point2 = intersectionB;
             path.Thickness = thickness;
-            
+            float len = Vector2.Distance(path.Point1, path.Point2);
+            path.NumberOfTiles = (int)Math.Floor(len-1); // Number of forest tiles on each side
+            path.BorderTypeLeft = new();
+            path.BorderTypeRight = new();
+
             Vector2 dir = point2.Position - point1.Position; //a vector pointing from pointA to pointB
             path.Rotation = Quaternion.LookRotation(new(dir.x, 0, dir.y), Vector3.up); //calc a rotation that
 
+            Debug.Log("Added pathhh");
             wd.Paths.Add(path);
         }
 
+        return true;
         #endregion
     }
 
@@ -563,108 +604,44 @@ public class BetterGenerator : MonoBehaviour
         return RemoveDuplicateEdges(edges);
     }
 
-    // https://stackoverflow.com/questions/4543506/algorithm-for-intersection-of-2-lines
+    // https://stackoverflow.com/questions/13937782/calculating-the-point-of-intersection-of-two-lines
     private (bool, Vector2) FindIntersection(Edge lineA, Edge lineB, float tolerance = 0.001f)
     {
-        float x1 = lineA.v0.Position.x, y1 = lineA.v0.Position.y;
-        float x2 = lineA.v1.Position.x, y2 = lineA.v1.Position.y;
 
-        float x3 = lineB.v0.Position.x, y3 = lineB.v0.Position.y;
-        float x4 = lineB.v1.Position.x, y4 = lineB.v1.Position.y;
+        float x1 = lineA.v0.Position.x;
+        float x2 = lineA.v1.Position.x;
+        float x3 = lineB.v0.Position.x;
+        float x4 = lineB.v1.Position.x;
+        float y1 = lineA.v0.Position.y;
+        float y2 = lineA.v1.Position.y;
+        float y3 = lineB.v0.Position.y;
+        float y4 = lineB.v1.Position.y;
 
-        // equations of the form x=c (two vertical lines) with overlapping
-        if (Math.Abs(x1 - x2) < tolerance && Math.Abs(x3 - x4) < tolerance && Math.Abs(x1 - x3) < tolerance)
-        {
-            throw new Exception("Both lines overlap vertically, ambiguous intersection points.");
+        // Check if none of the lines are of length 0
+        if ((x1 == x2 && y1 == y2) || (x3 == x4 && y3 == y4)) {
+            return (false, Vector2.zero);
         }
 
-        //equations of the form y=c (two horizontal lines) with overlapping
-        if (Math.Abs(y1 - y2) < tolerance && Math.Abs(y3 - y4) < tolerance && Math.Abs(y1 - y3) < tolerance)
-        {
-            throw new Exception("Both lines overlap horizontally, ambiguous intersection points.");
+        float denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+
+        // Lines are parallel
+        if (denominator == 0) {
+            return (false, Vector2.zero);
         }
 
-        //equations of the form x=c (two vertical parallel lines)
-        if (Math.Abs(x1 - x2) < tolerance && Math.Abs(x3 - x4) < tolerance)
-        {   
-            //return default (no intersection)
+        float ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
+        float ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
+
+        // is the intersection along the segments
+        if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
             return (false, Vector2.zero);;
         }
 
-        //equations of the form y=c (two horizontal parallel lines)
-        if (Math.Abs(y1 - y2) < tolerance && Math.Abs(y3 - y4) < tolerance)
-        {
-            //return default (no intersection)
-            return (false, Vector2.zero);;
-        }
+        // Return a object with the x and y coordinates of the intersection
+        float x = x1 + ua * (x2 - x1);
+        float y = y1 + ua * (y2 - y1);
 
-        float x, y;
-
-        if (Math.Abs(x1 - x2) < tolerance)
-        {
-            //compute slope of line 2 (m2) and c2
-            float m2 = (y4 - y3) / (x4 - x3);
-            float c2 = -m2 * x3 + y3;
-            x = x1;
-            y = c2 + m2 * x1;
-        }
-
-        else if (Math.Abs(x3 - x4) < tolerance)
-        {
-            //compute slope of line 1 (m1) and c2
-            float m1 = (y2 - y1) / (x2 - x1);
-            float c1 = -m1 * x1 + y1;
-            x = x3;
-            y = c1 + m1 * x3;
-        }
-        //lineA & lineB are not vertical 
-        //(could be horizontal we can handle it with slope = 0)
-        else
-        {
-            //compute slope of line 1 (m1) and c2
-            float m1 = (y2 - y1) / (x2 - x1);
-            float c1 = -m1 * x1 + y1;
-
-            //compute slope of line 2 (m2) and c2
-            float m2 = (y4 - y3) / (x4 - x3);
-            float c2 = -m2 * x3 + y3;
-
-            //solving equations (3) & (4) => x = (c1-c2)/(m2-m1)
-            //plugging x value in equation (4) => y = c2 + m2 * x
-            x = (c1 - c2) / (m2 - m1);
-            y = c2 + m2 * x;
-
-            //verify by plugging intersection point (x, y)
-            //in orginal equations (1) & (2) to see if they intersect
-            //otherwise x,y values will not be finite and will fail this check
-            if (!(Math.Abs(-m1 * x + y - c1) < tolerance
-                && Math.Abs(-m2 * x + y - c2) < tolerance))
-            {
-                //return default (no intersection)
-                return (false, Vector2.zero);
-            }
-        }
-
-        //x,y can intersect outside the line segment since line is infinitely long
-        //so finally check if x, y is within both the line segments
-        if (IsInsideLine(lineA, x, y) &&
-            IsInsideLine(lineB, x, y))
-        {
-            return (true, new Vector2 { x = x, y = y });
-        }
-
-        //return default (no intersection)
-        return default;
-
-    }
-
-    // Returns true if given point(x,y) is inside the given line segment
-    private static bool IsInsideLine(Edge line, float x, float y)
-    {
-        return (x >= line.v0.Position.x && x <= line.v1.Position.x
-                    || x >= line.v1.Position.x && x <= line.v0.Position.x)
-               && (y >= line.v1.Position.y && y <= line.v0.Position.y
-                    || y >= line.v1.Position.y && y <= line.v0.Position.x);
+        return (true, new Vector2(x,y));
     }
 
     #endregion
