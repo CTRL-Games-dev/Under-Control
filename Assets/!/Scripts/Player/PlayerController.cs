@@ -1,8 +1,10 @@
+using DG.Tweening;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Animator))]
@@ -28,6 +30,7 @@ public class PlayerController : MonoBehaviour
     public GameObject MainCameraObject;
     public GameObject CinemachineObject;
     public GameObject CameraTargetObject;
+    public CinemachineCamera PlayerTopDownCamera;
     public bool InputDisabled = true;
 
     [Header("Weapon")]
@@ -55,7 +58,9 @@ public class PlayerController : MonoBehaviour
             CoinsChangeEvent?.Invoke(value - _coins);
             _coins = value;
         }  
-    } 
+    }
+    private bool _isAttacking = false;
+    private bool _lockRotation = false;
 
     [Header("Events")]
     public UnityEvent InventoryToggleEvent;
@@ -72,7 +77,8 @@ public class PlayerController : MonoBehaviour
     private readonly int _dodgeHash = Animator.StringToHash("dodge");
     private readonly int _lightAttackHash = Animator.StringToHash("light_attack");
     private readonly int _heavyAttackHash = Animator.StringToHash("heavy_attack");
-
+    private readonly int _playerAttackLightHash = Animator.StringToHash("player_attack_light");
+    private readonly int _playerAttackHeavyHash = Animator.StringToHash("player_attack_heavy");
 
     // References
     public CharacterController CharacterController { get; private set; }
@@ -114,7 +120,7 @@ public class PlayerController : MonoBehaviour
         }
 
         handleInteraction();
-        handleRotation();
+        if (!_lockRotation) handleRotation();
     }
 
     void FixedUpdate()
@@ -219,21 +225,32 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if(UICanvas.Instance.CurrentUIState !=  UIState.NotVisible) return;
+        if(UICanvas.Instance.CurrentUIState != UIState.NotVisible) return;
 
         bool interacted = tryInteract(interactionType);
         
         if(interacted) return;
 
         // Default to attacking if no interaction was commited
-        switch(interactionType) {
-            case InteractionType.Primary:
-                performLightAttack();
-                break;
-            case InteractionType.Secondary:
-                performHeavyAttack();
-                break;
+        if(_isAttacking) return;
+
+        Ray ray = UICanvas.Instance.MainCamera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit)) {
+            Vector3 targetPosition = hit.point;
+            targetPosition.y = transform.position.y;
+            _lockRotation = true;
+            transform.DORotate(Quaternion.LookRotation(targetPosition - transform.position).eulerAngles, 0.01f).OnComplete(() => {
+                switch(interactionType) {
+                    case InteractionType.Primary:
+                        performLightAttack();
+                        break;
+                    case InteractionType.Secondary:
+                        performHeavyAttack();
+                        break;
+                }
+            });
         }
+
     }
 
     private bool tryInteract(InteractionType interactionType) {
@@ -270,11 +287,15 @@ public class PlayerController : MonoBehaviour
         WeaponHolder.UpdateWeapon(CurrentWeapon);
     }
 
+    // calluje sie z animacji jesli dodane jest AttackAnimationBehaviour w animatorze
     public void OnAttackAnimationStart() {
+        _isAttacking = true;
         WeaponHolder.BeginAttack();
     }
 
     public void OnAttackAnimationEnd() {
         WeaponHolder.EndAttack();
+        _isAttacking = false;
+        _lockRotation = false;
     }
 }

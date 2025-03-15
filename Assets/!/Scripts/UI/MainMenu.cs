@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
-    [SerializeField] private CinemachineCamera _mainMenuCamera;
-
     [SerializeField] private Image _logoImage, _bgImage;
     [SerializeField] private GameObject _continueButton, _newGameButton, _optionsButton, _creditsButton, _exitButton;
     private RectTransform _continueRect, _newGameRect, _optionsRect, _creditsRect, _exitRect;
@@ -35,12 +33,6 @@ public class MainMenu : MonoBehaviour
         _exitBtnStartingX = _exitRect.anchoredPosition.x;
     }
 
-    private void Start() {
-        CameraManager.Instance.StartCamera = _mainMenuCamera;
-
-        // animateButtons();
-    }
-
     public void PlayGame() {
         Debug.Log("");
     }
@@ -50,8 +42,8 @@ public class MainMenu : MonoBehaviour
     }
 
     public void OpenMenu() {
-        CameraManager.Instance.SwitchCamera(_mainMenuCamera);
-     
+        if (HubManager.MainMenuCamera != null) CameraManager.Instance.SwitchCamera(HubManager.MainMenuCamera);
+
         gameObject.SetActive(true);
 
         _canvasGroup.alpha = 1;

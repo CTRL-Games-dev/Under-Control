@@ -40,7 +40,8 @@ public class InvTileEquipment : InvTile {
         // Debug.Log("ItemUIClickEvent");
         // if (itemUI == _itemUI) 
         //     Destroy(_itemUI.gameObject);
-        // if (itemUI == null || UICanvas.Instance.SelectedItemUI.InventoryItem != null) return;
+        if (itemUI == null || UICanvas.Instance.SelectedItemUI.InventoryItem != null) return;
+        
         if (itemUI == _itemUI) {
             switch (_tileType) {
                 case TileType.Helmet:
@@ -80,6 +81,7 @@ public class InvTileEquipment : InvTile {
         if (SelectedInventoryItem != null && _itemUI != null) return;
         if(!IsEmpty) return;
 
+        
         try {
             if (_tileType == TileType.Helmet) {
                 if (SelectedInventoryItem.ItemData is not HelmetItemData helmetItemData) {
