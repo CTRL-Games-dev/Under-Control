@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Unity.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.UIElements;
 
 public struct Tile
@@ -19,6 +15,30 @@ public struct PathData
     public Vector2 Point1, Point2;
     public Quaternion Rotation;
     public int Thickness;
+}
+
+public struct Point // Aka vertex
+{
+    public Vector2 Position;
+    public Location LocationOfPoint;
+    public Point(Vector2 pos, Location location)
+    {
+        Position = pos;
+        LocationOfPoint = location;
+    }
+    public Point(float x, float y, Location location)
+    {
+        Position = new Vector2(x, y);
+        LocationOfPoint = location;
+    }
+    public static bool operator ==(Point a, Point b)
+    {
+        return(a.Position == b.Position);
+    }
+    public static bool operator !=(Point a, Point b)
+    {
+        return(a.Position != b.Position);
+    }
 }
 
 public struct WorldData
@@ -137,15 +157,15 @@ public class BetterGenerator : MonoBehaviour
         }
 
         // Calculate location centers
-        List<Vector2> locationCenters = new();
-        foreach(var l in wd.Locations)
-        {
-            Vector2 center = new Vector2(l.X + (l.TileWidth/2), l.Y + (l.TileHeight / 2));
-            locationCenters.Add(center);
-        }
+        // List<Vector2> locationCenters = new();
+        // foreach(var l in wd.Locations)
+        // {
+        //     Vector2 center = new Vector2(l.X + (l.TileWidth/2), l.Y + (l.TileHeight / 2));
+        //     locationCenters.Add(center);
+        // }
 
         // Create Passageways between locations
-        DigOutPaths(locationCenters, grid);
+        DigOutPaths(wd.Locations, grid);
 
         #region Forest around locations
         {
@@ -232,6 +252,8 @@ public class BetterGenerator : MonoBehaviour
                 }
                 Vector3 pathPos = new Vector3(p.Point1.x - wd.Offset.x, 0, p.Point1.y - wd.Offset.y) * wd.Scale;
                 Debug.Log($"Position of the path: {pathPos}");
+
+                
                 pathTileHolder.transform.rotation = p.Rotation;
                 pathTileHolder.transform.position = pathPos;
             }
@@ -344,25 +366,26 @@ public class BetterGenerator : MonoBehaviour
 
     #endregion
 
-    private void DigOutPaths(List<Vector2> locationCenters, bool[,] grid) 
+    private void DigOutPaths(List<Location> locations, bool[,] grid) 
     {
         List<Edge> uniqueEdges = new();
 
         // This is a hack
         // somethimes triangulation does not produce result. In such case, it should be repeated
         // Create "sigma triangle"
-        Triangle st = Triangle.GetSuperTriangle(locationCenters);
+        Triangle st = Triangle.GetSuperTriangle(locations);
         Debug.Log("Created sigma triangle: " + st.vA + " " + st.vB + " " + st.vC);
 
         List<Triangle> triangles = new();
         triangles.Add(st);
 
         // Triangulate each vertex (magic)
-        Debug.Log($"Number of centers: {locationCenters.Count}");
-        foreach (var vertex in locationCenters)
+        Debug.Log($"Number of centers: {locations.Count}");
+        foreach (var location in locations)
         {
+            Point vertex = new(location.GetTileCenterWithoutOffset(), location);
             Debug.Log("=== ITERATION ===");
-            Debug.Log("Current vertex = " + vertex);
+            Debug.Log("Current vertex = " + vertex.Position);
             triangles = AddVertex(vertex, triangles);
         }
         Debug.Log("Number of triangles: " + triangles.Count);
@@ -438,16 +461,16 @@ public class BetterGenerator : MonoBehaviour
         foreach(var line in uniqueEdges.Where(e => e.Used))
         {
             num++;
-            Vector2 point1 = line.v0.x < line.v1.x ? line.v0 : line.v1;
-            Vector2 point2 = line.v0.x > line.v1.x ? line.v0 : line.v1;
+            Point point1 = line.v0.Position.x < line.v1.Position.x ? line.v0 : line.v1;
+            Point point2 = line.v0.Position.x > line.v1.Position.x ? line.v0 : line.v1;
 
             Debug.Log("=== LINE " + num + " ===");
             Debug.Log("First point " + point1);
             Debug.Log("Second point " + point2);
 
-            float a = (point2.y - point1.y)/(point2.x - point1.x);
+            float a = (point2.Position.y - point1.Position.y)/(point2.Position.x - point1.Position.x);
             // y = ax + b ----> b = y - ax
-            float b = point1.y-(a * point1.x);
+            float b = point1.Position.y-(a * point1.Position.x);
 
             int yLength = (int)Math.Abs(Math.Ceiling(a));
             yLength = yLength < 1 ? 1 : yLength; // yLength cannot be smaller than 1
@@ -456,7 +479,7 @@ public class BetterGenerator : MonoBehaviour
             Debug.LogFormat("yLen = {0}, a = {1}, b = {2}", yLength, a, b);
             int thickness = UnityEngine.Random.Range(2, 4);
 
-            for(int ix = (int)Math.Floor(point1.x); ix < (int)Math.Floor(point2.x); ix++)
+            for(int ix = (int)Math.Floor(point1.Position.x); ix < (int)Math.Floor(point2.Position.x); ix++)
             {
                 int x = ix;
                 int indexX = x - (int)wd.Offset.x;
@@ -479,12 +502,41 @@ public class BetterGenerator : MonoBehaviour
                 }
             }
 
+
+            Vector2[,] edgesA = point1.LocationOfPoint.GetEdges();
+            Vector2 intersectionA = new Vector2(555555,555555); // Funny big vector if an error happens;
+            for(int i = 0; i < 4; i++)
+            {
+                Edge locationEdge = new(new(edgesA[i,0],point1.LocationOfPoint), new(edgesA[i,1],point1.LocationOfPoint));
+                Edge pathLine = new(point1, point2);
+                (bool ifFound, Vector2 intersection) = FindIntersection(locationEdge, pathLine);
+                if(ifFound)
+                {
+                    intersectionA = intersection;
+                    break;
+                }
+            }
+
+            Vector2[,] edgesB = point2.LocationOfPoint.GetEdges();
+            Vector2 intersectionB = new Vector2(555555,555555); // Funny big vector if an error happens
+            for(int i = 0; i < 4; i++)
+            {
+                Edge locationEdge = new(new(edgesB[i,0],point2.LocationOfPoint), new(edgesB[i,1],point2.LocationOfPoint));
+                Edge pathLine = new(point1, point2);
+                (bool ifFound, Vector2 intersection) = FindIntersection(locationEdge, pathLine);
+                if(ifFound)
+                {
+                    intersectionB = intersection;
+                    break;
+                }
+            }
+
             PathData path;
-            path.Point1 = point1;
-            path.Point2 = point2;
+            path.Point1 = intersectionA;
+            path.Point2 = intersectionB;
             path.Thickness = thickness;
             
-            Vector2 dir = point2 - point1; //a vector pointing from pointA to pointB
+            Vector2 dir = point2.Position - point1.Position; //a vector pointing from pointA to pointB
             path.Rotation = Quaternion.LookRotation(new(dir.x, 0, dir.y), Vector3.up); //calc a rotation that
 
             wd.Paths.Add(path);
@@ -512,13 +564,13 @@ public class BetterGenerator : MonoBehaviour
     }
 
     // https://stackoverflow.com/questions/4543506/algorithm-for-intersection-of-2-lines
-    private Vector2 FindIntersection(Edge lineA, Edge lineB, float tolerance = 0.001f)
+    private (bool, Vector2) FindIntersection(Edge lineA, Edge lineB, float tolerance = 0.001f)
     {
-        float x1 = lineA.v0.x, y1 = lineA.v0.y;
-        float x2 = lineA.v1.x, y2 = lineA.v1.y;
+        float x1 = lineA.v0.Position.x, y1 = lineA.v0.Position.y;
+        float x2 = lineA.v1.Position.x, y2 = lineA.v1.Position.y;
 
-        float x3 = lineB.v0.x, y3 = lineB.v0.y;
-        float x4 = lineB.v1.x, y4 = lineB.v1.y;
+        float x3 = lineB.v0.Position.x, y3 = lineB.v0.Position.y;
+        float x4 = lineB.v1.Position.x, y4 = lineB.v1.Position.y;
 
         // equations of the form x=c (two vertical lines) with overlapping
         if (Math.Abs(x1 - x2) < tolerance && Math.Abs(x3 - x4) < tolerance && Math.Abs(x1 - x3) < tolerance)
@@ -536,14 +588,14 @@ public class BetterGenerator : MonoBehaviour
         if (Math.Abs(x1 - x2) < tolerance && Math.Abs(x3 - x4) < tolerance)
         {   
             //return default (no intersection)
-            return default;
+            return (false, Vector2.zero);;
         }
 
         //equations of the form y=c (two horizontal parallel lines)
         if (Math.Abs(y1 - y2) < tolerance && Math.Abs(y3 - y4) < tolerance)
         {
             //return default (no intersection)
-            return default;
+            return (false, Vector2.zero);;
         }
 
         float x, y;
@@ -589,7 +641,7 @@ public class BetterGenerator : MonoBehaviour
                 && Math.Abs(-m2 * x + y - c2) < tolerance))
             {
                 //return default (no intersection)
-                return default;
+                return (false, Vector2.zero);
             }
         }
 
@@ -598,7 +650,7 @@ public class BetterGenerator : MonoBehaviour
         if (IsInsideLine(lineA, x, y) &&
             IsInsideLine(lineB, x, y))
         {
-            return new Vector2 { x = x, y = y };
+            return (true, new Vector2 { x = x, y = y });
         }
 
         //return default (no intersection)
@@ -609,23 +661,23 @@ public class BetterGenerator : MonoBehaviour
     // Returns true if given point(x,y) is inside the given line segment
     private static bool IsInsideLine(Edge line, float x, float y)
     {
-        return (x >= line.v0.x && x <= line.v1.x
-                    || x >= line.v1.x && x <= line.v0.x)
-               && (y >= line.v1.y && y <= line.v0.y
-                    || y >= line.v1.y && y <= line.v0.x);
+        return (x >= line.v0.Position.x && x <= line.v1.Position.x
+                    || x >= line.v1.Position.x && x <= line.v0.Position.x)
+               && (y >= line.v1.Position.y && y <= line.v0.Position.y
+                    || y >= line.v1.Position.y && y <= line.v0.Position.x);
     }
 
     #endregion
 
     #region Triangulation helper functions
-    private List<Triangle> AddVertex(Vector2 vertex, List<Triangle> triangles)
+    private List<Triangle> AddVertex(Point vertex, List<Triangle> triangles)
     {
         List<Edge> edges = new();
 
         // Remove triangles with circumcircles containing the vertex
         triangles = triangles.Where(t => {
             // Debug.Log("triangle center: " + t.vCenter);
-            if (t.InCircumcircle(vertex)) {
+            if (t.InCircumcircle(vertex.Position)) {
                 // Debug.Log("Bad triangle!");
                 edges.Add(new Edge(t.vA, t.vB));
                 edges.Add(new Edge(t.vB, t.vC));
@@ -686,11 +738,11 @@ public class BetterGenerator : MonoBehaviour
     private class Edge
     {
         // Variables and methods used for triangulation
-        public Vector2 v0, v1;
-        public Edge(Vector2 v0, Vector2 v1)
+        public Point v0, v1;
+        public Edge(Point v0, Point v1)
         {
             this.v0 = v0; this.v1 = v1;
-            this.Length = Vector2.Distance(v0, v1);
+            this.Length = Vector2.Distance(v0.Position, v1.Position);
         }
         public bool Equals(Edge other)
         {
@@ -765,21 +817,22 @@ public class BetterGenerator : MonoBehaviour
 
     private class Triangle
     {
-        public Vector2 vA, vB, vC;
+        public Point vA, vB, vC;
         public Vector2 vCenter;
-        public Triangle(Vector2 vA, Vector2 vB, Vector2 vC)
+        public Triangle(Point vA, Point vB, Point vC)
         {
             this.vA = vA; this.vB = vB; this.vC = vC;
-            this.vCenter = GetCircumcenter(vA, vB, vC);
+            this.vCenter = GetCircumcenter(vA.Position, vB.Position, vC.Position);
         }
 
-        public static Triangle GetSuperTriangle(List<Vector2> verticies)
+        public static Triangle GetSuperTriangle(List<Location> locations)
         {
             float minX, minY, maxX, maxY;
             minX = minY = 100000000000; // some big number
             maxX = maxY = -100000000000; // some big number
-            foreach(var vertex in verticies)
+            foreach(var l in locations)
             {
+                Vector2 vertex = l.GetTileCenter();
                 minX = Math.Min(minX, vertex.x);
                 minY = Math.Min(minX, vertex.y);
                 maxX = Math.Max(maxX, vertex.x);
@@ -788,9 +841,9 @@ public class BetterGenerator : MonoBehaviour
             var dx = (maxX - minX) * 10;
             var dy = (maxY - minY) * 10;
 
-            var v0 = new Vector2(minX - dx, minY - dy * 3);
-            var v1 = new Vector2(minX - dx, maxY + dy);
-            var v2 = new Vector2(maxX + dx * 3, maxY + dy);
+            var v0 = new Point(minX - dx, minY - dy * 3, new DummyLocation(new(25555,2555),new(25555,2555)));
+            var v1 = new Point(minX - dx, maxY + dy, new DummyLocation(new(25555,2555),new(25555,2555)));
+            var v2 = new Point(maxX + dx * 3, maxY + dy, new DummyLocation(new(25555,2555),new(25555,2555)));
 
             return new Triangle(v0, v1, v2);
         }
@@ -808,7 +861,7 @@ public class BetterGenerator : MonoBehaviour
         {
             var dx = vCenter.x - v.x;
             var dy = vCenter.y - v.y;
-            var radius = Vector2.Distance(vCenter, vA);
+            var radius = Vector2.Distance(vCenter, vA.Position);
             return Math.Sqrt(dx * dx + dy * dy) <= radius;
         }
 

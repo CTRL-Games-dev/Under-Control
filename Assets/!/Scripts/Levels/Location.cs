@@ -20,6 +20,10 @@ public abstract class Location
     {
         return new Vector2(X + (TileWidth/2), Y + (TileHeight/2)) - wd.Offset;
     }
+    public Vector2 GetTileCenterWithoutOffset()
+    {
+        return new Vector2(X + (TileWidth/2), Y + (TileHeight/2));
+    }
     public void SetTileCenter(Vector2 center)
     {
         X = (int)(center.x) - (TileWidth/2) - (int)wd.Offset.x;
@@ -30,11 +34,31 @@ public abstract class Location
     {
         return (new Vector2(X + (TileWidth/2), Y + (TileHeight/2)) - wd.Offset) * wd.Scale;
     }
-    // public void SetAbsoluteCenter(Vector2 center)
-    // {
-    //     X = (int)(center.x) - (TileWidth/2) - (int)wd.Offset.x;
-    //     Y = (int)(center.y) - (TileWidth/2) - (int)wd.Offset.y;
-    // }
+    
+    public Vector2[,] GetEdges()
+    {
+        Vector2[,] edges = new Vector2[4,2];
+
+        Vector2 p1 = new Vector2(X,Y);
+        Vector2 p2 = new Vector2(X+TileWidth,Y);
+        Vector2 p3 = new Vector2(X+TileWidth,Y+TileHeight);
+        Vector2 p4 = new Vector2(X,Y+TileHeight);
+
+        edges[0,0] = p1;
+        edges[0,1] = p2;
+
+        edges[1,0] = p2;
+        edges[1,1] = p3;
+
+        edges[2,0] = p3;
+        edges[2,1] = p4;
+
+        edges[3,0] = p4;
+        edges[3,1] = p1;
+
+
+        return edges;
+    }
 }
 
 // === Forest ===
