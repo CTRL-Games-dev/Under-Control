@@ -79,6 +79,7 @@ public class PlayerController : MonoBehaviour
     private readonly int _heavyAttackHash = Animator.StringToHash("heavy_attack");
     private readonly int _playerAttackLightHash = Animator.StringToHash("player_attack_light");
     private readonly int _playerAttackHeavyHash = Animator.StringToHash("player_attack_heavy");
+    private readonly int _weaponTypeHash = Animator.StringToHash("weapon_type");
 
     // References
     public CharacterController CharacterController { get; private set; }
@@ -104,7 +105,7 @@ public class PlayerController : MonoBehaviour
     {
         recalculateStats();
 
-        // Nie mozna playerinputa wylaczyc?
+        // Nie mozna playerinputa wylaczyc? - nie mozna :)
         if (InputDisabled) {
             _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0, _deceleration * Time.deltaTime);
             return;
@@ -209,7 +210,7 @@ public class PlayerController : MonoBehaviour
     }
 
     void OnDodge() {
-        Animator.SetTrigger(_dodgeHash);
+        if (!InputDisabled) Animator.SetTrigger(_dodgeHash);
     }
 
     private void handleInteraction() {
@@ -238,8 +239,8 @@ public class PlayerController : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit)) {
             Vector3 targetPosition = hit.point;
             targetPosition.y = transform.position.y;
-            _lockRotation = true;
-            transform.DORotate(Quaternion.LookRotation(targetPosition - transform.position).eulerAngles, 0.01f).OnComplete(() => {
+            transform.DORotate(Quaternion.LookRotation(targetPosition - transform.position).eulerAngles, 0.1f).OnComplete(() => {
+                _lockRotation = true;
                 switch(interactionType) {
                     case InteractionType.Primary:
                         performLightAttack();
@@ -285,10 +286,12 @@ public class PlayerController : MonoBehaviour
 
     public void OnInventoryChanged() {
         WeaponHolder.UpdateWeapon(CurrentWeapon);
+        Animator.SetInteger(_weaponTypeHash, (int)CurrentWeapon.WeaponType);
     }
 
     // calluje sie z animacji jesli dodane jest AttackAnimationBehaviour w animatorze
     public void OnAttackAnimationStart() {
+        _lockRotation = true;
         _isAttacking = true;
         WeaponHolder.BeginAttack();
     }
