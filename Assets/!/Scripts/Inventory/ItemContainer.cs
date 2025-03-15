@@ -165,7 +165,7 @@ public class ItemContainer
                 return false;
             }
     
-            if(inventoryItem.Amount + amount >= inventoryItem.ItemData.MaxQuantity) {
+            if(inventoryItem.Amount + amount > inventoryItem.ItemData.MaxQuantity) {
                 return false;
             }
 

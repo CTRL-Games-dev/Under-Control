@@ -9,7 +9,7 @@ public class SimpleInventory : EntityInventory
     public ItemContainer ItemContainer;
     public override Vector2Int Size => ItemContainer.Size;
 
-    // Does not guarantee that inventory WAS indeed changes
+    // Does not guarantee that inventory WAS indeed changed
     public UnityEvent OnInventoryChanged;
 
     public override bool AddItem(ItemData itemData, int amount, Vector2Int position, bool rotated = false) {
