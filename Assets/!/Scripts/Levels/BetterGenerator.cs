@@ -254,6 +254,10 @@ public class BetterGenerator : MonoBehaviour
         newMesh.SetVertices(vertices);
         newMesh.SetTriangles(trianglesFloor, 0);
         newMesh.SetUVs(0, uv);
+        newMesh.RecalculateNormals();
+        // newMesh.RecalculateBounds();
+        newMesh.RecalculateTangents();
+        newMesh.Optimize();
 
         // Get material
         Material dirt = Resources.Load<Material>("Materials/Forest/Dirt/Dirt");
