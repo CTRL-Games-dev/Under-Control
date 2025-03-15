@@ -29,13 +29,10 @@ public class WeaponHolder : MonoBehaviour
 
         _currentWeaponHitter.gameObject.layer = gameObject.layer;
         _currentWeaponHitter.OnHit.AddListener(OnHit);
-
-        _currentWeaponHitter.transform.localPosition = new Vector3(0, 0, 0);
-        _currentWeaponHitter.transform.localRotation = Quaternion.identity;
     }
 
     private Weapon InstantiateWeapon(WeaponItemData weaponData) {
-        return Instantiate(weaponData.WeaponPrefab, Vector3.zero, Quaternion.identity, transform);
+        return Instantiate(weaponData.WeaponPrefab, transform); // nie ma clearowania rotacji i pozycji bo gracz ma rozne gripy 
     }
 
     private Weapon InstantiateUnknownWeapon() {
