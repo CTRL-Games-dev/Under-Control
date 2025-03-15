@@ -24,10 +24,10 @@ public class CameraManager : MonoBehaviour
     private void Start() {
         _cinemachineCameras = new List<CinemachineCamera>(FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None));
     
-        StartCamera = (StartCamera == null) ? PlayerTopDownCamera : StartCamera;
-        _currentCamera = StartCamera;
+        // // StartCamera = (StartCamera == null) ? PlayerTopDownCamera : StartCamera;
+        // _currentCamera = StartCamera;
 
-        setCamerasPriority();
+        // setCamerasPriority();
     }
 
     public void SwitchCamera(CinemachineCamera camera) {

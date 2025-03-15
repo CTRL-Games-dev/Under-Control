@@ -18,6 +18,8 @@ public struct WorldData
     public Vector2 Offset;
     public float Scale;
     public int Width, Height;
+    public bool[,] grid;
+    public List<Location> locations;
 
     // public WorldData(Vector2 os, float sc)
     // {
@@ -31,7 +33,6 @@ public struct WorldData
 [RequireComponent(typeof(MeshFilter))]
 public class BetterGenerator : MonoBehaviour
 {
-    List<Location> allLocations = new();
     public WorldData wd;
     private MeshFilter _mf;
     private MeshCollider _mc;
@@ -60,7 +61,7 @@ public class BetterGenerator : MonoBehaviour
     public T Getlocation<T>()
     where T : Location
     {
-        foreach(var l in allLocations)
+        foreach(var l in wd.locations)
         {
             if(l.GetType() == typeof(T)) return (T)l;
         }
@@ -71,7 +72,7 @@ public class BetterGenerator : MonoBehaviour
     where T : Location
     {
         List<T> locations = new();
-        foreach(var l in allLocations)
+        foreach(var l in wd.locations)
         {
             if(l.GetType() == typeof(T)) locations.Add((T)l);
         }
@@ -80,11 +81,13 @@ public class BetterGenerator : MonoBehaviour
 
     private void GenerateForest()
     {
-        PlaceLocations(allLocations);
+        wd.locations = new();
+
+        PlaceLocations(wd.locations);
 
         // All locations
         int minX = 0, minY = 0, maxX = 0, maxY = 0;
-        foreach(var l in allLocations)
+        foreach(var l in wd.locations)
         {
             if (l.X < minX) minX = l.X;
             if (l.Y < minY) minY = l.Y;
@@ -112,8 +115,9 @@ public class BetterGenerator : MonoBehaviour
         wd.Scale = 9;
         wd.Width = gridWidth;
         wd.Height = gridHeight;
+        wd.grid = grid;
 
-        foreach(var l in allLocations)
+        foreach(var l in wd.locations)
         {
             // Remove trees
             for (int ix = 0; ix < l.TileWidth; ix++)
@@ -130,7 +134,7 @@ public class BetterGenerator : MonoBehaviour
 
         // Calculate location centers
         List<Vector2> locationCenters = new();
-        foreach(var l in allLocations)
+        foreach(var l in wd.locations)
         {
             Vector2 center = new Vector2(l.X + (l.TileWidth/2), l.Y + (l.TileHeight / 2));
             locationCenters.Add(center);
@@ -139,24 +143,54 @@ public class BetterGenerator : MonoBehaviour
         // Create Passageways between locations
         DigOutPaths(locationCenters, grid);
 
-        // Load forest tile
+        // Generate forest
         GameObject[] tiles = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestTiles");
-
-        for(int x = 0; x < gridWidth; x++)
+        foreach(var l in wd.locations)
         {
-            for(int y = 0; y < gridHeight; y++)
-            {
-                if(grid[x,y]) { continue; }
-                Vector3 pos = new Vector3(x + 0.5f, 0, y + 0.5f) * wd.Scale;
-                var tile = Instantiate(tiles[0], pos, Quaternion.identity, TerrainHolder.transform);
-                
-                // MeshRenderer[] meshRenderers = tile.GetComponentsInChildren<MeshRenderer>() ;
-                // GameObject[] gameObjects = new GameObject[meshRenderers.Length];
-                // for (int i = 0; i < meshRenderers.Length; i++) {
-                //     gameObjects[i] = meshRenderers[i].gameObject;
-                // }
+            int margin = 5;
 
-                // StaticBatchingUtility.Combine(gameObjects, TerrainHolder);
+            int xStart = l.X - (int)(wd.Offset.x) - margin;
+            int yStart = l.Y - (int)(wd.Offset.y) - margin;
+
+            Debug.Log($"xStart = {xStart}, yStart = {yStart} ");
+
+            xStart = xStart < 0 ? 0 : xStart;
+            xStart = xStart > wd.Width ? wd.Width : xStart;
+
+            yStart = yStart < 0 ? 0 : yStart;
+            yStart = yStart > wd.Height ? wd.Height : yStart;
+
+            int xEnd = xStart + l.TileWidth + 2 * margin;
+            int yEnd = yStart + l.TileHeight + 2 * margin;
+
+            Debug.Log($"xEnd = {xEnd}, yEnd = {yEnd} ");
+
+            xEnd = xEnd < 0 ? 0 : xEnd;
+            xEnd = xEnd > wd.Width ? wd.Width : xEnd;
+
+            yEnd = yEnd < 0 ? 0 : yEnd;
+            yEnd = yEnd > wd.Height ? wd.Height : yEnd;
+
+
+            Debug.Log($"New xStart = {xStart}, yStart = {yStart} ");
+            Debug.Log($"New xEnd = {xEnd}, yEnd = {yEnd} ");
+
+            for(int x = xStart; x < xEnd; x++)
+            {
+                for(int y = yStart; y < yEnd; y++)
+                {
+                    if(grid[x,y]) { continue; }
+                    Vector3 pos = new Vector3(x + 0.5f, 0, y + 0.5f) * wd.Scale;
+                    var tile = Instantiate(tiles[0], pos, Quaternion.identity, TerrainHolder.transform);
+                    
+                    // MeshRenderer[] meshRenderers = tile.GetComponentsInChildren<MeshRenderer>() ;
+                    // GameObject[] gameObjects = new GameObject[meshRenderers.Length];
+                    // for (int i = 0; i < meshRenderers.Length; i++) {
+                    //     gameObjects[i] = meshRenderers[i].gameObject;
+                    // }
+
+                    // StaticBatchingUtility.Combine(gameObjects, TerrainHolder);
+                }
             }
         }
 
@@ -407,9 +441,9 @@ public class BetterGenerator : MonoBehaviour
         }
 
         num = 0;
-        for(int x = 0; x < grid.GetLength(0); x++)
+        for(int x = 0; x < wd.grid.GetLength(0); x++)
         {
-            for(int y = 0; y < grid.GetLength(1); y++)
+            for(int y = 0; y < wd.grid.GetLength(1); y++)
             {
                 if(grid[x,y]) {num++; continue;}
             }
