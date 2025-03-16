@@ -1,16 +1,53 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using Unity.Collections;
-using Unity.VisualScripting;
+using System.Threading;
 using UnityEngine;
-using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.UIElements;
 
-public struct Tile
+public enum TileType
 {
-    public bool IsWall;
-    public int X, Y;
+    Wall,
+    Empty,
+    Path,
+}
+
+public enum PathBorderType
+{
+    None,
+    Short,
+    Long,
+}
+
+public struct PathData
+{
+    public Vector2 Point1, Point2;
+    public Quaternion Rotation;
+    public int Thickness;
+}
+
+public struct Point // Aka vertex
+{
+    public Vector2 Position;
+    public Location LocationOfPoint;
+    public Point(Vector2 pos, Location location)
+    {
+        Position = pos;
+        LocationOfPoint = location;
+    }
+    public Point(float x, float y, Location location)
+    {
+        Position = new Vector2(x, y);
+        LocationOfPoint = location;
+    }
+    public static bool operator ==(Point a, Point b)
+    {
+        return(a.Position == b.Position);
+    }
+    public static bool operator !=(Point a, Point b)
+    {
+        return(a.Position != b.Position);
+    }
 }
 
 public struct WorldData
@@ -18,12 +55,10 @@ public struct WorldData
     public Vector2 Offset;
     public float Scale;
     public int Width, Height;
-
-    // public WorldData(Vector2 os, float sc)
-    // {
-    //     Offset = os;
-    //     Scale = sc;
-    // }
+    public TileType[,] Grid;
+    public bool[,] GridUsed;
+    public List<Location> Locations;
+    public List<PathData> Paths;
 }
 
 [RequireComponent(typeof(MeshCollider))]
@@ -31,17 +66,16 @@ public struct WorldData
 [RequireComponent(typeof(MeshFilter))]
 public class BetterGenerator : MonoBehaviour
 {
-    List<Location> allLocations = new();
     public WorldData wd;
-    private MeshFilter _mf;
-    private MeshCollider _mc;
-    private MeshRenderer _mr;
+    private MeshFilter _meshFilter;
+    private MeshCollider _meshCollider;
+    private MeshRenderer _meshRenderer;
     public GameObject TerrainHolder;
     public void Awake()
     {
-        _mf = GetComponent<MeshFilter>();
-        _mc = GetComponent<MeshCollider>();
-        _mr = GetComponent<MeshRenderer>();
+        _meshFilter = GetComponent<MeshFilter>();
+        _meshCollider = GetComponent<MeshCollider>();
+        _meshRenderer = GetComponent<MeshRenderer>();
     }
     public enum LevelType
     {
@@ -60,7 +94,7 @@ public class BetterGenerator : MonoBehaviour
     public T Getlocation<T>()
     where T : Location
     {
-        foreach(var l in allLocations)
+        foreach(var l in wd.Locations)
         {
             if(l.GetType() == typeof(T)) return (T)l;
         }
@@ -71,7 +105,7 @@ public class BetterGenerator : MonoBehaviour
     where T : Location
     {
         List<T> locations = new();
-        foreach(var l in allLocations)
+        foreach(var l in wd.Locations)
         {
             if(l.GetType() == typeof(T)) locations.Add((T)l);
         }
@@ -80,85 +114,170 @@ public class BetterGenerator : MonoBehaviour
 
     private void GenerateForest()
     {
-        PlaceLocations(allLocations);
+        wd.Locations = new();
+        wd.Paths = new();
 
-        // All locations
-        int minX = 0, minY = 0, maxX = 0, maxY = 0;
-        foreach(var l in allLocations)
+        TileType[,] grid;
+        int gridPadding = 10;
+        int gridWidth;
+        int gridHeight;
+
+        while(true)
         {
-            if (l.X < minX) minX = l.X;
-            if (l.Y < minY) minY = l.Y;
-            if (l.X+l.TileWidth > maxX) maxX = l.X+l.TileWidth;
-            if (l.Y+l.TileHeight > maxY) maxY = l.Y+l.TileHeight;
+            PlaceLocations(wd.Locations);
 
-            Debug.Log("Spawned location at x->" + l.X + " y->" + l.Y);
-        }
-
-        // Grid is used to determine where to spawn trees
-        int gridPadding = 5;
-        int gridWidth = (int)Vector2.Distance(new(minX,0), new(maxX,0)) + (gridPadding*2);
-        int gridHeight = (int)Vector2.Distance(new(minY,0), new(maxY,0)) + (gridPadding*2);;
-        // int gridHeight = (int)Vector2.Distance(new(0,minY), new(0,maxY));
-        
-        bool[,] grid = new bool[gridWidth + (gridPadding*2), gridHeight + (gridPadding*2)];
-
-
-        // Since coordinates can be negative and we use an array
-        // we need to have some kind of an offset to index this array
-        Vector2 offset = new(minX-gridPadding, minY-gridPadding);
-
-        // Set world data
-        wd.Offset = offset;
-        wd.Scale = 9;
-        wd.Width = gridWidth;
-        wd.Height = gridHeight;
-
-        foreach(var l in allLocations)
-        {
-            // Remove trees
-            for (int ix = 0; ix < l.TileWidth; ix++)
+            // All locations
+            int minX = 0, minY = 0, maxX = 0, maxY = 0;
+            foreach(var l in wd.Locations)
             {
-                for (int iy = 0; iy < l.TileHeight; iy++)
-                {
-                    int indexX = (int)(ix + l.X - offset.x);
-                    int indexY = (int)(iy + l.Y - offset.y);
-                    grid[indexX, indexY] = true;
-                }
+                if (l.X < minX) minX = l.X;
+                if (l.Y < minY) minY = l.Y;
+                if (l.X+l.TileWidth > maxX) maxX = l.X+l.TileWidth;
+                if (l.Y+l.TileHeight > maxY) maxY = l.Y+l.TileHeight;
+
+                Debug.Log($"Spawned location {l.Name} at {l.X}x, {l.Y}");
             }
-            l.GenerateLocation(TerrainHolder, wd);
+
+            // Grid is used to determine where to spawn trees
+            gridWidth = (int)Vector2.Distance(new(minX,0), new(maxX,0)) + (gridPadding*2);
+            gridHeight = (int)Vector2.Distance(new(minY,0), new(maxY,0)) + (gridPadding*2);
+            // int gridHeight = (int)Vector2.Distance(new(0,minY), new(0,maxY));
+            
+            grid = new TileType[gridWidth + (gridPadding), gridHeight + (gridPadding)];
+
+
+            // Since coordinates can be negative and we use an array
+            // we need to have some kind of an offset to index this array
+            Vector2 offset = new(minX-gridPadding, minY-gridPadding);
+
+            // Set world data
+            wd.Offset = offset;
+            wd.Scale = 9;
+            wd.Width = gridWidth;
+            wd.Height = gridHeight;
+            wd.Grid = grid;
+            wd.GridUsed = new bool[gridWidth + (gridPadding), gridHeight + (gridPadding)];
+
+            if(!DigOutPaths(wd.Locations, grid))
+            {
+                wd.Locations.Clear();
+                continue;
+            }
+
+            foreach(var l in wd.Locations)
+            {
+                // Remove trees
+                for (int ix = 0; ix < l.TileWidth; ix++)
+                {
+                    for (int iy = 0; iy < l.TileHeight; iy++)
+                    {
+                        int indexX = (int)(ix + l.X - offset.x);
+                        int indexY = (int)(iy + l.Y - offset.y);
+                        wd.Grid[indexX, indexY] = TileType.Empty;
+                        wd.GridUsed[indexX, indexY] = true;
+                    }
+                }
+                l.GenerateLocation(TerrainHolder, wd);
+            }
+            break;
         }
 
-        // Calculate location centers
-        List<Vector2> locationCenters = new();
-        foreach(var l in allLocations)
-        {
-            Vector2 center = new Vector2(l.X + (l.TileWidth/2), l.Y + (l.TileHeight / 2));
-            locationCenters.Add(center);
-        }
-
-        // Create Passageways between locations
-        DigOutPaths(locationCenters, grid);
-
-        // Load forest tile
         GameObject[] tiles = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestTiles");
 
-        for(int x = 0; x < gridWidth; x++)
+        #region Forest around locations
         {
-            for(int y = 0; y < gridHeight; y++)
+            foreach(var l in wd.Locations)
             {
-                if(grid[x,y]) { continue; }
-                Vector3 pos = new Vector3(x + 0.5f, 0, y + 0.5f) * wd.Scale;
-                var tile = Instantiate(tiles[0], pos, Quaternion.identity, TerrainHolder.transform);
-                
-                // MeshRenderer[] meshRenderers = tile.GetComponentsInChildren<MeshRenderer>() ;
-                // GameObject[] gameObjects = new GameObject[meshRenderers.Length];
-                // for (int i = 0; i < meshRenderers.Length; i++) {
-                //     gameObjects[i] = meshRenderers[i].gameObject;
-                // }
+                int margin = 5;
 
-                // StaticBatchingUtility.Combine(gameObjects, TerrainHolder);
+                int xStart = l.X - (int)(wd.Offset.x) - margin;
+                int yStart = l.Y - (int)(wd.Offset.y) - margin;
+
+                Debug.Log($"xStart = {xStart}, yStart = {yStart} ");
+
+                xStart = xStart < 0 ? 0 : xStart;
+                xStart = xStart > wd.Width ? wd.Width : xStart;
+
+                yStart = yStart < 0 ? 0 : yStart;
+                yStart = yStart > wd.Height ? wd.Height : yStart;
+
+                int xEnd = xStart + l.TileWidth + 2 * margin;
+                int yEnd = yStart + l.TileHeight + 2 * margin;
+
+                Debug.Log($"xEnd = {xEnd}, yEnd = {yEnd} ");
+
+                xEnd = xEnd < 0 ? 0 : xEnd;
+                xEnd = xEnd > wd.Width ? wd.Width : xEnd;
+
+                yEnd = yEnd < 0 ? 0 : yEnd;
+                yEnd = yEnd > wd.Height ? wd.Height : yEnd;
+
+
+                Debug.Log($"New xStart = {xStart}, yStart = {yStart} ");
+                Debug.Log($"New xEnd = {xEnd}, yEnd = {yEnd} ");
+
+                for(int x = xStart; x < xEnd; x++)
+                {
+                    for(int y = yStart; y < yEnd; y++)
+                    {
+                        if(wd.Grid[x,y] != TileType.Wall || wd.GridUsed[x,y]) { continue; }
+                        float posX = x + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
+                        float posY = y + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
+                        Vector3 pos = new Vector3(posX, 0, posY) * wd.Scale;
+
+                        GameObject tilePrefab = tiles[UnityEngine.Random.Range(0, tiles.Length)];
+                        var newTile = Instantiate(tilePrefab, pos, Quaternion.identity, TerrainHolder.transform);
+                        wd.GridUsed[x,y] = true;
+
+                        newTile.transform.eulerAngles = new Vector3(0,UnityEngine.Random.Range(-180, 180),0);
+                    }
+                }
             }
         }
+
+        #endregion
+
+        #region Forest around paths
+
+        {
+            List<Vector2> pathTiles = new();
+
+            for (int x = 0; x < grid.GetLength(0); x++)
+            {
+                for (int y = 0; y < grid.GetLength(1); y++)
+                {
+                    if(wd.Grid[x,y] == TileType.Path && wd.GridUsed[x,y] == false) {
+                        pathTiles.Add(new(x,y));
+                        wd.GridUsed[x,y] = true;
+                    }
+                }
+            }
+
+            foreach(var pt in pathTiles)
+            {
+                int range = 3;
+                for(int ix = -range; ix < range; ix++)
+                {
+                    for (int iy = -range; iy < range; iy++)
+                    {
+                        int gridX = (ix + (int)pt.x), gridY = (iy + (int)pt.y);
+                        if(wd.Grid[gridX,gridY] == TileType.Wall && wd.GridUsed[gridX,gridY] == false)
+                        {
+                            float posX = gridX + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
+                            float posY = gridY + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
+                            Vector3 pos = new Vector3(posX, 0, posY) * wd.Scale;
+                            GameObject tilePrefab = tiles[UnityEngine.Random.Range(0, tiles.Length)];
+                            GameObject newTile = Instantiate(tilePrefab, pos, Quaternion.identity, TerrainHolder.transform);
+                            wd.GridUsed[gridX,gridY] = true;
+
+                            newTile.transform.eulerAngles = new Vector3(0,UnityEngine.Random.Range(-180, 180),0);
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
 
         GenerateMesh(gridWidth, gridHeight);
     }
@@ -186,7 +305,7 @@ public class BetterGenerator : MonoBehaviour
             indexY *= UnityEngine.Random.Range(0, 2) == 0 ? 1 : -1;
 
             bool flag = false;
-            for(int t = 0; t < 5; t++)
+            for(int t = 0; t < 20; t++)
             {
                 medow.SetTileCenter(new(indexX, indexY));
                 if(medow.CheckLocation(locations)) {
@@ -211,7 +330,7 @@ public class BetterGenerator : MonoBehaviour
         List<int> trianglesFloor = new();
         List<Vector2> uv = new();
 
-        // Generate terrain height (Londek is not helpful)
+        // Generate terrain height
         float[,] th = new float[gridWidth+1, gridHeight+1];
         for(int x = 0; x < gridWidth; x++)
         {
@@ -262,50 +381,53 @@ public class BetterGenerator : MonoBehaviour
         // Get material
         Material dirt = Resources.Load<Material>("Materials/Forest/Dirt/Dirt");
 
-        _mf.mesh = newMesh;
-        _mr.materials = new Material[] {dirt};
-        _mc.sharedMesh = newMesh;
+        _meshFilter.mesh = newMesh;
+        _meshRenderer.materials = new Material[] {dirt};
+        _meshCollider.sharedMesh = newMesh;
     }
 
     #endregion
 
-    private void DigOutPaths(List<Vector2> locationCenters, bool[,] grid) 
+    private bool DigOutPaths(List<Location> locations, TileType[,] grid) 
     {
         List<Edge> uniqueEdges = new();
 
         // This is a hack
         // somethimes triangulation does not produce result. In such case, it should be repeated
-        do
+        // Create "sigma triangle"
+        Triangle st = Triangle.GetSuperTriangle(locations);
+        Debug.Log("Created sigma triangle: " + st.vA + " " + st.vB + " " + st.vC);
+
+        List<Triangle> triangles = new();
+        triangles.Add(st);
+
+        // Triangulate each vertex (magic)
+        Debug.Log($"Number of centers: {locations.Count}");
+        foreach (var location in locations)
         {
-            // Create "sigma triangle"
-            Triangle st = Triangle.GetSuperTriangle(locationCenters);
-            Debug.Log("Created sigma triangle: " + st.vA + " " + st.vB + " " + st.vC);
+            Point vertex = new(location.GetTileCenterWithoutOffset(), location);
+            Debug.Log("=== ITERATION ===");
+            Debug.Log("Current vertex = " + vertex.Position);
+            triangles = AddVertex(vertex, triangles);
+        }
+        Debug.Log("Number of triangles: " + triangles.Count);
 
-            List<Triangle> triangles = new();
-            triangles.Add(st);
+        // Remove triangles that share edges with sigma triangle (they are not so sigma)
+        triangles = triangles.Where(t => 
+            !(t.vA == st.vA || t.vA == st.vB || t.vA == st.vC ||
+            t.vB == st.vA || t.vB == st.vB || t.vB == st.vC ||
+            t.vC == st.vA || t.vC == st.vB || t.vC == st.vC)
+        ).ToList();
 
-            // Triangulate each vertex (magic)
-            Debug.Log($"Number of centers: {locationCenters.Count}");
-            foreach (var vertex in locationCenters)
-            {
-                Debug.Log("=== ITERATION ===");
-                Debug.Log("Current vertex = " + vertex);
-                triangles = AddVertex(vertex, triangles);
-            }
-            Debug.Log("Number of triangles: " + triangles.Count);
-
-            // Remove triangles that share edges with sigma triangle (they are not so sigma)
-            triangles = triangles.Where(t => 
-                !(t.vA == st.vA || t.vA == st.vB || t.vA == st.vC ||
-                t.vB == st.vA || t.vB == st.vB || t.vB == st.vC ||
-                t.vC == st.vA || t.vC == st.vB || t.vC == st.vC)
-            ).ToList();
-
-            uniqueEdges = RemoveDuplicateEdges(triangles);
-        } while(uniqueEdges.Count == 0);
+        uniqueEdges = RemoveDuplicateEdges(triangles);
+        
 
         #region MST
 
+        if(uniqueEdges.Count == 0) {
+            Debug.Log("Cannot generate world, trying once again!");
+            return false;
+        }
         Debug.Log($"Number of unique edges: {uniqueEdges.Count}");
         Edge firstEdge = uniqueEdges.Aggregate(uniqueEdges[0], (smallest, next) => {
             return smallest.Length > next.Length ? next : smallest;
@@ -361,23 +483,20 @@ public class BetterGenerator : MonoBehaviour
 
         #region Rasterization
 
-        // Debug.Log("Dimensions of grid: x" + grid.GetLength(0));
-        // Debug.Log("Dimensions of grid: y" + grid.GetLength(1));
-
         int num = 0;
         foreach(var line in uniqueEdges.Where(e => e.Used))
         {
             num++;
-            Vector2 point1 = line.v0.x < line.v1.x ? line.v0 : line.v1;
-            Vector2 point2 = line.v0.x > line.v1.x ? line.v0 : line.v1;
+            Point point1 = line.v0.Position.x < line.v1.Position.x ? line.v0 : line.v1;
+            Point point2 = line.v0.Position.x > line.v1.Position.x ? line.v0 : line.v1;
 
             Debug.Log("=== LINE " + num + " ===");
-            Debug.Log("First point " + point1);
-            Debug.Log("Second point " + point2);
+            Debug.Log("First point " + point1.Position);
+            Debug.Log("Second point " + point2.Position);
 
-            float a = (point2.y - point1.y)/(point2.x - point1.x);
+            float a = (point2.Position.y - point1.Position.y)/(point2.Position.x - point1.Position.x);
             // y = ax + b ----> b = y - ax
-            float b = point1.y-(a * point1.x);
+            float b = point1.Position.y-(a * point1.Position.x);
 
             int yLength = (int)Math.Abs(Math.Ceiling(a));
             yLength = yLength < 1 ? 1 : yLength; // yLength cannot be smaller than 1
@@ -386,7 +505,7 @@ public class BetterGenerator : MonoBehaviour
             Debug.LogFormat("yLen = {0}, a = {1}, b = {2}", yLength, a, b);
             int thickness = UnityEngine.Random.Range(2, 4);
 
-            for(int ix = (int)Math.Floor(point1.x); ix < (int)Math.Floor(point2.x); ix++)
+            for(int ix = (int)Math.Floor(point1.Position.x); ix < (int)Math.Floor(point2.Position.x); ix++)
             {
                 int x = ix;
                 int indexX = x - (int)wd.Offset.x;
@@ -396,30 +515,72 @@ public class BetterGenerator : MonoBehaviour
                     int y = (int)Math.Floor(a*x + b)+(iy*ySymbol);
                     int indexY = y - (int)wd.Offset.y;
 
-                    // Debug.Log("Current x " + x + ", index x " + indexX);
-                    // Debug.LogFormat("Actual coordinates: [{0},{1}]", x, y);
-                    // Debug.LogFormat("Index: [{0},{1}]", indexX, indexY);
                     for(int tx = 0; tx < thickness; tx++)
                     {
                         for(int ty = 0; ty < thickness; ty++)
                         {
-                            grid[indexX+tx,indexY+ty] = true;
+                            wd.Grid[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = TileType.Path;
                         }
                     }
                 }
             }
-        }
 
-        num = 0;
-        for(int x = 0; x < grid.GetLength(0); x++)
-        {
-            for(int y = 0; y < grid.GetLength(1); y++)
+
+            Vector2[,] edgesA = point1.LocationOfPoint.GetEdges();
+            Vector2 intersectionA = new Vector2(555555,555555); // Funny big vector if an error happens;
+            bool foundA = false;
+            Debug.Log($"Line pA = {point1.Position}, pB = {point2.Position}");
+            for(int i = 0; i < 4; i++)
             {
-                if(grid[x,y]) {num++; continue;}
+                Edge locationEdge = new(new(edgesA[i,0],point1.LocationOfPoint), new(edgesA[i,1],point1.LocationOfPoint));
+                Edge pathLine = new(point1, point2);
+                (bool ifFound, Vector2 intersection) = FindIntersection(locationEdge, pathLine);
+                Debug.Log($"Loc1, Edge pA = {locationEdge.v0.Position}, pB = {locationEdge.v1.Position}");
+                if(ifFound)
+                {
+                    intersectionA = intersection;
+                    foundA = true;
+                    break;
+                }
             }
-        }
-        Debug.Log("Number of not used tiles (inside mst): " + num);
 
+            Vector2[,] edgesB = point2.LocationOfPoint.GetEdges();
+            Vector2 intersectionB = new Vector2(555555,555555); // Funny big vector if an error happens
+            bool foundB = false;
+            for(int i = 0; i < 4; i++)
+            {
+                Edge locationEdge = new(new(edgesB[i,0],point2.LocationOfPoint), new(edgesB[i,1],point2.LocationOfPoint));
+                Edge pathLine = new(point1, point2);
+                Debug.Log($"Loc2, Edge pA = {locationEdge.v0.Position}, pB = {locationEdge.v1.Position}");
+
+                (bool ifFound, Vector2 intersection) = FindIntersection(locationEdge, pathLine);
+                if(ifFound)
+                {
+                    intersectionB = intersection;
+                    foundB = true;
+                    break;
+                }
+            }
+
+            if(!(foundA && foundB))
+            {
+                throw new Exception("NIE DZIAŁA!");
+            }
+
+            PathData path;
+            path.Point1 = intersectionA;
+            path.Point2 = intersectionB;
+            path.Thickness = thickness;
+            float len = Vector2.Distance(path.Point1, path.Point2);
+
+            Vector2 dir = point2.Position - point1.Position; //a vector pointing from pointA to pointB
+            path.Rotation = Quaternion.LookRotation(new(dir.x, 0, dir.y), Vector3.up); //calc a rotation that
+
+            Debug.Log("Added pathhh");
+            wd.Paths.Add(path);
+        }
+
+        return true;
         #endregion
     }
 
@@ -441,17 +602,57 @@ public class BetterGenerator : MonoBehaviour
         return RemoveDuplicateEdges(edges);
     }
 
+    // https://stackoverflow.com/questions/13937782/calculating-the-point-of-intersection-of-two-lines
+    private (bool, Vector2) FindIntersection(Edge lineA, Edge lineB, float tolerance = 0.001f)
+    {
+
+        float x1 = lineA.v0.Position.x;
+        float x2 = lineA.v1.Position.x;
+        float x3 = lineB.v0.Position.x;
+        float x4 = lineB.v1.Position.x;
+        float y1 = lineA.v0.Position.y;
+        float y2 = lineA.v1.Position.y;
+        float y3 = lineB.v0.Position.y;
+        float y4 = lineB.v1.Position.y;
+
+        // Check if none of the lines are of length 0
+        if ((x1 == x2 && y1 == y2) || (x3 == x4 && y3 == y4)) {
+            return (false, Vector2.zero);
+        }
+
+        float denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+
+        // Lines are parallel
+        if (denominator == 0) {
+            return (false, Vector2.zero);
+        }
+
+        float ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
+        float ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
+
+        // is the intersection along the segments
+        if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
+            return (false, Vector2.zero);;
+        }
+
+        // Return a object with the x and y coordinates of the intersection
+        float x = x1 + ua * (x2 - x1);
+        float y = y1 + ua * (y2 - y1);
+
+        return (true, new Vector2(x,y));
+    }
+
     #endregion
 
     #region Triangulation helper functions
-    private List<Triangle> AddVertex(Vector2 vertex, List<Triangle> triangles)
+    private List<Triangle> AddVertex(Point vertex, List<Triangle> triangles)
     {
         List<Edge> edges = new();
 
         // Remove triangles with circumcircles containing the vertex
         triangles = triangles.Where(t => {
             // Debug.Log("triangle center: " + t.vCenter);
-            if (t.InCircumcircle(vertex)) {
+            if (t.InCircumcircle(vertex.Position)) {
                 // Debug.Log("Bad triangle!");
                 edges.Add(new Edge(t.vA, t.vB));
                 edges.Add(new Edge(t.vB, t.vC));
@@ -512,11 +713,11 @@ public class BetterGenerator : MonoBehaviour
     private class Edge
     {
         // Variables and methods used for triangulation
-        public Vector2 v0, v1;
-        public Edge(Vector2 v0, Vector2 v1)
+        public Point v0, v1;
+        public Edge(Point v0, Point v1)
         {
             this.v0 = v0; this.v1 = v1;
-            this.Length = Vector2.Distance(v0, v1);
+            this.Length = Vector2.Distance(v0.Position, v1.Position);
         }
         public bool Equals(Edge other)
         {
@@ -591,21 +792,22 @@ public class BetterGenerator : MonoBehaviour
 
     private class Triangle
     {
-        public Vector2 vA, vB, vC;
+        public Point vA, vB, vC;
         public Vector2 vCenter;
-        public Triangle(Vector2 vA, Vector2 vB, Vector2 vC)
+        public Triangle(Point vA, Point vB, Point vC)
         {
             this.vA = vA; this.vB = vB; this.vC = vC;
-            this.vCenter = GetCircumcenter(vA, vB, vC);
+            this.vCenter = GetCircumcenter(vA.Position, vB.Position, vC.Position);
         }
 
-        public static Triangle GetSuperTriangle(List<Vector2> verticies)
+        public static Triangle GetSuperTriangle(List<Location> locations)
         {
             float minX, minY, maxX, maxY;
             minX = minY = 100000000000; // some big number
             maxX = maxY = -100000000000; // some big number
-            foreach(var vertex in verticies)
+            foreach(var l in locations)
             {
+                Vector2 vertex = l.GetTileCenter();
                 minX = Math.Min(minX, vertex.x);
                 minY = Math.Min(minX, vertex.y);
                 maxX = Math.Max(maxX, vertex.x);
@@ -614,9 +816,9 @@ public class BetterGenerator : MonoBehaviour
             var dx = (maxX - minX) * 10;
             var dy = (maxY - minY) * 10;
 
-            var v0 = new Vector2(minX - dx, minY - dy * 3);
-            var v1 = new Vector2(minX - dx, maxY + dy);
-            var v2 = new Vector2(maxX + dx * 3, maxY + dy);
+            var v0 = new Point(minX - dx, minY - dy * 3, new DummyLocation(new(25555,2555),new(25555,2555)));
+            var v1 = new Point(minX - dx, maxY + dy, new DummyLocation(new(25555,2555),new(25555,2555)));
+            var v2 = new Point(maxX + dx * 3, maxY + dy, new DummyLocation(new(25555,2555),new(25555,2555)));
 
             return new Triangle(v0, v1, v2);
         }
@@ -634,7 +836,7 @@ public class BetterGenerator : MonoBehaviour
         {
             var dx = vCenter.x - v.x;
             var dy = vCenter.y - v.y;
-            var radius = Vector2.Distance(vCenter, vA);
+            var radius = Vector2.Distance(vCenter, vA.Position);
             return Math.Sqrt(dx * dx + dy * dy) <= radius;
         }
 
