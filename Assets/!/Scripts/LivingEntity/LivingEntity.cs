@@ -40,6 +40,7 @@ public class LivingEntity : MonoBehaviour
     private float _lastDamageTime = 0;
     private List<EffectData> _activeEffects = new List<EffectData>();
 
+    private readonly int _hurtHash = Animator.StringToHash("hurt");
     private readonly int _speedHash = Animator.StringToHash("speed");
     private readonly int _dodgeHash = Animator.StringToHash("dodge");
     private readonly int _lightAttackHash = Animator.StringToHash("light_attack");
@@ -83,6 +84,14 @@ public class LivingEntity : MonoBehaviour
 
     public void TakeDamage(Damage damage, LivingEntity source = null)
     {
+        if (gameObject.GetComponent<PlayerController>() != null) {
+            if (gameObject.GetComponent<PlayerController>().DamageDisabled) return;
+        }
+        if (gameObject.CompareTag("Boar")) {
+            gameObject.GetComponent<Animator>()?.SetTrigger(_hurtHash);
+        }
+
+        gameObject.GetComponent<HitFlashAnimator>()?.Flash();
         _lastDamageTime = Time.time;
 
         // Check if entity is dead
@@ -99,6 +108,10 @@ public class LivingEntity : MonoBehaviour
         }
 
         Health.Subtract(actualDamageAmount);
+
+        if (gameObject.GetComponent<BossHealthBar>() != null) {
+            gameObject.GetComponent<BossHealthBar>().SetHealth(Health / MaxHealth);
+        }
 
         OnDamageTaken.Invoke(new DamageTakenEventData {
             Damage = damage,
