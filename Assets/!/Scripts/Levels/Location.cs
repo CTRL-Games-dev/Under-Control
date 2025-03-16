@@ -5,49 +5,49 @@ public abstract class Location
     public string Name;
     public GameObject SpawnedInstance = null;
     public int TileWidth, TileHeight;
-    public int X, Y;
+    public int TilePosX, TilePosY;
     public abstract void GenerateLocation(GameObject parent, WorldData worldData);
     public bool CheckLocation(List<Location> generatedLocations)
     {
         foreach(var l in generatedLocations)
         {
-            if(X+TileWidth > l.X && X < l.X) return false;
-            if(Y+TileHeight > l.Y && Y < l.Y) return false;
+            if(TilePosX+TileWidth > l.TilePosX && TilePosX < l.TilePosX) return false;
+            if(TilePosY+TileHeight > l.TilePosY && TilePosY < l.TilePosY) return false;
         }
         return true;
     }
 
     public Vector2 GetTileGridCenter(Vector2 offset)
     {
-        return new Vector2(X + (TileWidth/2), Y + (TileHeight/2)) - offset;
+        return new Vector2(TilePosX + (TileWidth/2), TilePosY + (TileHeight/2)) - offset;
     }
     public Vector2 GetTileGridCorner(Vector2 offset)
     {
-        return new Vector2(X, Y) - offset;
+        return new Vector2(TilePosX, TilePosY) - offset;
     }
     public Vector2 GetTileCenterWithoutOffset()
     {
-        return new Vector2(X + (TileWidth/2), Y + (TileHeight/2));
+        return new Vector2(TilePosX + (TileWidth/2), TilePosY + (TileHeight/2));
     }
     public void SetTileCenter(Vector2 center)
     {
-        X = (int)(center.x) - (TileWidth/2);
-        Y = (int)(center.y) - (TileWidth/2);
+        TilePosX = (int)(center.x) - (TileWidth/2);
+        TilePosY = (int)(center.y) - (TileWidth/2);
     }
 
     public Vector2 GetAbsoluteCenter(Vector2 offset, float scale)
     {
-        return (new Vector2(X + (TileWidth/2), Y + (TileHeight/2)) - offset) * scale;
+        return (new Vector2(TilePosX + (TileWidth/2), TilePosY + (TileHeight/2)) - offset) * scale;
     }
     
     public Vector2[,] GetEdges()
     {
         Vector2[,] edges = new Vector2[4,2];
 
-        Vector2 p1 = new Vector2(X,Y);
-        Vector2 p2 = new Vector2(X+TileWidth,Y);
-        Vector2 p3 = new Vector2(X+TileWidth,Y+TileHeight);
-        Vector2 p4 = new Vector2(X,Y+TileHeight);
+        Vector2 p1 = new Vector2(TilePosX,TilePosY);
+        Vector2 p2 = new Vector2(TilePosX+TileWidth,TilePosY);
+        Vector2 p3 = new Vector2(TilePosX+TileWidth,TilePosY+TileHeight);
+        Vector2 p4 = new Vector2(TilePosX,TilePosY+TileHeight);
 
         edges[0,0] = p1;
         edges[0,1] = p2;
@@ -100,8 +100,8 @@ public class DummyLocation : Location
         this.TileWidth = (int)dimensions.x;
         this.TileHeight = (int)dimensions.y;
 
-        this.X = (int)position.x;
-        this.Y = (int)position.y;
+        this.TilePosX = (int)position.x;
+        this.TilePosY = (int)position.y;
     }
 
     public override void GenerateLocation(GameObject parent, WorldData worldData)
@@ -116,13 +116,16 @@ public class Medow : Location
     {
         Name = "Medow";
 
-        TileWidth = Random.Range(5, 12);
-        TileHeight = Random.Range(5, 12);
+        TileWidth = Random.Range(5, 8);
+        TileHeight = Random.Range(5, 8);
     }
     public override void GenerateLocation(GameObject parent, WorldData worldData)
     {
         Vector2 corner = GetTileGridCorner(worldData.Offset);
 
+        List<Vector2> occupiedSpace = new();
+
+        // Boars
         GameObject[] trees = Resources.LoadAll<GameObject>("Prefabs/Forest/Trees");
         float numberOfTrees = Random.Range(4, 8);
 
@@ -135,10 +138,12 @@ public class Medow : Location
             GameObject treePrefab = trees[Random.Range(0,trees.Length)];
             GameObject newTree = GameObject.Instantiate(treePrefab, pos, Quaternion.identity);
 
-            newTree.transform.eulerAngles = new(0, Random.Range(-180,180), 0);     
+            newTree.transform.eulerAngles = new(0, Random.Range(-180,180), 0);
+            occupiedSpace.Add(new(pos.x, pos.y));
         }
 
 
+        // Rocks
         GameObject[] rocks = Resources.LoadAll<GameObject>("Prefabs/Forest/Rocks");
         float numberOfRocks = Random.Range(10, 20);
 
@@ -151,7 +156,38 @@ public class Medow : Location
             GameObject treePrefab = rocks[Random.Range(0,trees.Length)];
             GameObject newTree = GameObject.Instantiate(treePrefab, pos, Quaternion.identity);
 
-            newTree.transform.eulerAngles = new(0, Random.Range(-180,180), 0);     
+            newTree.transform.eulerAngles = new(0, Random.Range(-180,180), 0);
+            occupiedSpace.Add(new(pos.x, pos.y));    
+        }
+
+        // Boars
+        GameObject boar = Resources.Load<GameObject>("Prefabs/Forest/Enemies/BoarPrefab");
+
+        float numberOfBoars = Random.Range(3, 6);
+        for(int i = 0; i < numberOfBoars; i++)
+        {
+            float x = Random.Range(corner.x + 2f, corner.x + TileWidth - 2f);
+            float y = Random.Range(corner.y + 2f, corner.y + TileHeight - 2f);
+            float tolerance = 3.0f;
+
+            foreach(var l in occupiedSpace)
+            {
+                bool flag = false;
+                for(int t = 0; t < 5; t++)
+                {
+                    bool con1 = l.x + tolerance < x + t;
+                    bool con2 = l.x - tolerance > x + t;
+                    bool con3 = l.y + tolerance < y + t;
+                    bool con4 = l.y - tolerance > y + t;
+
+                    if(!(con1 && con2 && con3 && con4)) {
+                        GameObject.Instantiate(boar, new Vector3(x, 0.2f, y) * worldData.Scale, Quaternion.identity);
+                        flag = true;
+                        break;
+                    }
+                }
+                if(flag) break;
+            }
         }
     }
 }
