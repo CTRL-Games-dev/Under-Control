@@ -321,7 +321,7 @@ public class BetterGenerator : MonoBehaviour
 
 
         Location arena = new ForestBossArena();
-        arena.SetTileCenter(new(12,12)); // Set it to center
+        arena.SetTileCenter(new(10,10)); // Set it to center
         wd.Locations.Add(arena);
     }
 
