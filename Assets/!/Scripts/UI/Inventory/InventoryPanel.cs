@@ -310,6 +310,7 @@ public class InventoryPanel : MonoBehaviour
         // if (UICanvas.Instance.SelectedItemUI.InventoryItem != null) return; 
         if (_inventory.Contains(itemUI.InventoryItem)) {
             if (UICanvas.Instance.SelectedItemUI.InventoryItem != null) return; 
+            if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
             UICanvas.Instance.SetSelectedItemUI(itemUI);
             if (IsSellerInventory) {
                 _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
@@ -325,8 +326,10 @@ public class InventoryPanel : MonoBehaviour
 
         if (_inventory.Contains(itemUI.InventoryItem)) {
             if (UICanvas.Instance.SelectedItemUI.InventoryItem == null) {
+                if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
                 UICanvas.Instance.SetSelectedItemUI(itemUI);
                 if (IsSellerInventory) {
+                    if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0) return;
                     _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
                     IsItemJustBought = true;
                 }
@@ -334,6 +337,7 @@ public class InventoryPanel : MonoBehaviour
             } else {
                 if (UICanvas.Instance.SelectedItemUI.InventoryItem.ItemData == itemUI.InventoryItem.ItemData) {
                     if (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount >= UICanvas.Instance.SelectedItemUI.InventoryItem.Amount) {
+                        if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
                         itemUI.InventoryItem.Amount += UICanvas.Instance.SelectedItemUI.InventoryItem.Amount;
                         if (IsSellerInventory) {
                             _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * UICanvas.Instance.SelectedItemUI.InventoryItem.Amount;
@@ -342,6 +346,7 @@ public class InventoryPanel : MonoBehaviour
                         itemUI.UpdateAmount();
                         UICanvas.Instance.SelectedItemUI.InventoryItem = null;
                     } else {
+                        if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
                         UICanvas.Instance.SelectedItemUI.InventoryItem.Amount = UICanvas.Instance.SelectedItemUI.InventoryItem.Amount - (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount);
                         itemUI.InventoryItem.Amount = itemUI.InventoryItem.ItemData.MaxQuantity;
                         itemUI.UpdateAmount();
@@ -363,6 +368,7 @@ public class InventoryPanel : MonoBehaviour
             if (UICanvas.Instance.SelectedItemUI.InventoryItem == null) {
                 if (itemUI.InventoryItem.Amount > 1) {
                     int half = itemUI.InventoryItem.Amount / 2;
+                    if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * (half + itemUI.InventoryItem.Amount % 2) < 0 && IsSellerInventory) return;
                     
                     InventoryItem inventoryItem = new(){
                         ItemData = itemUI.InventoryItem.ItemData,
@@ -380,6 +386,7 @@ public class InventoryPanel : MonoBehaviour
                         IsItemJustBought = true;
                     }
                 } else {
+                    if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
                     UICanvas.Instance.SetSelectedItemUI(itemUI);
                     if (IsSellerInventory) {
                         _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
