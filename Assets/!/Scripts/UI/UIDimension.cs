@@ -10,6 +10,7 @@ public class UIDimension : MonoBehaviour
     public string Name = "Sample Dimension";
     public string Description = "Sample Description";
     public DimensionType Type;
+    public Dimension WhatDimension;
     public DimensionDifficulty Difficulty;
     public int VekhtarControl = 0;
     public List<ItemData> AvaliableItems = new List<ItemData>();

@@ -69,19 +69,6 @@ public class BetterGenerator : MonoBehaviour
         _meshCollider = GetComponent<MeshCollider>();
         _meshRenderer = GetComponent<MeshRenderer>();
     }
-    public enum LevelType
-    {
-        Forest
-    }
-    public void GenerateMap(LevelType type)
-    {
-        switch(type)
-        {
-            case LevelType.Forest: {
-                GenerateForest();
-            } break;
-        }
-    }
 
     public T Getlocation<T>()
     where T : Location
@@ -104,7 +91,7 @@ public class BetterGenerator : MonoBehaviour
         return locations;
     }
 
-    private void GenerateForest()
+    public void GenerateMap(Dimension type)
     {
         wd.Locations = new();
         wd.Paths = new();
@@ -116,7 +103,15 @@ public class BetterGenerator : MonoBehaviour
 
         while(true)
         {
-            PlaceLocations();
+            switch(type) 
+            {
+                case Dimension.FOREST: {
+                    PlaceLocationsForest();
+                } break;
+                case Dimension.FOREST_BOSS: {
+                    PlaceLocationsForestBoss();
+                } break;
+            }
 
             // All locations
             int minX = 0, minY = 0, maxX = 0, maxY = 0;
@@ -276,7 +271,7 @@ public class BetterGenerator : MonoBehaviour
 
     #region Placing Locations
 
-    private void PlaceLocations()
+    private void PlaceLocationsForest()
     {
         // Place portal
         Location portal = new ForestPortal();
@@ -315,6 +310,19 @@ public class BetterGenerator : MonoBehaviour
             }
             else Debug.Log("Didnt found location!");
         }
+    }
+
+    private void PlaceLocationsForestBoss()
+    {
+        // Place portal
+        Location portal = new ForestPortal();
+        portal.SetTileCenter(new(0,0)); // Set it to center
+        wd.Locations.Add(portal);
+
+
+        Location arena = new ForestBossArena();
+        arena.SetTileCenter(new(10,10)); // Set it to center
+        wd.Locations.Add(arena);
     }
 
     #endregion
@@ -391,29 +399,36 @@ public class BetterGenerator : MonoBehaviour
     {
         List<Edge> uniqueEdges = new();
 
-        // This is a hack
-        // somethimes triangulation does not produce result. In such case, it should be repeated
-        // Create "sigma triangle"
-        Triangle st = Triangle.GetSuperTriangle(locations);
-
-        List<Triangle> triangles = new();
-        triangles.Add(st);
-
-        // Triangulate each vertex (magic)
-        foreach (var location in locations)
+        if(locations.Count > 2)
         {
-            Point vertex = new(location.GetTileCenterWithoutOffset(), location);
-            triangles = AddVertex(vertex, triangles);
+            // Create "sigma triangle"
+            Triangle st = Triangle.GetSuperTriangle(locations);
+
+            List<Triangle> triangles = new();
+            triangles.Add(st);
+
+            // Triangulate each vertex (magic)
+            foreach (var location in locations)
+            {
+                Point vertex = new(location.GetTileCenterWithoutOffset(), location);
+                triangles = AddVertex(vertex, triangles);
+            }
+
+            // Remove triangles that share edges with sigma triangle (they are not so sigma)
+            triangles = triangles.Where(t => 
+                !(t.vA == st.vA || t.vA == st.vB || t.vA == st.vC ||
+                t.vB == st.vA || t.vB == st.vB || t.vB == st.vC ||
+                t.vC == st.vA || t.vC == st.vB || t.vC == st.vC)
+            ).ToList();
+
+            uniqueEdges = RemoveDuplicateEdges(triangles);
+        } 
+        else
+        {
+            Vector2 pos1 = new(locations[0].TilePosX, locations[0].TilePosY);
+            Vector2 pos2 = new(locations[1].TilePosX, locations[1].TilePosY);
+            uniqueEdges .Add(new Edge(new Point(pos1, locations[0]), new Point(pos2, locations[1])));
         }
-
-        // Remove triangles that share edges with sigma triangle (they are not so sigma)
-        triangles = triangles.Where(t => 
-            !(t.vA == st.vA || t.vA == st.vB || t.vA == st.vC ||
-            t.vB == st.vA || t.vB == st.vB || t.vB == st.vC ||
-            t.vC == st.vA || t.vC == st.vB || t.vC == st.vC)
-        ).ToList();
-
-        uniqueEdges = RemoveDuplicateEdges(triangles);
         
 
         #region MST

@@ -191,3 +191,19 @@ public class Medow : Location
         }
     }
 }
+
+public class ForestBossArena : Location
+{
+    public ForestBossArena()
+    {
+        Name = "Forest Boss Arena";
+        
+        TileWidth = 20;
+        TileHeight = 20;
+    }
+
+    public override void GenerateLocation(GameObject parent, WorldData worldData)
+    {
+        
+    }
+}

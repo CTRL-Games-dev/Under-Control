@@ -21,4 +21,9 @@ public class Portal : MonoBehaviour
         Debug.Log("Changed dimension to: " + d.ToString());
         _dimension = d;
     }
+
+    public void SetDimension(Dimension d)
+    {
+        _dimension = d;
+    }
 }
