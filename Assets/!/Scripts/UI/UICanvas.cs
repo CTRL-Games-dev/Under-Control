@@ -74,7 +74,7 @@ public class UICanvas : MonoBehaviour
     private SettingsScreen _settingsScreen;
     private CanvasGroup _inventoryCanvasGroup;
     private IInteractableInventory _lastInteractableInventory;
-    private bool _isSettingsOpen = false;
+    public bool IsOtherUIOpen = false;
 
     #endregion
 
@@ -121,7 +121,7 @@ public class UICanvas : MonoBehaviour
     }
 
     private void OnUICancel() {
-        if (_isSettingsOpen) {
+        if (IsOtherUIOpen) {
             CloseSettingsScreen();
             return;
         }
@@ -312,12 +312,12 @@ public class UICanvas : MonoBehaviour
     }
 
     public void OpenSettingsScreen() {
-        _isSettingsOpen = true;
+        IsOtherUIOpen = true;
         _settingsScreen.OpenSettings();
     }
 
     public void CloseSettingsScreen() {
-        _isSettingsOpen = false;
+        IsOtherUIOpen = false;
         _settingsScreen.CloseSettings();
     }
 
