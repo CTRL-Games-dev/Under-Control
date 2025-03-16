@@ -116,7 +116,7 @@ public class BetterGenerator : MonoBehaviour
 
         while(true)
         {
-            PlaceLocations(wd.Locations);
+            PlaceLocations();
 
             // All locations
             int minX = 0, minY = 0, maxX = 0, maxY = 0;
@@ -215,7 +215,7 @@ public class BetterGenerator : MonoBehaviour
                         if(wd.Grid[x,y] != TileType.Wall || wd.GridUsed[x,y]) { continue; }
                         float posX = x + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
                         float posY = y + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
-                        Vector3 pos = new Vector3(posX, 0, posY) * wd.Scale;
+                        Vector3 pos = new Vector3(posX, 0.0f, posY) * wd.Scale;
 
                         GameObject tilePrefab = tiles[UnityEngine.Random.Range(0, tiles.Length)];
                         var newTile = Instantiate(tilePrefab, pos, Quaternion.identity, TerrainHolder.transform);
@@ -274,12 +274,12 @@ public class BetterGenerator : MonoBehaviour
         GenerateMesh(gridWidth, gridHeight);
     }
 
-    private void PlaceLocations(List<Location> locations)
+    private void PlaceLocations()
     {
         // Place portal
         Location portal = new ForestPortal();
         portal.SetTileCenter(new(0,0)); // Set it to center
-        locations.Add(portal);
+        wd.Locations.Add(portal);
 
         // Medow 
         int mCount = UnityEngine.Random.Range(2, 4);
@@ -287,8 +287,8 @@ public class BetterGenerator : MonoBehaviour
         {
             Location medow = new Medow();
 
-            int minRange = 30;
-            int maxRange = 60;
+            int minRange = 15;
+            int maxRange = 35;
             
             int indexX = UnityEngine.Random.Range(minRange, maxRange + 1);
             int indexY = UnityEngine.Random.Range(minRange, maxRange + 1);
@@ -300,14 +300,16 @@ public class BetterGenerator : MonoBehaviour
             for(int t = 0; t < 20; t++)
             {
                 medow.SetTileCenter(new(indexX, indexY));
-                if(medow.CheckLocation(locations)) {
+                if(medow.CheckLocation(wd.Locations)) {
                     flag = true;
                     Debug.Log("Found location");
                     break;
                 };
             }
-
-            if(flag) locations.Add(medow);
+            if(flag) 
+            {
+                wd.Locations.Add(medow);
+            }
             else Debug.Log("Didnt found location!");
         }
     }
@@ -327,7 +329,7 @@ public class BetterGenerator : MonoBehaviour
         for(int x = 0; x < gridWidth; x++)
         {
             for(int y = 0; y < gridHeight; y++) {
-                th[x,y] = UnityEngine.Random.Range(-0.1f, 0.1f);
+                th[x,y] = UnityEngine.Random.Range(-0.1f, -0.05f);
             }
         }
 
@@ -799,7 +801,7 @@ public class BetterGenerator : MonoBehaviour
             maxX = maxY = -100000000000; // some big number
             foreach(var l in locations)
             {
-                Vector2 vertex = l.GetTileCenter();
+                Vector2 vertex = l.GetTileCenterWithoutOffset();
                 minX = Math.Min(minX, vertex.x);
                 minY = Math.Min(minX, vertex.y);
                 maxX = Math.Max(maxX, vertex.x);
