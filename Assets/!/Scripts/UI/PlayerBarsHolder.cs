@@ -6,19 +6,14 @@ public class PlayerBarsHolder : MonoBehaviour
 {
     [SerializeField] private Image _healthBarImg;
     [SerializeField] private Image _manaBarImg;
-    [SerializeField] private Image _controlBarImg;
 
-    private UICanvas _uiCanvas;
-    private LivingEntity _livingEntity { get => _uiCanvas.PlayerLivingEntity; }
+    private LivingEntity _livingEntity { get => UICanvas.Instance.PlayerLivingEntity; }
 
     private void Start() {
-        _uiCanvas = UICanvas.Instance;   
+        UICanvas.Instance.PlayerLivingEntity.OnDamageTaken.AddListener(UpdateHealthBar);
     }
 
-    private void Update() {
-        // Temporary solution to update bars
+    private void UpdateHealthBar(DamageTakenEventData data) {
         _healthBarImg.fillAmount = _livingEntity.Health / _livingEntity.MaxHealth;
-        _manaBarImg.fillAmount = 1;
-        _controlBarImg.fillAmount = 1;
     }
 }

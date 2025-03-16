@@ -249,6 +249,14 @@ public class UICanvas : MonoBehaviour
         }
     }
 
+    public void HideUI() {
+        gameObject.SetActive(false);
+    }
+
+    public void ShowUI() {
+        gameObject.SetActive(true);
+    }
+
     private void openMainMenu() {
         PlayerController.InputDisabled = true;
         _mainMenu.OpenMenu();
