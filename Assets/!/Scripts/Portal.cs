@@ -5,7 +5,10 @@ using UnityEngine.Events;
 public class Portal : MonoBehaviour
 {
     [SerializeField] private Dimension _dimension = Dimension.HUB;
+    [SerializeField] private GameObject _portalInside;
+    [SerializeField] private BoxCollider _collider;
     public UnityEvent<Dimension> PlayerEnteredPortal;
+    
 
     void OnTriggerEnter(Collider other)
     {
@@ -24,6 +27,8 @@ public class Portal : MonoBehaviour
     }
     public void SetDimensionAndActivate(Dimension d)
     {
+        _portalInside.SetActive(true);
+        _collider.enabled = true;
         SetDimension(d);
         gameObject.SetActive(true);
     }

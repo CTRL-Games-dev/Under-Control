@@ -40,7 +40,7 @@ public class SettingsScreen : MonoBehaviour
     private CanvasGroup _controlsCanvasGroup;
     private CanvasGroup[] _controlsSettingsCanvasGroups;
 
-    private SettingsState _currentState;
+    private SettingsState _currentState = SettingsState.Controls;
 
 #endregion
 #region Unity Methods

@@ -124,12 +124,12 @@ public class MainMenu : MonoBehaviour
     }
 
     public void OnContinueGameBtnClick() {
-        UICanvas.Instance.CloseUIState(UIState.MainMenu);
-        UICanvas.Instance.OpenUIState(UIState.NotVisible);
+        
     }
 
     public void OnNewGameBtnClick() {
-        Debug.Log("New Game");
+        UICanvas.Instance.CloseUIState(UIState.MainMenu);
+        UICanvas.Instance.OpenUIState(UIState.NotVisible); 
     }
 
     public void OnSettingsBtnClick() {

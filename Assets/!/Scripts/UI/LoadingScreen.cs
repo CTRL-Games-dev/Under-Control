@@ -4,6 +4,7 @@ using DG.Tweening;
 using System.Collections.Generic;
 using System.Collections;
 using Unity.VisualScripting;
+using JetBrains.Annotations;
 
 public class LoadingScreen : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class LoadingScreen : MonoBehaviour
     [SerializeField] private Image _fillImage;
     [SerializeField] private List<Sprite> _sprites;
     private CanvasGroup _canvasGroup;
+    public static bool IsLoading = false;
 
     private void Awake()
     {
@@ -36,6 +38,7 @@ public class LoadingScreen : MonoBehaviour
     public static void LoadScene(string sceneName) {
         Instance._canvasGroup.alpha = 0;
         Instance._imageGO.SetActive(true);
+        IsLoading = true;
         Instance._canvasGroup.DOFade(1, 0.5f).SetUpdate(true).OnComplete(() => Instance.StartCoroutine(Instance.loadSceneAsync(sceneName))); 
         UICanvas.Instance.HideUI();
         Instance.StartCoroutine(Instance.animateImages());
@@ -55,13 +58,15 @@ public class LoadingScreen : MonoBehaviour
                 _canvasGroup.DOFade(0, 0.5f).SetUpdate(true).OnComplete(() => {
                     _imageGO.SetActive(false);
                     StopCoroutine(animateImages());
-                    UICanvas.Instance.ShowUI();
-                    UICanvas.Instance.OpenUIState(UIState.NotVisible);
                 });
             }
 
             yield return null;
         }
+
+        IsLoading = false;
+        UICanvas.Instance.ShowUI();
+        UICanvas.Instance.OpenUIState(UIState.NotVisible);
     }
 
 
