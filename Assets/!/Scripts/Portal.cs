@@ -12,7 +12,7 @@ public class Portal : MonoBehaviour
     {
         if(IsOpen) 
         {
-            Debug.Log("Player entered portal to: " + _dimension);
+            Debug.Log("Player entered portal to: " + _dimension.ToString());
             GameManager.Instance.ChangeDimension(_dimension);
         }
     }

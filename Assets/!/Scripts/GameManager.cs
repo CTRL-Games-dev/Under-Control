@@ -1,11 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour 
 {
-    public const string MainMenuSceneName = "MainMenu";
-    public const string HubSceneName = "Hub";
-    public const string AdventureSceneName = "Adventure";
     public static Vector3 StartingPos = new(10, 10, 10);
     public static GameManager Instance;
 
@@ -13,6 +11,10 @@ public class GameManager : MonoBehaviour
     public Weapon UnknownWeaponPrefab;
     public GameObject UnknownModelPrefab;
     public ItemEntity ItemEntityPrefab;
+    public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
+        {Dimension.HUB, "Hub"},
+        {Dimension.FOREST, "Adventure"},
+    };
 
     [Header("State")]
     [SerializeField] private GameContext _context;
@@ -42,14 +44,9 @@ public class GameManager : MonoBehaviour
     {
         _context.CurrentDimension = dimension;
 
-        Debug.Log("Loading new scene: " + _context.CurrentDimension);
-        if(_context.CurrentDimension == Dimension.MAIN_MENU) {
-            SceneManager.LoadScene(MainMenuSceneName);
-        } else if(_context.CurrentDimension == Dimension.HUB) {
-            SceneManager.LoadScene(HubSceneName);
-        } else {
-            SceneManager.LoadScene(AdventureSceneName);
-        }
+        Debug.Log("Loading new scene: " + _context.CurrentDimension.ToString());
+
+        LoadingScreen.LoadScene(SceneDictionary[_context.CurrentDimension]);
     }
 
     // public void ConnectPortals()
