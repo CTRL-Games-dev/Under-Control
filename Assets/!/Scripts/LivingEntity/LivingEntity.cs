@@ -83,6 +83,7 @@ public class LivingEntity : MonoBehaviour
 
     public void TakeDamage(Damage damage, LivingEntity source = null)
     {
+        gameObject.GetComponent<HitFlashAnimator>()?.Flash();
         _lastDamageTime = Time.time;
 
         // Check if entity is dead
