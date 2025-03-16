@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Video;
 
 public enum UIState
 {
@@ -75,6 +76,8 @@ public class UICanvas : MonoBehaviour
     private CanvasGroup _inventoryCanvasGroup;
     private IInteractableInventory _lastInteractableInventory;
     public bool IsOtherUIOpen = false;
+
+    [SerializeField] private VideoPlayer _videoPlayer;
 
     #endregion
 
@@ -250,11 +253,11 @@ public class UICanvas : MonoBehaviour
     }
 
     public void HideUI() {
-        gameObject.SetActive(false);
+        _HUDCanvasGO.SetActive(false);
     }
 
     public void ShowUI() {
-        gameObject.SetActive(true);
+        _HUDCanvasGO.SetActive(true);
     }
 
     private void openMainMenu() {
