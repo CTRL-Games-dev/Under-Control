@@ -347,9 +347,9 @@ public class BetterGenerator : MonoBehaviour
                 vertices.Add(p3);
 
                 uv.Add(new (0, 0));
-                uv.Add(new (1, 0));
-                uv.Add(new (1, 1));
                 uv.Add(new (0, 1));
+                uv.Add(new (1, 1));
+                uv.Add(new (1, 0));
 
                 trianglesFloor.Add(index * 4 + 0);
                 trianglesFloor.Add(index * 4 + 1);
@@ -371,7 +371,7 @@ public class BetterGenerator : MonoBehaviour
         newMesh.Optimize();
 
         // Get material
-        Material dirt = Resources.Load<Material>("Materials/Forest/Dirt/Dirt");
+        Material dirt = Resources.Load<Material>("Materials/Forest/Grass/Grass");
 
         _meshFilter.mesh = newMesh;
         _meshRenderer.materials = new Material[] {dirt};
