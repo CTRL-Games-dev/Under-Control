@@ -14,6 +14,7 @@ public class UIDimension : MonoBehaviour
     public DimensionDifficulty Difficulty;
     public int VekhtarControl = 0;
     public List<ItemData> AvaliableItems = new List<ItemData>();
+    public Color Color;
     private float _offset;
 
 
@@ -21,6 +22,7 @@ public class UIDimension : MonoBehaviour
         _img = GetComponent<Image>();
         _rect = GetComponent<RectTransform>();
         _offset = Random.Range(0, 10);
+        Color = _img.color;
     }
 
     private void FixedUpdate() {

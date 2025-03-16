@@ -10,6 +10,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
     [SerializeField] private Portal _portal;
     [SerializeField] private Material _ballMaterial;
     [SerializeField] private CinemachineCamera _ballCamera;
+    [SerializeField] private Material _portalMaterial;
 
     [Header("UI things")]
     [SerializeField] private GameObject _ui;
@@ -79,7 +80,6 @@ public class ChangePortal : MonoBehaviour, IInteractable
 
     public void SetPortal()
     {
-        _portal.SetDimensionAndActivate(_currentDimension.WhatDimension);
         Invoke(nameof(CloseUI), 1f);
     }
 
@@ -93,6 +93,8 @@ public class ChangePortal : MonoBehaviour, IInteractable
         }
         // if (_currentDimension == dimension) return;
         _currentDimension = dimension;
+        _portal.SetDimensionAndActivate(_currentDimension.WhatDimension);
+        _portalMaterial.DOColor(_currentDimension.Color, 0.3f);
 
         _whitePanelGO.SetActive(false);
         setupRightPanel(_currentDimension);
