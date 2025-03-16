@@ -13,7 +13,6 @@ public class LoadingScreen : MonoBehaviour
     [SerializeField] private Image _fillImage;
     [SerializeField] private List<Sprite> _sprites;
     private CanvasGroup _canvasGroup;
-    private bool _isAnimating = false;
 
     private void Awake()
     {
@@ -37,7 +36,6 @@ public class LoadingScreen : MonoBehaviour
     public static void LoadScene(string sceneName) {
         Instance._canvasGroup.alpha = 0;
         Instance._imageGO.SetActive(true);
-        Instance._isAnimating = true;
         Instance._canvasGroup.DOFade(1, 0.5f).SetUpdate(true).OnComplete(() => Instance.StartCoroutine(Instance.loadSceneAsync(sceneName))); 
         UICanvas.Instance.HideUI();
         Instance.StartCoroutine(Instance.animateImages());
@@ -71,7 +69,6 @@ public class LoadingScreen : MonoBehaviour
         int index = 0;
         while(true) {
             _image.sprite = _sprites[index];
-            if (index + 1 == _sprites.Count) _isAnimating = false;
             index = (index + 1) % _sprites.Count;
             yield return new WaitForSeconds(0.1f);
         }

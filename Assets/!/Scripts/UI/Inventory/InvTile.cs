@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class InvTile : MonoBehaviour {
     protected GameObject _highlightImage;
-
+    
     [SerializeField] protected Image _image;
     public InventoryPanel InventoryPanel;
     
