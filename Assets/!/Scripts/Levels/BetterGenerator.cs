@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-public struct Tile
+public enum TileType
 {
-    public bool IsWall;
-    public int X, Y;
+    Wall,
+    Empty,
+    Path,
 }
 
 public enum PathBorderType
@@ -53,7 +55,8 @@ public struct WorldData
     public Vector2 Offset;
     public float Scale;
     public int Width, Height;
-    public bool[,] Grid;
+    public TileType[,] Grid;
+    public bool[,] GridUsed;
     public List<Location> Locations;
     public List<PathData> Paths;
 }
@@ -114,7 +117,7 @@ public class BetterGenerator : MonoBehaviour
         wd.Locations = new();
         wd.Paths = new();
 
-        bool[,] grid;
+        TileType[,] grid;
         int gridPadding = 10;
         int gridWidth;
         int gridHeight;
@@ -140,7 +143,7 @@ public class BetterGenerator : MonoBehaviour
             gridHeight = (int)Vector2.Distance(new(minY,0), new(maxY,0)) + (gridPadding*2);
             // int gridHeight = (int)Vector2.Distance(new(0,minY), new(0,maxY));
             
-            grid = new bool[gridWidth + (gridPadding), gridHeight + (gridPadding)];
+            grid = new TileType[gridWidth + (gridPadding), gridHeight + (gridPadding)];
 
 
             // Since coordinates can be negative and we use an array
@@ -153,6 +156,7 @@ public class BetterGenerator : MonoBehaviour
             wd.Width = gridWidth;
             wd.Height = gridHeight;
             wd.Grid = grid;
+            wd.GridUsed = new bool[gridWidth + (gridPadding), gridHeight + (gridPadding)];
 
             if(!DigOutPaths(wd.Locations, grid))
             {
@@ -169,7 +173,8 @@ public class BetterGenerator : MonoBehaviour
                     {
                         int indexX = (int)(ix + l.X - offset.x);
                         int indexY = (int)(iy + l.Y - offset.y);
-                        grid[indexX, indexY] = true;
+                        wd.Grid[indexX, indexY] = TileType.Empty;
+                        wd.GridUsed[indexX, indexY] = true;
                     }
                 }
                 l.GenerateLocation(TerrainHolder, wd);
@@ -177,10 +182,10 @@ public class BetterGenerator : MonoBehaviour
             break;
         }
 
+        GameObject[] tiles = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestTiles");
 
         #region Forest around locations
         {
-            GameObject[] tiles = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestTiles");
             foreach(var l in wd.Locations)
             {
                 int margin = 5;
@@ -215,17 +220,16 @@ public class BetterGenerator : MonoBehaviour
                 {
                     for(int y = yStart; y < yEnd; y++)
                     {
-                        if(grid[x,y]) { continue; }
-                        Vector3 pos = new Vector3(x + 0.5f, 0, y + 0.5f) * wd.Scale;
-                        var tile = Instantiate(tiles[0], pos, Quaternion.identity, TerrainHolder.transform);
-                        
-                        // MeshRenderer[] meshRenderers = tile.GetComponentsInChildren<MeshRenderer>() ;
-                        // GameObject[] gameObjects = new GameObject[meshRenderers.Length];
-                        // for (int i = 0; i < meshRenderers.Length; i++) {
-                        //     gameObjects[i] = meshRenderers[i].gameObject;
-                        // }
+                        if(wd.Grid[x,y] != TileType.Wall || wd.GridUsed[x,y]) { continue; }
+                        float posX = x + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
+                        float posY = y + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
+                        Vector3 pos = new Vector3(posX, 0, posY) * wd.Scale;
 
-                        // StaticBatchingUtility.Combine(gameObjects, TerrainHolder);
+                        GameObject tilePrefab = tiles[UnityEngine.Random.Range(0, tiles.Length)];
+                        var newTile = Instantiate(tilePrefab, pos, Quaternion.identity, TerrainHolder.transform);
+                        wd.GridUsed[x,y] = true;
+
+                        newTile.transform.eulerAngles = new Vector3(0,UnityEngine.Random.Range(-180, 180),0);
                     }
                 }
             }
@@ -236,91 +240,40 @@ public class BetterGenerator : MonoBehaviour
         #region Forest around paths
 
         {
-            GameObject[] tilesStartEnd = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestBorder/BorderStartEnd");
-            GameObject[] tilesMiddle = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestBorder/BorderMiddle");
+            List<Vector2> pathTiles = new();
 
-            foreach(var p in wd.Paths)
+            for (int x = 0; x < grid.GetLength(0); x++)
             {
-                GameObject pathTileHolder = new GameObject();
-                pathTileHolder.transform.SetParent(TerrainHolder.transform);
-                float len = Vector2.Distance(p.Point1, p.Point2);
-                int numberOfAllTiles = (int)Math.Floor(len)-1; // Number of forest tiles on each side
-
-                if(numberOfAllTiles < 6)
+                for (int y = 0; y < grid.GetLength(1); y++)
                 {
-                    continue;
-                } 
-
-                int firstHalf = numberOfAllTiles/2;
-                int skip = 0;
-
-                for(int i = skip; i < firstHalf; i++)
-                {
-                    Vector3 posLeft;
-                    Vector3 posRight;
-
-                    GameObject tileLeft;
-                    GameObject tileRight;
-
-                    if(i < 3 + skip)
-                    {
-                        posLeft = new Vector3(-1f + UnityEngine.Random.Range(-0.1f, 0.1f), 0, i) * wd.Scale;
-                        posRight = new Vector3(1f + UnityEngine.Random.Range(-0.1f, 0.1f), 0, i) * wd.Scale;
-                        tileLeft = tilesStartEnd[UnityEngine.Random.Range(0, tilesStartEnd.Length)];
-                        tileRight = tilesStartEnd[UnityEngine.Random.Range(0, tilesStartEnd.Length)];
-                    } 
-                    else 
-                    {
-                        posLeft = new Vector3(-2f + UnityEngine.Random.Range(-0.4f, 0.4f), 0, i) * wd.Scale;
-                        posRight = new Vector3(2f + UnityEngine.Random.Range(-0.4f, 0.4f), 0, i) * wd.Scale;
-                        tileLeft = tilesMiddle[UnityEngine.Random.Range(0, tilesMiddle.Length)];
-                        tileRight = tilesMiddle[UnityEngine.Random.Range(0, tilesMiddle.Length)];
+                    if(wd.Grid[x,y] == TileType.Path && wd.GridUsed[x,y] == false) {
+                        pathTiles.Add(new(x,y));
+                        wd.GridUsed[x,y] = true;
                     }
-        
-                    GameObject leftTrees = Instantiate(tileLeft, posLeft, Quaternion.identity, pathTileHolder.transform);
-                    GameObject rightTrees = Instantiate(tileRight, posRight, Quaternion.identity, pathTileHolder.transform);
-
-                    leftTrees.transform.eulerAngles = new Vector3(0,-90,0);
-                    rightTrees.transform.eulerAngles = new Vector3(0,90,0);
                 }
+            }
 
-                for(int i = firstHalf; i < numberOfAllTiles - skip; i++)
+            foreach(var pt in pathTiles)
+            {
+                int range = 3;
+                for(int ix = -range; ix < range; ix++)
                 {
-                    Vector3 posLeft;
-                    Vector3 posRight;
-
-                    GameObject tileLeft;
-                    GameObject tileRight;
-
-                    if(i < numberOfAllTiles - 4 - skip)
+                    for (int iy = -range; iy < range; iy++)
                     {
-                        posLeft = new Vector3(-2f + UnityEngine.Random.Range(-0.4f, 0.4f), 0, i) * wd.Scale;
-                        posRight = new Vector3(2f + UnityEngine.Random.Range(-0.4f, 0.4f), 0, i) * wd.Scale;
-                        tileLeft = tilesMiddle[UnityEngine.Random.Range(0, tilesMiddle.Length)];
-                        tileRight = tilesMiddle[UnityEngine.Random.Range(0, tilesMiddle.Length)];
-                    } 
-                    else 
-                    {
-                        posLeft = new Vector3(-1f + UnityEngine.Random.Range(-0.1f, 0.1f), 0, i) * wd.Scale;
-                        posRight = new Vector3(1f + UnityEngine.Random.Range(-0.1f, 0.1f), 0, i) * wd.Scale;
-                        tileLeft = tilesStartEnd[UnityEngine.Random.Range(0, tilesStartEnd.Length)];
-                        tileRight = tilesStartEnd[UnityEngine.Random.Range(0, tilesStartEnd.Length)];
+                        int gridX = (ix + (int)pt.x), gridY = (iy + (int)pt.y);
+                        if(wd.Grid[gridX,gridY] == TileType.Wall && wd.GridUsed[gridX,gridY] == false)
+                        {
+                            float posX = gridX + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
+                            float posY = gridY + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
+                            Vector3 pos = new Vector3(posX, 0, posY) * wd.Scale;
+                            GameObject tilePrefab = tiles[UnityEngine.Random.Range(0, tiles.Length)];
+                            GameObject newTile = Instantiate(tilePrefab, pos, Quaternion.identity, TerrainHolder.transform);
+                            wd.GridUsed[gridX,gridY] = true;
+
+                            newTile.transform.eulerAngles = new Vector3(0,UnityEngine.Random.Range(-180, 180),0);
+                        }
                     }
-        
-                    GameObject leftTrees = Instantiate(tileLeft, posLeft, Quaternion.identity, pathTileHolder.transform);
-                    GameObject rightTrees = Instantiate(tileRight, posRight, Quaternion.identity, pathTileHolder.transform);
-
-                    leftTrees.transform.eulerAngles = new Vector3(0,-90,0);
-                    rightTrees.transform.eulerAngles = new Vector3(0,90,0);
                 }
-
-
-                Vector3 pathPos = new Vector3(p.Point1.x - wd.Offset.x + 0.5f, 0, p.Point1.y - wd.Offset.y + 0.5f) * wd.Scale;
-                Debug.Log($"Position of the path: {pathPos}");
-
-                
-                pathTileHolder.transform.rotation = p.Rotation;
-                pathTileHolder.transform.position = pathPos;
             }
         }
 
@@ -431,7 +384,7 @@ public class BetterGenerator : MonoBehaviour
 
     #endregion
 
-    private bool DigOutPaths(List<Location> locations, bool[,] grid) 
+    private bool DigOutPaths(List<Location> locations, TileType[,] grid) 
     {
         List<Edge> uniqueEdges = new();
 
@@ -562,7 +515,7 @@ public class BetterGenerator : MonoBehaviour
                     {
                         for(int ty = 0; ty < thickness; ty++)
                         {
-                            grid[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = true;
+                            wd.Grid[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = TileType.Path;
                         }
                     }
                 }
