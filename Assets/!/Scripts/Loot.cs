@@ -26,7 +26,7 @@ public class Loot : MonoBehaviour {
 
     public void Drop() {
         foreach(LootData lootData in PossibleLoot) {
-            if(UnityEngine.Random.Range(0, 1) > lootData.Chance) {
+            if(UnityEngine.Random.Range(0f, 1f) > lootData.Chance) {
                 continue;
             }
 
