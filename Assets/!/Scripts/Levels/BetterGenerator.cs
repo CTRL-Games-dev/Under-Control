@@ -21,9 +21,6 @@ public struct PathData
 {
     public Vector2 Point1, Point2;
     public Quaternion Rotation;
-    public int NumberOfTiles; // Per side
-    public List<bool> BorderTypeLeft; 
-    public List<bool> BorderTypeRight; 
     public int Thickness;
 }
 
@@ -135,7 +132,7 @@ public class BetterGenerator : MonoBehaviour
                 if (l.X+l.TileWidth > maxX) maxX = l.X+l.TileWidth;
                 if (l.Y+l.TileHeight > maxY) maxY = l.Y+l.TileHeight;
 
-                Debug.Log("Spawned location at x->" + l.X + " y->" + l.Y);
+                Debug.Log($"Spawned location {l.Name} at {l.X}x, {l.Y}");
             }
 
             // Grid is used to determine where to spawn trees
@@ -157,7 +154,11 @@ public class BetterGenerator : MonoBehaviour
             wd.Height = gridHeight;
             wd.Grid = grid;
 
-            if(!DigOutPaths(wd.Locations, grid)) continue;
+            if(!DigOutPaths(wd.Locations, grid))
+            {
+                wd.Locations.Clear();
+                continue;
+            }
 
             foreach(var l in wd.Locations)
             {
@@ -235,28 +236,85 @@ public class BetterGenerator : MonoBehaviour
         #region Forest around paths
 
         {
-            GameObject[] tiles = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestBorder");
-            Debug.Log($"Tiles: {tiles}, {Resources.LoadAll("Prefabs/Forest/ForestBorder")}");
+            GameObject[] tilesStartEnd = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestBorder/BorderStartEnd");
+            GameObject[] tilesMiddle = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestBorder/BorderMiddle");
+
             foreach(var p in wd.Paths)
             {
                 GameObject pathTileHolder = new GameObject();
                 pathTileHolder.transform.SetParent(TerrainHolder.transform);
+                float len = Vector2.Distance(p.Point1, p.Point2);
+                int numberOfAllTiles = (int)Math.Floor(len)-1; // Number of forest tiles on each side
 
-                for(int i = 0; i < numberOfSideTiles; i++)
+                if(numberOfAllTiles < 6)
                 {
-                    Vector3 posLeft = new Vector3(-3f, 0, i) * wd.Scale;
-                    Vector3 posRight = new Vector3(3f, 0, i) * wd.Scale;
+                    continue;
+                } 
 
-                    GameObject tileLeft = tiles[UnityEngine.Random.Range(0, tiles.Length)];
-                    GameObject tileRight = tiles[UnityEngine.Random.Range(0, tiles.Length)];
+                int firstHalf = numberOfAllTiles/2;
+                int skip = 0;
 
+                for(int i = skip; i < firstHalf; i++)
+                {
+                    Vector3 posLeft;
+                    Vector3 posRight;
+
+                    GameObject tileLeft;
+                    GameObject tileRight;
+
+                    if(i < 3 + skip)
+                    {
+                        posLeft = new Vector3(-1f + UnityEngine.Random.Range(-0.1f, 0.1f), 0, i) * wd.Scale;
+                        posRight = new Vector3(1f + UnityEngine.Random.Range(-0.1f, 0.1f), 0, i) * wd.Scale;
+                        tileLeft = tilesStartEnd[UnityEngine.Random.Range(0, tilesStartEnd.Length)];
+                        tileRight = tilesStartEnd[UnityEngine.Random.Range(0, tilesStartEnd.Length)];
+                    } 
+                    else 
+                    {
+                        posLeft = new Vector3(-2f + UnityEngine.Random.Range(-0.4f, 0.4f), 0, i) * wd.Scale;
+                        posRight = new Vector3(2f + UnityEngine.Random.Range(-0.4f, 0.4f), 0, i) * wd.Scale;
+                        tileLeft = tilesMiddle[UnityEngine.Random.Range(0, tilesMiddle.Length)];
+                        tileRight = tilesMiddle[UnityEngine.Random.Range(0, tilesMiddle.Length)];
+                    }
+        
                     GameObject leftTrees = Instantiate(tileLeft, posLeft, Quaternion.identity, pathTileHolder.transform);
                     GameObject rightTrees = Instantiate(tileRight, posRight, Quaternion.identity, pathTileHolder.transform);
 
                     leftTrees.transform.eulerAngles = new Vector3(0,-90,0);
                     rightTrees.transform.eulerAngles = new Vector3(0,90,0);
-
                 }
+
+                for(int i = firstHalf; i < numberOfAllTiles - skip; i++)
+                {
+                    Vector3 posLeft;
+                    Vector3 posRight;
+
+                    GameObject tileLeft;
+                    GameObject tileRight;
+
+                    if(i < numberOfAllTiles - 4 - skip)
+                    {
+                        posLeft = new Vector3(-2f + UnityEngine.Random.Range(-0.4f, 0.4f), 0, i) * wd.Scale;
+                        posRight = new Vector3(2f + UnityEngine.Random.Range(-0.4f, 0.4f), 0, i) * wd.Scale;
+                        tileLeft = tilesMiddle[UnityEngine.Random.Range(0, tilesMiddle.Length)];
+                        tileRight = tilesMiddle[UnityEngine.Random.Range(0, tilesMiddle.Length)];
+                    } 
+                    else 
+                    {
+                        posLeft = new Vector3(-1f + UnityEngine.Random.Range(-0.1f, 0.1f), 0, i) * wd.Scale;
+                        posRight = new Vector3(1f + UnityEngine.Random.Range(-0.1f, 0.1f), 0, i) * wd.Scale;
+                        tileLeft = tilesStartEnd[UnityEngine.Random.Range(0, tilesStartEnd.Length)];
+                        tileRight = tilesStartEnd[UnityEngine.Random.Range(0, tilesStartEnd.Length)];
+                    }
+        
+                    GameObject leftTrees = Instantiate(tileLeft, posLeft, Quaternion.identity, pathTileHolder.transform);
+                    GameObject rightTrees = Instantiate(tileRight, posRight, Quaternion.identity, pathTileHolder.transform);
+
+                    leftTrees.transform.eulerAngles = new Vector3(0,-90,0);
+                    rightTrees.transform.eulerAngles = new Vector3(0,90,0);
+                }
+
+
                 Vector3 pathPos = new Vector3(p.Point1.x - wd.Offset.x + 0.5f, 0, p.Point1.y - wd.Offset.y + 0.5f) * wd.Scale;
                 Debug.Log($"Position of the path: {pathPos}");
 
@@ -294,7 +352,7 @@ public class BetterGenerator : MonoBehaviour
             indexY *= UnityEngine.Random.Range(0, 2) == 0 ? 1 : -1;
 
             bool flag = false;
-            for(int t = 0; t < 5; t++)
+            for(int t = 0; t < 20; t++)
             {
                 medow.SetTileCenter(new(indexX, indexY));
                 if(medow.CheckLocation(locations)) {
@@ -476,8 +534,8 @@ public class BetterGenerator : MonoBehaviour
             Point point2 = line.v0.Position.x > line.v1.Position.x ? line.v0 : line.v1;
 
             Debug.Log("=== LINE " + num + " ===");
-            Debug.Log("First point " + point1);
-            Debug.Log("Second point " + point2);
+            Debug.Log("First point " + point1.Position);
+            Debug.Log("Second point " + point2.Position);
 
             float a = (point2.Position.y - point1.Position.y)/(point2.Position.x - point1.Position.x);
             // y = ax + b ----> b = y - ax
@@ -505,20 +563,6 @@ public class BetterGenerator : MonoBehaviour
                         for(int ty = 0; ty < thickness; ty++)
                         {
                             grid[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = true;
-                        }
-                    }
-
-                    int lenCheck = 5; // How far should algorithm look behind the actual path
-                    int numberOfFreeTiles = 0;
-                    // Left side
-                    for(int tx = 0; tx < lenCheck; tx++)
-                    {
-                        for(int ty = 0; ty < lenCheck; ty++)
-                        {
-                            if(grid[indexX-tx,indexY-ty])
-                            {
-
-                            }
                         }
                     }
                 }
@@ -571,9 +615,6 @@ public class BetterGenerator : MonoBehaviour
             path.Point2 = intersectionB;
             path.Thickness = thickness;
             float len = Vector2.Distance(path.Point1, path.Point2);
-            path.NumberOfTiles = (int)Math.Floor(len-1); // Number of forest tiles on each side
-            path.BorderTypeLeft = new();
-            path.BorderTypeRight = new();
 
             Vector2 dir = point2.Position - point1.Position; //a vector pointing from pointA to pointB
             path.Rotation = Quaternion.LookRotation(new(dir.x, 0, dir.y), Vector3.up); //calc a rotation that

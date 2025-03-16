@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public abstract class Location
 {
+    public string Name;
     public int TileWidth, TileHeight;
     public int X, Y;
     public WorldData wd;
@@ -68,6 +69,7 @@ public class ForestPortal : Location
     private GameObject _portalPrefab;
     public ForestPortal()
     {
+        Name = "Forest Portal";
         string portalPath = "Prefabs/Forest/ForestPortal";
 
         _portalPrefab = Resources.Load<GameObject>(portalPath);
@@ -91,6 +93,7 @@ public class DummyLocation : Location
 {
     public DummyLocation(Vector2 dimensions, Vector2 position)
     {
+        Name = "Dummy Location";
         this.TileWidth = (int)dimensions.x;
         this.TileHeight = (int)dimensions.y;
 
@@ -108,8 +111,10 @@ public class Medow : Location
 {
     public Medow()
     {
-        TileWidth = Random.Range(20, 22);
-        TileHeight = Random.Range(20, 22);
+        Name = "Medow";
+
+        TileWidth = Random.Range(8, 20);
+        TileHeight = Random.Range(8, 20);
     }
 
     public override void GenerateLocation(GameObject parent, WorldData worldData)
