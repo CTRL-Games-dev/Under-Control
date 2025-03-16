@@ -32,7 +32,6 @@ public class ChangePortal : MonoBehaviour, IInteractable
     private bool _opened;
     private bool _locked = false;
     private UIDimension _currentDimension;
-
     public static ChangePortal Instance;
 
     private void Awake() {
@@ -59,23 +58,6 @@ public class ChangePortal : MonoBehaviour, IInteractable
         if(_opened) CloseUI();
         else OpenUI();
     }
-    
-    public void ChangeDimension(int i)
-    {
-        Debug.Log(i);
-        switch(i) 
-        {
-            case 1: { 
-                _portal.ChangeDimension(Dimension.HUB);
-                break;
-            }
-            case 3: {
-                _portal.ChangeDimension(Dimension.FOREST);
-                break;
-            }
-        }
-        CloseUI();
-    }
     public void OpenUI()
     {
         UICanvas.Instance.IsOtherUIOpen = true;
@@ -93,6 +75,12 @@ public class ChangePortal : MonoBehaviour, IInteractable
             _ui.SetActive(false);
         });
         _opened = false;
+    }
+
+    public void SetPortal()
+    {
+        _portal.SetDimensionAndActivate(_currentDimension.WhatDimension);
+        Invoke("CloseUI", 1f);
     }
 
     public void SetDimensionInfo(UIDimension dimension) {
@@ -113,7 +101,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
                 _whitePanelGO.SetActive(true);
             });
         });
-        
+    
     }
 
     private void setupRightPanel(UIDimension dimension) {

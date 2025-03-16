@@ -4,7 +4,6 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour 
 {
-    public static Vector3 StartingPos = new(10, 10, 10);
     public static GameManager Instance;
 
     [Header("References")]
@@ -14,6 +13,7 @@ public class GameManager : MonoBehaviour
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
         {Dimension.HUB, "Hub"},
         {Dimension.FOREST, "Adventure"},
+        {Dimension.FOREST_BOSS, "Adventure"},
     };
 
     [Header("State")]
@@ -47,23 +47,10 @@ public class GameManager : MonoBehaviour
 
         LoadingScreen.LoadScene(SceneDictionary[_context.CurrentDimension]);
     }
-
-    // public void ConnectPortals()
-    // {
-    //     GameObject[] portals = GameObject.FindGameObjectsWithTag("Portal");
-    //     foreach(GameObject p in portals) 
-    //     {
-    //         var portal = p.GetComponent<Portal>();
-    //         portal.PlayerEnteredPortal.AddListener(ChangeDimension);
-    //     }
-    //     Debug.Log("Connected new portal");
-    // }
-
-    // private void OnLevelChange(Scene scene, LoadSceneMode mode)
-    // {
-    //     // Connect portals
-    //     ConnectPortals();
-    // }
+    public Dimension GetCurrentDimension()
+    {
+        return _context.CurrentDimension;
+    }
 
     public float GetInfluence()
     {

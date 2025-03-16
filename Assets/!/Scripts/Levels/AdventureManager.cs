@@ -20,7 +20,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
         _gameManager = GameManager.Instance;
         
         var generator = GetComponent<BetterGenerator>();
-        generator.GenerateMap(BetterGenerator.LevelType.Forest);
+        generator.GenerateMap(GameManager.Instance.GetCurrentDimension());
         
         ForestPortal portal = generator.Getlocation<ForestPortal>();
 
