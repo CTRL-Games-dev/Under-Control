@@ -75,13 +75,15 @@ public abstract class Location
 public class ForestPortal : Location
 {
     private GameObject _portalPrefab;
+    private bool _open;
+
     public ForestPortal(bool open)
     {
         Name = "Forest Portal";
         string portalPath = "Prefabs/Forest/ForestPortal";
 
         _portalPrefab = Resources.Load<GameObject>(portalPath);
-        _portalPrefab.GetComponentInChildren<Portal>().EnablePortal(open);
+        _open = open;
         
         TileWidth = 3;
         TileHeight = 3;
@@ -94,6 +96,7 @@ public class ForestPortal : Location
         Vector3 pos = (new Vector3(center.x, 0, center.y) * worldData.Scale) + new Vector3(0.5f, 2.04f, 0.5f);
          
         SpawnedInstance = GameObject.Instantiate(_portalPrefab, pos, Quaternion.identity, parent.transform);
+        SpawnedInstance.GetComponentInChildren<Portal>().EnablePortal(_open);
     }
 }
 
