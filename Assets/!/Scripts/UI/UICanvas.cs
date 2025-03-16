@@ -78,6 +78,7 @@ public class UICanvas : MonoBehaviour
     public bool IsOtherUIOpen = false;
 
     [SerializeField] private VideoPlayer _videoPlayer;
+    [SerializeField] private GameObject _videoPlayerGO;
 
     #endregion
 
@@ -330,6 +331,14 @@ public class UICanvas : MonoBehaviour
     public void CloseSettingsScreen() {
         IsOtherUIOpen = false;
         _settingsScreen.CloseSettings();
+    }
+
+    public void OpenVideoPlayer() {
+        _videoPlayer.gameObject.SetActive(true);
+        _videoPlayerGO.SetActive(true);
+        _videoPlayerGO.GetComponent<CanvasGroup>().DOFade(1, 1).SetUpdate(true).OnComplete(() => {
+            _videoPlayer.Play();
+        });
     }
 
 

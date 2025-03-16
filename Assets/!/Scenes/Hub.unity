@@ -472,11 +472,11 @@ VideoPlayer:
   m_TargetCameraAlpha: 0
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 1226395849}
-  m_TargetTexture: {fileID: 0}
+  m_TargetTexture: {fileID: 8400000, guid: 8b69498f9dc12e64e96ff53e5b31c1ae, type: 2}
   m_TimeReference: 0
   m_TargetMaterialRenderer: {fileID: 0}
   m_TargetMaterialProperty: <noninit>
-  m_RenderMode: 1
+  m_RenderMode: 2
   m_AspectRatio: 2
   m_DataSource: 0
   m_TimeUpdateMode: 2
@@ -4154,7 +4154,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3836085771783802005, guid: 93a764caf2a5e9b40b6a731468cfff36, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4975,6 +4975,91 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6128283647645438106, guid: bc7e67031e2572749933dfd85bc25fdc, type: 3}
   m_PrefabInstance: {fileID: 1554783845}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &358991110
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 358991111}
+  - component: {fileID: 358991113}
+  - component: {fileID: 358991112}
+  - component: {fileID: 358991114}
+  m_Layer: 6
+  m_Name: RawImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &358991111
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 358991110}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.000011473897}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2096851255}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0.00018310547, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &358991112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 358991110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 8400000, guid: 8b69498f9dc12e64e96ff53e5b31c1ae, type: 2}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &358991113
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 358991110}
+  m_CullTransparentMesh: 1
+--- !u!225 &358991114
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 358991110}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &362700900
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8679,12 +8764,31 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 3006076035978592924, guid: 16436806f41f7e841b37783d3931d9c0, type: 3}
+      propertyPath: _videoPlayer
+      value: 
+      objectReference: {fileID: 25437312}
+    - target: {fileID: 3006076035978592924, guid: 16436806f41f7e841b37783d3931d9c0, type: 3}
+      propertyPath: _videoPlayerGO
+      value: 
+      objectReference: {fileID: 358991110}
+    - target: {fileID: 5292351422741235862, guid: 16436806f41f7e841b37783d3931d9c0, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8832628687753641331, guid: 16436806f41f7e841b37783d3931d9c0, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 7434886761588367642, guid: 16436806f41f7e841b37783d3931d9c0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 25437311}
+    - targetCorrespondingSourceObject: {fileID: 7434886761588367642, guid: 16436806f41f7e841b37783d3931d9c0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 358991111}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 16436806f41f7e841b37783d3931d9c0, type: 3}
 --- !u!4 &738932818 stripped
@@ -9303,7 +9407,6 @@ GameObject:
   - component: {fileID: 813058306}
   - component: {fileID: 813058305}
   - component: {fileID: 813058304}
-  - component: {fileID: 813058308}
   m_Layer: 8
   m_Name: Bricks
   m_TagString: Untagged
@@ -9401,42 +9504,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!328 &813058308
-VideoPlayer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 813058303}
-  m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: 859a49a82dfd9cd45a073dab3a207c4e, type: 3}
-  m_TargetCameraAlpha: 1
-  m_TargetCamera3DLayout: 0
-  m_TargetCamera: {fileID: 0}
-  m_TargetTexture: {fileID: 0}
-  m_TimeReference: 0
-  m_TargetMaterialRenderer: {fileID: 0}
-  m_TargetMaterialProperty: <noninit>
-  m_RenderMode: 3
-  m_AspectRatio: 2
-  m_DataSource: 0
-  m_TimeUpdateMode: 2
-  m_PlaybackSpeed: 1
-  m_AudioOutputMode: 2
-  m_TargetAudioSources:
-  - {fileID: 0}
-  m_DirectAudioVolumes:
-  - 1
-  m_Url: 
-  m_EnabledAudioTracks: 01
-  m_DirectAudioMutes: 00
-  m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 1
-  m_SkipOnDrop: 1
-  m_Looping: 0
-  m_WaitForFirstFrame: 1
-  m_FrameReadyEventEnabled: 0
-  m_VideoShaders: []
 --- !u!4 &815925946 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4466865966766193386, guid: 42a72c1418e089445b6dc5a654d36c15, type: 3}
@@ -21189,7 +21256,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8d4a587e61e35104cac30e3fd9983692, type: 2}
+  - {fileID: 2100000, guid: 45474d5cec45ea74a8cf00c4288ce822, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -25426,6 +25493,42 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 634963384079693932, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: Name
+      value: Yaldrula's Forest
+      objectReference: {fileID: 0}
+    - target: {fileID: 634963384079693932, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: Description
+      value: In this dimension Vekthar's power is low. You won't encounter his minions
+        here, but that doesn't mean you are safe. You can find important resources
+        to help you in your journey.
+      objectReference: {fileID: 0}
+    - target: {fileID: 634963384079693932, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: AvaliableItems.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 634963384079693932, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: 'AvaliableItems.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 7f3a1b5152c312642aa6e38b9609647c, type: 2}
+    - target: {fileID: 840553470410276767, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: Name
+      value: Yaldrula's Forest
+      objectReference: {fileID: 0}
+    - target: {fileID: 840553470410276767, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: Description
+      value: In this dimension Vekthar's power is low. You won't encounter his minions
+        here, but that doesn't mean you are safe. You can find important resources
+        to help you in your journey.
+      objectReference: {fileID: 0}
+    - target: {fileID: 840553470410276767, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: AvaliableItems.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 840553470410276767, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: 'AvaliableItems.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 7f3a1b5152c312642aa6e38b9609647c, type: 2}
     - target: {fileID: 2330238128821965101, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
       propertyPath: m_Name
       value: BallOfDimensions
@@ -25470,10 +25573,53 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3156824464069081439, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: Name
+      value: Yaldrula's Forest
+      objectReference: {fileID: 0}
+    - target: {fileID: 3156824464069081439, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: Description
+      value: In this dimension Vekthar's power is low. You won't encounter his minions
+        here, but that doesn't mean you are safe. You can find important resources
+        to help you in your journey.
+      objectReference: {fileID: 0}
+    - target: {fileID: 3156824464069081439, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: AvaliableItems.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3156824464069081439, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: 'AvaliableItems.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 7f3a1b5152c312642aa6e38b9609647c, type: 2}
     - target: {fileID: 5880086513265183145, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
       propertyPath: _portal
       value: 
       objectReference: {fileID: 188220067}
+    - target: {fileID: 8336267223890070016, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: Name
+      value: Boss Dimension
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336267223890070016, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: Description
+      value: This dimension is controlled by one of the Vekthar's minions. You need
+        to slay it in order to progress further...
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336267223890070016, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: AvaliableItems.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8336267223890070016, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: 'AvaliableItems.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 76cc4ac11506f5949ad88e652d5100fb, type: 2}
+    - target: {fileID: 8336267223890070016, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: 'AvaliableItems.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 9df73015bdc274a4394a14e34153ecaf, type: 2}
+    - target: {fileID: 8336267223890070016, guid: e91e2ad5711c0614f9de2a2c06a19a89, type: 3}
+      propertyPath: 'AvaliableItems.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: e238eb001208bff4ab3b431ed6ee2db0, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
