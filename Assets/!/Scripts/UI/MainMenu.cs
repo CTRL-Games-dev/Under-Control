@@ -123,33 +123,32 @@ public class MainMenu : MonoBehaviour
         _exitRect.anchoredPosition = new Vector2(_exitBtnStartingX +50, _exitRect.anchoredPosition.y);
     }
 
-    public void OnContinueGame() {
+    public void OnContinueGameBtnClick() {
         UICanvas.Instance.CloseUIState(UIState.MainMenu);
         UICanvas.Instance.OpenUIState(UIState.NotVisible);
     }
 
-    public void OnNewGame() {
+    public void OnNewGameBtnClick() {
         Debug.Log("New Game");
     }
 
-    public void OnOptions() {
-        Debug.Log("Options");
+    public void OnSettingsBtnClick() {
+        UICanvas.Instance.OpenSettingsScreen();
     }
 
-    public void OnCredits() {
+    public void OnCreditsBtnClick() {
         Debug.Log("BY Ctrl Games");
     }
 
-    public void OnExit() {
+    public void OnExitBtnClick() {
         Debug.Log("exit");
     }
 
     public void OnPointerEnter(GameObject button) {
-        button.GetComponent<RectTransform>().DOScale(0.627f, 0.4f).SetEase(Ease.OutSine);
-        
+        button.GetComponent<RectTransform>().DOScale(1.1f, 0.4f).SetEase(Ease.OutSine);
     }
 
     public void OnPointerExit(GameObject button) {
-        button.GetComponent<RectTransform>().DOScale(0.57f, 0.4f).SetEase(Ease.OutSine);
+        button.GetComponent<RectTransform>().DOScale(1, 0.4f).SetEase(Ease.OutSine);
     }
 }
