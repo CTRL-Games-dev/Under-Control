@@ -215,6 +215,9 @@ public class ForestBossArena : Location
         GameObject boar = Resources.Load<GameObject>("Prefabs/Forest/Enemies/Boss");
         Vector2 center = GetTileGridCenter(worldData.Offset);
 
-        GameObject.Instantiate(boar, new Vector3(center.x, 0.2f, center.y) * worldData.Scale, Quaternion.identity);
+        GameObject boarInstance = GameObject.Instantiate(boar, new Vector3(center.x, 0.2f, center.y) * worldData.Scale, Quaternion.identity);
+   
+        LivingEntity boarLivingEntity = boarInstance.GetComponent<LivingEntity>();
+        boarLivingEntity.OnDeath.AddListener(UICanvas.Instance.OpenVideoPlayer);
     }
 }
