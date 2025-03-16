@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 92f8acfe03cc4c34f949698a7c691cbb
+guid: 8d4d7a5313c40654eaa9194305af6350
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -17,22 +17,26 @@ ModelImporter:
     removeConstantScaleCurves: 0
     motionNodeName: 
     animationImportErrors: 
-    animationImportWarnings: "\nClip 'character_walk' has import animation warnings
+    animationImportWarnings: "\nClip 'player_walk' has import animation warnings
       that might lower retargeting quality:\nNote: Activate translation DOF on avatar
       to improve retargeting quality.\n\t'spine.002' is inbetween humanoid transforms
-      and has rotation animation that will be discarded.\n\nClip 'character_run'
-      has import animation warnings that might lower retargeting quality:\nNote:
-      Activate translation DOF on avatar to improve retargeting quality.\n\t'spine.002'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip
-      'character_idle_1' has import animation warnings that might lower retargeting
+      and has rotation animation that will be discarded.\n\nClip 'player_run' has
+      import animation warnings that might lower retargeting quality:\nNote: Activate
+      translation DOF on avatar to improve retargeting quality.\n\t'spine.002' is
+      inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip
+      'player_idle_1' has import animation warnings that might lower retargeting
       quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'spine.002'
       is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip
-      'attack_short_heavy' has import animation warnings that might lower retargeting
-      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'spine.002'
-      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip
-      'attack_short' has import animation warnings that might lower retargeting quality:\nNote:
-      Activate translation DOF on avatar to improve retargeting quality.\n\t'thumb.r'
-      has translation animation that will be discarded.\n"
+      'player_attack_short_heavy' has import animation warnings that might lower
+      retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting
+      quality.\n\t'spine.002' is inbetween humanoid transforms and has rotation animation
+      that will be discarded.\n\nClip 'player_attack_short' has import animation
+      warnings that might lower retargeting quality:\nNote: Activate translation
+      DOF on avatar to improve retargeting quality.\n\t'thumb.r' has translation
+      animation that will be discarded.\n\nClip 'player_roll' has import animation
+      warnings that might lower retargeting quality:\nNote: Activate translation
+      DOF on avatar to improve retargeting quality.\n\t'spine.002' is inbetween humanoid
+      transforms and has rotation animation that will be discarded.\n"
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
@@ -46,8 +50,8 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: character_walk
-      takeName: character_walk
+      name: player_walk
+      takeName: player_walk
       internalID: -5645011040223839696
       firstFrame: 0
       lastFrame: 28
@@ -60,7 +64,7 @@ ModelImporter:
       loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
@@ -89,7 +93,7 @@ ModelImporter:
       loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
@@ -104,11 +108,11 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: attack_dodge
-      takeName: attack_dodge
+      name: player_roll
+      takeName: player_roll
       internalID: -5412299330181281302
       firstFrame: 0
-      lastFrame: 9
+      lastFrame: 23
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -133,8 +137,8 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: character_run
-      takeName: character_run
+      name: player_run
+      takeName: player_run
       internalID: 2951192991109207695
       firstFrame: 0
       lastFrame: 18
@@ -162,11 +166,11 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: character_idle_1
-      takeName: character_idle_1
+      name: player_idle_1
+      takeName: player_idle_1
       internalID: -241336811819105741
       firstFrame: 0
-      lastFrame: 10
+      lastFrame: 120
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -176,7 +180,7 @@ ModelImporter:
       loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
@@ -191,8 +195,8 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: attack_short_heavy
-      takeName: attack_short_heavy
+      name: player_attack_short_heavy
+      takeName: player_attack_short_heavy
       internalID: -4420325413381842935
       firstFrame: 0
       lastFrame: 29
@@ -205,7 +209,7 @@ ModelImporter:
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
@@ -220,8 +224,8 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: attack_short
-      takeName: attack_short
+      name: player_attack_short
+      takeName: player_attack_short
       internalID: 1033295968943752762
       firstFrame: 0
       lastFrame: 46
@@ -234,7 +238,7 @@ ModelImporter:
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
@@ -249,8 +253,8 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: attack_idle
-      takeName: attack_idle
+      name: player_attack_idle
+      takeName: player_attack_idle
       internalID: 3803998709608051806
       firstFrame: 0
       lastFrame: 39
@@ -263,7 +267,7 @@ ModelImporter:
       loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
@@ -278,8 +282,8 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: character_attack_short_step
-      takeName: character_attack_short_step
+      name: player_attack_short_step
+      takeName: player_attack_short_step
       internalID: -6355050193464654177
       firstFrame: 0
       lastFrame: 46
@@ -292,7 +296,7 @@ ModelImporter:
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
@@ -307,8 +311,8 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: attack_sword_1
-      takeName: attack_sword_1
+      name: player_attack_sword_1
+      takeName: player_attack_sword_1
       internalID: -3971429223191544131
       firstFrame: 0
       lastFrame: 18
@@ -321,7 +325,7 @@ ModelImporter:
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
@@ -336,8 +340,8 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: character_attack_sword_1_heavy
-      takeName: character_attack_sword_1_heavy
+      name: player_attack_sword_1_heavy
+      takeName: player_attack_sword_1_heavy
       internalID: 4105498250778535718
       firstFrame: 0
       lastFrame: 19
@@ -350,7 +354,7 @@ ModelImporter:
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
@@ -365,8 +369,8 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: sword_1_idle
-      takeName: sword_1_idle
+      name: player_sword_1_idle
+      takeName: player_sword_1_idle
       internalID: 2081745134369747585
       firstFrame: 0
       lastFrame: 40
@@ -379,7 +383,7 @@ ModelImporter:
       loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
@@ -394,8 +398,8 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: character_attack_advance
-      takeName: character_attack_advance
+      name: player_attack_advance
+      takeName: player_attack_advance
       internalID: -2454871582953247409
       firstFrame: 0
       lastFrame: 13
@@ -408,7 +412,7 @@ ModelImporter:
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
@@ -423,8 +427,8 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: attack_fist
-      takeName: attack_dodge
+      name: player_fist
+      takeName: player_walk
       internalID: -6992515747542209592
       firstFrame: 0
       lastFrame: 1
@@ -437,7 +441,7 @@ ModelImporter:
       loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
