@@ -35,6 +35,10 @@ public abstract class Location
         TilePosY = (int)(center.y) - (TileWidth/2);
     }
 
+    public Vector2 GetAbsoluteCorner(Vector2 offset, float scale)
+    {
+        return (new Vector2(TilePosX, TilePosY) - offset) * scale;
+    }
     public Vector2 GetAbsoluteCenter(Vector2 offset, float scale)
     {
         return (new Vector2(TilePosX + (TileWidth/2), TilePosY + (TileHeight/2)) - offset) * scale;
@@ -162,7 +166,7 @@ public class Medow : Location
         }
 
         // Boars
-        GameObject boar = Resources.Load<GameObject>("Prefabs/Forest/Enemies/BoarPrefab");
+        GameObject boar = Resources.Load<GameObject>("Prefabs/Forest/Enemies/Boar");
 
         float numberOfBoars = Random.Range(3, 6);
         for(int i = 0; i < numberOfBoars; i++)
@@ -199,12 +203,15 @@ public class ForestBossArena : Location
     {
         Name = "Forest Boss Arena";
         
-        TileWidth = 10;
-        TileHeight = 10;
+        TileWidth = 11;
+        TileHeight = 11;
     }
 
     public override void GenerateLocation(GameObject parent, WorldData worldData)
     {
-        
+        GameObject boar = Resources.Load<GameObject>("Prefabs/Forest/Enemies/Boss");
+        Vector2 center = GetTileGridCenter(worldData.Offset);
+
+        GameObject.Instantiate(boar, new Vector3(center.x, 0.2f, center.y) * worldData.Scale, Quaternion.identity);
     }
 }

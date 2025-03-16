@@ -4,7 +4,8 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(LivingEntity))]
-public class BoarController : MonoBehaviour {
+public class BoarController : MonoBehaviour 
+{
     public WeaponHolder WeaponHolder;
     public WeaponItemData PrimaryAttackWeapon;
     public WeaponItemData ChargeAttackWeapon;
