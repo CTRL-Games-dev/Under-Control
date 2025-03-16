@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading;
 using UnityEngine;
 
 public enum TileType
@@ -10,13 +8,6 @@ public enum TileType
     Wall,
     Empty,
     Path,
-}
-
-public enum PathBorderType
-{
-    None,
-    Short,
-    Long,
 }
 
 public struct PathData

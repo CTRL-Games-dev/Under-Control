@@ -3,6 +3,7 @@ using UnityEngine;
 public abstract class Location
 {
     public string Name;
+    public GameObject SpawnedInstance = null;
     public int TileWidth, TileHeight;
     public int X, Y;
     public WorldData wd;
@@ -85,7 +86,7 @@ public class ForestPortal : Location
 
         Vector3 pos = (new Vector3(center.x, 0, center.y) * wd.Scale) + new Vector3(0.5f, 3.0f, 0.5f);
          
-        var gm = GameObject.Instantiate(_portalPrefab, pos, Quaternion.identity, parent.transform);
+        SpawnedInstance = GameObject.Instantiate(_portalPrefab, pos, Quaternion.identity, parent.transform);
     }
 }
 

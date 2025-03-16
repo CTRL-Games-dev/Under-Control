@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.AI.Navigation;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
     private GameManager _gameManager;
     [SerializeField] private CameraManager _cameraManager;
     [SerializeField] private GameObject _player;
+    [SerializeField] private NavMeshSurface _navMeshSurface;
     private void Start()
     {
         _gameManager = GameManager.Instance;
@@ -20,12 +22,15 @@ public class AdventureManager : MonoBehaviour, ILevelManager
         var generator = GetComponent<BetterGenerator>();
         generator.GenerateMap(BetterGenerator.LevelType.Forest);
         
-        Location portal = generator.Getlocation<ForestPortal>();
+        ForestPortal portal = generator.Getlocation<ForestPortal>();
+
         Vector2 spawn = portal.GetAbsoluteCenter();
 
         Instantiate(_player, new(spawn.x, 0.2f, spawn.y - 3f), Quaternion.identity);
 
         _cameraManager.SwitchCamera(UICanvas.Instance.PlayerController.PlayerTopDownCamera);
+
+        _navMeshSurface.BuildNavMesh();
     }
 
     // public void SpawnPlayer()
