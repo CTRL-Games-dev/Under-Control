@@ -218,6 +218,11 @@ public class ForestBossArena : Location
         GameObject boarInstance = GameObject.Instantiate(boar, new Vector3(center.x, 0.2f, center.y) * worldData.Scale, Quaternion.identity);
    
         LivingEntity boarLivingEntity = boarInstance.GetComponent<LivingEntity>();
-        boarLivingEntity.OnDeath.AddListener(UICanvas.Instance.OpenVideoPlayer);
+        boarLivingEntity.OnDeath.AddListener(tester);
+    }
+
+    public void tester() {
+        Debug.Log("Dzialasadasdasd");
+        UICanvas.Instance.OpenVideoPlayer();
     }
 }
