@@ -1,9 +1,15 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour 
-{
+[RequireComponent(typeof(MusicPlayer))]
+public class GameManager : MonoBehaviour {
+    [Serializable]
+    public struct DimensionMusic {
+        public Dimension Dimension;
+        public AudioClip[] Clips;
+    }
+
     public static GameManager Instance;
 
     [Header("References")]
@@ -16,8 +22,12 @@ public class GameManager : MonoBehaviour
         {Dimension.FOREST_BOSS, "Adventure"},
     };
 
+    [Header("Music")]
+    public DimensionMusic[] MusicPalette;
+
     [Header("State")]
     [SerializeField] private GameContext _context;
+    private MusicPlayer _musicPlayer;
     
     private void Awake() 
     {
@@ -32,6 +42,8 @@ public class GameManager : MonoBehaviour
         } else{
             Destroy(gameObject);
         }
+
+        _musicPlayer = GetComponent<MusicPlayer>();
     }
     private void Start()
     {
@@ -45,8 +57,17 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("Loading new scene: " + _context.CurrentDimension.ToString());
 
+        _musicPlayer.Stop();
+
+        int dimensionMusicIndex = Array.FindIndex(MusicPalette, x => x.Dimension == dimension);
+        if(dimensionMusicIndex != -1) {
+            _musicPlayer.MusicClips = MusicPalette[dimensionMusicIndex].Clips;
+            _musicPlayer.Play();
+        }
+
         LoadingScreen.LoadScene(SceneDictionary[_context.CurrentDimension]);
     }
+
     public Dimension GetCurrentDimension()
     {
         return _context.CurrentDimension;
