@@ -290,7 +290,7 @@ public class BetterGenerator : MonoBehaviour
             Location medow = new Medow();
 
             int minRange = 8;
-            int maxRange = 40;
+            int maxRange = 20;
             
             int indexX = UnityEngine.Random.Range(minRange, maxRange + 1);
             int indexY = UnityEngine.Random.Range(minRange, maxRange + 1);
