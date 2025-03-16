@@ -1,21 +1,24 @@
 using UnityEngine;
 using DG.Tweening;
-using UnityEngine.EventSystems;
+using Unity.Cinemachine;
+
 public class ChangePortal : MonoBehaviour, IInteractable
 {
     [SerializeField] private Portal _portal;
     [SerializeField] private GameObject _panel;
     [SerializeField] private Vector2 _panelStartingPosition;
     [SerializeField] private Material _ballMaterial;
+    [SerializeField] private CinemachineCamera _ballCamera;
     private bool _opened;
+
     public void Start()
     {
         _panelStartingPosition = _panel.transform.position;
     }
 
     void FixedUpdate() {
-        float xOffset = Mathf.Sin(Time.time) * 0.1f;
-        float yOffset = Mathf.Cos(Time.time) * 0.1f;
+        float xOffset = Mathf.Sin(Time.time) * 0.2f;
+        float yOffset = Mathf.Cos(Time.time) * 0.2f;
         _ballMaterial.mainTextureOffset = new Vector2(xOffset, yOffset);
     }
 
@@ -47,6 +50,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
     }
     public void OpenUI()
     {
+        CameraManager.Instance.SwitchCamera(_ballCamera);
         Debug.Log("Kula pomacana");
         _panel.transform.DOLocalMoveY(0, 0.4f);
         _opened = true;
@@ -54,6 +58,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
 
     public void CloseUI()
     {
+        CameraManager.Instance.SwitchCamera(UICanvas.Instance.PlayerController.PlayerTopDownCamera);
         Debug.Log("Kula odmacana");
         _panel.transform.DOLocalMoveY(_panelStartingPosition.y, 0.4f);
         _opened = false;
