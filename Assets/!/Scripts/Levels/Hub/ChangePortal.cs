@@ -30,7 +30,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
 
 
     private bool _opened;
-    private bool _locked = false;
+    public bool Locked = false;
     private UIDimension _currentDimension;
     public static ChangePortal Instance;
 
@@ -80,26 +80,24 @@ public class ChangePortal : MonoBehaviour, IInteractable
     public void SetPortal()
     {
         _portal.SetDimensionAndActivate(_currentDimension.WhatDimension);
-        Invoke("CloseUI", 1f);
+        Invoke(nameof(CloseUI), 1f);
     }
 
     public void SetDimensionInfo(UIDimension dimension) {
-        if (_locked) return;
+        if (Locked) return;
         _rightPanelCanvasGroup.DOComplete();
         if (dimension == null) {
             _whitePanelGO.SetActive(false);
             _rightPanelCanvasGroup.DOFade(0, 0.3f).SetEase(Ease.OutSine);
             return;    
         }
-        if (_currentDimension == dimension) return;
+        // if (_currentDimension == dimension) return;
         _currentDimension = dimension;
 
         _whitePanelGO.SetActive(false);
-        _rightPanelCanvasGroup.DOFade(0, 0.3f).SetEase(Ease.OutSine).OnComplete(() => {
-            setupRightPanel(_currentDimension);
-            _rightPanelCanvasGroup.DOFade(1, 0.3f).SetEase(Ease.OutSine).OnComplete(() => {
-                _whitePanelGO.SetActive(true);
-            });
+        setupRightPanel(_currentDimension);
+        _rightPanelCanvasGroup.DOFade(1, 0.3f).SetEase(Ease.OutSine).OnComplete(() => {
+            _whitePanelGO.SetActive(true);
         });
     
     }
@@ -123,8 +121,8 @@ public class ChangePortal : MonoBehaviour, IInteractable
 
 
     public void LockDimension(UIDimension dimension) {
-        _locked = !_locked;
-        Vector3 newSize = _locked ? _rightPanelBGRect.sizeDelta - new Vector2(12, 12) : _rightPanelBGRect.sizeDelta + new Vector2(12, 12);
+        Locked = !Locked;
+        Vector3 newSize = Locked ? _rightPanelBGRect.sizeDelta - new Vector2(12, 12) : _rightPanelBGRect.sizeDelta + new Vector2(12, 12);
         _rightPanelBGRect.DOSizeDelta(newSize, 0.3f).SetEase(Ease.OutSine);
         SetDimensionInfo(dimension);
     }

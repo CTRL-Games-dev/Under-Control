@@ -100,7 +100,7 @@ public class UICanvas : MonoBehaviour
         PlayerController.InventoryToggleEvent.AddListener(OnInventoryToggle);
         PlayerController.UICancelEvent.AddListener(OnUICancel);
         
-        OpenUIState(CurrentUIState);
+        // OpenUIState(CurrentUIState);
     }
 
     #endregion

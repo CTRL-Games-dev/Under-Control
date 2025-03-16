@@ -58,6 +58,7 @@ public class LoadingScreen : MonoBehaviour
                     _imageGO.SetActive(false);
                     StopCoroutine(animateImages());
                     UICanvas.Instance.ShowUI();
+                    UICanvas.Instance.OpenUIState(UIState.NotVisible);
                 });
             }
 

@@ -33,7 +33,7 @@ public class UIDimension : MonoBehaviour
     }
 
     public void OnPointerExit() {
-        ChangePortal.Instance.SetDimensionInfo(null);
+        if (!ChangePortal.Instance.Locked) ChangePortal.Instance.SetDimensionInfo(null);
     }
 
     public void OnPoinerClick() {
