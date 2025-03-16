@@ -69,19 +69,6 @@ public class BetterGenerator : MonoBehaviour
         _meshCollider = GetComponent<MeshCollider>();
         _meshRenderer = GetComponent<MeshRenderer>();
     }
-    public enum LevelType
-    {
-        Forest
-    }
-    public void GenerateMap(LevelType type)
-    {
-        switch(type)
-        {
-            case LevelType.Forest: {
-                GenerateForest();
-            } break;
-        }
-    }
 
     public T Getlocation<T>()
     where T : Location
@@ -104,7 +91,7 @@ public class BetterGenerator : MonoBehaviour
         return locations;
     }
 
-    private void GenerateForest()
+    public void GenerateMap(Dimension type)
     {
         wd.Locations = new();
         wd.Paths = new();
@@ -116,7 +103,15 @@ public class BetterGenerator : MonoBehaviour
 
         while(true)
         {
-            PlaceLocations();
+            switch(type) 
+            {
+                case Dimension.FOREST: {
+                    PlaceLocationsForest();
+                } break;
+                case Dimension.FOREST_BOSS: {
+                    PlaceLocationsForestBoss();
+                } break;
+            }
 
             // All locations
             int minX = 0, minY = 0, maxX = 0, maxY = 0;
@@ -276,10 +271,10 @@ public class BetterGenerator : MonoBehaviour
 
     #region Placing Locations
 
-    private void PlaceLocations()
+    private void PlaceLocationsForest()
     {
         // Place portal
-        Location portal = new ForestPortal();
+        Location portal = new ForestPortal(true);
         portal.SetTileCenter(new(0,0)); // Set it to center
         wd.Locations.Add(portal);
 
@@ -315,6 +310,19 @@ public class BetterGenerator : MonoBehaviour
             }
             else Debug.Log("Didnt found location!");
         }
+    }
+
+    private void PlaceLocationsForestBoss()
+    {
+        // Place portal
+        Location portal = new ForestPortal(false);
+        portal.SetTileCenter(new(0,0)); // Set it to center
+        wd.Locations.Add(portal);
+
+
+        Location arena = new ForestBossArena();
+        arena.SetTileCenter(new(12,12)); // Set it to center
+        wd.Locations.Add(arena);
     }
 
     #endregion
@@ -391,29 +399,36 @@ public class BetterGenerator : MonoBehaviour
     {
         List<Edge> uniqueEdges = new();
 
-        // This is a hack
-        // somethimes triangulation does not produce result. In such case, it should be repeated
-        // Create "sigma triangle"
-        Triangle st = Triangle.GetSuperTriangle(locations);
-
-        List<Triangle> triangles = new();
-        triangles.Add(st);
-
-        // Triangulate each vertex (magic)
-        foreach (var location in locations)
+        if(locations.Count > 2)
         {
-            Point vertex = new(location.GetTileCenterWithoutOffset(), location);
-            triangles = AddVertex(vertex, triangles);
+            // Create "sigma triangle"
+            Triangle st = Triangle.GetSuperTriangle(locations);
+
+            List<Triangle> triangles = new();
+            triangles.Add(st);
+
+            // Triangulate each vertex (magic)
+            foreach (var location in locations)
+            {
+                Point vertex = new(location.GetTileCenterWithoutOffset(), location);
+                triangles = AddVertex(vertex, triangles);
+            }
+
+            // Remove triangles that share edges with sigma triangle (they are not so sigma)
+            triangles = triangles.Where(t => 
+                !(t.vA == st.vA || t.vA == st.vB || t.vA == st.vC ||
+                t.vB == st.vA || t.vB == st.vB || t.vB == st.vC ||
+                t.vC == st.vA || t.vC == st.vB || t.vC == st.vC)
+            ).ToList();
+
+            uniqueEdges = RemoveDuplicateEdges(triangles);
+        } 
+        else
+        {
+            Vector2 pos1 = new(locations[0].TilePosX, locations[0].TilePosY);
+            Vector2 pos2 = new(locations[1].TilePosX, locations[1].TilePosY);
+            uniqueEdges .Add(new Edge(new Point(pos1, locations[0]), new Point(pos2, locations[1])));
         }
-
-        // Remove triangles that share edges with sigma triangle (they are not so sigma)
-        triangles = triangles.Where(t => 
-            !(t.vA == st.vA || t.vA == st.vB || t.vA == st.vC ||
-            t.vB == st.vA || t.vB == st.vB || t.vB == st.vC ||
-            t.vC == st.vA || t.vC == st.vB || t.vC == st.vC)
-        ).ToList();
-
-        uniqueEdges = RemoveDuplicateEdges(triangles);
         
 
         #region MST
@@ -431,7 +446,7 @@ public class BetterGenerator : MonoBehaviour
         // Do this as long as there are unconnected edges
         // If edge is not connected from both sides, this means that at least one of it's points is not connected
         List<Edge> usedEdges = uniqueEdges.Where(e => e.Used).ToList(); // Used in some later computations
-        while(uniqueEdges.FindAll(e => !e.IsConnected(usedEdges)).Count > 0)
+        while(uniqueEdges.FindAll(e => !e.IsConnected(usedEdges)).Count > 0 && uniqueEdges.Count > 2)
         {
             usedEdges = uniqueEdges.Where(e => e.Used).ToList(); // Used in some later computations
 
@@ -479,13 +494,17 @@ public class BetterGenerator : MonoBehaviour
         int num = 0;
         foreach(var line in uniqueEdges.Where(e => e.Used))
         {
+            Debug.Log("=== LINE " + num + " ===");
+
+            Debug.Log("First point " + line.v0.Position);
+            Debug.Log("Second point " + line.v1.Position);
+
             num++;
             Point point1 = line.v0.Position.x < line.v1.Position.x ? line.v0 : line.v1;
             Point point2 = line.v0.Position.x > line.v1.Position.x ? line.v0 : line.v1;
 
-            // Debug.Log("=== LINE " + num + " ===");
-            // Debug.Log("First point " + point1.Position);
-            // Debug.Log("Second point " + point2.Position);
+            Debug.Log("First point " + point1.Position);
+            Debug.Log("Second point " + point2.Position);
 
             float a = (point2.Position.y - point1.Position.y)/(point2.Position.x - point1.Position.x);
             // y = ax + b ----> b = y - ax
@@ -519,56 +538,58 @@ public class BetterGenerator : MonoBehaviour
             }
 
 
-            Vector2[,] edgesA = point1.LocationOfPoint.GetEdges();
-            Vector2 intersectionA = new Vector2(555555,555555); // Funny big vector if an error happens;
-            bool foundA = false;
-            // Debug.Log($"Line pA = {point1.Position}, pB = {point2.Position}");
-            for(int i = 0; i < 4; i++)
-            {
-                Edge locationEdge = new(new(edgesA[i,0],point1.LocationOfPoint), new(edgesA[i,1],point1.LocationOfPoint));
-                Edge pathLine = new(point1, point2);
-                (bool ifFound, Vector2 intersection) = FindIntersection(locationEdge, pathLine);
-                // Debug.Log($"Loc1, Edge pA = {locationEdge.v0.Position}, pB = {locationEdge.v1.Position}");
-                if(ifFound)
-                {
-                    intersectionA = intersection;
-                    foundA = true;
-                    break;
-                }
-            }
+            // Vector2[,] edgesA = point1.LocationOfPoint.GetEdges();
+            // Vector2 intersectionA = new Vector2(555555,555555); // Funny big vector if an error happens;
+            // bool foundA = false;
+            // Debug.Log($"Line pA = (({point1.Position}),({point2.Position}))");
+            // for(int i = 0; i < 4; i++)
+            // {
+            //     Edge locationEdge = new(new(edgesA[i,0],point1.LocationOfPoint), new(edgesA[i,1],point1.LocationOfPoint));
+            //     Edge pathLine = new(point1, point2);
+            //     (bool ifFound, Vector2 intersection) = FindIntersection(locationEdge, pathLine);
+            //     Debug.Log($"Loc1, (({locationEdge.v0.Position}),({locationEdge.v1.Position}))");
+            //     if(ifFound)
+            //     {
+            //         intersectionA = intersection;
+            //         foundA = true;
+            //         break;
+            //     }
+            // }
 
-            Vector2[,] edgesB = point2.LocationOfPoint.GetEdges();
-            Vector2 intersectionB = new Vector2(555555,555555); // Funny big vector if an error happens
-            bool foundB = false;
-            for(int i = 0; i < 4; i++)
-            {
-                Edge locationEdge = new(new(edgesB[i,0],point2.LocationOfPoint), new(edgesB[i,1],point2.LocationOfPoint));
-                Edge pathLine = new(point1, point2);
+            // Vector2[,] edgesB = point2.LocationOfPoint.GetEdges();
+            // Vector2 intersectionB = new Vector2(555555,555555); // Funny big vector if an error happens
+            // bool foundB = false;
+            // for(int i = 0; i < 4; i++)
+            // {
+            //     Edge locationEdge = new(new(edgesB[i,0],point2.LocationOfPoint), new(edgesB[i,1],point2.LocationOfPoint));
+            //     Debug.Log($"Loc2, (({locationEdge.v0.Position}),({locationEdge.v1.Position}))");
+            //     Edge pathLine = new(point1, point2);
             
-                (bool ifFound, Vector2 intersection) = FindIntersection(locationEdge, pathLine);
-                if(ifFound)
-                {
-                    intersectionB = intersection;
-                    foundB = true;
-                    break;
-                }
-            }
+            //     (bool ifFound, Vector2 intersection) = FindIntersection(locationEdge, pathLine);
+            //     if(ifFound)
+            //     {
+            //         intersectionB = intersection;
+            //         foundB = true;
+            //         break;
+            //     }
+            // }
 
-            if(!(foundA && foundB))
-            {
-                throw new Exception("Generator fell from it's bicycle, oopsie");
-            }
+            // if(!(foundA && foundB))
+            // {
+            //     return false
+            //     // throw new Exception("Generator fell from it's bicycle, oopsie");
+            // }
 
-            PathData path;
-            path.Point1 = intersectionA;
-            path.Point2 = intersectionB;
-            path.Thickness = thickness;
-            float len = Vector2.Distance(path.Point1, path.Point2);
+            // PathData path;
+            // path.Point1 = intersectionA;
+            // path.Point2 = intersectionB;
+            // path.Thickness = thickness;
+            // float len = Vector2.Distance(path.Point1, path.Point2);
 
-            Vector2 dir = point2.Position - point1.Position; //a vector pointing from pointA to pointB
-            path.Rotation = Quaternion.LookRotation(new(dir.x, 0, dir.y), Vector3.up); //calc a rotation that
+            // Vector2 dir = point2.Position - point1.Position; //a vector pointing from pointA to pointB
+            // path.Rotation = Quaternion.LookRotation(new(dir.x, 0, dir.y), Vector3.up); //calc a rotation that
 
-            wd.Paths.Add(path);
+            // wd.Paths.Add(path);
         }
 
         return true;
