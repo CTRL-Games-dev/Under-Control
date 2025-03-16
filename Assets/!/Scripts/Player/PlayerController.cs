@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
     public GameObject CameraTargetObject;
     public CinemachineCamera PlayerTopDownCamera;
     public bool InputDisabled = true;
+    public bool DamageDisabled = false;
 
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
@@ -210,7 +211,14 @@ public class PlayerController : MonoBehaviour
     }
 
     void OnDodge() {
-        if (!InputDisabled) Animator.SetTrigger(_dodgeHash);
+        if (_isAttacking || InputDisabled) return; 
+        Animator.SetTrigger(_dodgeHash);
+        DamageDisabled = true;
+        Invoke(nameof(enavleDamage), 1f);
+    }
+
+    private void enavleDamage() {
+        DamageDisabled = false;
     }
 
     private void handleInteraction() {
@@ -239,17 +247,17 @@ public class PlayerController : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit)) {
             Vector3 targetPosition = hit.point;
             targetPosition.y = transform.position.y;
-            transform.DORotate(Quaternion.LookRotation(targetPosition - transform.position).eulerAngles, 0.1f).OnComplete(() => {
-                _lockRotation = true;
-                switch(interactionType) {
-                    case InteractionType.Primary:
-                        performLightAttack();
-                        break;
-                    case InteractionType.Secondary:
-                        performHeavyAttack();
-                        break;
-                }
-            });
+            transform.LookAt(targetPosition);
+
+            _lockRotation = true;
+            switch(interactionType) {
+                case InteractionType.Primary:
+                    performLightAttack();
+                    break;
+                case InteractionType.Secondary:
+                    performHeavyAttack();
+                    break;
+            };
         }
 
     }

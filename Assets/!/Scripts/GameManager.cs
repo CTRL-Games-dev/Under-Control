@@ -27,8 +27,7 @@ public class GameManager : MonoBehaviour
         // We need to check if there is already existing manager
         // Manager don't destoy itself on load, but since it needs to be defined in every scene
         // singleton pattern must be used.
-        if(Instance == null)
-        {
+        if(Instance == null) {
             Instance = this;
         } else{
             Destroy(gameObject);
