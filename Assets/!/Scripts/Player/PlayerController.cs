@@ -208,7 +208,6 @@ public class PlayerController : MonoBehaviour
 
     void OnRotateItem(InputValue value) {
         ItemRotateEvent?.Invoke();
-        UICanvas.Instance.OpenVideoPlayer();
     }
 
     void OnDodge() {
