@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class InvTile : MonoBehaviour {
     protected GameObject _highlightImage;
 
-    protected Image _image;
+    [SerializeField] protected Image _image;
     public InventoryPanel InventoryPanel;
     
     private bool _isEmpty = true;
@@ -26,7 +26,6 @@ public class InvTile : MonoBehaviour {
 
 
     protected void Awake() {
-        _image = GetComponent<Image>();
         _highlightImage = transform.GetChild(0).gameObject;
     }
 
