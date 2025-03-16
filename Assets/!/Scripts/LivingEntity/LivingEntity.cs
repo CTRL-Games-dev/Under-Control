@@ -161,6 +161,7 @@ public class LivingEntity : MonoBehaviour
 
             OnDeath.Invoke();
 
+            if (gameObject.GetComponent<PlayerController>() != null) return;
             Destroy(gameObject);
         }
     }

@@ -25,6 +25,7 @@ public class CameraManager : MonoBehaviour
         }
 
         _currentCamera = camera;
+        _currentCamera.Priority = 30;
 
         setCamerasPriority();
     }
