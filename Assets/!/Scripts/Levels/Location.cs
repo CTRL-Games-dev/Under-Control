@@ -91,7 +91,7 @@ public class ForestPortal : Location
     {
         Vector2 center = GetTileGridCenter(worldData.Offset);
 
-        Vector3 pos = (new Vector3(center.x, 0, center.y) * worldData.Scale) + new Vector3(0.5f, 3.0f, 0.5f);
+        Vector3 pos = (new Vector3(center.x, 0, center.y) * worldData.Scale) + new Vector3(0.5f, 2.04f, 0.5f);
          
         SpawnedInstance = GameObject.Instantiate(_portalPrefab, pos, Quaternion.identity, parent.transform);
     }
@@ -168,7 +168,7 @@ public class Medow : Location
         // Boars
         GameObject boar = Resources.Load<GameObject>("Prefabs/Forest/Enemies/Boar");
 
-        float numberOfBoars = Random.Range(3, 6);
+        float numberOfBoars = Random.Range(8, 20);
         for(int i = 0; i < numberOfBoars; i++)
         {
             float x = Random.Range(corner.x + 2f, corner.x + TileWidth - 2f);
