@@ -44,6 +44,8 @@ public class GameManager : MonoBehaviour {
         }
 
         _musicPlayer = GetComponent<MusicPlayer>();
+
+        playMusicForDimension(_context.CurrentDimension);
     }
     private void Start()
     {
@@ -57,15 +59,9 @@ public class GameManager : MonoBehaviour {
 
         Debug.Log("Loading new scene: " + _context.CurrentDimension.ToString());
 
-        _musicPlayer.Stop();
-
-        int dimensionMusicIndex = Array.FindIndex(MusicPalette, x => x.Dimension == dimension);
-        if(dimensionMusicIndex != -1) {
-            _musicPlayer.MusicClips = MusicPalette[dimensionMusicIndex].Clips;
-            _musicPlayer.Play();
-        }
-
         LoadingScreen.LoadScene(SceneDictionary[_context.CurrentDimension]);
+
+        playMusicForDimension(dimension);
     }
 
     public Dimension GetCurrentDimension()
@@ -76,5 +72,15 @@ public class GameManager : MonoBehaviour {
     public float GetInfluence()
     {
         return _context.Influence;
+    }
+
+    private void playMusicForDimension(Dimension dimension) {
+        _musicPlayer.Stop();
+
+        int dimensionMusicIndex = Array.FindIndex(MusicPalette, x => x.Dimension == dimension);
+        if(dimensionMusicIndex != -1) {
+            _musicPlayer.MusicClips = MusicPalette[dimensionMusicIndex].Clips;
+            _musicPlayer.Play();
+        }
     }
 }
