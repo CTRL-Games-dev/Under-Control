@@ -46,7 +46,7 @@ public class NavMeshAgentRootMotionInterop1D : MonoBehaviour {
     private float _speed = 0;
     private Vector3 _velocity = Vector3.zero;
 
-    void Start() {
+    void Awake() {
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
 
