@@ -6,7 +6,6 @@ public abstract class Location
     public GameObject SpawnedInstance = null;
     public int TileWidth, TileHeight;
     public int X, Y;
-    public WorldData wd;
     public abstract void GenerateLocation(GameObject parent, WorldData worldData);
     public bool CheckLocation(List<Location> generatedLocations)
     {
@@ -18,9 +17,13 @@ public abstract class Location
         return true;
     }
 
-    public Vector2 GetTileCenter()
+    public Vector2 GetTileGridCenter(Vector2 offset)
     {
-        return new Vector2(X + (TileWidth/2), Y + (TileHeight/2)) - wd.Offset;
+        return new Vector2(X + (TileWidth/2), Y + (TileHeight/2)) - offset;
+    }
+    public Vector2 GetTileGridCorner(Vector2 offset)
+    {
+        return new Vector2(X, Y) - offset;
     }
     public Vector2 GetTileCenterWithoutOffset()
     {
@@ -28,13 +31,13 @@ public abstract class Location
     }
     public void SetTileCenter(Vector2 center)
     {
-        X = (int)(center.x) - (TileWidth/2) - (int)wd.Offset.x;
-        Y = (int)(center.y) - (TileWidth/2) - (int)wd.Offset.y;
+        X = (int)(center.x) - (TileWidth/2);
+        Y = (int)(center.y) - (TileWidth/2);
     }
 
-    public Vector2 GetAbsoluteCenter()
+    public Vector2 GetAbsoluteCenter(Vector2 offset, float scale)
     {
-        return (new Vector2(X + (TileWidth/2), Y + (TileHeight/2)) - wd.Offset) * wd.Scale;
+        return (new Vector2(X + (TileWidth/2), Y + (TileHeight/2)) - offset) * scale;
     }
     
     public Vector2[,] GetEdges()
@@ -81,10 +84,9 @@ public class ForestPortal : Location
 
     public override void GenerateLocation(GameObject parent, WorldData worldData)
     {
-        wd = worldData;
-        Vector2 center = GetTileCenter();
+        Vector2 center = GetTileGridCenter(worldData.Offset);
 
-        Vector3 pos = (new Vector3(center.x, 0, center.y) * wd.Scale) + new Vector3(0.5f, 3.0f, 0.5f);
+        Vector3 pos = (new Vector3(center.x, 0, center.y) * worldData.Scale) + new Vector3(0.5f, 3.0f, 0.5f);
          
         SpawnedInstance = GameObject.Instantiate(_portalPrefab, pos, Quaternion.identity, parent.transform);
     }
@@ -104,7 +106,7 @@ public class DummyLocation : Location
 
     public override void GenerateLocation(GameObject parent, WorldData worldData)
     {
-
+        
     }
 }
 
@@ -114,12 +116,42 @@ public class Medow : Location
     {
         Name = "Medow";
 
-        TileWidth = Random.Range(8, 20);
-        TileHeight = Random.Range(8, 20);
+        TileWidth = Random.Range(5, 12);
+        TileHeight = Random.Range(5, 12);
     }
-
     public override void GenerateLocation(GameObject parent, WorldData worldData)
     {
-        // throw new System.NotImplementedException();
+        Vector2 corner = GetTileGridCorner(worldData.Offset);
+
+        GameObject[] trees = Resources.LoadAll<GameObject>("Prefabs/Forest/Trees");
+        float numberOfTrees = Random.Range(4, 8);
+
+        for(int i = 0; i < numberOfTrees; i++)
+        {
+            float x = Random.Range(corner.x, corner.x + TileWidth);
+            float y = Random.Range(corner.y, corner.y + TileHeight);
+
+            Vector3 pos = new Vector3(x, 0, y) * worldData.Scale;
+            GameObject treePrefab = trees[Random.Range(0,trees.Length)];
+            GameObject newTree = GameObject.Instantiate(treePrefab, pos, Quaternion.identity);
+
+            newTree.transform.eulerAngles = new(0, Random.Range(-180,180), 0);     
+        }
+
+
+        GameObject[] rocks = Resources.LoadAll<GameObject>("Prefabs/Forest/Rocks");
+        float numberOfRocks = Random.Range(10, 20);
+
+        for(int i = 0; i < numberOfRocks; i++)
+        {
+            float x = Random.Range(corner.x, corner.x + TileWidth);
+            float y = Random.Range(corner.y, corner.y + TileHeight);
+
+            Vector3 pos = new Vector3(x, -0.1f, y) * worldData.Scale;
+            GameObject treePrefab = rocks[Random.Range(0,trees.Length)];
+            GameObject newTree = GameObject.Instantiate(treePrefab, pos, Quaternion.identity);
+
+            newTree.transform.eulerAngles = new(0, Random.Range(-180,180), 0);     
+        }
     }
 }
