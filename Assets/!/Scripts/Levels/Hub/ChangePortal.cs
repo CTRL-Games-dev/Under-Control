@@ -77,6 +77,12 @@ public class ChangePortal : MonoBehaviour, IInteractable
         _opened = false;
     }
 
+    public void SetPortal()
+    {
+        _portal.SetDimensionAndActivate(_currentDimension.WhatDimension);
+        Invoke("CloseUI", 1f);
+    }
+
     public void SetDimensionInfo(UIDimension dimension) {
         if (_locked) return;
         _rightPanelCanvasGroup.DOComplete();
@@ -95,8 +101,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
                 _whitePanelGO.SetActive(true);
             });
         });
-        
-        _portal.SetDimension(dimension.WhatDimension);
+    
     }
 
     private void setupRightPanel(UIDimension dimension) {

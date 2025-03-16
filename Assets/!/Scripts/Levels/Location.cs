@@ -71,12 +71,13 @@ public abstract class Location
 public class ForestPortal : Location
 {
     private GameObject _portalPrefab;
-    public ForestPortal()
+    public ForestPortal(bool open)
     {
         Name = "Forest Portal";
         string portalPath = "Prefabs/Forest/ForestPortal";
 
         _portalPrefab = Resources.Load<GameObject>(portalPath);
+        _portalPrefab.GetComponentInChildren<Portal>().EnablePortal(open);
         
         TileWidth = 3;
         TileHeight = 3;
@@ -198,8 +199,8 @@ public class ForestBossArena : Location
     {
         Name = "Forest Boss Arena";
         
-        TileWidth = 20;
-        TileHeight = 20;
+        TileWidth = 10;
+        TileHeight = 10;
     }
 
     public override void GenerateLocation(GameObject parent, WorldData worldData)

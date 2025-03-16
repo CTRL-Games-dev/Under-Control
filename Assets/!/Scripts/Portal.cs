@@ -4,17 +4,13 @@ using UnityEngine.Events;
 [RequireComponent(typeof(Collider))]
 public class Portal : MonoBehaviour
 {
-    public bool IsOpen = true;
     [SerializeField] private Dimension _dimension = Dimension.HUB;
     public UnityEvent<Dimension> PlayerEnteredPortal;
 
     void OnTriggerEnter(Collider other)
     {
-        if(IsOpen) 
-        {
-            Debug.Log("Player entered portal to: " + _dimension.ToString());
-            GameManager.Instance.ChangeDimension(_dimension);
-        }
+        Debug.Log("Player entered portal to: " + _dimension.ToString());
+        GameManager.Instance.ChangeDimension(_dimension);
     }
     
     public void ChangeDimension(Dimension d) {
@@ -25,5 +21,15 @@ public class Portal : MonoBehaviour
     public void SetDimension(Dimension d)
     {
         _dimension = d;
+    }
+    public void SetDimensionAndActivate(Dimension d)
+    {
+        SetDimension(d);
+        gameObject.SetActive(true);
+    }
+    public void EnablePortal(bool enable)
+    {
+        Debug.Log($"Portal enabled: {enable}");
+        gameObject.SetActive(enable);
     }
 }
