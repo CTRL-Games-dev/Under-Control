@@ -339,6 +339,12 @@ public class UICanvas : MonoBehaviour
         _videoPlayerGO.GetComponent<CanvasGroup>().DOFade(1, 1).SetUpdate(true).OnComplete(() => {
             _videoPlayer.Play();
         });
+
+        Invoke("quit", 45);
+    }
+
+    private void quit() {
+        Application.Quit();
     }
 
 

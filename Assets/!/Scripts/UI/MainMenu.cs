@@ -141,7 +141,7 @@ public class MainMenu : MonoBehaviour
     }
 
     public void OnExitBtnClick() {
-        Debug.Log("exit");
+        Application.Quit();
     }
 
     public void OnPointerEnter(GameObject button) {
