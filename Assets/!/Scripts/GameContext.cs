@@ -9,9 +9,8 @@ public enum GameDifficulty
 
 public enum Dimension
 {
-    MAIN_MENU,
     HUB,
-    FOREST,
+    FOREST
 }
 
 [CreateAssetMenu(fileName = "SO_GameContext", menuName = "GameContext")]

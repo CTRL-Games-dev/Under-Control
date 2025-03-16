@@ -69,10 +69,6 @@ public class ChangePortal : MonoBehaviour, IInteractable
                 _portal.ChangeDimension(Dimension.HUB);
                 break;
             }
-            case 2: {
-                _portal.ChangeDimension(Dimension.MAIN_MENU);
-                break;
-            }
             case 3: {
                 _portal.ChangeDimension(Dimension.FOREST);
                 break;
