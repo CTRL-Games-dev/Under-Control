@@ -50,7 +50,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
     void FixedUpdate() {
         float xOffset = Mathf.Sin(Time.time) * 0.2f;
         float yOffset = Mathf.Cos(Time.time) * 0.2f;
-        _ballMaterial.mainTextureOffset = new Vector2(xOffset, yOffset);
+        // _ballMaterial.mainTextureOffset = new Vector2(xOffset, yOffset);
         _spaceBGRect.rotation = Quaternion.Euler(0, 0, Mathf.PingPong(Time.time, 10));
     }
 
