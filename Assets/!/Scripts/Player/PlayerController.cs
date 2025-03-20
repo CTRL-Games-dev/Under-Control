@@ -95,7 +95,6 @@ public class PlayerController : MonoBehaviour
         LivingEntity = GetComponent<LivingEntity>();
         CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
         LivingEntity.OnDeath.AddListener(onDeath);
-
         
         _cameraDistance = MinCameraDistance;
 

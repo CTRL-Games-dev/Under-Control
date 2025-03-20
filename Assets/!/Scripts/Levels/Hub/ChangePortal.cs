@@ -8,7 +8,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
 {
     [Header("Portal things")]
     [SerializeField] private Portal _portal;
-    [SerializeField] private Renderer _ballRenderer;
+    [SerializeField] private Renderer[] _ballRenderers;
     [SerializeField] private CinemachineCamera _ballCamera;
     [SerializeField] private Material _portalMaterial;
 
@@ -50,7 +50,8 @@ public class ChangePortal : MonoBehaviour, IInteractable
     void FixedUpdate() {
         float xOffset = Mathf.Sin(Time.time) * 0.2f;
         float yOffset = Mathf.Cos(Time.time) * 0.2f;
-        _ballRenderer.material.mainTextureOffset = new Vector2(xOffset, yOffset);
+        foreach (Renderer _ballRenderer in _ballRenderers)
+            _ballRenderer.material.mainTextureOffset = new Vector2(xOffset, yOffset);
         _spaceBGRect.rotation = Quaternion.Euler(0, 0, Mathf.PingPong(Time.time, 10));
     }
 
