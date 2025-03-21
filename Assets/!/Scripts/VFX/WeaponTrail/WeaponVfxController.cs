@@ -1,5 +1,6 @@
 using UnityEngine;
 
+using Unity.Behavior;
 public class WeaponVfxController : MonoBehaviour {
     public ParticleSystem ParticleSystem;
 

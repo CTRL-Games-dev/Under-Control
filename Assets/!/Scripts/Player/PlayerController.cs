@@ -62,6 +62,7 @@ public class PlayerController : MonoBehaviour
     }
     private bool _isAttacking = false;
     private bool _lockRotation = false;
+    private bool _isDodging = false;
 
     [Header("Events")]
     public UnityEvent InventoryToggleEvent;
@@ -76,10 +77,8 @@ public class PlayerController : MonoBehaviour
 
     private readonly int _speedHash = Animator.StringToHash("speed");
     private readonly int _dodgeHash = Animator.StringToHash("dodge");
-    private readonly int _lightAttackHash = Animator.StringToHash("light_attack");
-    private readonly int _heavyAttackHash = Animator.StringToHash("heavy_attack");
-    private readonly int _playerAttackLightHash = Animator.StringToHash("player_attack_light");
-    private readonly int _playerAttackHeavyHash = Animator.StringToHash("player_attack_heavy");
+    private readonly int _lightAttackHash = Animator.StringToHash("attack_light");
+    private readonly int _heavyAttackHash = Animator.StringToHash("attack_heavy");
     private readonly int _weaponTypeHash = Animator.StringToHash("weapon_type");
 
     // References
@@ -210,7 +209,7 @@ public class PlayerController : MonoBehaviour
     }
 
     void OnDodge() {
-        if (_isAttacking || InputDisabled) return; 
+        if (_isAttacking || InputDisabled || _isDodging) return; 
         Animator.SetTrigger(_dodgeHash);
         DamageDisabled = true;
         Invoke(nameof(enavleDamage), 1f);
@@ -307,5 +306,21 @@ public class PlayerController : MonoBehaviour
         WeaponHolder.EndAttack();
         _isAttacking = false;
         _lockRotation = false;
+    }
+
+    public void OnDodgeAnimationStart() {
+        _isDodging = true;
+    }
+
+    public void OnDodgeAnimationEnd() {
+        _isDodging = false;
+    }
+
+    public void OnComboWindowAnimationStart() {
+        Debug.Log("Combo window start");
+    }
+
+    public void OnComboWindowAnimationEnd() {
+        Debug.Log("Combo window end");
     }
 }
