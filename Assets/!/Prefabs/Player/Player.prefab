@@ -2090,7 +2090,7 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 3
   m_Height: 2
-  m_Radius: 0.3
+  m_Radius: 0.35
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
@@ -2155,6 +2155,8 @@ MonoBehaviour:
   PlayerTopDownCamera: {fileID: 1842100701194989401}
   InputDisabled: 0
   DamageDisabled: 0
+  LightAttackSpeed: 1.5
+  HeavyAttackSpeed: 1.5
   WeaponHolder: {fileID: 3910325353038009931}
   FistsWeaponData: {fileID: 11400000, guid: 4fca43a1ca5a94f62af3bf7b337d65f3, type: 2}
   VekhtarControl:
@@ -7255,7 +7257,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Priority:
     Enabled: 1
-    m_Value: 100
+    m_Value: -1
   OutputChannel: 1
   StandbyUpdate: 2
   m_StreamingVersion: 20241001
@@ -10785,8 +10787,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2942579809011625722}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.0000000028749123, y: 0.9995573, z: -0.029753478, w: 0.00000008793026}
-  m_LocalPosition: {x: -0.000000056810677, y: 1.7228845, z: 0.48405048}
+  m_LocalRotation: {x: 0.06245057, y: -0.6483556, z: 0.053495888, w: 0.7568839}
+  m_LocalPosition: {x: 9.289117, y: 3.75, z: 1.0986023}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -25027,8 +25029,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7797664138220259676}
   - component: {fileID: 6251394514067095998}
-  - component: {fileID: 7372562775737998978}
-  - component: {fileID: 7235638313540095234}
   - component: {fileID: 7395196740846900076}
   m_Layer: 6
   m_Name: ActionNotifiermanager
@@ -25054,7 +25054,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: -50, y: 200}
-  m_SizeDelta: {x: 361.0284, y: 0}
+  m_SizeDelta: {x: 250, y: 1400}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &6251394514067095998
 CanvasRenderer:
@@ -25064,46 +25064,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7698821741452916413}
   m_CullTransparentMesh: 1
---- !u!114 &7372562775737998978
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7698821741452916413}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 8
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 1
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
---- !u!114 &7235638313540095234
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7698821741452916413}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
 --- !u!114 &7395196740846900076
 MonoBehaviour:
   m_ObjectHideFlags: 0

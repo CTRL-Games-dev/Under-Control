@@ -2,13 +2,17 @@ using UnityEngine;
 
 using Unity.Behavior;
 public class WeaponVfxController : MonoBehaviour {
-    public ParticleSystem ParticleSystem;
+    [SerializeField] private ParticleSystem _hitParticles;
+    [SerializeField] private GameObject _hitTrail;
+
 
     public void StartTrail() {
-        ParticleSystem.Play();
+        _hitTrail.SetActive(true);
+        // _hitParticles.Play();0
     }
 
     public void StopTrail() {
-        ParticleSystem.Stop();
+        _hitTrail.SetActive(false);
+        // _hitParticles.Stop();
     }
 }

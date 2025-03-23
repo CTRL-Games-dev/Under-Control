@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviour
     public CinemachineCamera PlayerTopDownCamera;
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
+    public float LightAttackSpeed = 1f;
+    public float HeavyAttackSpeed = 1f;
 
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
@@ -63,6 +65,7 @@ public class PlayerController : MonoBehaviour
     private bool _isAttacking = false;
     private bool _lockRotation = false;
     private bool _isDodging = false;
+    private bool _canRotateOnClick = false;
 
     [Header("Events")]
     public UnityEvent InventoryToggleEvent;
@@ -80,6 +83,8 @@ public class PlayerController : MonoBehaviour
     private readonly int _lightAttackHash = Animator.StringToHash("attack_light");
     private readonly int _heavyAttackHash = Animator.StringToHash("attack_heavy");
     private readonly int _weaponTypeHash = Animator.StringToHash("weapon_type");
+    private readonly int _lightAttackSpeedHash = Animator.StringToHash("attack_light_speed");
+    private readonly int _heavyAttackSpeedHash = Animator.StringToHash("attack_heavy_speed");
 
     // References
     public CharacterController CharacterController { get; private set; }
@@ -126,6 +131,8 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         Animator.SetFloat(_speedHash, _currentSpeed / _maxSprintingSpeed);
+        Animator.SetFloat(_lightAttackSpeedHash, LightAttackSpeed);
+        Animator.SetFloat(_heavyAttackSpeedHash, HeavyAttackSpeed);
     }
 
     private void handleRotation() {
@@ -210,13 +217,8 @@ public class PlayerController : MonoBehaviour
 
     void OnDodge() {
         if (_isAttacking || InputDisabled || _isDodging) return; 
+        transform.DORotateQuaternion(Quaternion.Euler(0, 45, 0) * Quaternion.LookRotation(new Vector3(_movementInputVector.x, 0, _movementInputVector.y)), 0.05f).SetEase(Ease.OutSine);
         Animator.SetTrigger(_dodgeHash);
-        DamageDisabled = true;
-        Invoke(nameof(enavleDamage), 1f);
-    }
-
-    private void enavleDamage() {
-        DamageDisabled = false;
     }
 
     private void handleInteraction() {
@@ -240,23 +242,23 @@ public class PlayerController : MonoBehaviour
 
         // Default to attacking if no interaction was commited
         if(_isAttacking) return;
+            
+        if (_canRotateOnClick) {
+            Vector2 dir = new Vector2(Input.mousePosition.x - Screen.width / 2, Input.mousePosition.y - Screen.height / 2).normalized;
+            Quaternion targetRotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.y)) * Quaternion.Euler(0, 45, 0);
+            transform.DORotateQuaternion(targetRotation, 0.05f).SetEase(Ease.OutSine);
+        } 
 
-        Ray ray = UICanvas.Instance.MainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit)) {
-            Vector3 targetPosition = hit.point;
-            targetPosition.y = transform.position.y;
-            transform.LookAt(targetPosition);
-
-            _lockRotation = true;
-            switch(interactionType) {
-                case InteractionType.Primary:
-                    performLightAttack();
-                    break;
-                case InteractionType.Secondary:
-                    performHeavyAttack();
-                    break;
-            };
-        }
+        _lockRotation = true;
+        switch(interactionType) {
+            case InteractionType.Primary:
+                performLightAttack();
+                break;
+            case InteractionType.Secondary:
+                performHeavyAttack();
+                break;
+        };
+        
 
     }
 
@@ -283,10 +285,12 @@ public class PlayerController : MonoBehaviour
     }
 
     private void performLightAttack() {
+        Animator.SetBool(_heavyAttackHash, false);
         Animator.SetTrigger(_lightAttackHash);
     }
 
     private void performHeavyAttack() {
+        Animator.SetBool(_lightAttackHash, false);
         Animator.SetTrigger(_heavyAttackHash);
     }
 
@@ -297,7 +301,6 @@ public class PlayerController : MonoBehaviour
 
     // calluje sie z animacji jesli dodane jest AttackAnimationBehaviour w animatorze
     public void OnAttackAnimationStart() {
-        _lockRotation = true;
         _isAttacking = true;
         WeaponHolder.BeginAttack();
     }
@@ -305,22 +308,35 @@ public class PlayerController : MonoBehaviour
     public void OnAttackAnimationEnd() {
         WeaponHolder.EndAttack();
         _isAttacking = false;
-        _lockRotation = false;
     }
 
     public void OnDodgeAnimationStart() {
         _isDodging = true;
+        Animator.SetBool(_lightAttackHash, false);
+        Animator.SetBool(_heavyAttackHash, false);
+        DamageDisabled = true;
     }
 
     public void OnDodgeAnimationEnd() {
         _isDodging = false;
+        DamageDisabled = true;
     }
 
-    public void OnComboWindowAnimationStart() {
-        Debug.Log("Combo window start");
+    public void OnLockRotationAnimationStart() {
+        _lockRotation = true;
     }
 
-    public void OnComboWindowAnimationEnd() {
-        Debug.Log("Combo window end");
+    public void OnUnLockRotationAnimationStart() {
+        _lockRotation = false;
+        _canRotateOnClick = true;
     }
+
+    public void OnLockRotationOnClickAnimationStart() {
+        _canRotateOnClick = false;
+    }
+
+    public void OnUnLockRotationOnClickAnimationStart() {
+        _canRotateOnClick = true;
+    }
+
 }
