@@ -6,7 +6,7 @@ public class UnLockRotationOnClickAnimationBehavior : StateMachineBehaviour
 
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-      animator.SendMessage("OnUnLockRotationOnClickAnimationStart");
+      animator.SendMessage("OnUnLockRotationOnClickAnimationEnter");
     }
 
 

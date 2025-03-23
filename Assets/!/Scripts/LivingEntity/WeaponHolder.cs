@@ -42,13 +42,25 @@ public class WeaponHolder : MonoBehaviour
     public void BeginAttack() {
         if(_currentWeaponHitter == null) return;
         _hitEntities.Clear();
-        _currentWeaponHitter.EnableHitbox();
+        _currentWeaponHitter.StartMinorTrail();
     }
 
     public void EndAttack() {
         if(_currentWeaponHitter == null) return;
-        _currentWeaponHitter.DisableHitbox();
         _hitEntities.Clear();
+        _currentWeaponHitter.StopMinorTrail();
+    }
+
+    public void EnableHitbox() {
+        if(_currentWeaponHitter == null) return;
+        _currentWeaponHitter.EnableHitbox();
+        _currentWeaponHitter.StartMajorTrail();
+    }
+
+    public void DisableHitbox() {
+        if(_currentWeaponHitter == null) return;
+        _currentWeaponHitter.DisableHitbox();
+        _currentWeaponHitter.StopMajorTrail();
     }
 
     public void OnHit(LivingEntity victim) {
