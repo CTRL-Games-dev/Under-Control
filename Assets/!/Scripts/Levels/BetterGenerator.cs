@@ -1,21 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Splines;
 
 public enum TileType
 {
     Wall,
     Empty,
     Path,
-}
-
-public struct PathData
-{
-    public Vector2 Point1, Point2;
-    public Quaternion Rotation;
-    public int Thickness;
 }
 
 public struct Point // Aka vertex
@@ -40,6 +33,13 @@ public struct Point // Aka vertex
     {
         return(a.Position != b.Position);
     }
+}
+
+public struct PathData
+{
+    public Vector2 Point1, Point2;
+    public Quaternion Rotation;
+    public int Thickness;
 }
 
 public struct WorldData
@@ -101,72 +101,65 @@ public class BetterGenerator : MonoBehaviour
         int gridWidth;
         int gridHeight;
 
-        while(true)
+        switch(type) 
         {
-            switch(type) 
+            case Dimension.FOREST: {
+                PlaceLocationsForest();
+            } break;
+            // case Dimension.FOREST_BOSS: {
+            //     PlaceLocationsForestBoss();
+            // } break;
+        }
+
+        // All locations
+        int minX = 0, minY = 0, maxX = 0, maxY = 0;
+        foreach(var l in wd.Locations)
+        {
+            Vector2 gridCorner = l.GetAbsoluteCorner();
+            if (gridCorner.x < minX) minX = (int)gridCorner.x;
+            if (gridCorner.y < minY) minY = (int)gridCorner.y;
+            if (gridCorner.x + l.GetWidth() > maxX) maxX = (int)(gridCorner.x + l.GetWidth());
+            if (gridCorner.y + l.GetHeight() > maxY) maxY = (int)(gridCorner.y + l.GetHeight());
+
+            Debug.Log($"Spawned location {l.Name} at {l.GetAbsoluteCenter().x}x, {l.GetAbsoluteCenter().y}");
+        }
+
+        // Grid is used to determine where to spawn trees
+        gridWidth = (int)Vector2.Distance(new(minX,0), new(maxX,0)) + (gridPadding*2);
+        gridHeight = (int)Vector2.Distance(new(minY,0), new(maxY,0)) + (gridPadding*2);
+        // int gridHeight = (int)Vector2.Distance(new(0,minY), new(0,maxY));
+        
+        grid = new TileType[gridWidth + (gridPadding), gridHeight + (gridPadding)];
+
+
+        // Since coordinates can be negative and we use an array
+        // we need to have some kind of an offset to index this array
+        Vector2 offset = new(minX-gridPadding, minY-gridPadding);
+
+        // Set world data
+        wd.Offset = offset;
+        wd.Scale = 9;
+        wd.Width = gridWidth;
+        wd.Height = gridHeight;
+        wd.Grid = grid;
+        wd.GridUsed = new bool[gridWidth + (gridPadding), gridHeight + (gridPadding)];
+
+        DigOutPaths(wd.Locations, grid);
+
+        foreach(var l in wd.Locations)
+        {
+            // Remove trees
+            for (int ix = 0; ix < l.GetWidth(); ix++)
             {
-                case Dimension.FOREST: {
-                    PlaceLocationsForest();
-                } break;
-                case Dimension.FOREST_BOSS: {
-                    PlaceLocationsForestBoss();
-                } break;
-            }
-
-            // All locations
-            int minX = 0, minY = 0, maxX = 0, maxY = 0;
-            foreach(var l in wd.Locations)
-            {
-                if (l.TilePosX < minX) minX = l.TilePosX;
-                if (l.TilePosY < minY) minY = l.TilePosY;
-                if (l.TilePosX+l.TileWidth > maxX) maxX = l.TilePosX+l.TileWidth;
-                if (l.TilePosY+l.TileHeight > maxY) maxY = l.TilePosY+l.TileHeight;
-
-                Debug.Log($"Spawned location {l.Name} at {l.TilePosY}x, {l.TilePosY}");
-            }
-
-            // Grid is used to determine where to spawn trees
-            gridWidth = (int)Vector2.Distance(new(minX,0), new(maxX,0)) + (gridPadding*2);
-            gridHeight = (int)Vector2.Distance(new(minY,0), new(maxY,0)) + (gridPadding*2);
-            // int gridHeight = (int)Vector2.Distance(new(0,minY), new(0,maxY));
-            
-            grid = new TileType[gridWidth + (gridPadding), gridHeight + (gridPadding)];
-
-
-            // Since coordinates can be negative and we use an array
-            // we need to have some kind of an offset to index this array
-            Vector2 offset = new(minX-gridPadding, minY-gridPadding);
-
-            // Set world data
-            wd.Offset = offset;
-            wd.Scale = 9;
-            wd.Width = gridWidth;
-            wd.Height = gridHeight;
-            wd.Grid = grid;
-            wd.GridUsed = new bool[gridWidth + (gridPadding), gridHeight + (gridPadding)];
-
-            if(!DigOutPaths(wd.Locations, grid))
-            {
-                wd.Locations.Clear();
-                continue;
-            }
-
-            foreach(var l in wd.Locations)
-            {
-                // Remove trees
-                for (int ix = 0; ix < l.TileWidth; ix++)
+                for (int iy = 0; iy < l.GetHeight(); iy++)
                 {
-                    for (int iy = 0; iy < l.TileHeight; iy++)
-                    {
-                        int indexX = (int)(ix + l.TilePosX - offset.x);
-                        int indexY = (int)(iy + l.TilePosY - offset.y);
-                        wd.Grid[indexX, indexY] = TileType.Empty;
-                        wd.GridUsed[indexX, indexY] = true;
-                    }
+                    int indexX = (int)(ix + l.GetTileGridCorner(offset).x);
+                    int indexY = (int)(iy + l.GetTileGridCorner(offset).y);
+                    wd.Grid[indexX, indexY] = TileType.Empty;
+                    wd.GridUsed[indexX, indexY] = true;
                 }
-                l.GenerateLocation(TerrainHolder, wd);
             }
-            break;
+            l.GenerateLocation(TerrainHolder, wd);
         }
 
         GameObject[] tiles = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestTiles");
@@ -177,8 +170,10 @@ public class BetterGenerator : MonoBehaviour
             {
                 int margin = 5;
 
-                int xStart = l.TilePosX - (int)(wd.Offset.x) - margin;
-                int yStart = l.TilePosY - (int)(wd.Offset.y) - margin;
+                Vector2 locationPos = l.GetTileGridCorner(wd.Offset);
+
+                int xStart = (int)(locationPos.x - margin);
+                int yStart = (int)(locationPos.y - margin);
 
                 Debug.Log($"xStart = {xStart}, yStart = {yStart} ");
 
@@ -188,8 +183,8 @@ public class BetterGenerator : MonoBehaviour
                 yStart = yStart < 0 ? 0 : yStart;
                 yStart = yStart > wd.Height ? wd.Height : yStart;
 
-                int xEnd = xStart + l.TileWidth + 2 * margin;
-                int yEnd = yStart + l.TileHeight + 2 * margin;
+                int xEnd = xStart + l.GetWidth() + 2 * margin;
+                int yEnd = yStart + l.GetHeight() + 2 * margin;
 
                 Debug.Log($"xEnd = {xEnd}, yEnd = {yEnd} ");
 
@@ -271,11 +266,50 @@ public class BetterGenerator : MonoBehaviour
 
     #region Placing Locations
 
+    private bool findSpot(Location location, int minRange, int maxRange)
+    {
+        int indexX = UnityEngine.Random.Range(minRange, maxRange + 1);
+        int indexY = UnityEngine.Random.Range(minRange, maxRange + 1);
+
+        indexX *= UnityEngine.Random.Range(0, 2) == 0 ? 1 : -1;
+        indexY *= UnityEngine.Random.Range(0, 2) == 0 ? 1 : -1;
+
+        Vector2[] directions = { new(-1, 0), new(1, 0), new(0, -1), new(0, 1)};
+
+        List<Vector2> queue = new(){ new(indexX, indexY) };
+        List<Vector2> visited = new(){ new(indexX, indexY) };
+
+        while(queue.Count > 0)
+        {
+            Vector2 current = queue[0];
+            queue.RemoveAt(0);
+
+            location.LocationRectangle.SetCenter(current);
+            
+            Area[] rectangles = wd.Locations.Select(l => l.LocationRectangle).ToArray();
+            if(location.LocationRectangle.IsOverlapping(rectangles)) {
+                return true;
+            }
+
+            // If location is not suitable
+            foreach(Vector2 d in directions)
+            {
+                Vector2 newPos = current + d;
+                if(newPos.x < minRange || newPos.x > maxRange || newPos.y < minRange || newPos.y > maxRange)
+                    continue;
+                queue.Add(newPos);
+            }
+        }
+
+        // If it got here, this means no free space was found
+        return false;
+    }
+
     private void PlaceLocationsForest()
     {
         // Place portal
         Location portal = new ForestPortal(true);
-        portal.SetTileCenter(new(0,0)); // Set it to center
+        portal.LocationRectangle.SetCenter(new(0,0)); // Set it to center
         wd.Locations.Add(portal);
 
         // Medow 
@@ -283,47 +317,26 @@ public class BetterGenerator : MonoBehaviour
         for(int i = 0; i < mCount; i++)
         {
             Location medow = new Medow();
-
-            int minRange = 8;
-            int maxRange = 20;
-            
-            int indexX = UnityEngine.Random.Range(minRange, maxRange + 1);
-            int indexY = UnityEngine.Random.Range(minRange, maxRange + 1);
-
-            indexX *= UnityEngine.Random.Range(0, 2) == 0 ? 1 : -1;
-            indexY *= UnityEngine.Random.Range(0, 2) == 0 ? 1 : -1;
-
-            bool flag = false;
-            for(int t = 0; t < 20; t++)
-            {
-                medow.SetTileCenter(new(indexX, indexY));
-                if(medow.CheckLocation(wd.Locations)) {
-                    flag = true;
-                    Debug.Log("Found location");
-                    break;
-                };
-            }
-
-            if(flag) 
+            if(findSpot(medow, 5, 20)) 
             {
                 wd.Locations.Add(medow);
             }
-            else Debug.Log("Didnt found location!");
+            else Debug.LogError($"Cannot find place for location: {medow.Name}");
         }
     }
 
-    private void PlaceLocationsForestBoss()
-    {
-        // Place portal
-        Location portal = new ForestPortal(false);
-        portal.SetTileCenter(new(0,0)); // Set it to center
-        wd.Locations.Add(portal);
+    // private void PlaceLocationsForestBoss()
+    // {
+    //     // Place portal
+    //     Location portal = new ForestPortal(false);
+    //     portal.SetTileCenter(new(0,0)); // Set it to center
+    //     wd.Locations.Add(portal);
 
 
-        Location arena = new ForestBossArena();
-        arena.SetTileCenter(new(3,3)); // Set it to center
-        wd.Locations.Add(arena);
-    }
+    //     Location arena = new ForestBossArena();
+    //     arena.SetTileCenter(new(3,3)); // Set it to center
+    //     wd.Locations.Add(arena);
+    // }
 
     #endregion
 
@@ -410,7 +423,7 @@ public class BetterGenerator : MonoBehaviour
             // Triangulate each vertex (magic)
             foreach (var location in locations)
             {
-                Point vertex = new(location.GetTileCenterWithoutOffset(), location);
+                Point vertex = new(location.GetAbsoluteCenter(), location);
                 triangles = AddVertex(vertex, triangles);
             }
 
@@ -425,8 +438,8 @@ public class BetterGenerator : MonoBehaviour
         } 
         else
         {
-            Vector2 pos1 = new(locations[0].TilePosX, locations[0].TilePosY);
-            Vector2 pos2 = new(locations[1].TilePosX, locations[1].TilePosY);
+            Vector2 pos1 = new(locations[0].GetAbsoluteCorner().x, locations[0].GetAbsoluteCorner().y);
+            Vector2 pos2 = new(locations[1].GetAbsoluteCorner().x, locations[1].GetAbsoluteCorner().y);
             uniqueEdges .Add(new Edge(new Point(pos1, locations[0]), new Point(pos2, locations[1])));
         }
         
@@ -819,7 +832,7 @@ public class BetterGenerator : MonoBehaviour
             maxX = maxY = -100000000000; // some big number
             foreach(var l in locations)
             {
-                Vector2 vertex = l.GetTileCenterWithoutOffset();
+                Vector2 vertex = l.GetAbsoluteCenter();
                 minX = Math.Min(minX, vertex.x);
                 minY = Math.Min(minX, vertex.y);
                 maxX = Math.Max(maxX, vertex.x);
