@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Animator))]
@@ -33,6 +32,12 @@ public class PlayerController : MonoBehaviour
     public CinemachineCamera PlayerTopDownCamera;
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
+    public float LightAttackSpeed = 1f;
+    public float HeavyAttackSpeed = 1f;
+    public float DashDistance = 2f;
+    public float DashCooldown = 1f;
+    public float DashDuration = 0.2f;
+    [SerializeField] private ParticleSystem[] _trailParticles;
 
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
@@ -62,6 +67,9 @@ public class PlayerController : MonoBehaviour
     }
     private bool _isAttacking = false;
     private bool _lockRotation = false;
+    private bool _canRotateOnClick = false;
+    private bool _canDodge = true;
+
 
     [Header("Events")]
     public UnityEvent InventoryToggleEvent;
@@ -75,12 +83,11 @@ public class PlayerController : MonoBehaviour
     private InteractionType? _queuedInteraction;
 
     private readonly int _speedHash = Animator.StringToHash("speed");
-    private readonly int _dodgeHash = Animator.StringToHash("dodge");
-    private readonly int _lightAttackHash = Animator.StringToHash("light_attack");
-    private readonly int _heavyAttackHash = Animator.StringToHash("heavy_attack");
-    private readonly int _playerAttackLightHash = Animator.StringToHash("player_attack_light");
-    private readonly int _playerAttackHeavyHash = Animator.StringToHash("player_attack_heavy");
+    private readonly int _lightAttackHash = Animator.StringToHash("attack_light");
+    private readonly int _heavyAttackHash = Animator.StringToHash("attack_heavy");
     private readonly int _weaponTypeHash = Animator.StringToHash("weapon_type");
+    private readonly int _lightAttackSpeedHash = Animator.StringToHash("attack_light_speed");
+    private readonly int _heavyAttackSpeedHash = Animator.StringToHash("attack_heavy_speed");
 
     // References
     public CharacterController CharacterController { get; private set; }
@@ -127,6 +134,8 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         Animator.SetFloat(_speedHash, _currentSpeed / _maxSprintingSpeed);
+        Animator.SetFloat(_lightAttackSpeedHash, LightAttackSpeed);
+        Animator.SetFloat(_heavyAttackSpeedHash, HeavyAttackSpeed);
     }
 
     private void handleRotation() {
@@ -210,14 +219,42 @@ public class PlayerController : MonoBehaviour
     }
 
     void OnDodge() {
-        if (_isAttacking || InputDisabled) return; 
-        Animator.SetTrigger(_dodgeHash);
+        if (_isAttacking || InputDisabled) return;
+        
+        if (!_canDodge) {
+            Debug.Log("Can't dodge yet");
+            return;
+        }
+
+        _canDodge = false;
+        Invoke(nameof(enableDodging), DashCooldown);
+        _lockRotation = true;
         DamageDisabled = true;
-        Invoke(nameof(enavleDamage), 1f);
+
+        if (_movementInputVector.magnitude > 0.1f)
+            transform.rotation = Quaternion.Euler(0, 45, 0) * Quaternion.LookRotation(new Vector3(_movementInputVector.x, 0, _movementInputVector.y));
+        
+        Animator.speed = 0;
+        Animator.applyRootMotion = false;
+        Animator.SetBool(_lightAttackHash, false);
+        Animator.SetBool(_heavyAttackHash, false);
+
+
+        foreach (ParticleSystem trail in _trailParticles) { trail.Play(); }
+        transform.DOMove(transform.position + transform.forward * DashDistance, DashDuration).SetEase(Ease.OutQuint).OnComplete(() => {
+            Animator.applyRootMotion = true;
+            Animator.speed = 1;
+            DamageDisabled = false;
+            _lockRotation = false;
+            foreach (ParticleSystem trail in _trailParticles) {
+                trail.Clear();
+                trail.Stop();
+            }
+        });
     }
 
-    private void enavleDamage() {
-        DamageDisabled = false;
+    private void enableDodging() {
+        _canDodge = true;
     }
 
     private void handleInteraction() {
@@ -241,23 +278,23 @@ public class PlayerController : MonoBehaviour
 
         // Default to attacking if no interaction was commited
         if(_isAttacking) return;
+            
+        if (_canRotateOnClick) {
+            Vector2 dir = new Vector2(Input.mousePosition.x - Screen.width / 2, Input.mousePosition.y - Screen.height / 2).normalized;
+            Quaternion targetRotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.y)) * Quaternion.Euler(0, 45, 0);
+            transform.DORotateQuaternion(targetRotation, 0.05f).SetEase(Ease.OutSine);
+        } 
 
-        Ray ray = UICanvas.Instance.MainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit)) {
-            Vector3 targetPosition = hit.point;
-            targetPosition.y = transform.position.y;
-            transform.LookAt(targetPosition);
-
-            _lockRotation = true;
-            switch(interactionType) {
-                case InteractionType.Primary:
-                    performLightAttack();
-                    break;
-                case InteractionType.Secondary:
-                    performHeavyAttack();
-                    break;
-            };
-        }
+        _lockRotation = true;
+        switch(interactionType) {
+            case InteractionType.Primary:
+                performLightAttack();
+                break;
+            case InteractionType.Secondary:
+                performHeavyAttack();
+                break;
+        };
+        
 
     }
 
@@ -284,10 +321,12 @@ public class PlayerController : MonoBehaviour
     }
 
     private void performLightAttack() {
+        Animator.SetBool(_heavyAttackHash, false);
         Animator.SetTrigger(_lightAttackHash);
     }
 
     private void performHeavyAttack() {
+        Animator.SetBool(_lightAttackHash, false);
         Animator.SetTrigger(_heavyAttackHash);
     }
 
@@ -296,16 +335,53 @@ public class PlayerController : MonoBehaviour
         Animator.SetInteger(_weaponTypeHash, (int)CurrentWeapon.WeaponType);
     }
 
+
     // calluje sie z animacji jesli dodane jest AttackAnimationBehaviour w animatorze
-    public void OnAttackAnimationStart() {
-        _lockRotation = true;
+
+    #region Animation Messages
+    public void OnStartAttackAnimationsEnter() {
         _isAttacking = true;
         WeaponHolder.BeginAttack();
     }
 
-    public void OnAttackAnimationEnd() {
+    public void OnEndAttackAnimationsEnter() {
         WeaponHolder.EndAttack();
         _isAttacking = false;
-        _lockRotation = false;
     }
+
+    public void OnDealDamageAnimationEnter() {
+        WeaponHolder.EnableHitbox();
+    }
+
+    public void OnDealDamageAnimationExit() {
+        WeaponHolder.DisableHitbox();
+    }
+
+
+    // public void OnDodgeAnimationStart() {
+    //     _isDodging = true;
+    //     Animator.SetBool(_lightAttackHash, false);
+    //     Animator.SetBool(_heavyAttackHash, false);
+    //     DamageDisabled = true;
+    // }
+
+
+    public void OnLockRotationAnimationEnter() {
+        _lockRotation = true;
+    }
+
+    public void OnUnLockRotationAnimationEnter() {
+        _lockRotation = false;
+        _canRotateOnClick = true;
+    }
+
+    public void OnLockRotationOnClickAnimationEnter() {
+        _canRotateOnClick = false;
+    }
+
+    public void OnUnLockRotationOnClickAnimationEnter() {
+        _canRotateOnClick = true;
+    }
+
+    #endregion
 }

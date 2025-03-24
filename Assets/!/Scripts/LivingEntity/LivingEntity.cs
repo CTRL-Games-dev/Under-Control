@@ -90,6 +90,9 @@ public class LivingEntity : MonoBehaviour
         if (gameObject.CompareTag("Boar")) {
             gameObject.GetComponent<Animator>()?.SetTrigger(_hurtHash);
         }
+        if (gameObject.GetComponent<Rigidbody>() != null) {
+            gameObject.GetComponent<Rigidbody>().AddForce(-transform.forward * 10, ForceMode.Impulse);
+        }
 
         gameObject.GetComponent<HitFlashAnimator>()?.Flash();
         _lastDamageTime = Time.time;

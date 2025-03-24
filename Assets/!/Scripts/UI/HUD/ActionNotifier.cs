@@ -11,6 +11,7 @@ public class ActionNotifier : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _amountText;
     private RectTransform _rectTransform;
     private CanvasGroup _canvasGroup;
+    private float _goalY = 0;
 
 
     private void Awake() {
@@ -31,7 +32,13 @@ public class ActionNotifier : MonoBehaviour
                 parent.TryClearChildren(this);
             });
         });
+    }
 
+    public void MoveUp() {
+        _rectTransform.DOAnchorPosY(_goalY, 0).OnComplete(() => {
+            _goalY += 70;
+            _rectTransform.DOAnchorPosY(_goalY, 0.2f).SetEase(Ease.OutSine);
+        });
     }
 
     public void Destroy() {
