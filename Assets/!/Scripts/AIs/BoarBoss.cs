@@ -23,14 +23,14 @@ public class BoarBoss : MonoBehaviour
 
         WorldData wd = _generator.wd;
         ForestBossArena location = _generator.Getlocation<ForestBossArena>();
-        Vector2 corner = location.GetAbsoluteCorner(wd.Offset, wd.Scale);
+        Vector2 corner = location.GetWorldCorner(wd.Offset, wd.Scale);
     
         if
         (!(
             pos.x > corner.x ||
-            pos.x < corner.x + (location.TileWidth * wd.Scale) ||
+            pos.x < corner.x + (location.GetWidth() * wd.Scale) ||
             pos.y > corner.y ||
-            pos.y < corner.y + (location.TileHeight * wd.Scale)
+            pos.y < corner.y + (location.GetHeight() * wd.Scale)
         ))
         {
             Debug.Log($"Cannot spawn boars, to little space {corner}");

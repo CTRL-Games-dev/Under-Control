@@ -175,7 +175,7 @@ public class BetterGenerator : MonoBehaviour
                 int xStart = (int)(locationPos.x - margin);
                 int yStart = (int)(locationPos.y - margin);
 
-                Debug.Log($"xStart = {xStart}, yStart = {yStart} ");
+                // Debug.Log($"xStart = {xStart}, yStart = {yStart} ");
 
                 xStart = xStart < 0 ? 0 : xStart;
                 xStart = xStart > wd.Width ? wd.Width : xStart;
@@ -186,7 +186,7 @@ public class BetterGenerator : MonoBehaviour
                 int xEnd = xStart + l.GetWidth() + 2 * margin;
                 int yEnd = yStart + l.GetHeight() + 2 * margin;
 
-                Debug.Log($"xEnd = {xEnd}, yEnd = {yEnd} ");
+                // Debug.Log($"xEnd = {xEnd}, yEnd = {yEnd} ");
 
                 xEnd = xEnd < 0 ? 0 : xEnd;
                 xEnd = xEnd > wd.Width ? wd.Width : xEnd;
@@ -195,8 +195,8 @@ public class BetterGenerator : MonoBehaviour
                 yEnd = yEnd > wd.Height ? wd.Height : yEnd;
 
 
-                Debug.Log($"New xStart = {xStart}, yStart = {yStart} ");
-                Debug.Log($"New xEnd = {xEnd}, yEnd = {yEnd} ");
+                // Debug.Log($"New xStart = {xStart}, yStart = {yStart} ");
+                // Debug.Log($"New xEnd = {xEnd}, yEnd = {yEnd} ");
 
                 for(int x = xStart; x < xEnd; x++)
                 {
@@ -287,7 +287,7 @@ public class BetterGenerator : MonoBehaviour
             location.LocationRectangle.SetCenter(current);
             
             Area[] rectangles = wd.Locations.Select(l => l.LocationRectangle).ToArray();
-            if(location.LocationRectangle.IsOverlapping(rectangles)) {
+            if(!location.LocationRectangle.IsOverlapping(rectangles)) {
                 return true;
             }
 
@@ -507,17 +507,17 @@ public class BetterGenerator : MonoBehaviour
         int num = 0;
         foreach(var line in uniqueEdges.Where(e => e.Used))
         {
-            Debug.Log("=== LINE " + num + " ===");
+            // Debug.Log("=== LINE " + num + " ===");
 
-            Debug.Log("First point " + line.v0.Position);
-            Debug.Log("Second point " + line.v1.Position);
+            // Debug.Log("First point " + line.v0.Position);
+            // Debug.Log("Second point " + line.v1.Position);
 
             num++;
             Point point1 = line.v0.Position.x < line.v1.Position.x ? line.v0 : line.v1;
             Point point2 = line.v0.Position.x > line.v1.Position.x ? line.v0 : line.v1;
 
-            Debug.Log("First point " + point1.Position);
-            Debug.Log("Second point " + point2.Position);
+            // Debug.Log("First point " + point1.Position);
+            // Debug.Log("Second point " + point2.Position);
 
             float a = (point2.Position.y - point1.Position.y)/(point2.Position.x - point1.Position.x);
             // y = ax + b ----> b = y - ax

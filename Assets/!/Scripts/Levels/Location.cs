@@ -119,6 +119,14 @@ public abstract class Location
     {
         return LocationRectangle.TopLeftCorner - offset;
     }
+    public Vector2 GetWorldCenter(Vector2 offset, float scale)
+    {
+        return GetTileGridCenter(offset) * scale;
+    }
+    public Vector2 GetWorldCorner(Vector2 offset, float scale)
+    {
+        return GetTileGridCorner(offset) * scale;
+    }
     public Vector2 GetAbsoluteCenter()
     {
         return LocationRectangle.GetCenter();
@@ -263,24 +271,23 @@ public class Medow : Location
     }
 }
 
-// public class ForestBossArena : Location
-// {
-//     public ForestBossArena()
-//     {
-//         Name = "Forest Boss Arena";
+public class ForestBossArena : Location
+{
+    public ForestBossArena()
+    {
+        Name = "Forest Boss Arena";
         
-//         TileWidth = 11;
-//         TileHeight = 11;
-//     }
+        LocationRectangle = new(new(11, 11));
+    }
 
-//     public override void GenerateLocation(GameObject parent, WorldData worldData)
-//     {
-//         GameObject boar = Resources.Load<GameObject>("Prefabs/Forest/Enemies/Boss");
-//         Vector2 center = GetTileGridCenter(worldData.Offset);
+    public override void GenerateLocation(GameObject parent, WorldData worldData)
+    {
+        GameObject boar = Resources.Load<GameObject>("Prefabs/Forest/Enemies/Boss");
+        Vector2 center = GetTileGridCenter(worldData.Offset);
 
-//         GameObject boarInstance = GameObject.Instantiate(boar, new Vector3(center.x, 0.2f, center.y) * worldData.Scale, Quaternion.identity);
+        GameObject boarInstance = GameObject.Instantiate(boar, new Vector3(center.x, 0.2f, center.y) * worldData.Scale, Quaternion.identity);
    
-//         LivingEntity boarLivingEntity = boarInstance.GetComponent<LivingEntity>();
-//         boarLivingEntity.OnDeath.AddListener(() => UICanvas.Instance.OpenVideoPlayer());
-//     }
-// }
+        LivingEntity boarLivingEntity = boarInstance.GetComponent<LivingEntity>();
+        boarLivingEntity.OnDeath.AddListener(() => UICanvas.Instance.OpenVideoPlayer());
+    }
+}
