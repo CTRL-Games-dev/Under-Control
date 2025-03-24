@@ -279,6 +279,8 @@ public class BetterGenerator : MonoBehaviour
         List<Vector2> queue = new(){ new(indexX, indexY) };
         List<Vector2> visited = new(){ new(indexX, indexY) };
 
+        Area[] rectangles = wd.Locations.Select(l => l.LocationRectangle).ToArray();
+
         while(queue.Count > 0)
         {
             Vector2 current = queue[0];
@@ -286,7 +288,6 @@ public class BetterGenerator : MonoBehaviour
 
             location.LocationRectangle.SetCenter(current);
             
-            Area[] rectangles = wd.Locations.Select(l => l.LocationRectangle).ToArray();
             if(!location.LocationRectangle.IsOverlapping(rectangles)) {
                 return true;
             }

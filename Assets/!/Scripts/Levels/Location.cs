@@ -56,7 +56,7 @@ public struct Area
         float minDiffX = (Dimensions.x/2) + (other.Dimensions.x/2);
         float minDiffY = (Dimensions.y/2) + (other.Dimensions.y/2);
 
-        return diffX < minDiffX || diffY < minDiffY;
+        return diffX < minDiffX && diffY < minDiffY;
     }
 
     public bool IsOverlapping(Area[] others)
@@ -68,13 +68,19 @@ public struct Area
             Vector2 center = GetCenter();
             Vector2 centerOther = other.GetCenter();
 
+            float halfWidth = Dimensions.x / 2;
+            float halfHeight = Dimensions.y / 2;
+
+            float halfWidthOther = other.Dimensions.x / 2;
+            float halfHeightOther = other.Dimensions.y / 2;
+
             float diffX = Math.Abs(center.x - centerOther.x);
             float diffY = Math.Abs(center.y - centerOther.y);
 
             float minDiffX = (Dimensions.x/2) + (other.Dimensions.x/2);
             float minDiffY = (Dimensions.y/2) + (other.Dimensions.y/2);
 
-            if(diffX < minDiffX || diffY < minDiffY) return true;
+            if(diffX < halfWidth + halfWidthOther && diffY < halfHeight + halfHeightOther) return true;
         }
         return false;
     }

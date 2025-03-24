@@ -24,9 +24,9 @@ public class AdventureManager : MonoBehaviour, ILevelManager
         
         ForestPortal portal = generator.Getlocation<ForestPortal>();
 
-        Vector2 spawn = portal.GetWorldCorner(generator.wd.Offset, generator.wd.Scale);
+        Vector2 spawn = portal.GetWorldCenter(generator.wd.Offset, generator.wd.Scale);
 
-        Instantiate(_player, new(spawn.x, 0.2f, spawn.y - 1f), Quaternion.identity);
+        Instantiate(_player, new(spawn.x, 0.2f, spawn.y - 2f), Quaternion.identity);
 
         _cameraManager.SwitchCamera(UICanvas.Instance.PlayerController.PlayerTopDownCamera);
 
