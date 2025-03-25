@@ -150,7 +150,7 @@ public class PlayerController : MonoBehaviour
     }
 
     private void onDeath() {
-        UICanvas.Instance.OpenUIState(UIState.DeathScreen);
+        Player.UICanvas.ChangeUITopState(UITopState.Death);
     }
 
     // Input events
@@ -270,7 +270,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if(UICanvas.Instance.CurrentUIState != UIState.NotVisible) return;
+        if(Player.UICanvas.CurrentUIMiddleState != UIMiddleState.NotVisible || Player.UICanvas.CurrentUITopState != UITopState.NotVisible) return;
 
         bool interacted = tryInteract(interactionType);
         
@@ -299,7 +299,7 @@ public class PlayerController : MonoBehaviour
     }
 
     private bool tryInteract(InteractionType interactionType) {
-        Ray ray = UICanvas.Instance.MainCamera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = Player.UICanvas.MainCamera.ScreenPointToRay(Input.mousePosition);
         if (!Physics.Raycast(ray, out RaycastHit hit)) {
             return false;
         }

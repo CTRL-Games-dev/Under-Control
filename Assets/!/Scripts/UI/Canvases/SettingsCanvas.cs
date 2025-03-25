@@ -3,7 +3,7 @@ using DG.Tweening;
 using UnityEngine.UI;
 using System.Collections;
 
-public class SettingsScreen : MonoBehaviour
+public class SettingsCanvas : MonoBehaviour
 {
     private enum SettingsState {
         Audio,
@@ -85,7 +85,7 @@ public class SettingsScreen : MonoBehaviour
 #endregion
 #region Public Methods
 
-    public void OpenSettings() {
+    public void ShowUI() {
         float fadeSpeed = 0.2f;
         float moveSpeed = 0.4f;
         Ease ease = Ease.OutBack;
@@ -119,7 +119,7 @@ public class SettingsScreen : MonoBehaviour
         });
     }
 
-    public void CloseSettings() {
+    public void HideUI() {
         killTweens();
         _canvasGroup.DOFade(0, 0.8f).SetUpdate(true).OnComplete(() => {
             resetBtnAlphas();
@@ -187,7 +187,7 @@ public class SettingsScreen : MonoBehaviour
     }
 
     public void OnBackBtnClick() {
-        UICanvas.Instance.CloseSettingsScreen();
+        Player.UICanvas.ChangeUITopState(UITopState.NotVisible);
     }
 
     public void OnPointerEnter(GameObject button) {

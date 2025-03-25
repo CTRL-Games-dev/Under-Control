@@ -28,7 +28,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
 
         Instantiate(_player, new(spawn.x, 0.2f, spawn.y - 3f), Quaternion.identity);
 
-        _cameraManager.SwitchCamera(UICanvas.Instance.PlayerController.PlayerTopDownCamera);
+        _cameraManager.SwitchCamera(Player.PlayerController.PlayerTopDownCamera);
 
         _navMeshSurface.BuildNavMesh();
     }

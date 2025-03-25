@@ -71,7 +71,7 @@ public class ItemEntity : MonoBehaviour, IInteractable
             return;
         }
 
-        UICanvas.Instance.PickupItemNotify(ItemData, Amount);
+        Player.UICanvas.PickupItemNotify(ItemData, Amount);
         EventBus.InventoryItemChangedEvent?.Invoke();
         Destroy(gameObject);
     }

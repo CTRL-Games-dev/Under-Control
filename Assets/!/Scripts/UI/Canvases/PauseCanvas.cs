@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections;
 
-public class PauseScreen : MonoBehaviour
+public class PauseCanvas : MonoBehaviour
 {
     [SerializeField] private Image _bgImage;
     [SerializeField] private GameObject _blackBar, _resumeButton, _saveButton, _loadButton, _optionsButton, _exitButton;
@@ -36,7 +36,7 @@ public class PauseScreen : MonoBehaviour
     }
 
     #region Public Methods
-    public void ShowPauseMenu() {
+    public void ShowUI() {
         float fadeSpeed = 0.2f;
         float moveSpeed = 0.4f;
         
@@ -67,7 +67,7 @@ public class PauseScreen : MonoBehaviour
         });
     }
 
-    public Tween HidePauseMenu() {
+    public Tween HideUI() {
         gameObject.SetActive(true);
         StopCoroutine(slowdownTime());
         StartCoroutine(speedupTime());
@@ -140,8 +140,7 @@ public class PauseScreen : MonoBehaviour
 #endregion
 #region Button Clicks
     public void OnResumeBtnClick() {
-        UICanvas.Instance.CloseUIState(UIState.PauseScreen);
-        UICanvas.Instance.OpenUIState(UIState.NotVisible);
+        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
     }  
 
     public void OnSaveBtnClick() {
@@ -153,12 +152,12 @@ public class PauseScreen : MonoBehaviour
     }
 
     public void OnSettingsBtnClick() {
-        UICanvas.Instance.OpenSettingsScreen();
+        Player.UICanvas.ChangeUITopState(UITopState.Settings);
     }
 
     public void OnExitBtnClick() {
-        HidePauseMenu().OnComplete(() => {
-            UICanvas.Instance.OpenUIState(UIState.MainMenu);
+        HideUI().OnComplete(() => {
+            Player.UICanvas.ChangeUIMiddleState(UIMiddleState.MainMenu);
         });
     }
 

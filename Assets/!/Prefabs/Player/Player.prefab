@@ -6783,6 +6783,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 144433619801425869}
+  - component: {fileID: 862517588485659023}
   - component: {fileID: 6116184372583243191}
   - component: {fileID: 1065449432897141361}
   - component: {fileID: 2932634121617026090}
@@ -6820,6 +6821,20 @@ Transform:
   - {fileID: 1680530961393609627}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 88.199, z: 0}
+--- !u!114 &862517588485659023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669612683939749239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 000f6496e0e46f14086da8138cfa8f61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _uiCanvas: {fileID: 3006076035978592924}
+  _topDownCamera: {fileID: 1842100701194989401}
 --- !u!95 &6116184372583243191
 Animator:
   serializedVersion: 7
@@ -28634,7 +28649,7 @@ GameObject:
   - component: {fileID: 5941706819646656640}
   - component: {fileID: 7395559262214055753}
   m_Layer: 6
-  m_Name: --- InventoryTab ---
+  m_Name: --- Inventory Canvas ---
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28711,6 +28726,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9575766d1cc5ba243a5913fe03ec2995, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _otherInventoryHolder: {fileID: 3792339334767032551}
   _underlineRect: {fileID: 114972813073065737}
   _armorBtnTabGO: {fileID: 5863800997523287559}
   _abilitiesBtnTabGO: {fileID: 1265979935100632868}
@@ -43185,7 +43201,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a3f05f1c9aa317d45a776280c5450b4d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 588ac4366e0ae7f41bc339ed681fd95f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -53459,6 +53475,7 @@ GameObject:
   - component: {fileID: 6234377532302884400}
   - component: {fileID: 352315615313285807}
   - component: {fileID: 5137449100525560814}
+  - component: {fileID: 730796343055989421}
   m_Layer: 6
   m_Name: ---- HUD ----
   m_TagString: Untagged
@@ -53562,6 +53579,18 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
+--- !u!114 &730796343055989421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7294371726403986283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0805ec6a7c7be994692d0b74a9e7c3bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7330073963720348697
 GameObject:
   m_ObjectHideFlags: 0
@@ -56468,27 +56497,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17412b75683f1994f88e50f3a7c59c89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentUIState: 0
-  Player: {fileID: 669612683939749239}
+  CurrentUIBottomState: 1
+  CurrentUIMiddleState: 0
+  CurrentUITopState: 0
   MainCamera: {fileID: 469925352793417921}
   IsGamePaused: 0
   PlayerInventoryPanel: {fileID: 284689467940606008}
   ActiveInventoryPanel: {fileID: 0}
   ItemInfoPanel: {fileID: 8625786131296700281}
   SelectedItemUI: {fileID: 6426937909227685031}
-  _HUDCanvasGO: {fileID: 7294371726403986283}
-  _inventoryCanvasGO: {fileID: 2367552731233971060}
-  _alwayOnTopCanvasGO: {fileID: 8137387430319127367}
-  _mainMenuCanvasGO: {fileID: 134009506264848142}
-  _deathScreenCanvasGO: {fileID: 7997247900853851710}
-  _pauseScreenCanvasGO: {fileID: 9026535060080493191}
-  _settingsScreenCanvasGO: {fileID: 4068170101227977391}
-  _otherInventoryHolder: {fileID: 3792339334767032551}
+  _HUDCanvas: {fileID: 730796343055989421}
+  _inventoryCanvas: {fileID: 8009762627218955476}
+  _mainMenuCanvas: {fileID: 2317319173652209890}
+  _deathScreenCanvas: {fileID: 879355441624287258}
+  _pauseCanvas: {fileID: 5709484866977846341}
+  _settingsCanvas: {fileID: 1062370146414261843}
   _navBarRectTransform: {fileID: 4848918840006595570}
   _actionNotifierManager: {fileID: 7395196740846900076}
   IsOtherUIOpen: 0
   _videoPlayer: {fileID: 1208959181034177214}
-  _videoPlayerGO: {fileID: 5153291652525688465}
 --- !u!1 &8661896618484555543
 GameObject:
   m_ObjectHideFlags: 0

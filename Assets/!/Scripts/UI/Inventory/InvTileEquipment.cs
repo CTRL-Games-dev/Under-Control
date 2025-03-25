@@ -16,17 +16,15 @@ public class InvTileEquipment : InvTile {
     [SerializeField] private TileType _tileType;
 
     private RectTransform _rectTransform;
-    private UICanvas _uiCanvas;
     private ItemUI _itemUI;
     
-    private InventoryItem SelectedInventoryItem => _uiCanvas.SelectedItemUI.InventoryItem;
+    private InventoryItem SelectedInventoryItem => Player.UICanvas.SelectedItemUI.InventoryItem;
 
     private void Start() {
         EventBus.TileSizeSetEvent.AddListener(OnTileSizeSetEvent);
         EventBus.ItemUILeftClickEvent.AddListener(OnItemUIClickEvent);
         EventBus.ItemUIRightClickEvent.AddListener(OnItemUIClickEvent);
 
-        _uiCanvas = UICanvas.Instance;
         _rectTransform = GetComponent<RectTransform>();
         // EventBus.InvTileClickEvent.AddListener(OnTileClick);
         OnTileSizeSetEvent();
@@ -40,36 +38,36 @@ public class InvTileEquipment : InvTile {
         // Debug.Log("ItemUIClickEvent");
         // if (itemUI == _itemUI) 
         //     Destroy(_itemUI.gameObject);
-        if (itemUI == null || UICanvas.Instance.SelectedItemUI.InventoryItem != null) return;
+        if (itemUI == null || Player.UICanvas.SelectedItemUI.InventoryItem != null) return;
         
         if (itemUI == _itemUI) {
             switch (_tileType) {
                 case TileType.Helmet:
-                    _uiCanvas.PlayerInventory.Helmet = null;
+                    Player.Inventory.Helmet = null;
                     break;
                 case TileType.Chestplate:
-                    _uiCanvas.PlayerInventory.Chestplate = null;
+                    Player.Inventory.Chestplate = null;
                     break;
                 case TileType.Leggings:
-                    _uiCanvas.PlayerInventory.Leggings = null;
+                    Player.Inventory.Leggings = null;
                     break;
                 case TileType.Boots:
-                    _uiCanvas.PlayerInventory.Boots = null;
+                    Player.Inventory.Boots = null;
                     break;
                 case TileType.Amulet:
-                    _uiCanvas.PlayerInventory.Amulet = null;
+                    Player.Inventory.Amulet = null;
                     break;
                 case TileType.Ring:
-                    _uiCanvas.PlayerInventory.Ring = null;
+                    Player.Inventory.Ring = null;
                     break;
                 case TileType.Weapon:
-                    _uiCanvas.PlayerInventory.Weapon = null;
+                    Player.Inventory.Weapon = null;
                     break;
             }
 
             IsEmpty = true;
             if (_itemUI != null) {
-                UICanvas.Instance.SetSelectedItemUI(_itemUI);
+                Player.UICanvas.SetSelectedItemUI(_itemUI);
                 Destroy(_itemUI.gameObject);
                 _itemUI = null;
             }
@@ -88,43 +86,43 @@ public class InvTileEquipment : InvTile {
                     return;
                 }
 
-                _uiCanvas.PlayerInventory.Helmet = helmetItemData;
+                Player.Inventory.Helmet = helmetItemData;
             } else if (_tileType == TileType.Chestplate) {
                 if (SelectedInventoryItem.ItemData is not ChestplateItemData chestplateItemData) {
                     return;
                 }
 
-                _uiCanvas.PlayerInventory.Chestplate = chestplateItemData;
+                Player.Inventory.Chestplate = chestplateItemData;
             } else if (_tileType == TileType.Leggings) {
                 if (SelectedInventoryItem.ItemData is not LeggingsItemData leggingsItemData) {
                     return;
                 }
 
-                _uiCanvas.PlayerInventory.Leggings = leggingsItemData;
+                Player.Inventory.Leggings = leggingsItemData;
             } else if (_tileType == TileType.Boots) {
                 if (SelectedInventoryItem.ItemData is not BootsItemData bootsItemData) {
                     return;
                 }
 
-                _uiCanvas.PlayerInventory.Boots = bootsItemData;
+                Player.Inventory.Boots = bootsItemData;
             } else if (_tileType == TileType.Ring) {
                 if (SelectedInventoryItem.ItemData is not RingItemData ringItemData) {
                     return;
                 }
 
-                _uiCanvas.PlayerInventory.Ring = ringItemData;
+                Player.Inventory.Ring = ringItemData;
             } else if (_tileType == TileType.Amulet) {
                 if (SelectedInventoryItem.ItemData is not AmuletItemData amuletItemData) {
                     return;
                 }
 
-                _uiCanvas.PlayerInventory.Amulet = amuletItemData;
+                Player.Inventory.Amulet = amuletItemData;
             } else if (_tileType == TileType.Weapon) {
                 if (SelectedInventoryItem.ItemData is not WeaponItemData weaponItemData) {
                     return;
                 }
 
-                _uiCanvas.PlayerInventory.Weapon = weaponItemData;
+                Player.Inventory.Weapon = weaponItemData;
             }
         } catch (System.Exception e) {
             Debug.Log(e);
@@ -135,7 +133,7 @@ public class InvTileEquipment : InvTile {
 
         EventBus.ItemPlacedEvent?.Invoke();
         IsEmpty = false;
-        _uiCanvas.SelectedItemUI.InventoryItem = null;
+        Player.UICanvas.SelectedItemUI.InventoryItem = null;
     }
 
     private GameObject createItemUI(InventoryItem inventoryItem){

@@ -1,9 +1,8 @@
 using DG.Tweening;
-using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MainMenu : MonoBehaviour
+public class MainMenuCanvas : MonoBehaviour
 {
     [SerializeField] private Image _logoImage, _bgImage;
     [SerializeField] private GameObject _continueButton, _newGameButton, _optionsButton, _creditsButton, _exitButton;
@@ -41,7 +40,7 @@ public class MainMenu : MonoBehaviour
         Application.Quit();
     }
 
-    public void OpenMenu() {
+    public void ShowUI() {
         if (HubManager.MainMenuCamera != null) CameraManager.Instance.SwitchCamera(HubManager.MainMenuCamera);
 
         gameObject.SetActive(true);
@@ -52,9 +51,9 @@ public class MainMenu : MonoBehaviour
         });
     }
 
-    public void CloseMenu() {
+    public void HideUI() {
         killTweens();
-        CameraManager.Instance.SwitchCamera(CameraManager.Instance.PlayerTopDownCamera);
+        CameraManager.Instance.SwitchCamera(Player.TopDownCamera);
 
         _canvasGroup.DOFade(0, 1f).OnComplete(() => {
             _bgImage.DOFade(0, 0);
@@ -128,12 +127,12 @@ public class MainMenu : MonoBehaviour
     }
 
     public void OnNewGameBtnClick() {
-        UICanvas.Instance.CloseUIState(UIState.MainMenu);
-        UICanvas.Instance.OpenUIState(UIState.NotVisible); 
+        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
     }
 
     public void OnSettingsBtnClick() {
-        UICanvas.Instance.OpenSettingsScreen();
+        Player.UICanvas.ChangeUITopState(UITopState.Settings);
     }
 
     public void OnCreditsBtnClick() {
