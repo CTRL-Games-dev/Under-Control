@@ -6783,6 +6783,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 144433619801425869}
+  - component: {fileID: 1631082660512880978}
   - component: {fileID: 862517588485659023}
   - component: {fileID: 6116184372583243191}
   - component: {fileID: 1065449432897141361}
@@ -6821,6 +6822,33 @@ Transform:
   - {fileID: 1680530961393609627}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 88.199, z: 0}
+--- !u!114 &1631082660512880978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669612683939749239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 116ee84ade2e2d74bb59f2d207e8514a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxHealth: 100
+  Health: 100
+  MaxMana: 100
+  Mana: 100
+  Armor: 0
+  LightAttackDamage: 10
+  LightAttackSpeed: 1
+  LightAttackRange: 1
+  HeavyAttackDamage: 20
+  HeavyAttackSpeed: 1
+  HeavyAttackRange: 1
+  MovementSpeed: 5
+  DashSpeed: 0.3
+  DashCooldown: 1
+  DashDistance: 2
 --- !u!114 &862517588485659023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6834,7 +6862,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _uiCanvas: {fileID: 3006076035978592924}
-  _topDownCamera: {fileID: 1842100701194989401}
+  TopDownCamera: {fileID: 1842100701194989401}
+  CoinsChangeEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  _coins: 0
 --- !u!95 &6116184372583243191
 Animator:
   serializedVersion: 7
@@ -7048,8 +7080,6 @@ MonoBehaviour:
   _acceleration: 30
   _deceleration: 11
   _currentSpeed: 0
-  _maxWalkingSpeed: 7
-  _maxSprintingSpeed: 14
   _turnSpeed: 1000
   MinCameraDistance: 5
   MaxCameraDistance: 50
@@ -7059,14 +7089,8 @@ MonoBehaviour:
   MainCameraObject: {fileID: 2942579809011625722}
   CinemachineObject: {fileID: 1577044056733285295}
   CameraTargetObject: {fileID: 4902519630981857668}
-  PlayerTopDownCamera: {fileID: 1842100701194989401}
   InputDisabled: 0
   DamageDisabled: 0
-  LightAttackSpeed: 1.5
-  HeavyAttackSpeed: 1.5
-  DashDistance: 3
-  DashCooldown: 0.3
-  DashDuration: 0.3
   _trailParticles:
   - {fileID: 6183109688690110002}
   - {fileID: 5137047182867421199}
@@ -7087,9 +7111,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   ItemRotateEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  CoinsChangeEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &6818052596347534429

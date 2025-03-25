@@ -25,7 +25,7 @@ public class MoneyAnimator : MonoBehaviour
     }
 
     void Start() {
-        Player.PlayerController.CoinsChangeEvent.AddListener(OnCoinsChange);
+        Player.Instance.CoinsChangeEvent.AddListener(OnCoinsChange);
 
         OnCoinsChange(0);
     }
@@ -38,10 +38,10 @@ public class MoneyAnimator : MonoBehaviour
 
     private void OnCoinsChange(int change) {
         if (change == 0) {
-            _coinsText.text = $"{Player.PlayerController.Coins}";
+            _coinsText.text = $"{Player.Instance.Coins}";
             return;
         };
-        float coins = Player.PlayerController.Coins;
+        float coins = Player.Instance.Coins;
         _coinsRectTransform.DOComplete();
         _changeRectTransform.DOComplete();
         _changeCanvasGroup.DOKill();

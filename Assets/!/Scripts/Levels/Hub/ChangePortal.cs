@@ -71,7 +71,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
 
     public void CloseUI()
     {
-        CameraManager.Instance.SwitchCamera(Player.PlayerController.PlayerTopDownCamera);
+        CameraManager.Instance.SwitchCamera(Player.Instance.TopDownCamera);
         _canvasGroup.DOFade(0, 1).OnComplete(() => {
             Player.UICanvas.IsOtherUIOpen = false;
             _ui.SetActive(false);

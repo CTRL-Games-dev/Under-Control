@@ -53,7 +53,7 @@ public class MainMenuCanvas : MonoBehaviour
 
     public void HideUI() {
         killTweens();
-        CameraManager.Instance.SwitchCamera(Player.TopDownCamera);
+        CameraManager.Instance.SwitchCamera(Player.Instance.TopDownCamera);
 
         _canvasGroup.DOFade(0, 1f).OnComplete(() => {
             _bgImage.DOFade(0, 0);

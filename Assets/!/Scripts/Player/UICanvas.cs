@@ -88,6 +88,7 @@ public class UICanvas : MonoBehaviour
     }    
 
     private void OnInventoryToggle() {
+        if (IsOtherUIOpen) return;
         ChangeUIMiddleState(CurrentUIMiddleState == UIMiddleState.Inventory ? UIMiddleState.NotVisible : UIMiddleState.Inventory);
     }
 

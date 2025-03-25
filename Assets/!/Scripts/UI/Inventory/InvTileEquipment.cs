@@ -28,6 +28,66 @@ public class InvTileEquipment : InvTile {
         _rectTransform = GetComponent<RectTransform>();
         // EventBus.InvTileClickEvent.AddListener(OnTileClick);
         OnTileSizeSetEvent();
+
+        // cant really test this without the rest of the game 
+        switch (_tileType) {
+            case TileType.Helmet:
+                if (Player.Inventory.Helmet != null) {
+                    InventoryItem inventoryItem = new();
+                    inventoryItem.ItemData = Player.Inventory.Helmet;
+                    createItemUI(inventoryItem);
+                    IsEmpty = false;
+                }
+                break;
+            case TileType.Chestplate:
+                if (Player.Inventory.Chestplate != null) {
+                    InventoryItem inventoryItem = new();
+                    inventoryItem.ItemData = Player.Inventory.Chestplate;
+                    createItemUI(inventoryItem);
+                    IsEmpty = false;
+                }
+                break;
+            case TileType.Leggings:
+                if (Player.Inventory.Leggings != null) {
+                    InventoryItem inventoryItem = new();
+                    inventoryItem.ItemData = Player.Inventory.Leggings;
+                    createItemUI(inventoryItem);
+                    IsEmpty = false;
+                }
+                break;
+            case TileType.Boots:
+                if (Player.Inventory.Boots != null) {
+                    InventoryItem inventoryItem = new();
+                    inventoryItem.ItemData = Player.Inventory.Boots;
+                    createItemUI(inventoryItem);
+                    IsEmpty = false;
+                }
+                break;
+            case TileType.Amulet:
+                if (Player.Inventory.Amulet != null) {
+                    InventoryItem inventoryItem = new();
+                    inventoryItem.ItemData = Player.Inventory.Amulet;
+                    createItemUI(inventoryItem);
+                    IsEmpty = false;
+                }
+                break;
+            case TileType.Ring:
+                if (Player.Inventory.Ring != null) {
+                    InventoryItem inventoryItem = new();
+                    inventoryItem.ItemData = Player.Inventory.Ring;
+                    createItemUI(inventoryItem);
+                    IsEmpty = false;
+                }
+                break;
+            case TileType.Weapon:
+                if (Player.Inventory.Weapon != null) {
+                    InventoryItem inventoryItem = new();
+                    inventoryItem.ItemData = Player.Inventory.Weapon;
+                    createItemUI(inventoryItem);
+                    IsEmpty = false;
+                }
+                break; 
+        }
     }
 
     private void OnTileSizeSetEvent() {
