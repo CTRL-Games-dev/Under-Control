@@ -41,10 +41,6 @@ public class LivingEntity : MonoBehaviour
     private List<EffectData> _activeEffects = new List<EffectData>();
 
     private readonly int _hurtHash = Animator.StringToHash("hurt");
-    private readonly int _speedHash = Animator.StringToHash("speed");
-    private readonly int _dodgeHash = Animator.StringToHash("dodge");
-    private readonly int _lightAttackHash = Animator.StringToHash("light_attack");
-    private readonly int _heavyAttackHash = Animator.StringToHash("heavy_attack");
 
     // References
     public ModifierSystem ModifierSystem { get; private set; }
