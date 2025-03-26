@@ -14,6 +14,7 @@ public enum UIMiddleState {
     Inventory,
     MainMenu,
     Pause,
+    Choose
 }
 
 public enum UITopState {
@@ -46,10 +47,13 @@ public class UICanvas : MonoBehaviour
 
     [Header("Canvases")]
     [SerializeField] private HUDCanvas _HUDCanvas;
+
     [SerializeField] private InventoryCanvas _inventoryCanvas;
     [SerializeField] private MainMenuCanvas _mainMenuCanvas;
-    [SerializeField] private DeathScreenCanvas _deathScreenCanvas;
     [SerializeField] private PauseCanvas _pauseCanvas;
+    [SerializeField] private ChooseCanvas _chooseCanvas;
+
+    [SerializeField] private DeathScreenCanvas _deathScreenCanvas;
     [SerializeField] private SettingsCanvas _settingsCanvas;
 
 
@@ -191,6 +195,9 @@ public class UICanvas : MonoBehaviour
             case UIMiddleState.Pause:
                 _pauseCanvas.HideUI();
                 break;
+            case UIMiddleState.Choose:
+                _chooseCanvas.HideUI();
+                break;
         }
     }
 
@@ -212,6 +219,9 @@ public class UICanvas : MonoBehaviour
                 InventoryPanel.IsItemJustBought = false;
                 DropItem();
                 _inventoryCanvas.SetOtherInventory(null, null);
+                break;
+            case UIMiddleState.Choose:
+                _chooseCanvas.ShowUI();
                 break;
         }
     }
