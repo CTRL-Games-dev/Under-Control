@@ -16,8 +16,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _acceleration = 2f;
     [SerializeField] private float _deceleration = 2f;
     public float _currentSpeed = 0f;
-    [SerializeField] private float _maxWalkingSpeed = 2f;
-    [SerializeField] private float _maxSprintingSpeed = 4f;
     
     [SerializeField] private float _turnSpeed = 1f;
     
@@ -29,14 +27,9 @@ public class PlayerController : MonoBehaviour
     public GameObject MainCameraObject;
     public GameObject CinemachineObject;
     public GameObject CameraTargetObject;
-    public CinemachineCamera PlayerTopDownCamera;
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
-    public float LightAttackSpeed = 1f;
-    public float HeavyAttackSpeed = 1f;
-    public float DashDistance = 2f;
-    public float DashCooldown = 1f;
-    public float DashDuration = 0.2f;
+
     [SerializeField] private ParticleSystem[] _trailParticles;
 
     [Header("Weapon")]
@@ -56,15 +49,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Stats")]
     public DynamicStat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
-    private int _coins = 100;
-    public int Coins { 
-        get{
-            return _coins;
-        } set {
-            CoinsChangeEvent?.Invoke(value - _coins);
-            _coins = value;
-        }  
-    }
+
     private bool _isAttacking = false;
     private bool _lockRotation = false;
     private bool _canRotateOnClick = false;
@@ -75,7 +60,6 @@ public class PlayerController : MonoBehaviour
     public UnityEvent InventoryToggleEvent;
     public UnityEvent UICancelEvent;
     public UnityEvent ItemRotateEvent;
-    public UnityEvent<int> CoinsChangeEvent;
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
@@ -95,6 +79,8 @@ public class PlayerController : MonoBehaviour
     public LivingEntity LivingEntity { get; private set; }
     public CinemachinePositionComposer CinemachinePositionComposer { get; private set; }
 
+
+    #region Unity Methods
     void Start()
     {
         CharacterController = GetComponent<CharacterController>();
@@ -118,7 +104,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        float goalSpeed = Input.GetKey(KeyCode.LeftShift) ? _maxSprintingSpeed : _maxWalkingSpeed; // do zmiany
+        float goalSpeed = Input.GetKey(KeyCode.LeftShift) ? Player.Stats.MovementSpeed : Player.Stats.MovementSpeed / 2; // do zmiany
 
         var movementVector = Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
         if (movementVector.magnitude > 0.1) {
@@ -133,10 +119,12 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        Animator.SetFloat(_speedHash, _currentSpeed / _maxSprintingSpeed);
-        Animator.SetFloat(_lightAttackSpeedHash, LightAttackSpeed);
-        Animator.SetFloat(_heavyAttackSpeedHash, HeavyAttackSpeed);
+        Animator.SetFloat(_speedHash, _currentSpeed / Player.Stats.MovementSpeed);
+        Animator.SetFloat(_lightAttackSpeedHash, Player.Stats.LightAttackSpeed);
+        Animator.SetFloat(_heavyAttackSpeedHash, Player.Stats.HeavyAttackSpeed);
     }
+
+    #endregion
 
     private void handleRotation() {
         if (_movementInputVector.magnitude > 0.1f) {
@@ -150,11 +138,11 @@ public class PlayerController : MonoBehaviour
     }
 
     private void onDeath() {
-        UICanvas.Instance.OpenUIState(UIState.DeathScreen);
+        Player.UICanvas.ChangeUITopState(UITopState.Death);
     }
 
     // Input events
-
+    #region Input Events
     void OnMove(InputValue value) {
         _movementInputVector = value.Get<Vector2>();
     }
@@ -227,7 +215,7 @@ public class PlayerController : MonoBehaviour
         }
 
         _canDodge = false;
-        Invoke(nameof(enableDodging), DashCooldown);
+        Invoke(nameof(enableDodging), Player.Stats.DashCooldown);
         _lockRotation = true;
         DamageDisabled = true;
 
@@ -241,7 +229,7 @@ public class PlayerController : MonoBehaviour
 
 
         foreach (ParticleSystem trail in _trailParticles) { trail.Play(); }
-        transform.DOMove(transform.position + transform.forward * DashDistance, DashDuration).SetEase(Ease.OutQuint).OnComplete(() => {
+        transform.DOMove(transform.position + transform.forward * Player.Stats.DashDistance, Player.Stats.DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
             Animator.applyRootMotion = true;
             Animator.speed = 1;
             DamageDisabled = false;
@@ -252,6 +240,7 @@ public class PlayerController : MonoBehaviour
             }
         });
     }
+    #endregion
 
     private void enableDodging() {
         _canDodge = true;
@@ -266,11 +255,12 @@ public class PlayerController : MonoBehaviour
     }
 
     private void interact(InteractionType interactionType) {
+        Debug.Log("Interacting");
         if(EventSystem.current.IsPointerOverGameObject()) {
             return;
         }
 
-        if(UICanvas.Instance.CurrentUIState != UIState.NotVisible) return;
+        if(Player.UICanvas.CurrentUIMiddleState != UIMiddleState.NotVisible || Player.UICanvas.CurrentUITopState != UITopState.NotVisible) return;
 
         bool interacted = tryInteract(interactionType);
         
@@ -299,7 +289,7 @@ public class PlayerController : MonoBehaviour
     }
 
     private bool tryInteract(InteractionType interactionType) {
-        Ray ray = UICanvas.Instance.MainCamera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = Player.UICanvas.MainCamera.ScreenPointToRay(Input.mousePosition);
         if (!Physics.Raycast(ray, out RaycastHit hit)) {
             return false;
         }

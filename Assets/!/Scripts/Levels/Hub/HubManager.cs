@@ -11,6 +11,6 @@ public class HubManager : MonoBehaviour, ILevelManager
 
     private void Start() {
         CameraManager.Instance.SwitchCamera(MainMenuCamera);
-        UICanvas.Instance.OpenUIState(UIState.MainMenu);
+        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.MainMenu);
     }
 }

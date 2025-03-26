@@ -15,7 +15,9 @@ public class InventoryCanvas : MonoBehaviour
         Quests
     }
 
-
+    private IInteractableInventory _lastInteractableInventory;
+    private ItemContainer _currentOtherInventory;
+    [SerializeField] private GameObject _otherInventoryHolder;
     [SerializeField] private RectTransform _underlineRect;
     [SerializeField] private GameObject _armorBtnTabGO, _abilitiesBtnTabGO, _skillsBtnTabGO, _questsBtnTabGO, _otherBtnTabGO;
 
@@ -36,19 +38,19 @@ public class InventoryCanvas : MonoBehaviour
     private RectTransform[] _tabRectTranforms;
     private Dictionary<InventoryTabs, int> _tabPanelsIndex;
 
+    private CanvasGroup _canvasGroup;
     private GameObject _currentTabPanel;
     private Button _currentTabButton;
     private Image _currentTabImage;
     private TextMeshProUGUI _currentTabText;
     private InventoryTabs _currentTab = InventoryTabs.Armor;
 
-    private UICanvas _uiCanvas;
-
     private Color _defaultColor = Color.white;
 
     #region Unity Methods
 
     void Awake() {
+        _canvasGroup = GetComponent<CanvasGroup>();
         _tabButtonGameObjects = new GameObject[] {
             _armorBtnTabGO,
             _abilitiesBtnTabGO,
@@ -95,8 +97,6 @@ public class InventoryCanvas : MonoBehaviour
     }
 
     void Start() {
-        _uiCanvas = UICanvas.Instance;
-
         _currentTab = InventoryTabs.Armor;
         
         foreach (GameObject go in _armorSlotsGO) {
@@ -108,6 +108,25 @@ public class InventoryCanvas : MonoBehaviour
     #endregion
 
     #region Public Methods
+
+    public void HideUI() {
+        CloseAllTabs();
+        
+        _canvasGroup.DOFade(0, 0.25f);
+        _canvasGroup.blocksRaycasts = false;
+        _canvasGroup.interactable = false;
+        SetOtherInventory(null, null);
+    }
+
+    public void ShowUI() {
+        gameObject.SetActive(true);
+        _canvasGroup.DOComplete();
+        _underlineRect.DOAnchorPosX(_tabRectTranforms[_tabPanelsIndex[_currentTab]].anchoredPosition.x, 0);
+        SetCurrentTab(_currentTab);
+        _canvasGroup.DOFade(1, 0.25f);
+        _canvasGroup.blocksRaycasts = true;
+        _canvasGroup.interactable = true;
+    }
 
     public void SetCurrentTab(InventoryTabs tab) {
         InventoryTabs previousTab = _currentTab;
@@ -196,6 +215,28 @@ public class InventoryCanvas : MonoBehaviour
         _playerInventoryPanelGO.GetComponent<RectTransform>().DOKill();
     }
 
+    public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab, IInteractableInventory interactable = null, string title = null) {
+        if (_currentOtherInventory == itemContainer) return;
+        _currentTab = itemContainer == null ? InventoryTabs.Armor : InventoryTabs.Other;
+
+        _lastInteractableInventory?.EndInteract();
+        _lastInteractableInventory = interactable;
+
+        _currentOtherInventory = itemContainer;
+        SetOtherTabTitle(title);
+
+        if (itemContainer != null) { // animacja zmiany
+            if (_otherInventoryHolder.transform.childCount > 0)
+                Destroy(_otherInventoryHolder.transform.GetChild(0).gameObject);
+            
+            InventoryPanel inventoryPanel = Instantiate(prefab, _otherInventoryHolder.transform).GetComponentInChildren<InventoryPanel>();
+            inventoryPanel.SetTargetInventory(itemContainer);
+        } else {
+            if (_otherInventoryHolder.transform.childCount > 0)
+                Destroy(_otherInventoryHolder.transform.GetChild(0).gameObject);
+        }
+    }
+
     public void SetOtherTabTitle(string text) {
         _tabTexts[_tabPanelsIndex[InventoryTabs.Other]].text = text ?? "";
         _tabTexts[_tabPanelsIndex[InventoryTabs.Other]].DOColor(text == null ? Color.gray : Color.white, 0.15f);
@@ -210,7 +251,7 @@ public class InventoryCanvas : MonoBehaviour
     }
 
     public void OnBackgroundClick() {
-        _uiCanvas.DropItem();
+        Player.UICanvas.DropItem();
     }
 
     public void OnOpenOtherTab() { SetCurrentTab(InventoryTabs.Other); }

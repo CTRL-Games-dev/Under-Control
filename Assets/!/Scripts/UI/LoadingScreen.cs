@@ -40,7 +40,7 @@ public class LoadingScreen : MonoBehaviour
         Instance._imageGO.SetActive(true);
         IsLoading = true;
         Instance._canvasGroup.DOFade(1, 0.5f).SetUpdate(true).OnComplete(() => Instance.StartCoroutine(Instance.loadSceneAsync(sceneName))); 
-        UICanvas.Instance.HideUI();
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
         Instance.StartCoroutine(Instance.animateImages());
     }
 
@@ -54,7 +54,7 @@ public class LoadingScreen : MonoBehaviour
             if (operation.progress >= 0.9f) {
                 yield return new WaitForSeconds(0.5f);
                 operation.allowSceneActivation = true;
-                UICanvas.Instance.HideUI();
+                Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
                 _canvasGroup.DOFade(0, 0.5f).SetUpdate(true).OnComplete(() => {
                     _imageGO.SetActive(false);
                     StopCoroutine(animateImages());
@@ -65,8 +65,7 @@ public class LoadingScreen : MonoBehaviour
         }
 
         IsLoading = false;
-        UICanvas.Instance.ShowUI();
-        UICanvas.Instance.OpenUIState(UIState.NotVisible);
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
     }
 
 

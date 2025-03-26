@@ -44,7 +44,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
     }
 
     private void Start() {
-        UICanvas.Instance.PlayerController.UICancelEvent.AddListener(CloseUI);   
+        Player.PlayerController.UICancelEvent.AddListener(CloseUI);   
     }
 
     void FixedUpdate() {
@@ -62,7 +62,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
     }
     public void OpenUI()
     {
-        UICanvas.Instance.IsOtherUIOpen = true;
+        Player.UICanvas.IsOtherUIOpen = true;
         CameraManager.Instance.SwitchCamera(_ballCamera);
         _ui.SetActive(true);
         _canvasGroup.DOFade(1, 1).SetDelay(1);
@@ -71,9 +71,9 @@ public class ChangePortal : MonoBehaviour, IInteractable
 
     public void CloseUI()
     {
-        CameraManager.Instance.SwitchCamera(UICanvas.Instance.PlayerController.PlayerTopDownCamera);
+        CameraManager.Instance.SwitchCamera(Player.Instance.TopDownCamera);
         _canvasGroup.DOFade(0, 1).OnComplete(() => {
-            UICanvas.Instance.IsOtherUIOpen = false;
+            Player.UICanvas.IsOtherUIOpen = false;
             _ui.SetActive(false);
         });
         _opened = false;

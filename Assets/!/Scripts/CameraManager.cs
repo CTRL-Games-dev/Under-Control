@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    public CinemachineCamera PlayerTopDownCamera => UICanvas.Instance.PlayerController.PlayerTopDownCamera;
     private CinemachineCamera _currentCamera;
 
     public static CameraManager Instance;
