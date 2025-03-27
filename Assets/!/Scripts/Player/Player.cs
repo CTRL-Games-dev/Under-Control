@@ -432,4 +432,17 @@ public class Player : MonoBehaviour {
         // Calculates movement speed multiplier
         Animator.SetFloat(_movementSpeedHash, MovementSpeed / MaxMovementSpeed);
     }
+
+    public void SetPlayerPosition(Vector3 position) {
+        Animator.applyRootMotion = false;
+        Animator.speed = 0;
+        gameObject.transform.position = position;
+
+        Invoke(nameof(applyRootMotion), 1f);
+    }
+
+    private void applyRootMotion() {
+        Animator.applyRootMotion = true;
+        Animator.speed = 1;
+    }
 }

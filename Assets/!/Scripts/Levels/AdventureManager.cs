@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using Unity.AI.Navigation;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -25,13 +26,15 @@ public class AdventureManager : MonoBehaviour, ILevelManager
         ForestPortal portal = generator.Getlocation<ForestPortal>();
 
         Vector2 spawn = portal.GetAbsoluteCenter(generator.wd.Offset, generator.wd.Scale);
-
-        Player.Instance.transform.position = new(spawn.x, 0.2f, spawn.y - 3f);
+        
+        Debug.Log($"Spawn: {spawn}");
+        Player.Instance.SetPlayerPosition(new Vector3(spawn.x, 1, spawn.y + 3));
 
         _cameraManager.SwitchCamera(Player.Instance.TopDownCamera);
 
         _navMeshSurface.BuildNavMesh();
     }
+
 
     // public void SpawnPlayer()
     // {
