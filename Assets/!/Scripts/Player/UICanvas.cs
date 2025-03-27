@@ -178,7 +178,6 @@ public class UICanvas : MonoBehaviour
 
     // Middle
     public void ChangeUIMiddleState(UIMiddleState state) {
-        Debug.Log(state);
         closeUIMiddleState(CurrentUIMiddleState);
         openUIMiddleState(state);
         CurrentUIMiddleState = state;

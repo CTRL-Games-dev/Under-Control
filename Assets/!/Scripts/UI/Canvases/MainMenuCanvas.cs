@@ -33,7 +33,6 @@ public class MainMenuCanvas : MonoBehaviour
     }
 
     public void PlayGame() {
-        Debug.Log("");
     }
 
     public void QuitGame() {
@@ -41,6 +40,7 @@ public class MainMenuCanvas : MonoBehaviour
     }
 
     public void ShowUI() {
+        killTweens();
         if (HubManager.MainMenuCamera != null) CameraManager.Instance.SwitchCamera(HubManager.MainMenuCamera);
 
         gameObject.SetActive(true);
