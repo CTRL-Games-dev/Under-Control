@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,6 +19,8 @@ public class WeaponHolder : MonoBehaviour
             _currentWeaponHitter = null;
             _currentWeaponData = null;
         }
+        
+        if(weaponData == null) return;
 
         if (weaponData.WeaponPrefab != null) {
             _currentWeaponHitter = InstantiateWeapon(weaponData);
@@ -40,30 +43,55 @@ public class WeaponHolder : MonoBehaviour
     }
 
     public void BeginAttack() {
+        if(_currentWeaponData == null) {
+            Debug.LogWarning($"Current weapon is null");
+            return;
+        }
+
         if(_currentWeaponHitter == null) return;
         _hitEntities.Clear();
         _currentWeaponHitter.StartMinorTrail();
     }
 
     public void EndAttack() {
+        if(_currentWeaponData == null) {
+            Debug.LogWarning($"Current weapon is null");
+            return;
+        }
+        
         if(_currentWeaponHitter == null) return;
         _hitEntities.Clear();
         _currentWeaponHitter.StopMinorTrail();
     }
 
     public void EnableHitbox() {
+        if(_currentWeaponData == null) {
+            Debug.LogWarning($"Current weapon is null");
+            return;
+        }
+        
         if(_currentWeaponHitter == null) return;
         _currentWeaponHitter.EnableHitbox();
         _currentWeaponHitter.StartMajorTrail();
     }
 
     public void DisableHitbox() {
+        if(_currentWeaponData == null) {
+            Debug.LogWarning($"Current weapon is null");
+            return;
+        }
+
         if(_currentWeaponHitter == null) return;
         _currentWeaponHitter.DisableHitbox();
         _currentWeaponHitter.StopMajorTrail();
     }
 
     public void OnHit(LivingEntity victim) {
+        if(_currentWeaponData == null) {
+            Debug.LogError($"Current weapon is null, but hit was registered!");
+            return;
+        }
+
         if(PreventSelfDamage && victim == Self) return;
         if(!victim.Guild.IsHostileTowards(Self.Guild)) return;
 
@@ -87,7 +115,7 @@ public class WeaponHolder : MonoBehaviour
             return;
         }
 
-        float damageValue = Random.Range(_currentWeaponData.DamageMin, _currentWeaponData.DamageMax);
+        float damageValue = UnityEngine.Random.Range(_currentWeaponData.DamageMin, _currentWeaponData.DamageMax);
 
         Self.Attack(new Damage{
             Type = _currentWeaponData.DamageType,

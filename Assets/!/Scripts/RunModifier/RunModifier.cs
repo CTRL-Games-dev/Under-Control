@@ -7,5 +7,5 @@ public class RunModifier : ScriptableObject
     public string ModifierName;
     public string ModifierDescription;
     public float ModifierValue;
-    public RunStat Modifier;
+    public Modifier Modifier;
 }

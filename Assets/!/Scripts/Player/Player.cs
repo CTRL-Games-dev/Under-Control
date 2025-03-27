@@ -130,7 +130,9 @@ public class Player : MonoBehaviour {
 
         registerStats();
 
-        WeaponHolder.UpdateWeapon(CurrentWeapon);
+        if (CurrentWeapon != null) {
+            WeaponHolder.UpdateWeapon(CurrentWeapon);
+        }
     }
 
     void Update(){
@@ -348,8 +350,8 @@ public class Player : MonoBehaviour {
     }
 
     public void OnInventoryChanged() {
-        WeaponHolder.UpdateWeapon(CurrentWeapon);
-        Animator.SetInteger(_weaponTypeHash, (int)CurrentWeapon.WeaponType);
+            WeaponHolder.UpdateWeapon(CurrentWeapon);
+            Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.WeaponType ?? WeaponType.None));
     }
 
 
