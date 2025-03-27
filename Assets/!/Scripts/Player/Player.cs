@@ -52,6 +52,19 @@ public class Player : MonoBehaviour
         }  
     }
 
+    public void SetPlayerPosition(Vector3 position) {
+        PlayerController.Animator.applyRootMotion = false;
+        PlayerController.Animator.speed = 0;
+        PlayerController.gameObject.transform.position = position;
+
+        Invoke(nameof(applyRootMotion), 1f);
+    }
+
+    private void applyRootMotion() {
+        PlayerController.Animator.applyRootMotion = true;
+        PlayerController.Animator.speed = 1;
+    }
+
 
     #endregion
     #region Unity Methods

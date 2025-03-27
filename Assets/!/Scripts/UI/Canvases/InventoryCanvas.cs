@@ -10,7 +10,7 @@ public class InventoryCanvas : MonoBehaviour
     public enum InventoryTabs {
         Other,
         Armor,
-        Abilities,
+        Cards,
         Skills,
         Quests
     }
@@ -19,11 +19,11 @@ public class InventoryCanvas : MonoBehaviour
     private ItemContainer _currentOtherInventory;
     [SerializeField] private GameObject _otherInventoryHolder;
     [SerializeField] private RectTransform _underlineRect;
-    [SerializeField] private GameObject _armorBtnTabGO, _abilitiesBtnTabGO, _skillsBtnTabGO, _questsBtnTabGO, _otherBtnTabGO;
+    [SerializeField] private GameObject _armorBtnTabGO, _cardsBtnTabGO, _skillsBtnTabGO, _questsBtnTabGO, _otherBtnTabGO;
 
     [Header("Panel Game Objects")]
     [SerializeField] private GameObject _playerInventoryPanelGO;
-    [SerializeField] private GameObject _armorInventoryPanelGO, _abilitiesInventoryPanelGO, _skillsInventoryPanelGO, _questsInventoryPanelGO, _otherInventoryPanelGO;
+    [SerializeField] private GameObject _armorInventoryPanelGO, _cardsInventoryPanelGO, _skillsInventoryPanelGO, _questsInventoryPanelGO, _otherInventoryPanelGO;
 
     [Header("Armor panel parts")]
     [SerializeField] private GameObject _playerPreviewGO;
@@ -53,35 +53,35 @@ public class InventoryCanvas : MonoBehaviour
         _canvasGroup = GetComponent<CanvasGroup>();
         _tabButtonGameObjects = new GameObject[] {
             _armorBtnTabGO,
-            _abilitiesBtnTabGO,
+            _cardsBtnTabGO,
             _skillsBtnTabGO,
             _questsBtnTabGO,
             _otherBtnTabGO
         };
         _tabButtons = new Button[] {
             _armorBtnTabGO.GetComponent<Button>(),
-            _abilitiesBtnTabGO.GetComponent<Button>(),
+            _cardsBtnTabGO.GetComponent<Button>(),
             _skillsBtnTabGO.GetComponent<Button>(),
             _questsBtnTabGO.GetComponent<Button>(),
             _otherBtnTabGO.GetComponent<Button>()
         };
         _tabImages = new Image[] {
             _armorBtnTabGO.GetComponent<Image>(),
-            _abilitiesBtnTabGO.GetComponent<Image>(),
+            _cardsBtnTabGO.GetComponent<Image>(),
             _skillsBtnTabGO.GetComponent<Image>(),
             _questsBtnTabGO.GetComponent<Image>(),
             _otherBtnTabGO.GetComponent<Image>(),
         };
         _tabTexts = new TextMeshProUGUI[] {
             _armorBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
-            _abilitiesBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
+            _cardsBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
             _skillsBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
             _questsBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
             _otherBtnTabGO.GetComponentInChildren<TextMeshProUGUI>()
         };
         _tabRectTranforms = new RectTransform[] {
             _armorBtnTabGO.GetComponent<RectTransform>(),
-            _abilitiesBtnTabGO.GetComponent<RectTransform>(),
+            _cardsBtnTabGO.GetComponent<RectTransform>(),
             _skillsBtnTabGO.GetComponent<RectTransform>(),
             _questsBtnTabGO.GetComponent<RectTransform>(),
             _otherBtnTabGO.GetComponent<RectTransform>(),
@@ -89,7 +89,7 @@ public class InventoryCanvas : MonoBehaviour
 
         _tabPanelsIndex = new Dictionary<InventoryTabs, int> {
             { InventoryTabs.Armor, 0 },
-            { InventoryTabs.Abilities, 1 },
+            { InventoryTabs.Cards, 1 },
             { InventoryTabs.Skills, 2 },
             { InventoryTabs.Quests, 3 },
             { InventoryTabs.Other, 4 }
@@ -159,8 +159,8 @@ public class InventoryCanvas : MonoBehaviour
                 if (!(_currentTab == InventoryTabs.Other || _currentTab == InventoryTabs.Armor)) playerTabExit();
                 armorTabExit().OnComplete(() => openTab(_currentTab));
                 break;
-            case InventoryTabs.Abilities:
-                abilitiesTabExit().OnComplete(() => openTab(_currentTab));
+            case InventoryTabs.Cards:
+                cardsTabExit().OnComplete(() => openTab(_currentTab));
                 break;
             case InventoryTabs.Skills:
                 skillsTabExit().OnComplete(() => openTab(_currentTab));
@@ -181,8 +181,8 @@ public class InventoryCanvas : MonoBehaviour
                 armorTabEnter();
                 playerTabEnter();
                 break;
-            case InventoryTabs.Abilities:
-                abilitiesTabEnter();
+            case InventoryTabs.Cards:
+                cardsTabEnter();
                 break;
             case InventoryTabs.Skills:
                 skillsTabEnter();
@@ -200,7 +200,7 @@ public class InventoryCanvas : MonoBehaviour
     public void CloseAllTabs() {
         playerTabExit();
         armorTabExit();
-        abilitiesTabExit();
+        cardsTabExit();
         skillsTabExit();
         questsTabExit();
         otherTabExit();
@@ -209,7 +209,7 @@ public class InventoryCanvas : MonoBehaviour
     public void KillAllTweens() {
         _otherInventoryPanelGO.GetComponent<RectTransform>().DOKill();
         _armorInventoryPanelGO.GetComponent<RectTransform>().DOKill();
-        _abilitiesInventoryPanelGO.GetComponent<RectTransform>().DOKill();
+        _cardsInventoryPanelGO.GetComponent<RectTransform>().DOKill();
         _skillsInventoryPanelGO.GetComponent<RectTransform>().DOKill();
         _questsInventoryPanelGO.GetComponent<RectTransform>().DOKill();
         _playerInventoryPanelGO.GetComponent<RectTransform>().DOKill();
@@ -258,7 +258,7 @@ public class InventoryCanvas : MonoBehaviour
 
     public void OnOpenArmorTab() { SetCurrentTab(InventoryTabs.Armor); }
 
-    public void OnOpenAbilitiesTab() { SetCurrentTab(InventoryTabs.Abilities); }
+    public void OnOpenCardsTab() { SetCurrentTab(InventoryTabs.Cards); }
 
     public void OnOpenSkillsTab() { SetCurrentTab(InventoryTabs.Skills); }
 
@@ -266,7 +266,7 @@ public class InventoryCanvas : MonoBehaviour
     
     public void HighlightButton(int index) {
         if (index == _tabPanelsIndex[_currentTab]) return;
-        _tabButtonGameObjects[index].transform.DOScale(1.2f, 0.75f);
+        _tabButtonGameObjects[index].transform.DOScale(1.1f, 0.75f);
     }
 
     public void UnhighlightButton(int index) {
@@ -280,7 +280,7 @@ public class InventoryCanvas : MonoBehaviour
     private void highlightTab(InventoryTabs tab, bool value) {
         _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOKill();
         if (value) {
-            _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOScale(1.5f, 0.35f);
+            _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOScale(1.2f, 0.35f);
             _tabTexts[_tabPanelsIndex[tab]].fontStyle = FontStyles.Bold;
         } else {
             _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOScale(1, 0.35f);
@@ -381,18 +381,18 @@ public class InventoryCanvas : MonoBehaviour
         return _armorInventoryPanelGO.transform.DOScale(1, scaleSpeed * 7);
     }
 
-    private Tween abilitiesTabEnter() {
-        _abilitiesInventoryPanelGO.SetActive(true);
-        return _abilitiesInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-630, 0.25f);
+    private Tween cardsTabEnter() {
+        _cardsInventoryPanelGO.SetActive(true);
+        return _cardsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-1000, 0.25f);
     }
 
-    private Tween abilitiesTabExit() {
-        return _abilitiesInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f).OnComplete(() => _abilitiesInventoryPanelGO.SetActive(false));
+    private Tween cardsTabExit() {
+        return _cardsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f).OnComplete(() => _cardsInventoryPanelGO.SetActive(false));
     }
 
     private Tween skillsTabEnter() {
         _skillsInventoryPanelGO.SetActive(true);
-        return _skillsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-630, 0.25f);
+        return _skillsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-1000, 0.25f);
     }
 
     private Tween skillsTabExit() {

@@ -42,6 +42,7 @@ public class UICanvas : MonoBehaviour
 
     [HideInInspector] public InventoryPanel ActiveInventoryPanel;
     public ItemInfoPanel ItemInfoPanel;
+    public EvoInfo EvoInfo;
     public SelectedItemUI SelectedItemUI;
 
 
@@ -258,10 +259,11 @@ public class UICanvas : MonoBehaviour
                 _settingsCanvas.ShowUI();
                 break;
             case UITopState.VideoPlayer:
+                Debug.Log("VideoPlayer");
+
                 _videoPlayer.gameObject.SetActive(true);
-                _videoPlayer.gameObject.GetComponent<CanvasGroup>().DOFade(1, 1).SetUpdate(true).OnComplete(() => {
-                    _videoPlayer.Play();
-                });
+                _videoPlayer.Play();
+                _videoPlayer.gameObject.GetComponent<CanvasGroup>().DOFade(1, 1).SetUpdate(true);
                 break;
         }
     }
