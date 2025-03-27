@@ -89,10 +89,10 @@ public class WeaponHolder : MonoBehaviour
 
         float damageValue = Random.Range(_currentWeaponData.DamageMin, _currentWeaponData.DamageMax);
 
-        victim.TakeDamage(new Damage{
+        Self.Attack(new Damage{
             Type = _currentWeaponData.DamageType,
             Value = damageValue
-        }, Self);
+        }, victim);
 
         _hitEntities.Add(victim);
     }

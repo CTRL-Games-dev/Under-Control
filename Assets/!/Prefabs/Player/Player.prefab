@@ -6783,7 +6783,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 144433619801425869}
-  - component: {fileID: 1631082660512880978}
   - component: {fileID: 862517588485659023}
   - component: {fileID: 6116184372583243191}
   - component: {fileID: 1065449432897141361}
@@ -6791,7 +6790,6 @@ GameObject:
   - component: {fileID: 7225692478355850701}
   - component: {fileID: 3092076507248883512}
   - component: {fileID: 4213774698585673196}
-  - component: {fileID: 2894247839866454681}
   - component: {fileID: 6818052596347534429}
   m_Layer: 6
   m_Name: Player
@@ -6822,33 +6820,6 @@ Transform:
   - {fileID: 1680530961393609627}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 88.199, z: 0}
---- !u!114 &1631082660512880978
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 669612683939749239}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 116ee84ade2e2d74bb59f2d207e8514a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxHealth: 100
-  Health: 100
-  MaxMana: 100
-  Mana: 100
-  Armor: 0
-  LightAttackDamage: 10
-  LightAttackSpeed: 1
-  LightAttackRange: 1
-  HeavyAttackDamage: 20
-  HeavyAttackSpeed: 1
-  HeavyAttackRange: 1
-  MovementSpeed: 5
-  DashSpeed: 0.3
-  DashCooldown: 1
-  DashDistance: 2
 --- !u!114 &862517588485659023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6858,15 +6829,104 @@ MonoBehaviour:
   m_GameObject: {fileID: 669612683939749239}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 000f6496e0e46f14086da8138cfa8f61, type: 3}
+  m_Script: {fileID: 11500000, guid: 063630ca55530384188525911dbcb86b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _uiCanvas: {fileID: 3006076035978592924}
+  VekhtarControl:
+    _raw: 0
+    _adjusted: 0
+    _initValue: 0
+  MaxMana:
+    _raw: 100
+    _adjusted: 100
+    _initValue: 100
+  Mana:
+    _raw: 100
+    _adjusted: 100
+    _initValue: 100
+  Armor:
+    _raw: 0
+    _adjusted: 0
+    _initValue: 0
+  LightAttackDamage:
+    _raw: 10
+    _adjusted: 10
+    _initValue: 10
+  LightAttackSpeed:
+    _raw: 1
+    _adjusted: 1
+    _initValue: 1
+  LightAttackRange:
+    _raw: 1
+    _adjusted: 1
+    _initValue: 1
+  HeavyAttackDamage:
+    _raw: 20
+    _adjusted: 20
+    _initValue: 20
+  HeavyAttackSpeed:
+    _raw: 1
+    _adjusted: 1
+    _initValue: 1
+  HeavyAttackRange:
+    _raw: 1
+    _adjusted: 1
+    _initValue: 1
+  MovementSpeed:
+    _raw: 5
+    _adjusted: 5
+    _initValue: 5
+  DashSpeed:
+    _raw: 10
+    _adjusted: 10
+    _initValue: 10
+  DashCooldown:
+    _raw: 5
+    _adjusted: 5
+    _initValue: 5
+  DashDistance:
+    _raw: 5
+    _adjusted: 5
+    _initValue: 5
+  _coins: 0
+  _acceleration: 8
+  _deceleration: 2
+  _currentSpeed: 0
+  _turnSpeed: 300
+  MinCameraDistance: 10
+  MaxCameraDistance: 30
+  CameraDistanceSpeed: 1
+  MaxInteractionRange: 10
+  CameraTargetObjectBounds: {x: 0, y: 0}
+  MainCameraObject: {fileID: 2942579809011625722}
+  CinemachineObject: {fileID: 1577044056733285295}
+  CameraTargetObject: {fileID: 4902519630981857668}
   TopDownCamera: {fileID: 1842100701194989401}
+  InputDisabled: 1
+  DamageDisabled: 0
+  _uiCanvas: {fileID: 3006076035978592924}
+  _trailParticles:
+  - {fileID: 6183109688690110002}
+  - {fileID: 5137047182867421199}
+  - {fileID: 2609193454348196689}
+  - {fileID: 4064662017494815324}
+  - {fileID: 2609193454348196689}
+  - {fileID: 4502127967977854063}
+  - {fileID: 7873717060959444079}
+  WeaponHolder: {fileID: 3910325353038009931}
+  FistsWeaponData: {fileID: 11400000, guid: 4fca43a1ca5a94f62af3bf7b337d65f3, type: 2}
+  InventoryToggleEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  UICancelEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  ItemRotateEvent:
+    m_PersistentCalls:
+      m_Calls: []
   CoinsChangeEvent:
     m_PersistentCalls:
       m_Calls: []
-  _coins: 0
 --- !u!95 &6116184372583243191
 Animator:
   serializedVersion: 7
@@ -6942,19 +7002,7 @@ MonoBehaviour:
       Rotated: 0
   OnInventoryChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2894247839866454681}
-        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: OnInventoryChanged
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &2932634121617026090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6968,6 +7016,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _activeModifiers: []
+  _stats: []
 --- !u!114 &7225692478355850701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6986,24 +7035,31 @@ MonoBehaviour:
   TimeToRegenAfterDamage: 2
   Exp: 0
   DroppedExpMultiplier: 1
+  DestroyOnDeath: 0
   Health:
     _raw: 100
     _adjusted: 100
+    _initValue: 100
   MaxHealth:
     _raw: 100
     _adjusted: 100
+    _initValue: 100
   RegenRate:
     _raw: 1
     _adjusted: 1
+    _initValue: 1
   Armor:
     _raw: 0
     _adjusted: 0
+    _initValue: 0
   ElementalArmor:
     _raw: 0
     _adjusted: 0
+    _initValue: 0
   MovementSpeed:
     _raw: 1
     _adjusted: 1
+    _initValue: 1
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -7065,54 +7121,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &2894247839866454681
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 669612683939749239}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 063630ca55530384188525911dbcb86b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _acceleration: 30
-  _deceleration: 11
-  _currentSpeed: 0
-  _turnSpeed: 1000
-  MinCameraDistance: 5
-  MaxCameraDistance: 50
-  CameraDistanceSpeed: 1.5
-  MaxInteractionRange: 10
-  CameraTargetObjectBounds: {x: 0, y: 0}
-  MainCameraObject: {fileID: 2942579809011625722}
-  CinemachineObject: {fileID: 1577044056733285295}
-  CameraTargetObject: {fileID: 4902519630981857668}
-  InputDisabled: 0
-  DamageDisabled: 0
-  _trailParticles:
-  - {fileID: 6183109688690110002}
-  - {fileID: 5137047182867421199}
-  - {fileID: 2609193454348196689}
-  - {fileID: 4064662017494815324}
-  - {fileID: 4502127967977854063}
-  - {fileID: 2537144645822657553}
-  - {fileID: 7873717060959444079}
-  WeaponHolder: {fileID: 3910325353038009931}
-  FistsWeaponData: {fileID: 11400000, guid: 4fca43a1ca5a94f62af3bf7b337d65f3, type: 2}
-  VekhtarControl:
-    _raw: 0
-    _adjusted: 0
-  InventoryToggleEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  UICancelEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  ItemRotateEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &6818052596347534429
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30403,7 +30411,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2942579809011625722}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.06245057, y: -0.6483556, z: 0.053495888, w: 0.7568839}
+  m_LocalRotation: {x: 0.06245057, y: -0.6483556, z: 0.053495888, w: 0.75688386}
   m_LocalPosition: {x: 9.289117, y: 3.75, z: 1.0986023}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
@@ -62789,10 +62797,6 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 40
       objectReference: {fileID: 0}
-    - target: {fileID: 687868817882308220, guid: 3a9af6c8891ead7499cf3294be968d67, type: 3}
-      propertyPath: PlayerController
-      value: 
-      objectReference: {fileID: 2894247839866454681}
     - target: {fileID: 687868817882308220, guid: 3a9af6c8891ead7499cf3294be968d67, type: 3}
       propertyPath: ItemEntityTooltip
       value: 

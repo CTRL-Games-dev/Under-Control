@@ -44,7 +44,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
     }
 
     private void Start() {
-        Player.PlayerController.UICancelEvent.AddListener(CloseUI);   
+        Player.Instance.UICancelEvent.AddListener(CloseUI);   
     }
 
     void FixedUpdate() {
@@ -55,7 +55,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
         _spaceBGRect.rotation = Quaternion.Euler(0, 0, Mathf.PingPong(Time.time, 10));
     }
 
-    public void Interact(PlayerController player)
+    public void Interact()
     {
         if(_opened) CloseUI();
         else OpenUI();

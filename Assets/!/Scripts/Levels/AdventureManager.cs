@@ -37,7 +37,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
     // {
         // GameObject player = Instantiate(_player, _map.SpawnLocation, Quaternion.identity);
         // GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
-        // player.GetComponent<PlayerController>().CameraObject = camera;
+        // player.GetComponent<Player>().CameraObject = camera;
         // camera.GetComponent<CinemachineCamera>().Follow = player.transform;
     // }
     // private void SpawnEnemies(WorldMap map)

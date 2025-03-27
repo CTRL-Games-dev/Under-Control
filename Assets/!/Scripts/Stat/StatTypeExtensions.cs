@@ -15,7 +15,7 @@ public static class StatTypeExtensions {
                 return "Elemental Armor";
             case StatType.MOVEMENT_SPEED:
                 return "Movement Speed";
-            case StatType.STENGTH:
+            case StatType.STRENGTH:
                 return "Strength";
             case StatType.INTELLIGENCE:
                 return "Intelligence";
