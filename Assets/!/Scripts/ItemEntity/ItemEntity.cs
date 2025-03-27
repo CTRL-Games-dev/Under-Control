@@ -66,8 +66,8 @@ public class ItemEntity : MonoBehaviour, IInteractable
         Rigidbody = GetComponent<Rigidbody>();
     }
 
-    public void Interact(PlayerController player) {
-        if(!player.LivingEntity.Inventory.AddItem(ItemData, Amount)) {
+    public void Interact() {
+        if(!Player.LivingEntity.Inventory.AddItem(ItemData, Amount)) {
             return;
         }
 

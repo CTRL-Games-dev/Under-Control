@@ -62,7 +62,6 @@ public class UICanvas : MonoBehaviour
     [SerializeField] private RectTransform _navBarRectTransform;
     [SerializeField] private ActionNotifierManager _actionNotifierManager;
 
-    private CanvasGroup _inventoryCanvasGroup;
     public bool IsOtherUIOpen = false;
 
     [SerializeField] private VideoPlayer _videoPlayer;
@@ -73,8 +72,8 @@ public class UICanvas : MonoBehaviour
 
     private void Start() {
         EventBus.ItemUIHoverEvent.AddListener(OnItemUIHover);
-        Player.PlayerController.InventoryToggleEvent.AddListener(OnInventoryToggle);
-        Player.PlayerController.UICancelEvent.AddListener(OnUICancel);
+        Player.Instance.InventoryToggleEvent.AddListener(OnInventoryToggle);
+        Player.Instance.UICancelEvent.AddListener(OnUICancel);
         
         if (!LoadingScreen.IsLoading) {
             ChangeUIBottomState(CurrentUIBottomState);
@@ -141,7 +140,7 @@ public class UICanvas : MonoBehaviour
     public void DropItem() {
         if (SelectedItemUI.InventoryItem == null) return;
 
-        Player.PlayerController.LivingEntity.DropItem(SelectedItemUI.InventoryItem);
+        Player.LivingEntity.DropItem(SelectedItemUI.InventoryItem);
 
         SelectedItemUI.InventoryItem = null;
         EventBus.ItemPlacedEvent?.Invoke();
@@ -190,7 +189,7 @@ public class UICanvas : MonoBehaviour
                 _inventoryCanvas.HideUI();                
                 break;
             case UIMiddleState.MainMenu:
-                Player.PlayerController.InputDisabled = false;
+                Player.Instance.InputDisabled = false;
                 _mainMenuCanvas.HideUI();
                 break;
             case UIMiddleState.Pause:
@@ -209,14 +208,14 @@ public class UICanvas : MonoBehaviour
                 break;
             case UIMiddleState.MainMenu:
                 closeUIBottomState(CurrentUIBottomState);
-                Player.PlayerController.InputDisabled = true;
+                Player.Instance.InputDisabled = true;
                 _mainMenuCanvas.ShowUI();
                 break;
             case UIMiddleState.Pause:
                 _pauseCanvas.ShowUI();
                 break;
             case UIMiddleState.NotVisible:
-                Player.PlayerController.InputDisabled = false;
+                Player.Instance.InputDisabled = false;
                 InventoryPanel.IsItemJustBought = false;
                 DropItem();
                 _inventoryCanvas.SetOtherInventory(null, null);
@@ -252,7 +251,7 @@ public class UICanvas : MonoBehaviour
     private void openUITopState(UITopState state) {
         switch (state) {
             case UITopState.Death:
-                Player.PlayerController.InputDisabled = true;
+                Player.Instance.InputDisabled = true;
                 _deathScreenCanvas.ShowUI();
                 break;
             case UITopState.Settings:

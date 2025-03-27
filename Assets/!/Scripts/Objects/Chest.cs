@@ -12,7 +12,7 @@ public class Chest : MonoBehaviour, IInteractableInventory
         _animator = GetComponent<Animator>();
     }
 
-    public void Interact(PlayerController player) {
+    public void Interact() {
         _animator.SetTrigger("open");
         Player.UICanvas.SetOtherInventory(_inventory.ItemContainer, _uiPrefab, this, "CHEST");
     }

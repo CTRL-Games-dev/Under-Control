@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class HoverTooltip : MonoBehaviour {
-    public PlayerController PlayerController;
+    public Player Player;
 
     [Header("Tooltips")]
     public ItemEntityTooltip ItemEntityTooltip;
@@ -47,7 +47,7 @@ public class HoverTooltip : MonoBehaviour {
         if(hit.transform.gameObject.TryGetComponent(out ItemEntity itemEntity)) {
             ItemEntityTooltip.Enable(itemEntity);
         } else if(hit.transform.gameObject.TryGetComponent(out LivingEntity livingEntity)) {
-            if(livingEntity == PlayerController.LivingEntity) {
+            if(livingEntity == Player.LivingEntity) {
                 return;
             }
 

@@ -48,7 +48,7 @@ public class ChooseCanvas : MonoBehaviour
     }
 
     private void OnRunCardClicked(RunModifier runModifier) {
-        Player.Stats.AddRunModifier(runModifier);
+        Player.LivingEntity.ApplyIndefiniteModifier(runModifier.Modifier);
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         _currentCards.Clear();
     }

@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class ModifierSystem : MonoBehaviour
 {
@@ -11,6 +14,9 @@ public class ModifierSystem : MonoBehaviour
     }
 
     [SerializeField] private List<ModifierData> _activeModifiers = new List<ModifierData>();
+    [SerializeField, HideInInspector] private List<Stat> _stats = new List<Stat>();
+
+    private bool _statsModified = false;
 
     void Update() {
         for(int i = 0; i < _activeModifiers.Count; i++) {
@@ -19,6 +25,16 @@ public class ModifierSystem : MonoBehaviour
             }
 
             _activeModifiers.RemoveAt(i);
+
+            _statsModified = true;
+        }
+
+        if(_statsModified) {
+            for(int i = 0; i < _stats.Count; i++) {
+                _stats[i].Recalculate(this);
+            }
+
+            _statsModified = false;
         }
     }
 
@@ -27,6 +43,8 @@ public class ModifierSystem : MonoBehaviour
             Modifier = modifier,
             Expiration = Mathf.Infinity
         });
+
+        _statsModified = true;
     }
 
     public void ApplyTemporaryModifier(Modifier modifier, float duration) {
@@ -34,12 +52,15 @@ public class ModifierSystem : MonoBehaviour
             Modifier = modifier,
             Expiration = Time.time + duration
         });
+
+        _statsModified = true;
     }
 
     public void RemoveModifier(Modifier modifier) {
         for(int i = 0; i < _activeModifiers.Count; i++) {
             if(_activeModifiers[i].Modifier.Equals(modifier)) {
                 _activeModifiers.RemoveAt(i);
+                _statsModified = true;
                 return;
             }
         }
@@ -62,4 +83,49 @@ public class ModifierSystem : MonoBehaviour
         }
         return modifiers;
     }
+
+    public void Reset() {
+        _activeModifiers.Clear();
+
+        for(int i = 0; i < _stats.Count; i++) {
+            _stats[i].Reset();
+        }
+
+        _statsModified = false;
+    }
+
+    public void Recalculate() {
+        for(int i = 0; i < _stats.Count; i++) {
+            _stats[i].Recalculate(this);
+        }
+    }
+
+    public void RegisterStat(ref Stat stat) {
+        _stats.Add(stat);
+        stat.Recalculate(this);
+    }
+
+    public void RegisterStat(ref DynamicStat stat) {
+        _stats.Add(stat);
+        stat.Recalculate(this);
+    }
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(ModifierSystem))]
+public class ModifierSystemEditor : Editor {
+    public override void OnInspectorGUI() {
+        DrawDefaultInspector();
+
+        ModifierSystem modifierSystem = (ModifierSystem) target;
+
+        if(GUILayout.Button("Recalculate")) {
+            modifierSystem.Recalculate();
+        }
+
+        if(GUILayout.Button("Reset")) {
+            modifierSystem.Reset();
+        }
+    }
+}
+#endif

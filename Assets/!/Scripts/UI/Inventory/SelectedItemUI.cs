@@ -60,7 +60,7 @@ public class SelectedItemUI : MonoBehaviour
     }
 
     private void Start() {
-        Player.PlayerController.ItemRotateEvent.AddListener(OnRotate);
+        Player.Instance.ItemRotateEvent.AddListener(OnRotate);
     }
 
     private void Update()  {

@@ -66,7 +66,7 @@ public class MoneyAnimator : MonoBehaviour
             });
         });
 
-        // _coinsText.text = $"{PlayerController.Coins + change}";
+        // _coinsText.text = $"{Player.Coins + change}";
         // StartCoroutine(animateCoins(change > 0));
     }
 }
