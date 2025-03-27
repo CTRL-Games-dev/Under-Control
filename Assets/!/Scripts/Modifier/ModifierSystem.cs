@@ -95,29 +95,19 @@ public class ModifierSystem : MonoBehaviour
     }
 
     public void Recalculate() {
-        for(int i = 0; i < _activeModifiers.Count; i++) {
-            if(_activeModifiers[i].Expiration > Time.time) {
-                continue;
-            }
-
-            _activeModifiers.RemoveAt(i);
-
-            _statsModified = true;
-        }
-
         for(int i = 0; i < _stats.Count; i++) {
             _stats[i].Recalculate(this);
         }
-
-        _statsModified = false;
     }
 
     public void RegisterStat(ref Stat stat) {
         _stats.Add(stat);
+        stat.Recalculate(this);
     }
 
     public void RegisterStat(ref DynamicStat stat) {
         _stats.Add(stat);
+        stat.Recalculate(this);
     }
 }
 

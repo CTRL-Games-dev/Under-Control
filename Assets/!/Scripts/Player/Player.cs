@@ -22,11 +22,11 @@ public class Player : MonoBehaviour {
     public Stat Mana = new Stat(StatType.MANA, 100f);
     public Stat Armor = new Stat(StatType.ARMOR, 0f);
 
-    public Stat LightAttackDamage = new Stat(StatType.LIGHT_ATTACK_DAMAGE, 10f);
+    // public Stat LightAttackDamage = new Stat(StatType.LIGHT_ATTACK_DAMAGE, 10f);
     public Stat LightAttackSpeed = new Stat(StatType.LIGHT_ATTACK_SPEED, 1f);
     public Stat LightAttackRange = new Stat(StatType.LIGHT_ATTACK_RANGE, 1f);
 
-    public Stat HeavyAttackDamage = new Stat(StatType.HEAVY_ATTACK_DAMAGE, 20f);
+    // public Stat HeavyAttackDamage = new Stat(StatType.HEAVY_ATTACK_DAMAGE, 20f);
     public Stat HeavyAttackSpeed = new Stat(StatType.HEAVY_ATTACK_SPEED, 1f);
     public Stat HeavyAttackRange = new Stat(StatType.HEAVY_ATTACK_RANGE, 1f);
 
@@ -188,12 +188,15 @@ public class Player : MonoBehaviour {
         if (pointerVector.x < 0) {
             pointerVector.x = 0;
         }
+        
         if (pointerVector.x > 1) {
             pointerVector.x = 1;
         }
+        
         if (pointerVector.y < 0) {
             pointerVector.y = 0;
         }
+
         if (pointerVector.y > 1) {
             pointerVector.y = 1;
         }
@@ -350,8 +353,8 @@ public class Player : MonoBehaviour {
     }
 
     public void OnInventoryChanged() {
-            WeaponHolder.UpdateWeapon(CurrentWeapon);
-            Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.WeaponType ?? WeaponType.None));
+        WeaponHolder.UpdateWeapon(CurrentWeapon);
+        Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.WeaponType ?? WeaponType.None));
     }
 
 
@@ -413,10 +416,10 @@ public class Player : MonoBehaviour {
         ModifierSystem.RegisterStat(ref MaxMana);
         ModifierSystem.RegisterStat(ref Mana);
         ModifierSystem.RegisterStat(ref Armor);
-        ModifierSystem.RegisterStat(ref LightAttackDamage);
+        // ModifierSystem.RegisterStat(ref LightAttackDamage);
         ModifierSystem.RegisterStat(ref LightAttackSpeed);
         ModifierSystem.RegisterStat(ref LightAttackRange);
-        ModifierSystem.RegisterStat(ref HeavyAttackDamage);
+        // ModifierSystem.RegisterStat(ref HeavyAttackDamage);
         ModifierSystem.RegisterStat(ref HeavyAttackSpeed);
         ModifierSystem.RegisterStat(ref HeavyAttackRange);
         ModifierSystem.RegisterStat(ref MovementSpeed);

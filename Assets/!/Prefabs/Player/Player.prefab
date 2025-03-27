@@ -6860,9 +6860,9 @@ GameObject:
   m_Component:
   - component: {fileID: 144433619801425869}
   - component: {fileID: 862517588485659023}
+  - component: {fileID: 2932634121617026090}
   - component: {fileID: 6116184372583243191}
   - component: {fileID: 1065449432897141361}
-  - component: {fileID: 2932634121617026090}
   - component: {fileID: 7225692478355850701}
   - component: {fileID: 3092076507248883512}
   - component: {fileID: 4213774698585673196}
@@ -6912,63 +6912,92 @@ MonoBehaviour:
     _raw: 0
     _adjusted: 0
     _initValue: 0
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   MaxMana:
     _raw: 100
     _adjusted: 100
     _initValue: 100
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   Mana:
     _raw: 100
     _adjusted: 100
     _initValue: 100
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   Armor:
     _raw: 0
     _adjusted: 0
     _initValue: 0
-  LightAttackDamage:
-    _raw: 10
-    _adjusted: 10
-    _initValue: 10
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   LightAttackSpeed:
     _raw: 1
     _adjusted: 1
     _initValue: 1
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   LightAttackRange:
-    _raw: 1
+    _raw: 2
     _adjusted: 1
     _initValue: 1
-  HeavyAttackDamage:
-    _raw: 20
-    _adjusted: 20
-    _initValue: 20
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   HeavyAttackSpeed:
     _raw: 1
     _adjusted: 1
     _initValue: 1
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   HeavyAttackRange:
     _raw: 1
     _adjusted: 1
     _initValue: 1
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   MovementSpeed:
     _raw: 5
     _adjusted: 5
     _initValue: 5
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   DashSpeed:
-    _raw: 10
+    _raw: 0.5
     _adjusted: 10
     _initValue: 10
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   DashCooldown:
-    _raw: 5
+    _raw: 2
     _adjusted: 5
     _initValue: 5
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   DashDistance:
     _raw: 5
     _adjusted: 5
     _initValue: 5
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   _coins: 0
   _acceleration: 8
-  _deceleration: 2
+  _deceleration: 4
   _currentSpeed: 0
   _turnSpeed: 300
+  MaxMovementSpeed: 10
   MinCameraDistance: 10
   MaxCameraDistance: 30
   CameraDistanceSpeed: 1
@@ -6990,10 +7019,21 @@ MonoBehaviour:
   - {fileID: 4502127967977854063}
   - {fileID: 7873717060959444079}
   WeaponHolder: {fileID: 3910325353038009931}
-  FistsWeaponData: {fileID: 11400000, guid: 4fca43a1ca5a94f62af3bf7b337d65f3, type: 2}
   InventoryToggleEvent:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 862517588485659023}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: OnInventoryChanged
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   UICancelEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -7003,6 +7043,20 @@ MonoBehaviour:
   CoinsChangeEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2932634121617026090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669612683939749239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7268ef27f4efa5d43a43982b4df186ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _activeModifiers: []
+  _stats: []
 --- !u!95 &6116184372583243191
 Animator:
   serializedVersion: 7
@@ -7079,20 +7133,6 @@ MonoBehaviour:
   OnInventoryChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &2932634121617026090
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 669612683939749239}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7268ef27f4efa5d43a43982b4df186ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _activeModifiers: []
-  _stats: []
 --- !u!114 &7225692478355850701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7116,26 +7156,44 @@ MonoBehaviour:
     _raw: 100
     _adjusted: 100
     _initValue: 100
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   MaxHealth:
     _raw: 100
     _adjusted: 100
     _initValue: 100
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   RegenRate:
     _raw: 1
     _adjusted: 1
     _initValue: 1
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   Armor:
     _raw: 0
     _adjusted: 0
     _initValue: 0
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   ElementalArmor:
     _raw: 0
     _adjusted: 0
     _initValue: 0
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   MovementSpeed:
     _raw: 1
     _adjusted: 1
     _initValue: 1
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -30549,7 +30607,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2942579809011625722}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.06245057, y: -0.6483556, z: 0.053495888, w: 0.75688386}
+  m_LocalRotation: {x: 0.06245057, y: -0.6483556, z: 0.053495888, w: 0.7568839}
   m_LocalPosition: {x: 9.289117, y: 3.75, z: 1.0986023}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0

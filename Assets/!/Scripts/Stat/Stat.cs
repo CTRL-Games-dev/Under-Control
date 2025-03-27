@@ -33,7 +33,7 @@ public class Stat {
         _initValue = initValue;
     }
 
-    public virtual void Reset() {
+    public void Reset() {
         Raw = _initValue;
         Adjusted = _initValue;
 
