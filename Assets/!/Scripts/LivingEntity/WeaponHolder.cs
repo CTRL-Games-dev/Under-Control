@@ -19,7 +19,7 @@ public class WeaponHolder : MonoBehaviour
             _currentWeaponHitter = null;
             _currentWeaponData = null;
         }
-        
+
         if(weaponData == null) return;
 
         if (weaponData.WeaponPrefab != null) {
@@ -95,18 +95,18 @@ public class WeaponHolder : MonoBehaviour
         if(PreventSelfDamage && victim == Self) return;
         if(!victim.Guild.IsHostileTowards(Self.Guild)) return;
 
-        if(_currentWeaponData.DamageMax <= 0) {
+        if(_currentWeaponData.LightDamageMax <= 0) {
             Debug.LogWarning($"{Self.DebugName}: DamageMax is zero or negative. Current weapon is {_currentWeaponData.DisplayName}");
             return;
         }
 
-        if(_currentWeaponData.DamageMin < 0) {
+        if(_currentWeaponData.LightDamageMin < 0) {
             Debug.LogWarning($"{Self.DebugName}: DamageMin is negative. Current weapon is {_currentWeaponData.DisplayName}");
             return;
         }
 
-        if(_currentWeaponData.DamageMax < _currentWeaponData.DamageMin) {
-            Debug.LogWarning($"{Self.DebugName}: DamageMax ({_currentWeaponData.DamageMax}) is less than DamageMin ({_currentWeaponData.DamageMin}). Current weapon is {_currentWeaponData.DisplayName}");
+        if(_currentWeaponData.LightDamageMax < _currentWeaponData.LightDamageMin) {
+            Debug.LogWarning($"{Self.DebugName}: DamageMax ({_currentWeaponData.LightDamageMax}) is less than DamageMin ({_currentWeaponData.LightDamageMin}). Current weapon is {_currentWeaponData.DisplayName}");
             return;
         }
 
@@ -115,7 +115,7 @@ public class WeaponHolder : MonoBehaviour
             return;
         }
 
-        float damageValue = UnityEngine.Random.Range(_currentWeaponData.DamageMin, _currentWeaponData.DamageMax);
+        float damageValue = UnityEngine.Random.Range(_currentWeaponData.LightDamageMin, _currentWeaponData.LightDamageMax);
 
         Self.Attack(new Damage{
             Type = _currentWeaponData.DamageType,
