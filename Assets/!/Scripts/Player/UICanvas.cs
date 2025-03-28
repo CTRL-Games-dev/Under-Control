@@ -49,13 +49,12 @@ public class UICanvas : MonoBehaviour
     [Header("Canvases")]
     [SerializeField] private HUDCanvas _HUDCanvas;
 
-    [SerializeField] private InventoryCanvas _inventoryCanvas;
-    [SerializeField] private MainMenuCanvas _mainMenuCanvas;
-    [SerializeField] private PauseCanvas _pauseCanvas;
-    [SerializeField] private ChooseCanvas _chooseCanvas;
-
-    [SerializeField] private DeathScreenCanvas _deathScreenCanvas;
-    [SerializeField] private SettingsCanvas _settingsCanvas;
+    public InventoryCanvas InventoryCanvas;
+    public MainMenuCanvas MainMenuCanvas;
+    public PauseCanvas PauseCanvas;
+    public ChooseCanvas ChooseCanvas;
+    public DeathScreenCanvas DeathScreenCanvas;
+    public SettingsCanvas SettingsCanvas;
 
 
     [Header("UI Elements")]
@@ -133,7 +132,7 @@ public class UICanvas : MonoBehaviour
 
 
     public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab, IInteractableInventory interactable = null, string title = null) {
-        _inventoryCanvas.SetOtherInventory(itemContainer, prefab, interactable, title);
+        InventoryCanvas.SetOtherInventory(itemContainer, prefab, interactable, title);
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Inventory);
     }
 
@@ -186,17 +185,17 @@ public class UICanvas : MonoBehaviour
     private void closeUIMiddleState(UIMiddleState state) {
         switch (state) {
             case UIMiddleState.Inventory:
-                _inventoryCanvas.HideUI();                
+                InventoryCanvas.HideUI();                
                 break;
             case UIMiddleState.MainMenu:
                 Player.Instance.InputDisabled = false;
-                _mainMenuCanvas.HideUI();
+                MainMenuCanvas.HideUI();
                 break;
             case UIMiddleState.Pause:
-                _pauseCanvas.HideUI();
+                PauseCanvas.HideUI();
                 break;
             case UIMiddleState.Choose:
-                _chooseCanvas.HideUI();
+                ChooseCanvas.HideUI();
                 break;
         }
     }
@@ -204,24 +203,24 @@ public class UICanvas : MonoBehaviour
     private void openUIMiddleState(UIMiddleState state) {
         switch (state) {
             case UIMiddleState.Inventory:
-                _inventoryCanvas.ShowUI();
+                InventoryCanvas.ShowUI();
                 break;
             case UIMiddleState.MainMenu:
                 closeUIBottomState(CurrentUIBottomState);
                 Player.Instance.InputDisabled = true;
-                _mainMenuCanvas.ShowUI();
+                MainMenuCanvas.ShowUI();
                 break;
             case UIMiddleState.Pause:
-                _pauseCanvas.ShowUI();
+                PauseCanvas.ShowUI();
                 break;
             case UIMiddleState.NotVisible:
                 Player.Instance.InputDisabled = false;
                 InventoryPanel.IsItemJustBought = false;
                 DropItem();
-                _inventoryCanvas.SetOtherInventory(null, null);
+                InventoryCanvas.SetOtherInventory(null, null);
                 break;
             case UIMiddleState.Choose:
-                _chooseCanvas.ShowUI();
+                ChooseCanvas.ShowUI();
                 break;
         }
     }
@@ -236,10 +235,10 @@ public class UICanvas : MonoBehaviour
     private void closeUITopState(UITopState state) {
         switch (state) {
             case UITopState.Death:
-                _deathScreenCanvas.HideUI();
+                DeathScreenCanvas.HideUI();
                 break;
             case UITopState.Settings:
-                _settingsCanvas.HideUI();
+                SettingsCanvas.HideUI();
                 break;
             case UITopState.VideoPlayer:
                 _videoPlayer.Stop();
@@ -252,10 +251,10 @@ public class UICanvas : MonoBehaviour
         switch (state) {
             case UITopState.Death:
                 Player.Instance.InputDisabled = true;
-                _deathScreenCanvas.ShowUI();
+                DeathScreenCanvas.ShowUI();
                 break;
             case UITopState.Settings:
-                _settingsCanvas.ShowUI();
+                SettingsCanvas.ShowUI();
                 break;
             case UITopState.VideoPlayer:
                 Debug.Log("VideoPlayer");

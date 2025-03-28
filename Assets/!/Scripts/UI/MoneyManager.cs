@@ -30,11 +30,6 @@ public class MoneyAnimator : MonoBehaviour
         OnCoinsChange(0);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     private void OnCoinsChange(int change) {
         if (change == 0) {
