@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DG.Tweening;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -65,6 +66,16 @@ public class Player : MonoBehaviour {
     public CinemachineCamera TopDownCamera;
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
+
+    private int _evolutionPoints = 4;
+    public int EvolutionPoints {
+        get{ return _evolutionPoints; }
+        set {
+            _evolutionPoints = value;
+            UICanvas.InventoryCanvas.ChangeEvoPoints();
+        }
+    }
+    public List<EvoUI> SelectedEvolutions;
 
     [SerializeField] private UICanvas _uiCanvas;
     [SerializeField] private ParticleSystem[] _trailParticles;

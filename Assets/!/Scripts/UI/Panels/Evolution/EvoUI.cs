@@ -12,10 +12,12 @@ public class EvoUI : MonoBehaviour
     [SerializeField] private List<EvoUI> _nextEvoUIs;
 
     [SerializeField] private string _title;
-    [SerializeField] private string _description;
+    private string _description = "";
 
     [SerializeField] private bool _isAvailable = false;
     [SerializeField] private bool _isSelected = false;
+
+    [SerializeField] private List<Modifier> _modifiers = new List<Modifier>();
 
     private RectTransform _rectTransform;
     private EventTrigger _eventTrigger;
@@ -27,6 +29,10 @@ public class EvoUI : MonoBehaviour
         _rectTransform.localScale = _isAvailable ? Vector3.one : Vector3.one * 0.9f;
         _bgImage.color = _isAvailable ? Color.white : Color.gray;
         _lineImage.fillAmount = _isSelected ? 1 : 0;
+
+        foreach (Modifier modifier in _modifiers) {
+            _description += modifier.ToString() + "\n";
+        }
     }
 
 
@@ -54,7 +60,9 @@ public class EvoUI : MonoBehaviour
     }
 
     public void OnPointerClick() {
-        if (!_isAvailable || _isSelected) return;
+        if (!_isAvailable || _isSelected || Player.Instance.EvolutionPoints <= 0) return;
+        Player.Instance.EvolutionPoints--;
+        Player.Instance.SelectedEvolutions.Add(this);
         float fillAmount = 0;
         DOTween.To(() => fillAmount, x => fillAmount = x, 1, 0.5f).SetEase(Ease.InOutSine).OnUpdate(() => {
             _lineImage.fillAmount = fillAmount;

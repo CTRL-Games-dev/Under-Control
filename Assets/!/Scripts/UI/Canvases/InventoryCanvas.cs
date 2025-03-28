@@ -11,7 +11,7 @@ public class InventoryCanvas : MonoBehaviour
         Other,
         Armor,
         Cards,
-        Skills,
+        Evo,
         Quests
     }
 
@@ -19,17 +19,22 @@ public class InventoryCanvas : MonoBehaviour
     private ItemContainer _currentOtherInventory;
     [SerializeField] private GameObject _otherInventoryHolder;
     [SerializeField] private RectTransform _underlineRect;
-    [SerializeField] private GameObject _armorBtnTabGO, _cardsBtnTabGO, _skillsBtnTabGO, _questsBtnTabGO, _otherBtnTabGO;
+    [SerializeField] private GameObject _armorBtnTabGO, _cardsBtnTabGO, _evoBtnTabGO, _questsBtnTabGO, _otherBtnTabGO;
 
     [Header("Panel Game Objects")]
     [SerializeField] private GameObject _playerInventoryPanelGO;
-    [SerializeField] private GameObject _armorInventoryPanelGO, _cardsInventoryPanelGO, _skillsInventoryPanelGO, _questsInventoryPanelGO, _otherInventoryPanelGO;
+    [SerializeField] private GameObject _armorInventoryPanelGO, _cardsInventoryPanelGO, _evoInventoryPanelGO, _questsInventoryPanelGO, _otherInventoryPanelGO;
 
     [Header("Armor panel parts")]
     [SerializeField] private GameObject _playerPreviewGO;
     [SerializeField] private GameObject[] _armorSlotsGO = new GameObject[7];
     private RectTransform[] _armorSlotsRects = new RectTransform[7];
     private CanvasGroup[] _armorSlotsCanvasGroups = new CanvasGroup[7];
+
+    [Header("Evolution panel parts")]
+    [SerializeField] private GameObject _evoPointsGO;
+    [SerializeField] private RectTransform _pointsHolderRect;
+
 
     private GameObject[] _tabButtonGameObjects;
     private Button[] _tabButtons;
@@ -54,35 +59,35 @@ public class InventoryCanvas : MonoBehaviour
         _tabButtonGameObjects = new GameObject[] {
             _armorBtnTabGO,
             _cardsBtnTabGO,
-            _skillsBtnTabGO,
+            _evoBtnTabGO,
             _questsBtnTabGO,
             _otherBtnTabGO
         };
         _tabButtons = new Button[] {
             _armorBtnTabGO.GetComponent<Button>(),
             _cardsBtnTabGO.GetComponent<Button>(),
-            _skillsBtnTabGO.GetComponent<Button>(),
+            _evoBtnTabGO.GetComponent<Button>(),
             _questsBtnTabGO.GetComponent<Button>(),
             _otherBtnTabGO.GetComponent<Button>()
         };
         _tabImages = new Image[] {
             _armorBtnTabGO.GetComponent<Image>(),
             _cardsBtnTabGO.GetComponent<Image>(),
-            _skillsBtnTabGO.GetComponent<Image>(),
+            _evoBtnTabGO.GetComponent<Image>(),
             _questsBtnTabGO.GetComponent<Image>(),
             _otherBtnTabGO.GetComponent<Image>(),
         };
         _tabTexts = new TextMeshProUGUI[] {
             _armorBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
             _cardsBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
-            _skillsBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
+            _evoBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
             _questsBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
             _otherBtnTabGO.GetComponentInChildren<TextMeshProUGUI>()
         };
         _tabRectTranforms = new RectTransform[] {
             _armorBtnTabGO.GetComponent<RectTransform>(),
             _cardsBtnTabGO.GetComponent<RectTransform>(),
-            _skillsBtnTabGO.GetComponent<RectTransform>(),
+            _evoBtnTabGO.GetComponent<RectTransform>(),
             _questsBtnTabGO.GetComponent<RectTransform>(),
             _otherBtnTabGO.GetComponent<RectTransform>(),
         };
@@ -90,7 +95,7 @@ public class InventoryCanvas : MonoBehaviour
         _tabPanelsIndex = new Dictionary<InventoryTabs, int> {
             { InventoryTabs.Armor, 0 },
             { InventoryTabs.Cards, 1 },
-            { InventoryTabs.Skills, 2 },
+            { InventoryTabs.Evo, 2 },
             { InventoryTabs.Quests, 3 },
             { InventoryTabs.Other, 4 }
         };
@@ -162,8 +167,8 @@ public class InventoryCanvas : MonoBehaviour
             case InventoryTabs.Cards:
                 cardsTabExit().OnComplete(() => openTab(_currentTab));
                 break;
-            case InventoryTabs.Skills:
-                skillsTabExit().OnComplete(() => openTab(_currentTab));
+            case InventoryTabs.Evo:
+                evoTabExit().OnComplete(() => openTab(_currentTab));
                 break;
             case InventoryTabs.Quests:
                 questsTabExit().OnComplete(() => openTab(_currentTab));
@@ -184,8 +189,8 @@ public class InventoryCanvas : MonoBehaviour
             case InventoryTabs.Cards:
                 cardsTabEnter();
                 break;
-            case InventoryTabs.Skills:
-                skillsTabEnter();
+            case InventoryTabs.Evo:
+                evoTabEnter();
                 break;
             case InventoryTabs.Quests:
                 questsTabEnter();
@@ -201,7 +206,7 @@ public class InventoryCanvas : MonoBehaviour
         playerTabExit();
         armorTabExit();
         cardsTabExit();
-        skillsTabExit();
+        evoTabExit();
         questsTabExit();
         otherTabExit();
     }
@@ -210,7 +215,7 @@ public class InventoryCanvas : MonoBehaviour
         _otherInventoryPanelGO.GetComponent<RectTransform>().DOKill();
         _armorInventoryPanelGO.GetComponent<RectTransform>().DOKill();
         _cardsInventoryPanelGO.GetComponent<RectTransform>().DOKill();
-        _skillsInventoryPanelGO.GetComponent<RectTransform>().DOKill();
+        _evoInventoryPanelGO.GetComponent<RectTransform>().DOKill();
         _questsInventoryPanelGO.GetComponent<RectTransform>().DOKill();
         _playerInventoryPanelGO.GetComponent<RectTransform>().DOKill();
     }
@@ -254,13 +259,25 @@ public class InventoryCanvas : MonoBehaviour
         Player.UICanvas.DropItem();
     }
 
+    public void ChangeEvoPoints() {
+        Debug.Log("Evo points changed: " + Player.Instance.EvolutionPoints * 57);
+        foreach(RectTransform rect in _pointsHolderRect) {
+            rect.DOKill();
+            rect.DOScale(0.9f, 0.2f).SetEase(Ease.OutCubic).OnComplete(() => {
+                rect.DOScale(1, 0.2f).SetDelay(0.4f).SetEase(Ease.OutCubic);
+            });
+        }
+        _pointsHolderRect.DOAnchorPosY(Player.Instance.EvolutionPoints * 57, 0.4f).SetDelay(0.2f).SetEase(Ease.InOutBack);
+    }
+
+
     public void OnOpenOtherTab() { SetCurrentTab(InventoryTabs.Other); }
 
     public void OnOpenArmorTab() { SetCurrentTab(InventoryTabs.Armor); }
 
     public void OnOpenCardsTab() { SetCurrentTab(InventoryTabs.Cards); }
 
-    public void OnOpenSkillsTab() { SetCurrentTab(InventoryTabs.Skills); }
+    public void OnOpenEvoTab() { SetCurrentTab(InventoryTabs.Evo); }
 
     public void OnOpenQuestsTab() { SetCurrentTab(InventoryTabs.Quests); }
     
@@ -390,13 +407,13 @@ public class InventoryCanvas : MonoBehaviour
         return _cardsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f).OnComplete(() => _cardsInventoryPanelGO.SetActive(false));
     }
 
-    private Tween skillsTabEnter() {
-        _skillsInventoryPanelGO.SetActive(true);
-        return _skillsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-1000, 0.25f);
+    private Tween evoTabEnter() {
+        _evoInventoryPanelGO.SetActive(true);
+        return _evoInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-1000, 0.25f);
     }
 
-    private Tween skillsTabExit() {
-        return _skillsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f).OnComplete(() => _skillsInventoryPanelGO.SetActive(false));
+    private Tween evoTabExit() {
+        return _evoInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f).OnComplete(() => _evoInventoryPanelGO.SetActive(false));
     }
 
     private Tween questsTabEnter() {
