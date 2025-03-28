@@ -419,10 +419,10 @@ public class Player : MonoBehaviour {
         ModifierSystem.RegisterStat(ref Armor);
         // ModifierSystem.RegisterStat(ref LightAttackDamage);
         ModifierSystem.RegisterStat(ref LightAttackSpeed);
-        ModifierSystem.RegisterStat(ref LightAttackRange);
+        // ModifierSystem.RegisterStat(ref LightAttackRange);
         // ModifierSystem.RegisterStat(ref HeavyAttackDamage);
         ModifierSystem.RegisterStat(ref HeavyAttackSpeed);
-        ModifierSystem.RegisterStat(ref HeavyAttackRange);
+        // ModifierSystem.RegisterStat(ref HeavyAttackRange);
         ModifierSystem.RegisterStat(ref MovementSpeed);
         ModifierSystem.RegisterStat(ref DashSpeed);
         ModifierSystem.RegisterStat(ref DashCooldown);
