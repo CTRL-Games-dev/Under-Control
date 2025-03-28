@@ -1,4 +1,4 @@
-using System;
+using UnityEngine;
 
 public static class StatTypeExtensions {
     public static string GetDisplayName(this StatType statType) {
@@ -26,7 +26,8 @@ public static class StatTypeExtensions {
             case StatType.VEKTHAR_CONTROL:
                 return "Vekhtar Control";
             default:
-                throw new ArgumentOutOfRangeException(nameof(statType), statType, null);
+                Debug.LogError($"Requested display name for stat type {statType} but it is not implemented, returning {statType}");
+                return statType.ToString();
         }
     }
 }
