@@ -24,11 +24,11 @@ public class Player : MonoBehaviour {
 
     // public Stat LightAttackDamage = new Stat(StatType.LIGHT_ATTACK_DAMAGE, 10f);
     public Stat LightAttackSpeed = new Stat(StatType.LIGHT_ATTACK_SPEED, 1f);
-    public Stat LightAttackRange = new Stat(StatType.LIGHT_ATTACK_RANGE, 1f);
+    // public Stat LightAttackRange = new Stat(StatType.LIGHT_ATTACK_RANGE, 1f);
 
     // public Stat HeavyAttackDamage = new Stat(StatType.HEAVY_ATTACK_DAMAGE, 20f);
     public Stat HeavyAttackSpeed = new Stat(StatType.HEAVY_ATTACK_SPEED, 1f);
-    public Stat HeavyAttackRange = new Stat(StatType.HEAVY_ATTACK_RANGE, 1f);
+    // public Stat HeavyAttackRange = new Stat(StatType.HEAVY_ATTACK_RANGE, 1f);
 
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 10f);
 
@@ -135,7 +135,7 @@ public class Player : MonoBehaviour {
         }
     }
 
-    void Update(){
+    void Update() {
         // Nie mozna playerinputa wylaczyc? - nie mozna :)
         if (InputDisabled) {
             _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0, _deceleration * Time.deltaTime);
@@ -156,8 +156,7 @@ public class Player : MonoBehaviour {
         if (!_lockRotation) handleRotation();
     }
 
-    void FixedUpdate()
-    {
+    void FixedUpdate() {
         Animator.SetFloat(_speedHash, _currentSpeed / MaxMovementSpeed);
         Animator.SetFloat(_lightAttackSpeedHash, Instance.LightAttackSpeed);
         Animator.SetFloat(_heavyAttackSpeedHash, Instance.HeavyAttackSpeed);
