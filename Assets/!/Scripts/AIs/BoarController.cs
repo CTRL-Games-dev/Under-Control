@@ -33,9 +33,11 @@ public class BoarController : MonoBehaviour
 
     public void OnAttackAnimationStart() {
         WeaponHolder.BeginAttack();
+        WeaponHolder.EnableHitbox();
     }
 
     public void OnAttackAnimationEnd() {
+        WeaponHolder.DisableHitbox();
         WeaponHolder.EndAttack();
     }
 }

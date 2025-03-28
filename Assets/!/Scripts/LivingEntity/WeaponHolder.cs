@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +12,7 @@ public class WeaponHolder : MonoBehaviour
     private WeaponItemData _currentWeaponData;
     private List<LivingEntity> _hitEntities = new List<LivingEntity>();
     private AttackType? _currentAttackType;
+    private bool _isAttacking = false;
 
     public void UpdateWeapon(WeaponItemData weaponData) {
         if (_currentWeaponHitter != null) {
@@ -68,7 +68,15 @@ public class WeaponHolder : MonoBehaviour
             return;
         }
 
+        if(_currentAttackType == null) {
+            Debug.LogWarning($"Current attack type is null");
+            return;
+        }
+
         if(_currentWeaponHitter == null) return;
+        if(_isAttacking) return;
+
+        _isAttacking = true;
 
         _hitEntities.Clear();
         _currentWeaponHitter.StartMinorTrail();
@@ -82,6 +90,9 @@ public class WeaponHolder : MonoBehaviour
         
         if(_currentWeaponHitter == null) return;
         if(_currentAttackType == null) return;
+        if(!_isAttacking) return;
+
+        _isAttacking = false;
 
         _hitEntities.Clear();
         _currentWeaponHitter.StopMinorTrail();
@@ -95,6 +106,7 @@ public class WeaponHolder : MonoBehaviour
         }
         
         if(_currentWeaponHitter == null) return;
+
         _currentWeaponHitter.EnableHitbox();
         _currentWeaponHitter.StartMajorTrail();
     }
@@ -106,6 +118,7 @@ public class WeaponHolder : MonoBehaviour
         }
 
         if(_currentWeaponHitter == null) return;
+
         _currentWeaponHitter.DisableHitbox();
         _currentWeaponHitter.StopMajorTrail();
     }
@@ -143,7 +156,7 @@ public class WeaponHolder : MonoBehaviour
             return;
         }
 
-        float damageValue = UnityEngine.Random.Range(damageMin, damageMax);
+        float damageValue = Random.Range(damageMin, damageMax);
 
         if (_currentAttackType == AttackType.LIGHT) {
             damageValue = Self.ModifierSystem.CalculateForStatType(StatType.LIGHT_ATTACK_DAMAGE, damageValue);
