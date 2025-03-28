@@ -12,6 +12,7 @@ public class WeaponHolder : MonoBehaviour
     private Weapon _currentWeaponHitter;
     private WeaponItemData _currentWeaponData;
     private List<LivingEntity> _hitEntities = new List<LivingEntity>();
+    private AttackType? _currentAttackType;
 
     public void UpdateWeapon(WeaponItemData weaponData) {
         if (_currentWeaponHitter != null) {
@@ -42,6 +43,25 @@ public class WeaponHolder : MonoBehaviour
         return Instantiate(UnknownWeaponPrefab, Vector3.zero, Quaternion.identity, transform);
     }
 
+    public void InitializeAttack(AttackType attackType) {
+        if(_currentWeaponData == null) {
+            Debug.LogWarning($"Current weapon is null");
+            return;
+        }
+
+        if(_currentWeaponHitter == null) {
+            Debug.LogWarning($"Current weapon hitter is null");
+            return;
+        }
+
+        if(_currentAttackType != null) {
+            Debug.LogWarning($"Attack type is not null");
+            return;
+        }
+
+        _currentAttackType = attackType;
+    }
+
     public void BeginAttack() {
         if(_currentWeaponData == null) {
             Debug.LogWarning($"Current weapon is null");
@@ -49,6 +69,7 @@ public class WeaponHolder : MonoBehaviour
         }
 
         if(_currentWeaponHitter == null) return;
+
         _hitEntities.Clear();
         _currentWeaponHitter.StartMinorTrail();
     }
@@ -60,8 +81,11 @@ public class WeaponHolder : MonoBehaviour
         }
         
         if(_currentWeaponHitter == null) return;
+        if(_currentAttackType == null) return;
+
         _hitEntities.Clear();
         _currentWeaponHitter.StopMinorTrail();
+        _currentAttackType = null;
     }
 
     public void EnableHitbox() {
@@ -94,19 +118,23 @@ public class WeaponHolder : MonoBehaviour
 
         if(PreventSelfDamage && victim == Self) return;
         if(!victim.Guild.IsHostileTowards(Self.Guild)) return;
+        if(_currentAttackType == null) return;
 
-        if(_currentWeaponData.LightDamageMax <= 0) {
-            Debug.LogWarning($"{Self.DebugName}: DamageMax is zero or negative. Current weapon is {_currentWeaponData.DisplayName}");
+        float damageMin = _currentAttackType.Value == AttackType.LIGHT ? _currentWeaponData.LightDamageMin : _currentWeaponData.HeavyDamageMin;
+        float damageMax = _currentAttackType.Value == AttackType.LIGHT ? _currentWeaponData.LightDamageMax : _currentWeaponData.HeavyDamageMax;
+
+        if(damageMax <= 0) {
+            Debug.LogWarning($"{Self.DebugName}: DamageMax is zero or negative. Current weapon is {_currentWeaponData.DisplayName}. Attack type is {_currentAttackType}");
             return;
         }
 
-        if(_currentWeaponData.LightDamageMin < 0) {
-            Debug.LogWarning($"{Self.DebugName}: DamageMin is negative. Current weapon is {_currentWeaponData.DisplayName}");
+        if(damageMin < 0) {
+            Debug.LogWarning($"{Self.DebugName}: DamageMin is negative. Current weapon is {_currentWeaponData.DisplayName}. Attack type is {_currentAttackType}");
             return;
         }
 
-        if(_currentWeaponData.LightDamageMax < _currentWeaponData.LightDamageMin) {
-            Debug.LogWarning($"{Self.DebugName}: DamageMax ({_currentWeaponData.LightDamageMax}) is less than DamageMin ({_currentWeaponData.LightDamageMin}). Current weapon is {_currentWeaponData.DisplayName}");
+        if(damageMax < damageMin) {
+            Debug.LogWarning($"{Self.DebugName}: DamageMax ({damageMax}) is less than DamageMin ({damageMin}). Current weapon is {_currentWeaponData.DisplayName}. Attack type is {_currentAttackType}");
             return;
         }
 
@@ -115,7 +143,13 @@ public class WeaponHolder : MonoBehaviour
             return;
         }
 
-        float damageValue = UnityEngine.Random.Range(_currentWeaponData.LightDamageMin, _currentWeaponData.LightDamageMax);
+        float damageValue = UnityEngine.Random.Range(damageMin, damageMax);
+
+        if (_currentAttackType == AttackType.LIGHT) {
+            damageValue = Self.ModifierSystem.CalculateForStatType(StatType.LIGHT_ATTACK_DAMAGE, damageValue);
+        } else {
+            damageValue = Self.ModifierSystem.CalculateForStatType(StatType.HEAVY_ATTACK_DAMAGE, damageValue);
+        }
 
         Self.Attack(new Damage{
             Type = _currentWeaponData.DamageType,

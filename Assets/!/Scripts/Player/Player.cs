@@ -343,11 +343,13 @@ public class Player : MonoBehaviour {
     }
 
     private void performLightAttack() {
+        WeaponHolder.InitializeAttack(AttackType.LIGHT);
         Animator.SetBool(_heavyAttackHash, false);
         Animator.SetTrigger(_lightAttackHash);
     }
 
     private void performHeavyAttack() {
+        WeaponHolder.InitializeAttack(AttackType.HEAVY);
         Animator.SetBool(_lightAttackHash, false);
         Animator.SetTrigger(_heavyAttackHash);
     }
