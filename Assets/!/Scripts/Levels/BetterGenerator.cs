@@ -22,23 +22,37 @@ public struct Point // Aka vertex
 {
     public Vector2 Position;
     public Location LocationOfPoint;
+    
     public Point(Vector2 pos, Location location)
     {
         Position = pos;
         LocationOfPoint = location;
     }
+    
     public Point(float x, float y, Location location)
     {
         Position = new Vector2(x, y);
         LocationOfPoint = location;
     }
+    
     public static bool operator ==(Point a, Point b)
     {
-        return(a.Position == b.Position);
+        return a.Position == b.Position;
     }
+
     public static bool operator !=(Point a, Point b)
     {
-        return(a.Position != b.Position);
+        return a.Position != b.Position;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return base.Equals(obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
     }
 }
 
