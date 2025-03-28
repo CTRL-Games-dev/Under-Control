@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 [Serializable]
 public struct Modifier {
@@ -55,6 +56,27 @@ public struct Modifier {
         return $"{valueString} {StatType.GetDisplayName()}";
     }
 
+    public string ToRichTextString() {
+        ModifierImpact impact = GetImpact();
+
+        string color;
+        switch(impact) {
+            case ModifierImpact.POSITIVE:
+                color = "#00FF00";
+                break;
+            case ModifierImpact.NEUTRAL:
+                color = "#FFFFFF";
+                break;
+            case ModifierImpact.NEGATIVE:
+                color = "#FF0000";
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        return $"<color={color}>{ToString()}</color>";
+    }
+
     public ModifierImpact GetImpact() {
         switch(StatType) {
             case StatType.HEALTH:
@@ -82,7 +104,8 @@ public struct Modifier {
                     return ModifierImpact.NEUTRAL;
                 }
             default:
-                throw new ArgumentOutOfRangeException();
+                Debug.LogError($"Requested impact for stat type {StatType} but it is not implemented, returning NEUTRAL");
+                return ModifierImpact.NEUTRAL;
         }
     }
 }
