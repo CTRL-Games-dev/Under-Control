@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -107,6 +108,17 @@ public class LivingEntity : MonoBehaviour {
         float desiredDamageAmount = damage.Value;
         // TODO: Calculate damage based on damage type, current entity modifiers, spells and what not
 
+        float resistance = getDamageResistance(damage.Type);
+        if(resistance < 0) {
+            Debug.LogWarning($"Resistance for damage type {damage.Type} is negative. Resistance is floored to 0. Resistance is {resistance}");
+            resistance = 0;
+        } else if (resistance > 1) {
+            Debug.LogWarning($"Resistance for damage type {damage.Type} is greater than 1. Resistance is floored to 1. Resistance is {resistance}");
+            resistance = 1;
+        }
+
+        desiredDamageAmount *= 1 - resistance;
+
         float actualDamageAmount = desiredDamageAmount;
         if(actualDamageAmount > Health) {
             actualDamageAmount = Health;
@@ -181,6 +193,19 @@ public class LivingEntity : MonoBehaviour {
 
             if (DestroyOnDeath) Destroy(gameObject);
         }
+    }
+
+    private float getDamageResistance(DamageType damageType) {
+        if(Inventory is not HumanoidInventory humanoidInventory) return 0;
+
+        float resistance = 0;
+
+        resistance += humanoidInventory.Helmet?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
+        resistance += humanoidInventory.Chestplate?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
+        resistance += humanoidInventory.Leggings?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
+        resistance += humanoidInventory.Boots?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
+
+        return resistance;
     }
 
     #region Effects
