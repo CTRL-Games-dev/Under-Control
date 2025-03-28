@@ -23,6 +23,7 @@ public class BoarController : MonoBehaviour
         if(!PrimaryAttackCooldown.Execute()) return;
 
         WeaponHolder.UpdateWeapon(PrimaryAttackWeapon);
+        WeaponHolder.InitializeAttack(AttackType.LIGHT);
         _animator.SetTrigger(_primaryAttackHash);
     }
 
