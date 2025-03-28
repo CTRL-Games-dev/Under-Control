@@ -31,7 +31,7 @@ public class EvoUI : MonoBehaviour
         _lineImage.fillAmount = _isSelected ? 1 : 0;
 
         foreach (Modifier modifier in _modifiers) {
-            _description += modifier.ToString() + "\n";
+            _description += modifier.ToRichTextString() + "\n";
         }
     }
 

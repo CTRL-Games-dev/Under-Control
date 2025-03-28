@@ -260,7 +260,6 @@ public class InventoryCanvas : MonoBehaviour
     }
 
     public void ChangeEvoPoints() {
-        Debug.Log("Evo points changed: " + Player.Instance.EvolutionPoints * 57);
         foreach(RectTransform rect in _pointsHolderRect) {
             rect.DOKill();
             rect.DOScale(0.9f, 0.2f).SetEase(Ease.OutCubic).OnComplete(() => {
