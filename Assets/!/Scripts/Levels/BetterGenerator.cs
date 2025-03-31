@@ -44,8 +44,6 @@ public struct PathData
 
 public struct WorldData
 {
-    public Vector2 Offset;
-    public float Scale;
     public int Width, Height;
     public TileType[,] Grid;
     public bool[,] GridUsed;
@@ -58,6 +56,7 @@ public struct WorldData
 [RequireComponent(typeof(MeshFilter))]
 public class BetterGenerator : MonoBehaviour
 {
+    public float Scale = 9;
     public WorldData wd;
     private MeshFilter _meshFilter;
     private MeshCollider _meshCollider;
@@ -137,8 +136,6 @@ public class BetterGenerator : MonoBehaviour
         Vector2 offset = new(minX-gridPadding, minY-gridPadding);
 
         // Set world data
-        wd.Offset = offset;
-        wd.Scale = 9;
         wd.Width = gridWidth;
         wd.Height = gridHeight;
         wd.Grid = grid;
@@ -159,7 +156,10 @@ public class BetterGenerator : MonoBehaviour
                     wd.GridUsed[indexX, indexY] = true;
                 }
             }
-            l.GenerateLocation(TerrainHolder, wd);
+
+            Location location = Instantiate(l).GetComponent<Location>();
+            location.PlaceInWorld(Scale);
+            location.InitLocation(TerrainHolder, wd);
         }
 
         GameObject[] tiles = Resources.LoadAll<GameObject>("Prefabs/Forest/ForestTiles");
@@ -205,7 +205,7 @@ public class BetterGenerator : MonoBehaviour
                         if(wd.Grid[x,y] != TileType.Wall || wd.GridUsed[x,y]) { continue; }
                         float posX = x + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
                         float posY = y + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
-                        Vector3 pos = new Vector3(posX, 0.0f, posY) * wd.Scale;
+                        Vector3 pos = new Vector3(posX, 0.0f, posY) * Scale;
 
                         GameObject tilePrefab = tiles[UnityEngine.Random.Range(0, tiles.Length)];
                         var newTile = Instantiate(tilePrefab, pos, Quaternion.identity, TerrainHolder.transform);
@@ -247,7 +247,7 @@ public class BetterGenerator : MonoBehaviour
                         {
                             float posX = gridX + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
                             float posY = gridY + 0.5f + UnityEngine.Random.Range(-0.1f, 0.1f);
-                            Vector3 pos = new Vector3(posX, 0, posY) * wd.Scale;
+                            Vector3 pos = new Vector3(posX, 0, posY) * Scale;
                             GameObject tilePrefab = tiles[UnityEngine.Random.Range(0, tiles.Length)];
                             GameObject newTile = Instantiate(tilePrefab, pos, Quaternion.identity, TerrainHolder.transform);
                             wd.GridUsed[gridX,gridY] = true;
@@ -261,7 +261,7 @@ public class BetterGenerator : MonoBehaviour
 
         #endregion
 
-        GenerateMesh(gridWidth, gridHeight);
+        GenerateMesh(gridWidth, gridHeight, offset);
     }
 
     #region Placing Locations
@@ -308,21 +308,22 @@ public class BetterGenerator : MonoBehaviour
 
     private void PlaceLocationsForest()
     {
+        GameObject portalPrefab = Resources.Load<GameObject>("Prefabs/Forest/Locations/ForestPortal");
+        GameObject[] meadowPrefabs = Resources.LoadAll<GameObject>("Prefabs/Forest/Locations/Meadows");
+        
         // Place portal
-        Location portal = new ForestPortal(true);
-        portal.LocationRectangle.SetCenter(new(0,0)); // Set it to center
-        wd.Locations.Add(portal);
+        wd.Locations.Add();
 
         // Medow 
         int mCount = UnityEngine.Random.Range(3, 6);
         for(int i = 0; i < mCount; i++)
         {
-            Location medow = new Medow();
-            if(findSpot(medow, 5, 20)) 
+            MeadowLocation meadow = meadowPrefabs[UnityEngine.Random.Range(0, meadowPrefabs.Length)].GetComponent<MeadowLocation>();
+            if(findSpot(meadow, 5, 20)) 
             {
-                wd.Locations.Add(medow);
+                wd.Locations.Add(meadow);
             }
-            else Debug.LogError($"Cannot find place for location: {medow.Name}");
+            else Debug.LogError($"Cannot find place for location: {meadow.Name}");
         }
     }
 
@@ -343,7 +344,7 @@ public class BetterGenerator : MonoBehaviour
 
     #region Mesh
 
-    private void GenerateMesh(int gridWidth, int gridHeight)
+    private void GenerateMesh(int gridWidth, int gridHeight, Vector2 offset)
     {
         Mesh newMesh = new();
         
@@ -360,15 +361,18 @@ public class BetterGenerator : MonoBehaviour
             }
         }
 
-        for(int x = 0; x < gridWidth; x++)
+        for(int xi = 0; xi < gridWidth; xi++)
         {
-            for(int y = 0; y < gridHeight; y++) {
-                int index = x * gridHeight + y;
+            for(int yi = 0; yi < gridHeight; yi++) {
+                int index = xi * gridHeight + yi;
 
-                Vector3 p0 = new Vector3(x,     th[x,y],  y) * wd.Scale;
-                Vector3 p1 = new Vector3(x,     th[x,y+1],  (y+1)) * wd.Scale;
-                Vector3 p2 = new Vector3((x+1), th[x+1,y+1],  (y+1)) * wd.Scale;
-                Vector3 p3 = new Vector3((x+1), th[x+1,y], y) * wd.Scale;
+                int x = (int)(xi - offset.x);
+                int y = (int)(yi - offset.y);
+
+                Vector3 p0 = new Vector3(x,     th[x,y],  y) * Scale;
+                Vector3 p1 = new Vector3(x,     th[x,y+1],  (y+1)) * Scale;
+                Vector3 p2 = new Vector3((x+1), th[x+1,y+1],  (y+1)) * Scale;
+                Vector3 p3 = new Vector3((x+1), th[x+1,y], y) * Scale;
 
                 vertices.Add(p0);
                 vertices.Add(p1);

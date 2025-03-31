@@ -22,7 +22,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
         var generator = GetComponent<BetterGenerator>();
         generator.GenerateMap(GameManager.Instance.GetCurrentDimension());
         
-        ForestPortal portal = generator.Getlocation<ForestPortal>();
+        ForestPortalLocation portal = generator.Getlocation<ForestPortalLocation>();
 
         Vector2 spawn = portal.GetWorldCenter(generator.wd.Offset, generator.wd.Scale);
 
