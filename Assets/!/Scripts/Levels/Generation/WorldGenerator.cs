@@ -1,11 +1,22 @@
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public struct CellType
+public enum CellType
 {
+    Empty,
+    Forest,
+}
 
+public struct Grid
+{
+    public CellType[,] Cells;
+    public Vector2 Dimensions;
+    public int Padding;
+    public Vector2 Offset;
 }
 
 public class WorldGenerator : MonoBehaviour {
@@ -27,18 +38,35 @@ public class WorldGenerator : MonoBehaviour {
     public void GenerateMap(Dimension type)
     {
 
-        Vector2 gridDimensions;
-        CellType[,] grid;
+        Grid grid;
+        List<Location> locationPrefabs;
 
         switch(type)
         {
             case Dimension.FOREST: {
-                gridDimensions = PlaceLocationsForest();
+                (locationPrefabs, grid) = PlaceLocationsForest();
             } break;
             default: {
                 Debug.LogError($"This type of dimension is not implemented! -> {type}");
+                return;
             } break;
         }
+
+        foreach(Location l in locationPrefabs)
+        {
+            for(int ix = 0; ix < (int)grid.Dimensions.x; ix++)
+            {
+                for (int iy = 0; iy < (int)grid.Dimensions.y; iy++)
+                {
+                    int x = (int)(ix + grid.Offset.x);
+                    int y = (int)(iy + grid.Offset.y);
+
+                    grid.Cells[x,y] = CellType.Forest;
+                }
+            }
+        }
+
+
     }
 
 
@@ -100,7 +128,7 @@ public class WorldGenerator : MonoBehaviour {
             return neighbours;
         }
     }
-    public (List<Location>, Vector2) PlaceLocationsForest()
+    public (List<Location>, Grid) PlaceLocationsForest()
     {
         ForestPortalLocation forestPortalPrefab = Resources.Load<ForestPortalLocation>("Prefabs/Forest/Locations/ForestPortal");
         MeadowLocation[] meadowsPrefabs = Resources.LoadAll<MeadowLocation>("Prefabs/Forest/Locations/ForestPortal");
@@ -153,9 +181,105 @@ public class WorldGenerator : MonoBehaviour {
             if(node.Location.LocationCenterInWorld.y < minY) minY = node.Location.LocationCenterInWorld.y;  
         }
 
-        List<Location> locations = nodes.Select(x => x.Location).ToList();
+        int padding = 5;
+        maxX += padding;
+        maxY += padding;
+        minX -= padding;
+        minY -= padding;
 
-        return (locations, new(maxX - minX, maxY - minY));
+        Vector2 dimensions = new((float)Math.Ceiling(maxX - minX), (float)Math.Ceiling(maxY - minY));
+        List<Location> locations = nodes.Select(x => x.Location).ToList();
+        Grid grid = new Grid
+        {
+            Cells = new CellType[(int)dimensions.x, (int)dimensions.y],
+            Dimensions = dimensions,
+            Offset = new(minX, minY),
+            Padding = padding
+        };
+
+        return (locations, grid);
+    }
+
+    #endregion
+
+    #region Digging Paths
+
+    struct Path
+    {
+        public Vector2 Point1, Point2;
+        public bool Compare(Path other)
+        {
+            return  (Point1 == other.Point1 && Point2 == other.Point2) ||
+                    (Point1 == other.Point2 && Point2 == other.Point1);
+        }
+    }
+    public void DigOutPaths(List<Location> locations, ref Grid grid)
+    {
+        List<Path> uniquePaths = new();
+
+        foreach(var l in locations)
+        {
+            foreach(var neighbour in l.ConnectedLocations)
+            {
+                Path newPath = new Path 
+                {
+                    Point1 = l.LocationCenterInWorld, 
+                    Point2 = neighbour.LocationCenterInWorld,
+                };
+
+                if(uniquePaths.FindAll(p => p.Compare(newPath)).Count == 0)
+                {
+                    uniquePaths.Add(newPath);
+                }
+            }
+        }
+
+        int num = 0;
+        foreach(var path in uniquePaths)
+        {
+            // Debug.Log("=== LINE " + num + " ===");
+
+            // Debug.Log("First point " + line.v0.Position);
+            // Debug.Log("Second point " + line.v1.Position);
+
+            num++;
+            Vector2 point1 = path.Point1.x < path.Point2.x ? path.Point1 : path.Point2;
+            Vector2 point2 = path.Point1.x > path.Point2.x ? path.Point1 : path.Point2;
+
+            // Debug.Log("First point " + point1.Position);
+            // Debug.Log("Second point " + point2.Position);
+
+            float a = (point2.y - point1.y)/(point2.x - point1.x);
+            // y = ax + b ----> b = y - ax
+            float b = point1.y-(a * point1.x);
+
+            int yLength = (int)Math.Abs(Math.Ceiling(a));
+            yLength = yLength < 1 ? 1 : yLength; // yLength cannot be smaller than 1
+            int ySymbol = a > 0 ? 1 : -1;
+
+            //  Debug.LogFormat("yLen = {0}, a = {1}, b = {2}", yLength, a, b);
+            int thickness = UnityEngine.Random.Range(2, 4);
+
+            for(int ix = (int)Math.Floor(point1.x); ix < (int)Math.Floor(point2.x); ix++)
+            {
+                int x = ix;
+                int indexX = x - (int)grid.Offset.x;
+
+                for(int iy = 0; iy < yLength; iy++)
+                {
+                    int y = (int)Math.Floor(a*x + b)+(iy*ySymbol);
+                    int indexY = y - (int)grid.Offset.y;
+
+                    for(int tx = 0; tx < thickness; tx++)
+                    {
+                        for(int ty = 0; ty < thickness; ty++)
+                        {
+                            grid.Cells[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = CellType.Empty;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     #endregion
