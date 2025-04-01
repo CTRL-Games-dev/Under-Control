@@ -132,6 +132,8 @@ public class WorldGenerator : MonoBehaviour {
             List<LocationNode> neighbours = node.GetNeighbours(nodes);
             foreach(var neighbour in neighbours)
             {
+                node.Location.ConnectedLocations.Add(neighbour.Location);
+
                 if(neighbour.Location.LocationCenterInWorld != Vector2.zero) continue;
                 Vector2 diff = new(
                     (node.Location.Width / 2) + (neighbour.Location.Width / 2),
