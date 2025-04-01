@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -17,24 +18,19 @@ public struct Grid
     public Vector2 Dimensions;
     public int Padding;
     public Vector2 Offset;
+
+    public int GetWidthCeil()
+    {
+        return (int)Math.Ceiling(Dimensions.x);
+    }
+    public int GetHeightCeil()
+    {
+        return (int)Math.Ceiling(Dimensions.y);
+    }
 }
 
 public class WorldGenerator : MonoBehaviour {
-    public static List<T> ShuffleList<T>(List<T> list)
-    {
-        List<T> clonedList = new();
-        list.ForEach(item => clonedList.Add(item));
-
-        for (int i = clonedList.Count - 1; i > 0; i--)
-        {
-            var k = UnityEngine.Random.Range(0, i);
-            var value = clonedList[k];
-            clonedList[k] = clonedList[i];
-            clonedList[i] = value;
-        }
-
-        return clonedList;
-    }
+    [SerializeField] private Chunk _chunkPrefab
     public void GenerateMap(Dimension type)
     {
 
@@ -66,7 +62,9 @@ public class WorldGenerator : MonoBehaviour {
             }
         }
 
-
+        DigOutPaths(locationPrefabs, ref grid);
+        SpawnPrefabs();
+        GenerateMesh();
     }
 
 
@@ -280,6 +278,63 @@ public class WorldGenerator : MonoBehaviour {
                 }
             }
         }
+    }
+
+    #endregion
+
+
+    #region Mesh
+
+    struct ChunkData
+    {
+        public Vector2 TopLeftCorner;
+        public float Width;
+        public float Height;
+    }
+
+    public void GenerateChunks(ref Grid grid)
+    {
+        List<ChunkData> chunkInfo = new();
+
+        int maxChunkWidth = 10;
+        int maxChunkHeight = 10;
+
+        int widthLeft = grid.GetWidthCeil();
+        int heightLeft = grid.GetHeightCeil();
+
+        for(int ix = 0; ix < grid.GetWidthCeil() / maxChunkWidth; ix++)
+        {
+            for (int iy = 0; iy < grid.GetHeightCeil() / maxChunkHeight; iy++)
+            {
+                int chunkWidth;
+                int chunkHeight;
+
+                if(widthLeft - maxChunkWidth > 0)
+                {
+
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region Misc
+
+    public static List<T> ShuffleList<T>(List<T> list)
+    {
+        List<T> clonedList = new();
+        list.ForEach(item => clonedList.Add(item));
+
+        for (int i = clonedList.Count - 1; i > 0; i--)
+        {
+            var k = UnityEngine.Random.Range(0, i);
+            var value = clonedList[k];
+            clonedList[k] = clonedList[i];
+            clonedList[i] = value;
+        }
+
+        return clonedList;
     }
 
     #endregion
