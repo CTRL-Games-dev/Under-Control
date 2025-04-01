@@ -142,11 +142,18 @@ public class WorldGenerator : MonoBehaviour {
             }
         }
 
-        max
-        foreach(var node in nodes)
+        float maxX = 0, maxY = 0, minX = 0, minY = 0;
+        foreach(LocationNode node in nodes)
         {
-
+            if(node.Location.LocationCenterInWorld.x > maxX) maxX = node.Location.LocationCenterInWorld.x;
+            if(node.Location.LocationCenterInWorld.x < minX) minX = node.Location.LocationCenterInWorld.x;
+            if(node.Location.LocationCenterInWorld.y > maxY) maxY = node.Location.LocationCenterInWorld.y;
+            if(node.Location.LocationCenterInWorld.y < minY) minY = node.Location.LocationCenterInWorld.y;  
         }
+
+        List<Location> locations = nodes.Select(x => x.Location).ToList();
+
+        return (locations, new(maxX - minX, maxY - minY));
     }
 
     #endregion
