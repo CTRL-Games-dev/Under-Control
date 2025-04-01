@@ -25,26 +25,31 @@ public class Chunk : MonoBehaviour
         List<Vector2> uv = new();
 
         // Generate terrain height
-        float[,] th = new float[gridWidth+1, gridHeight+1];
-        for(int x = 0; x < gridWidth; x++)
-        {
-            for(int y = 0; y < gridHeight; y++) {
-                th[x,y] = UnityEngine.Random.Range(-0.1f, -0.05f);
-            }
-        }
+        // float[,] th = new float[gridWidth+1, gridHeight+1];
+        // for(int x = 0; x < gridWidth; x++)
+        // {
+        //     for(int y = 0; y < gridHeight; y++) {
+        //         th[x,y] = UnityEngine.Random.Range(-0.1f, -0.05f);
+        //     }
+        // }
 
         for(int ix = 0; ix < gridWidth; ix++)
         {
             for(int iy = 0; iy < gridHeight; iy++) {
-                int index = iy * gridHeight + iy;
+                int index = iy * gridHeight + ix;
 
                 int x = (int)(ix + topLeftCornerPosition.x);
                 int y = (int)(iy + topLeftCornerPosition.y);
 
-                Vector3 p0 = new Vector3(x,     th[x,y],  y);
-                Vector3 p1 = new Vector3(x,     th[x,y+1],  (y+1));
-                Vector3 p2 = new Vector3((x+1), th[x+1,y+1],  (y+1));
-                Vector3 p3 = new Vector3((x+1), th[x+1,y], y);
+                // Vector3 p0 = new Vector3(x,     th[x,y],  y);
+                // Vector3 p1 = new Vector3(x,     th[x,y+1],  (y+1));
+                // Vector3 p2 = new Vector3((x+1), th[x+1,y+1],  (y+1));
+                // Vector3 p3 = new Vector3((x+1), th[x+1,y], y);
+
+                Vector3 p0 = new Vector3(x,     0,  y);
+                Vector3 p1 = new Vector3(x,     0,  (y+1));
+                Vector3 p2 = new Vector3((x+1), 0,  (y+1));
+                Vector3 p3 = new Vector3((x+1), 0, y);
 
                 vertices.Add(p0);
                 vertices.Add(p1);

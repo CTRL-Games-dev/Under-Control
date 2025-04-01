@@ -8,7 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshCollider))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(BetterGenerator))]
+[RequireComponent(typeof(WorldGenerator))]
 public class AdventureManager : MonoBehaviour, ILevelManager
 {
     private GameManager _gameManager;
@@ -19,12 +19,12 @@ public class AdventureManager : MonoBehaviour, ILevelManager
     {
         _gameManager = GameManager.Instance;
         
-        var generator = GetComponent<BetterGenerator>();
+        var generator = GetComponent<WorldGenerator>();
         generator.GenerateMap(GameManager.Instance.GetCurrentDimension());
         
         ForestPortalLocation portal = generator.Getlocation<ForestPortalLocation>();
 
-        Vector2 spawn = portal.GetWorldCenter(generator.wd.Offset, generator.wd.Scale);
+        Vector2 spawn = portal.LocationCenterInWorld;
 
         Instantiate(_player, new(spawn.x, 0.2f, spawn.y - 2f), Quaternion.identity);
 

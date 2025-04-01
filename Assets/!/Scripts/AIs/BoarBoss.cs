@@ -5,14 +5,14 @@ using UnityEngine.AI;
 
 public class BoarBoss : MonoBehaviour 
 {
-    private BetterGenerator _generator;
+    private WorldGenerator _generator;
     private GameObject _boarPrefab;
     private int _boarNumber = 0;
     private int _maxBoarNumber = 10;
     public void Start()
     {
         _boarPrefab = Resources.Load<GameObject>("Prefabs/Forest/Enemies/Boar");
-        _generator = GameObject.Find("AdventureManager").GetComponent<BetterGenerator>();
+        _generator = GameObject.Find("AdventureManager").GetComponent<WorldGenerator>();
         InvokeRepeating("SpawnBoars", 20, 7);
     }
 
@@ -21,21 +21,21 @@ public class BoarBoss : MonoBehaviour
         Debug.Log("Spawning boars");
         Vector3 pos = transform.position;
 
-        WorldData wd = _generator.wd;
-        ForestBossArena location = _generator.Getlocation<ForestBossArena>();
-        Vector2 corner = location.GetWorldCorner(wd.Offset, wd.Scale);
+        // WorldData wd = _generator.wd;
+        // ForestBossArena location = _generator.Getlocation<ForestBossArena>();
+        // Vector2 corner = location.GetWorldCorner(wd.Offset, wd.Scale);
     
-        if
-        (!(
-            pos.x > corner.x ||
-            pos.x < corner.x + (location.GetWidth() * wd.Scale) ||
-            pos.y > corner.y ||
-            pos.y < corner.y + (location.GetHeight() * wd.Scale)
-        ))
-        {
-            Debug.Log($"Cannot spawn boars, to little space {corner}");
-            return;
-        }
+        // if
+        // (!(
+        //     pos.x > corner.x ||
+        //     pos.x < corner.x + (location.GetWidth() * wd.Scale) ||
+        //     pos.y > corner.y ||
+        //     pos.y < corner.y + (location.GetHeight() * wd.Scale)
+        // ))
+        // {
+        //     Debug.Log($"Cannot spawn boars, to little space {corner}");
+        //     return;
+        // }
 
         List<BoarController> boars = new();
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -30,7 +31,31 @@ public struct Grid
 }
 
 public class WorldGenerator : MonoBehaviour {
-    [SerializeField] private Chunk _chunkPrefab
+    [SerializeField] private Chunk _chunkPrefab;
+    [SerializeField] private GameObject _terrainHolder;
+    [SerializeField] private GameObject _terrainChunkHolder;
+    [HideInInspector] public List<Location> SpawnedLocations = new();
+
+    public T Getlocation<T>()
+    where T : Location
+    {
+        foreach(var l in SpawnedLocations)
+        {
+            if(l.GetType() == typeof(T)) return (T)l;
+        }
+        return null;
+    }
+
+    public List<T> GetAllLocation<T>()
+    where T : Location
+    {
+        List<T> locations = new();
+        foreach(var l in SpawnedLocations)
+        {
+            if(l.GetType() == typeof(T)) locations.Add((T)l);
+        }
+        return locations;
+    }
     public void GenerateMap(Dimension type)
     {
 
@@ -45,26 +70,23 @@ public class WorldGenerator : MonoBehaviour {
             default: {
                 Debug.LogError($"This type of dimension is not implemented! -> {type}");
                 return;
-            } break;
+            };
         }
 
-        foreach(Location l in locationPrefabs)
-        {
-            for(int ix = 0; ix < (int)grid.Dimensions.x; ix++)
-            {
-                for (int iy = 0; iy < (int)grid.Dimensions.y; iy++)
-                {
-                    int x = (int)(ix + grid.Offset.x);
-                    int y = (int)(iy + grid.Offset.y);
+        Debug.Log("Locations have been placed");
 
-                    grid.Cells[x,y] = CellType.Forest;
-                }
-            }
-        }
-
+        
+        Debug.Log("Placing trees");
+        PlaceForestAroundLocations(locationPrefabs, ref grid);
         DigOutPaths(locationPrefabs, ref grid);
-        SpawnPrefabs();
-        GenerateMesh();
+        Debug.Log("Trees are in place");
+
+        Debug.Log("Spawning locations");
+        SpawnLocationPrefabs(locationPrefabs);
+        Debug.Log("Spawned locations");
+
+        GenerateChunks(ref grid);
+        Debug.Log("Generated mesh chunks");
     }
 
 
@@ -129,16 +151,18 @@ public class WorldGenerator : MonoBehaviour {
     public (List<Location>, Grid) PlaceLocationsForest()
     {
         ForestPortalLocation forestPortalPrefab = Resources.Load<ForestPortalLocation>("Prefabs/Forest/Locations/ForestPortal");
-        MeadowLocation[] meadowsPrefabs = Resources.LoadAll<MeadowLocation>("Prefabs/Forest/Locations/ForestPortal");
+        MeadowLocation[] meadowsPrefabs = Resources.LoadAll<MeadowLocation>("Prefabs/Forest/Locations/Meadows");
+
+        Debug.Log("Loaded location prefabs");
 
         List<Location> allPrefabLocations = new()
         {   
             // forestPortalPrefab,
-            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length - 1)],
-            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length - 1)],
-            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length - 1)],
-            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length - 1)],
-            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length - 1)],
+            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)],
+            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)],
+            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)],
+            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)],
+            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)],
         };
 
         List<LocationNode> nodes = new()
@@ -179,7 +203,7 @@ public class WorldGenerator : MonoBehaviour {
             if(node.Location.LocationCenterInWorld.y < minY) minY = node.Location.LocationCenterInWorld.y;  
         }
 
-        int padding = 5;
+        int padding = 100;
         maxX += padding;
         maxY += padding;
         minX -= padding;
@@ -200,7 +224,7 @@ public class WorldGenerator : MonoBehaviour {
 
     #endregion
 
-    #region Digging Paths
+    #region Digging Paths and Placing Forest
 
     struct Path
     {
@@ -209,6 +233,45 @@ public class WorldGenerator : MonoBehaviour {
         {
             return  (Point1 == other.Point1 && Point2 == other.Point2) ||
                     (Point1 == other.Point2 && Point2 == other.Point1);
+        }
+    }
+
+    public void PlaceForestAroundLocations(List<Location> locations, ref Grid grid)
+    {
+        foreach(Location l in locations)
+        {
+            // Place forest
+            int margin = grid.Padding; // Margin cannot be bigger that padding (otherwise may index grid out of bounds)
+            for(int ix = -margin; ix < (int)l.Width + margin - 1; ix++)
+            {
+                for (int iy = -margin; iy < (int)l.Height + margin - 1 ; iy++)
+                {
+                    Vector2 pos = l.GetTopLeftCorner();
+                    int x = (int)(pos.x + ix - grid.Offset.x);
+                    int y = (int)(pos.y + iy - grid.Offset.y);
+
+                    Debug.Log($"Pos: {pos}, Offset: {grid.Offset}");
+                    Debug.Log($"ix: {ix}, iy: {iy}");
+                    Debug.Log($"Index: {new Vector2(x, y)}");
+
+                    grid.Cells[x,y] = CellType.Forest;
+                }
+            }
+
+            // Dig out the actual location
+            for(int ix = 0; ix < (int)l.Width - 1; ix++)
+            {
+                for (int iy = 0; iy < (int)l.Height - 1; iy++)
+                {
+                    Vector2 pos = l.GetTopLeftCorner();
+                    int x = (int)(pos.x + ix - grid.Offset.x);
+                    int y = (int)(pos.y + iy - grid.Offset.y);
+
+                    Debug.Log($"Index: {new Vector2(x, y)}");
+
+                    grid.Cells[x,y] = CellType.Empty;
+                }
+            }
         }
     }
     public void DigOutPaths(List<Location> locations, ref Grid grid)
@@ -282,6 +345,18 @@ public class WorldGenerator : MonoBehaviour {
 
     #endregion
 
+    #region Location Spawning
+
+    public void SpawnLocationPrefabs(List<Location> locationPrefabs)
+    {
+        foreach(Location l in locationPrefabs)
+        {
+            Location spawnedLocation = Instantiate(l, l.GetTopLeftCorner3(), Quaternion.identity, _terrainHolder.transform);
+            SpawnedLocations.Add(spawnedLocation);
+        }
+    }
+
+    #endregion
 
     #region Mesh
 
@@ -296,8 +371,8 @@ public class WorldGenerator : MonoBehaviour {
     {
         List<ChunkData> chunkInfo = new();
 
-        int maxChunkWidth = 10;
-        int maxChunkHeight = 10;
+        int maxChunkWidth = 100;
+        int maxChunkHeight = 100;
 
         int widthLeft = grid.GetWidthCeil();
         int heightLeft = grid.GetHeightCeil();
@@ -309,18 +384,30 @@ public class WorldGenerator : MonoBehaviour {
                 int chunkWidth;
                 int chunkHeight;
 
-                if(widthLeft - maxChunkWidth > 0)
-                {
+                if(widthLeft - maxChunkWidth > 0) chunkWidth = maxChunkWidth;
+                else chunkWidth = widthLeft;
 
-                }
+                if(heightLeft - maxChunkHeight > 0) chunkHeight = maxChunkHeight;
+                else chunkHeight = maxChunkHeight;
+
+                chunkInfo.Add(new ChunkData {
+                    TopLeftCorner = new(ix * maxChunkWidth + grid.Offset.x, iy * maxChunkHeight + grid.Offset.y),
+                    Width = chunkWidth,
+                    Height = chunkHeight,
+                });
             }
+        }
+
+        foreach(var ci in chunkInfo)
+        {
+            Chunk chunk = Instantiate(_chunkPrefab, Vector3.zero, Quaternion.identity, _terrainChunkHolder.transform);
+            chunk.GenerateChunkMesh(ci.TopLeftCorner, (int)ci.Width, (int)ci.Height);
         }
     }
 
     #endregion
 
     #region Misc
-
     public static List<T> ShuffleList<T>(List<T> list)
     {
         List<T> clonedList = new();
