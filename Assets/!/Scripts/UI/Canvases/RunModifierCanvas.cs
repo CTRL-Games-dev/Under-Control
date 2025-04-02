@@ -3,7 +3,7 @@ using UnityEngine;
 using DG.Tweening;
 using System.Collections;
 
-public class ChooseCanvas : MonoBehaviour
+public class ChooseCanvas : MonoBehaviour, IUICanvasState
 {
     [SerializeField] private GameObject _cardsHolder;
     [SerializeField] private GameObject _cardPrefab;

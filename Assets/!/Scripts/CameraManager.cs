@@ -6,6 +6,7 @@ using UnityEngine;
 public class CameraManager : MonoBehaviour
 {
     private CinemachineCamera _currentCamera;
+    private CinemachineCamera _previousCamera = null;
 
     public static CameraManager Instance;
 
@@ -19,12 +20,21 @@ public class CameraManager : MonoBehaviour
 
 
     public void SwitchCamera(CinemachineCamera camera) {
+        if (camera == _currentCamera) {
+            return;
+        }
         if(camera == null) {
-            throw new ArgumentNullException("Camera cannot be null");
+            if (_previousCamera != null) {
+                SwitchCamera(_previousCamera);
+                return;
+            } else {
+                return;
+            }
         }
 
+        _previousCamera = _currentCamera == null ? camera : _currentCamera;
+
         _currentCamera = camera;
-        _currentCamera.Priority = 30;
 
         setCamerasPriority();
     }

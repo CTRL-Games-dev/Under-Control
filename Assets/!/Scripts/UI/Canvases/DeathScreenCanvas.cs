@@ -1,7 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 
-public class DeathScreenCanvas : MonoBehaviour
+public class DeathScreenCanvas : MonoBehaviour, IUICanvasState
 {
     [SerializeField] private GameObject _text, _btn;
 

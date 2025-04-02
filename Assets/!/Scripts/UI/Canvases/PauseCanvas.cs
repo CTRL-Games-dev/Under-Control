@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections;
 
-public class PauseCanvas : MonoBehaviour
+public class PauseCanvas : MonoBehaviour, IUICanvasState
 {
     [SerializeField] private Image _bgImage;
     [SerializeField] private GameObject _blackBar, _resumeButton, _saveButton, _loadButton, _optionsButton, _exitButton;
@@ -67,7 +67,11 @@ public class PauseCanvas : MonoBehaviour
         });
     }
 
-    public Tween HideUI() {
+    public void HideUI() {
+        hideUI();
+    }
+
+    private Tween hideUI() {
         gameObject.SetActive(true);
         StopCoroutine(slowdownTime());
         StartCoroutine(speedupTime());
@@ -156,7 +160,7 @@ public class PauseCanvas : MonoBehaviour
     }
 
     public void OnExitBtnClick() {
-        HideUI().OnComplete(() => {
+        hideUI().OnComplete(() => {
             Player.UICanvas.ChangeUIMiddleState(UIMiddleState.MainMenu);
         });
     }

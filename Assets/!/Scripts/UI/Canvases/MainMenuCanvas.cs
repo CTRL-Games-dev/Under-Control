@@ -2,7 +2,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MainMenuCanvas : MonoBehaviour
+public class MainMenuCanvas : MonoBehaviour, IUICanvasState
 {
     [SerializeField] private Image _logoImage, _bgImage;
     [SerializeField] private GameObject _continueButton, _newGameButton, _optionsButton, _creditsButton, _exitButton;
@@ -53,7 +53,7 @@ public class MainMenuCanvas : MonoBehaviour
 
     public void HideUI() {
         killTweens();
-        CameraManager.Instance.SwitchCamera(Player.Instance.TopDownCamera);
+        // CameraManager.Instance.SwitchCamera(Player.Instance.TopDownCamera);
 
         _canvasGroup.DOFade(0, 1f).OnComplete(() => {
             _bgImage.DOFade(0, 0);

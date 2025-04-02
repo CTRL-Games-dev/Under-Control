@@ -6,7 +6,8 @@ using UnityEngine.Video;
 public enum UIBottomState {
     NotVisible,
     HUD,
-    Cutscene
+    Cutscene,
+    Talking
 }
 
 public enum UIMiddleState {
@@ -47,12 +48,17 @@ public class UICanvas : MonoBehaviour
 
 
     [Header("Canvases")]
-    [SerializeField] private HUDCanvas _HUDCanvas;
+    // Bottom
+    public HUDCanvas HUDCanvas;
+    public TalkingCanvas TalkingCanvas;
 
+    // Middle
     public InventoryCanvas InventoryCanvas;
     public MainMenuCanvas MainMenuCanvas;
     public PauseCanvas PauseCanvas;
     public ChooseCanvas ChooseCanvas;
+
+    // Top
     public DeathScreenCanvas DeathScreenCanvas;
     public SettingsCanvas SettingsCanvas;
 
@@ -98,6 +104,11 @@ public class UICanvas : MonoBehaviour
     private void OnUICancel() {
         if (IsOtherUIOpen) {
             Debug.Log("Other UI is open");
+            return;
+        }
+
+        if (CurrentUIBottomState == UIBottomState.Talking) {
+            ChangeUIBottomState(UIBottomState.HUD);
             return;
         }
 
@@ -162,7 +173,11 @@ public class UICanvas : MonoBehaviour
     private void closeUIBottomState(UIBottomState state) {
         switch (state) {
             case UIBottomState.HUD:
-                _HUDCanvas.HideUI();
+                HUDCanvas.HideUI();
+                break;
+            case UIBottomState.Talking:
+                Player.Instance.InputDisabled = false;
+                TalkingCanvas.HideUI();
                 break;
         }
     }
@@ -170,7 +185,12 @@ public class UICanvas : MonoBehaviour
     private void openUIBottomState(UIBottomState state) {
         switch (state) {
             case UIBottomState.HUD:
-                _HUDCanvas.ShowUI();
+                Player.Instance.InputDisabled = false;
+                HUDCanvas.ShowUI();
+                break;
+            case UIBottomState.Talking:
+                Player.Instance.InputDisabled = true;
+                TalkingCanvas.ShowUI();
                 break;
         }
     }

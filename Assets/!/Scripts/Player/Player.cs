@@ -445,12 +445,13 @@ public class Player : MonoBehaviour {
         Animator.SetFloat(_movementSpeedHash, MovementSpeed / MaxMovementSpeed);
     }
 
-    public void SetPlayerPosition(Vector3 position) {
+    public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
         Animator.applyRootMotion = false;
         Animator.speed = 0;
         gameObject.transform.position = position;
-
-        Invoke(nameof(applyRootMotion), 1f);
+        gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time).SetEase(Ease.OutSine).OnComplete(() => {
+            applyRootMotion();
+        });
     }
 
     private void applyRootMotion() {

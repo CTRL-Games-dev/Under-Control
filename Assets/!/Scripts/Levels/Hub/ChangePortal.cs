@@ -43,10 +43,6 @@ public class ChangePortal : MonoBehaviour, IInteractable
         _rightPanelCanvasGroup = _rightPanel.GetComponent<CanvasGroup>();
     }
 
-    private void Start() {
-        Player.Instance.UICancelEvent.AddListener(CloseUI);   
-    }
-
     void FixedUpdate() {
         float xOffset = Mathf.Sin(Time.time) * 0.2f;
         float yOffset = Mathf.Cos(Time.time) * 0.2f;
@@ -57,6 +53,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        Player.Instance.UICancelEvent.AddListener(CloseUI);
         if(_opened) CloseUI();
         else OpenUI();
     }
@@ -71,7 +68,8 @@ public class ChangePortal : MonoBehaviour, IInteractable
 
     public void CloseUI()
     {
-        CameraManager.Instance.SwitchCamera(Player.Instance.TopDownCamera);
+        Player.Instance.UICancelEvent.RemoveListener(CloseUI);
+        CameraManager.Instance.SwitchCamera(null); 
         _canvasGroup.DOFade(0, 1).OnComplete(() => {
             Player.UICanvas.IsOtherUIOpen = false;
             _ui.SetActive(false);
