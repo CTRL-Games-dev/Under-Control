@@ -34,12 +34,12 @@ public class WorldGenerator : MonoBehaviour {
     [SerializeField] private Chunk _chunkPrefab;
     [SerializeField] private GameObject _terrainHolder;
     [SerializeField] private GameObject _terrainChunkHolder;
-    [HideInInspector] public List<Location> SpawnedLocations = new();
+    [HideInInspector] public List<Location> PlacedLocations = new();
 
     public T Getlocation<T>()
     where T : Location
     {
-        foreach(var l in SpawnedLocations)
+        foreach(var l in PlacedLocations)
         {
             if(l.GetType() == typeof(T)) return (T)l;
         }
@@ -50,7 +50,7 @@ public class WorldGenerator : MonoBehaviour {
     where T : Location
     {
         List<T> locations = new();
-        foreach(var l in SpawnedLocations)
+        foreach(var l in PlacedLocations)
         {
             if(l.GetType() == typeof(T)) locations.Add((T)l);
         }
@@ -60,12 +60,12 @@ public class WorldGenerator : MonoBehaviour {
     {
 
         Grid grid;
-        List<Location> locationPrefabs;
+        List<Location> locations;
 
         switch(type)
         {
             case Dimension.FOREST: {
-                (locationPrefabs, grid) = PlaceLocationsForest();
+                (locations, grid) = PlaceLocationsForest();
             } break;
             default: {
                 Debug.LogError($"This type of dimension is not implemented! -> {type}");
@@ -77,12 +77,12 @@ public class WorldGenerator : MonoBehaviour {
 
         
         Debug.Log("Placing trees");
-        PlaceForestAroundLocations(locationPrefabs, ref grid);
-        DigOutPaths(locationPrefabs, ref grid);
+        PlaceForestAroundLocations(locations, ref grid);
+        DigOutPaths(locations, ref grid);
         Debug.Log("Trees are in place");
 
         Debug.Log("Spawning locations");
-        SpawnLocationPrefabs(locationPrefabs);
+        SetProperLocationCoordinates(locations);
         Debug.Log("Spawned locations");
 
         GenerateChunks(ref grid);
@@ -97,6 +97,7 @@ public class WorldGenerator : MonoBehaviour {
         public Location Location;
         public Vector2 Position;
         private List<Vector2> _directions;
+        public bool AlreadyPlaced = false;
         public LocationNode(Location l, Vector2 pos)
         {
             Location = l;
@@ -105,9 +106,9 @@ public class WorldGenerator : MonoBehaviour {
             _directions = new()
             {
                 new(Position.x, Position.y + 1), // Up
-                new(Position.x+1, Position.y), // Right
-                new(Position.x, Position.y-1), // Down
-                new(Position.x-1, Position.y), // Left
+                new(Position.x + 1, Position.y), // Right
+                new(Position.x, Position.y - 1), // Down
+                new(Position.x - 1, Position.y), // Left
             };
         }
 
@@ -155,52 +156,81 @@ public class WorldGenerator : MonoBehaviour {
 
         Debug.Log("Loaded location prefabs");
 
-        List<Location> allPrefabLocations = new()
+        List<Location> allLocations = new()
         {   
             // forestPortalPrefab,
-            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)],
-            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)],
-            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)],
-            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)],
-            meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)],
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
         };
 
         List<LocationNode> nodes = new()
         {
-            new(forestPortalPrefab, new(0,0)),
+            new(Instantiate(forestPortalPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform), new(0,0)),
         };
 
-        for(int i = 0; i < allPrefabLocations.Count - allPrefabLocations.Count ; i++)
+        // Get place in a grid of locations
+        while(allLocations.Count != 0)
         {
             Vector2 freeSpace = LocationNode.GetRandomFreeNeighbourSpace(nodes);
-            nodes.Add(new(allPrefabLocations[0], freeSpace));
-            allPrefabLocations.RemoveAt(0);
+            nodes.Add(new(allLocations[0], freeSpace));
+            allLocations.RemoveAt(0);
         }
 
-        foreach(var node in nodes)
+        // Since locations have different sizes,
+        // they need to be taken into consideration when placing things from the grid into the real world
+
+        List<LocationNode> nodesToCheck = new();
+
+        LocationNode firstNode = nodes[0]; // First node
+        firstNode.Location.LocationCenterInWorld = firstNode.Position;
+        firstNode.AlreadyPlaced = true;
+
+        nodesToCheck.Add(firstNode);
+
+        while(nodesToCheck.Count != 0)
         {
-            List<LocationNode> neighbours = node.GetNeighbours(nodes);
+            LocationNode currentNode = nodesToCheck[0];
+            nodesToCheck.RemoveAt(0);
+
+            List<LocationNode> neighbours = currentNode.GetNeighbours(nodes);
             foreach(var neighbour in neighbours)
             {
-                node.Location.ConnectedLocations.Add(neighbour.Location);
+                currentNode.Location.ConnectedLocations.Add(neighbour.Location);
 
-                if(neighbour.Location.LocationCenterInWorld != Vector2.zero) continue;
+                if(neighbour.AlreadyPlaced) continue;
+                
+
+
+                // Distance between centers of both locations
                 Vector2 diff = new(
-                    (node.Location.Width / 2) + (neighbour.Location.Width / 2),
-                     (node.Location.Height / 2) + (neighbour.Location.Height / 2)
+                    (currentNode.Location.Width / 2) + (neighbour.Location.Width / 2),
+                     (currentNode.Location.Height / 2) + (neighbour.Location.Height / 2)
                     );
-                diff *= (neighbour.Position - node.Position);
-                neighbour.Location.LocationCenterInWorld = node.Location.LocationCenterInWorld + diff;
+
+                // Additional padding for distance between locations
+                diff += new Vector2(20,20);
+                
+                // This is very important.
+                // Diff by default applies to all axis and can only have positive value.
+                // This will make difference only contain one, relevant axis. It will also invert the value, if neighbour is under the current node 
+                diff *= neighbour.Position - currentNode.Position;
+
+                neighbour.Location.LocationCenterInWorld = currentNode.Location.LocationCenterInWorld + diff;
+
+                neighbour.AlreadyPlaced = true;
+                nodesToCheck.Add(neighbour);
             }
         }
 
         float maxX = 0, maxY = 0, minX = 0, minY = 0;
         foreach(LocationNode node in nodes)
         {
-            if(node.Location.LocationCenterInWorld.x > maxX) maxX = node.Location.LocationCenterInWorld.x;
-            if(node.Location.LocationCenterInWorld.x < minX) minX = node.Location.LocationCenterInWorld.x;
-            if(node.Location.LocationCenterInWorld.y > maxY) maxY = node.Location.LocationCenterInWorld.y;
-            if(node.Location.LocationCenterInWorld.y < minY) minY = node.Location.LocationCenterInWorld.y;  
+            if(node.Location.GetTopRightCorner().x > maxX) maxX = node.Location.GetTopRightCorner().x;
+            if(node.Location.GetTopLeftCorner().x < minX) minX = node.Location.GetTopLeftCorner().x;
+            if(node.Location.GetBottomLeftCorner().y > maxY) maxY = node.Location.GetBottomLeftCorner().y;
+            if(node.Location.GetTopLeftCorner().y < minY) minY = node.Location.GetTopLeftCorner().y;  
         }
 
         int padding = 100;
@@ -250,9 +280,9 @@ public class WorldGenerator : MonoBehaviour {
                     int x = (int)(pos.x + ix - grid.Offset.x);
                     int y = (int)(pos.y + iy - grid.Offset.y);
 
-                    Debug.Log($"Pos: {pos}, Offset: {grid.Offset}");
-                    Debug.Log($"ix: {ix}, iy: {iy}");
-                    Debug.Log($"Index: {new Vector2(x, y)}");
+                    // Debug.Log($"Pos: {pos}, Offset: {grid.Offset}");
+                    // Debug.Log($"ix: {ix}, iy: {iy}");
+                    // Debug.Log($"Index: {new Vector2(x, y)}");
 
                     grid.Cells[x,y] = CellType.Forest;
                 }
@@ -267,7 +297,7 @@ public class WorldGenerator : MonoBehaviour {
                     int x = (int)(pos.x + ix - grid.Offset.x);
                     int y = (int)(pos.y + iy - grid.Offset.y);
 
-                    Debug.Log($"Index: {new Vector2(x, y)}");
+                    // Debug.Log($"Index: {new Vector2(x, y)}");
 
                     grid.Cells[x,y] = CellType.Empty;
                 }
@@ -345,14 +375,15 @@ public class WorldGenerator : MonoBehaviour {
 
     #endregion
 
-    #region Location Spawning
+    #region Location Placing
 
-    public void SpawnLocationPrefabs(List<Location> locationPrefabs)
+    public void SetProperLocationCoordinates(List<Location> locations)
     {
-        foreach(Location l in locationPrefabs)
-        {
-            Location spawnedLocation = Instantiate(l, l.GetTopLeftCorner3(), Quaternion.identity, _terrainHolder.transform);
-            SpawnedLocations.Add(spawnedLocation);
+        foreach(Location l in locations)
+        {   
+            Debug.Log($"Placing location {l.Name} at {l.LocationCenterInWorld}");
+            l.transform.position = l.GetTopLeftCorner3();
+            PlacedLocations.Add(l);
         }
     }
 
