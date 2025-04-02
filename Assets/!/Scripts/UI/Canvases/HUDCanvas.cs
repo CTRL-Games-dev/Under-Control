@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class HUDCanvas : MonoBehaviour
+public class HUDCanvas : MonoBehaviour, IUICanvasState
 {
     public void ShowUI() {
         gameObject.SetActive(true);

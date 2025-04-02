@@ -45,7 +45,7 @@ public class LoadingScreen : MonoBehaviour
     }
 
 
-    private IEnumerator loadSceneAsync(string sceneName) {        
+    private IEnumerator loadSceneAsync(string sceneName) {
         AsyncOperation operation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName);
 
         while (!operation.isDone) {

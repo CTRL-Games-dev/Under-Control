@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using System;
 
-public class InventoryCanvas : MonoBehaviour
+public class InventoryCanvas : MonoBehaviour, IUICanvasState
 {
     public enum InventoryTabs {
         Other,

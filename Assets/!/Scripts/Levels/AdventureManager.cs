@@ -30,7 +30,7 @@ public class AdventureManager : MonoBehaviour, ILevelManager
         Debug.Log($"Spawn: {spawn}");
         Player.Instance.SetPlayerPosition(new Vector3(spawn.x, 1, spawn.y + 3));
 
-        _cameraManager.SwitchCamera(Player.Instance.TopDownCamera);
+        // _cameraManager.SwitchCamera(Player.Instance.TopDownCamera);
 
         _navMeshSurface.BuildNavMesh();
     }

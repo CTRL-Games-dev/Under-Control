@@ -3,7 +3,7 @@ using DG.Tweening;
 using UnityEngine.UI;
 using System.Collections;
 
-public class SettingsCanvas : MonoBehaviour
+public class SettingsCanvas : MonoBehaviour, IUICanvasState
 {
     private enum SettingsState {
         Audio,
