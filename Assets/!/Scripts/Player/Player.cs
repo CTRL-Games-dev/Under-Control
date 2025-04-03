@@ -92,6 +92,7 @@ public class Player : MonoBehaviour {
     public UnityEvent InventoryToggleEvent;
     public UnityEvent UICancelEvent;
     public UnityEvent ItemRotateEvent;
+    public UnityEvent<EvoUI> OnEvolutionSelected = new();
     [HideInInspector] public UnityEvent<int> CoinsChangeEvent;
 
     // State
@@ -144,6 +145,12 @@ public class Player : MonoBehaviour {
         if (CurrentWeapon != null) {
             WeaponHolder.UpdateWeapon(CurrentWeapon);
         }
+
+        OnEvolutionSelected.AddListener((evoUI) => {
+            foreach (Modifier modifier in evoUI.GetModifiers()) {
+                LivingEntity.ApplyIndefiniteModifier(modifier);
+            }
+        });
     }
 
     void Update() {
@@ -421,6 +428,12 @@ public class Player : MonoBehaviour {
 
     public void ResetRun() {
         ModifierSystem.Reset();
+
+        foreach (EvoUI evoUI in SelectedEvolutions) {
+            foreach (Modifier modifier in evoUI.GetModifiers()) {
+                LivingEntity.ApplyIndefiniteModifier(modifier);
+            }
+        }
     }
 
     private void registerStats() {
