@@ -12,11 +12,14 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     private CanvasGroup _canvasGroup, _topBarCanvasGroup, _bottomBarCanvasGroup;
     [SerializeField] private FaceAnimator _playerFaceAnimator, _mageFaceAnimator;
     [SerializeField] private TextMeshProUGUI _nameText, _dialogueText;
+    [SerializeField] private TextLocalizer _nameTextLocalizer, _dialogueTextLocalizer;
 
     private bool _isTalking = false;
 
     public Dialogue _dialogue;
     private int _currentDialogueIndex = 0;
+    private string _goalString = string.Empty;
+
     [SerializeField] private float _textSpeed = 1f;
     
     private void Awake() {
@@ -24,13 +27,21 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         
         _topBarCanvasGroup = _topBar.GetComponent<CanvasGroup>();
         _bottomBarCanvasGroup = _bottomBar.GetComponent<CanvasGroup>();
+
+        TextData.OnLanguageChanged?.RemoveListener(OnLanguageChanged);
+    }
+
+    private void OnLanguageChanged() {
+        StopAllCoroutines();
+        _isTalking = false;
+        _dialogueText.text = _goalString;
     }
 
     private void Update() {
         if (Input.GetKeyUp(KeyCode.B)) {
             if (_isTalking) {
                 StopAllCoroutines();
-                _dialogueText.text = _dialogue.dialogueEntries[_currentDialogueIndex].Text;
+                _dialogueText.text = _goalString;
                 _playerFaceAnimator.EndTalk();
                 _mageFaceAnimator.EndTalk();
                 _isTalking = false;
@@ -47,22 +58,21 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         }
     }
 
-    private IEnumerator animateText(DialogueEntry entry) {
+    private IEnumerator animateText() {
         _isTalking = true;
         _dialogueText.text = string.Empty;
-        float _letterInterval = Mathf.Clamp(_textSpeed / entry.Text.Length, 0.05f, 0.1f);
-        Debug.Log(_letterInterval);
+        float _letterInterval = Mathf.Clamp(_textSpeed / _goalString.Length, 0.05f, 0.1f);
 
-        foreach (char letter in entry.Text.ToCharArray()) {
+        foreach (char letter in _goalString.ToCharArray()) {
             _dialogueText.text += letter;
             if (letter == ' ') {
-                _letterInterval = 0.07f;
+                _letterInterval = 0.05f;
             } else if (letter == '.' || letter == ',' || letter == ';' || letter == ':') {
                 _letterInterval = 0.2f;
             } else if (letter == '\n') {
                 _letterInterval = 0.3f;
             } else {
-                _letterInterval = Mathf.Clamp(_textSpeed / entry.Text.Length, 0.05f, 0.1f);
+                _letterInterval = Mathf.Clamp(_textSpeed / _goalString.Length, 0.03f, 0.1f);
             }
 
             yield return new WaitForSeconds(_letterInterval);
@@ -74,8 +84,11 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     }
 
     private void updateDialogueBox() {
-        _nameText.text = _dialogue.dialogueEntries[_currentDialogueIndex].Name;
-        _dialogueText.text = string.Empty;
+        _nameTextLocalizer.Key = _dialogue.dialogueEntries[_currentDialogueIndex].Name;
+
+        _dialogueTextLocalizer.Key = _dialogue.dialogueEntries[_currentDialogueIndex].Text;
+
+        _goalString = TextData.LocalizationTable[_dialogueTextLocalizer.Key][TextData.CurrentLanguage];
 
         _playerFaceAnimator.EndTalk();
         _mageFaceAnimator.EndTalk();
@@ -90,7 +103,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         } else {
             _mageFaceAnimator.StartTalk();
         }
-        StartCoroutine(animateText(_dialogue.dialogueEntries[_currentDialogueIndex]));
+        StartCoroutine(animateText());
     }
 
 

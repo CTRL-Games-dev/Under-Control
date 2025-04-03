@@ -87,6 +87,15 @@ public class UICanvas : MonoBehaviour
         }
     }
 
+    private void Update() {
+        if (Input.GetKeyDown(KeyCode.F1)) {
+            TextData.ChangeLanguage(Language.English);
+        }
+        if (Input.GetKeyDown(KeyCode.F2)) {
+            TextData.ChangeLanguage(Language.Polish);
+        }
+    }
+
     #endregion
 
     #region Callbacks
@@ -122,6 +131,8 @@ public class UICanvas : MonoBehaviour
             ChangeUIMiddleState(UIMiddleState.NotVisible);
         }
     }
+
+    
 
     #endregion
 
