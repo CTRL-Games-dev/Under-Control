@@ -169,6 +169,16 @@ public class WorldGenerator : MonoBehaviour {
             Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
             Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
             Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
+            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
         };
 
         List<LocationNode> nodes = new()
@@ -252,7 +262,7 @@ public class WorldGenerator : MonoBehaviour {
             Cells = new WorldCell[(int)dimensions.x, (int)dimensions.y],
             Dimensions = dimensions,
             Offset = new(minX, minY),
-            Padding = padding
+            Padding = padding,
         };
 
         return (locations, grid);
@@ -284,6 +294,7 @@ public class WorldGenerator : MonoBehaviour {
                 for (int iy = -margin; iy < (int)l.Height + margin - 1 ; iy++)
                 {
                     Vector2 pos = l.GetTopLeftCorner();
+
                     int x = (int)(pos.x + ix - grid.Offset.x);
                     int y = (int)(pos.y + iy - grid.Offset.y);
 
@@ -312,7 +323,7 @@ public class WorldGenerator : MonoBehaviour {
 
                     // Debug.Log($"Index: {new Vector2(x, y)}");
 
-                    grid.Cells[x,y] = new WorldCell { Type = CellType.Empty };
+                    grid.Cells[x,y] = new WorldCell { Type = CellType.Empty, WasPlaced = true };
                 }
             }
         }
@@ -341,48 +352,77 @@ public class WorldGenerator : MonoBehaviour {
         int num = 0;
         foreach(var path in uniquePaths)
         {
-            // Debug.Log("=== LINE " + num + " ===");
+            Debug.Log("=== LINE " + num + " ===");
 
-            // Debug.Log("First point " + line.v0.Position);
-            // Debug.Log("Second point " + line.v1.Position);
+            Debug.Log("First point " + path.Point1);
+            Debug.Log("Second point " + path.Point2);
 
             num++;
             Vector2 point1 = path.Point1.x < path.Point2.x ? path.Point1 : path.Point2;
-            Vector2 point2 = path.Point1.x > path.Point2.x ? path.Point1 : path.Point2;
+            Vector2 point2 = path.Point1.x >= path.Point2.x ? path.Point1 : path.Point2;
 
-            // Debug.Log("First point " + point1.Position);
-            // Debug.Log("Second point " + point2.Position);
+            Debug.Log("First point " + point1);
+            Debug.Log("Second point " + point2);
 
-            float a = (point2.y - point1.y)/(point2.x - point1.x);
-            // y = ax + b ----> b = y - ax
-            float b = point1.y-(a * point1.x);
-
-            int yLength = (int)Math.Abs(Math.Ceiling(a));
-            yLength = yLength < 1 ? 1 : yLength; // yLength cannot be smaller than 1
-            int ySymbol = a > 0 ? 1 : -1;
-
-            //  Debug.LogFormat("yLen = {0}, a = {1}, b = {2}", yLength, a, b);
             int thickness = UnityEngine.Random.Range(20, 21);
 
-            for(int ix = (int)Math.Floor(point1.x); ix < (int)Math.Floor(point2.x); ix++)
+            if(point2.x != point1.x)
             {
-                int x = ix;
-                int indexX = x - (int)grid.Offset.x;
+                float a = (point2.y - point1.y)/(point2.x - point1.x);
+                // y = ax + b ----> b = y - ax
+                float b = point1.y-(a * point1.x);
 
-                for(int iy = 0; iy < yLength; iy++)
+                int yLength = (int)Math.Abs(Math.Ceiling(a));
+                yLength = yLength < 1 ? 1 : yLength; // yLength cannot be smaller than 1
+                int ySymbol = a > 0 ? 1 : -1;
+
+                Debug.LogFormat("yLen = {0}, a = {1}, b = {2}", yLength, a, b);
+
+                for(int ix = (int)Math.Floor(point1.x); ix < (int)Math.Floor(point2.x); ix++)
                 {
-                    int y = (int)Math.Floor(a*x + b)+(iy*ySymbol);
-                    int indexY = y - (int)grid.Offset.y;
+                    int x = ix;
+                    int indexX = x - (int)grid.Offset.x;
 
-                    for(int tx = 0; tx < thickness; tx++)
+                    for(int iy = 0; iy < yLength; iy++)
                     {
-                        for(int ty = 0; ty < thickness; ty++)
+                        int y = (int)Math.Floor(a*x + b)+(iy*ySymbol);
+                        int indexY = y - (int)grid.Offset.y;
+
+                        for(int tx = 0; tx < thickness; tx++)
                         {
-                            grid.Cells[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = new WorldCell { Type = CellType.Empty };
+                            for(int ty = 0; ty < thickness; ty++)
+                            {
+                                grid.Cells[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = new WorldCell { Type = CellType.Empty };
+                            }
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                Debug.Log("Dupa");
+                // Handle vertical line separately
+                int startY = Mathf.FloorToInt(Mathf.Min(point1.y, point2.y));
+                int endY = Mathf.FloorToInt(Mathf.Max(point1.y, point2.y));
+                int x = Mathf.FloorToInt(point1.x);  // or point2.x since they are the same
+
+                // Loop over the Y values of the vertical line
+                for (int iy = startY; iy <= endY; iy++)
+                {
+                    int indexX = x - (int)grid.Offset.x;
+                    int indexY = iy - (int)grid.Offset.y;
+
+                    for (int tx = 0; tx < thickness; tx++)
+                    {
+                        for (int ty = 0; ty < thickness; ty++)
+                        {
+                            grid.Cells[indexX + tx - (thickness / 2), indexY + ty - (thickness / 2)] = new WorldCell { Type = CellType.Empty };
                         }
                     }
                 }
             }
+            
         }
     }
 
@@ -395,7 +435,7 @@ public class WorldGenerator : MonoBehaviour {
         foreach(Location l in locations)
         {   
             Debug.Log($"Placing location {l.Name} at {l.LocationCenterInWorld}");
-            l.transform.position = l.GetTopLeftCorner3();
+            l.transform.position = new(l.LocationCenterInWorld.x, 0, l.LocationCenterInWorld.y);
             PlacedLocations.Add(l);
         }
     }
@@ -445,9 +485,9 @@ public class WorldGenerator : MonoBehaviour {
         int widthLeft = grid.GetWidthCeil();
         int heightLeft = grid.GetHeightCeil();
 
-        for(int ix = 0; ix < grid.GetWidthCeil() / maxChunkWidth; ix++)
+        for(int ix = 0; ix < grid.GetWidthCeil() / maxChunkWidth + 1; ix++)
         {
-            for (int iy = 0; iy < grid.GetHeightCeil() / maxChunkHeight; iy++)
+            for (int iy = 0; iy < grid.GetHeightCeil() / maxChunkHeight + 1; iy++)
             {
                 int chunkWidth;
                 int chunkHeight;
@@ -458,8 +498,11 @@ public class WorldGenerator : MonoBehaviour {
                 if(heightLeft - maxChunkHeight > 0) chunkHeight = maxChunkHeight;
                 else chunkHeight = maxChunkHeight;
 
+                float x = ix * maxChunkWidth + grid.Offset.x;
+                float y = iy * maxChunkHeight + grid.Offset.y;
+
                 chunkInfo.Add(new ChunkData {
-                    TopLeftCorner = new(ix * maxChunkWidth + grid.Offset.x, iy * maxChunkHeight + grid.Offset.y),
+                    TopLeftCorner = new(x, y),
                     Width = chunkWidth,
                     Height = chunkHeight,
                 });
