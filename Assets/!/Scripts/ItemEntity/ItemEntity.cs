@@ -66,12 +66,12 @@ public class ItemEntity : MonoBehaviour, IInteractable
         Rigidbody = GetComponent<Rigidbody>();
     }
 
-    public void Interact(PlayerController player) {
-        if(!player.LivingEntity.Inventory.AddItem(ItemData, Amount)) {
+    public void Interact() {
+        if(!Player.LivingEntity.Inventory.AddItem(ItemData, Amount)) {
             return;
         }
 
-        UICanvas.Instance.PickupItemNotify(ItemData, Amount);
+        Player.UICanvas.PickupItemNotify(ItemData, Amount);
         EventBus.InventoryItemChangedEvent?.Invoke();
         Destroy(gameObject);
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using Unity.AI.Navigation;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -33,11 +34,12 @@ public class AdventureManager : MonoBehaviour, ILevelManager
         _navMeshSurface.BuildNavMesh();
     }
 
+
     // public void SpawnPlayer()
     // {
         // GameObject player = Instantiate(_player, _map.SpawnLocation, Quaternion.identity);
         // GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
-        // player.GetComponent<PlayerController>().CameraObject = camera;
+        // player.GetComponent<Player>().CameraObject = camera;
         // camera.GetComponent<CinemachineCamera>().Follow = player.transform;
     // }
     // private void SpawnEnemies(WorldMap map)

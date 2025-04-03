@@ -287,6 +287,7 @@
 //             queue.RemoveAt(0);
 
 //             location.LocationRectangle.SetCenter(current);
+
             
 //             if(!location.LocationRectangle.IsOverlapping(rectangles)) {
 //                 return true;

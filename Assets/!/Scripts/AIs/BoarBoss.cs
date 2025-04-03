@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.AI;
 
 public class BoarBoss : MonoBehaviour 
 {
@@ -42,14 +40,14 @@ public class BoarBoss : MonoBehaviour
         for(int b = 0; b < 1; b++)
         {
             if(_boarNumber == _maxBoarNumber) { break; }
-            LivingEntity boar = Instantiate(_boarPrefab, new(pos.x + b*3 + 5, 0.1f, pos.z), this.transform.rotation).GetComponent<LivingEntity>();
+            LivingEntity boar = Instantiate(_boarPrefab, new(pos.x + b*3 + 5, 0.1f, pos.z), transform.rotation).GetComponent<LivingEntity>();
             boar.OnDeath.AddListener(changeCounter);
             _boarNumber++;
         }
         for(int b = 0; b < 1; b++)
         {
             if(_boarNumber == _maxBoarNumber) { break; }
-            LivingEntity boar = Instantiate(_boarPrefab, new(pos.x - b*3 - 5, 0.1f, pos.z), this.transform.rotation).GetComponent<LivingEntity>();
+            LivingEntity boar = Instantiate(_boarPrefab, new(pos.x - b*3 - 5, 0.1f, pos.z), transform.rotation).GetComponent<LivingEntity>();
             boar.OnDeath.AddListener(changeCounter);
             _boarNumber++;
         }

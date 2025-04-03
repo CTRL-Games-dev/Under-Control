@@ -11,6 +11,8 @@ public class WeaponHolder : MonoBehaviour
     private Weapon _currentWeaponHitter;
     private WeaponItemData _currentWeaponData;
     private List<LivingEntity> _hitEntities = new List<LivingEntity>();
+    private AttackType? _currentAttackType;
+    private bool _isAttacking = false;
 
     public void UpdateWeapon(WeaponItemData weaponData) {
         if (_currentWeaponHitter != null) {
@@ -18,6 +20,8 @@ public class WeaponHolder : MonoBehaviour
             _currentWeaponHitter = null;
             _currentWeaponData = null;
         }
+
+        if(weaponData == null) return;
 
         if (weaponData.WeaponPrefab != null) {
             _currentWeaponHitter = InstantiateWeapon(weaponData);
@@ -39,34 +43,111 @@ public class WeaponHolder : MonoBehaviour
         return Instantiate(UnknownWeaponPrefab, Vector3.zero, Quaternion.identity, transform);
     }
 
+    public void InitializeAttack(AttackType attackType) {
+        if(_currentWeaponData == null) {
+            Debug.LogWarning($"Current weapon is null");
+            return;
+        }
+
+        if(_currentWeaponHitter == null) {
+            Debug.LogWarning($"Current weapon hitter is null");
+            return;
+        }
+
+        if(_currentAttackType != null) {
+            Debug.LogWarning($"Attack type is not null");
+            return;
+        }
+
+        _currentAttackType = attackType;
+    }
+
     public void BeginAttack() {
+        if(_currentWeaponData == null) {
+            Debug.LogWarning($"Current weapon is null");
+            return;
+        }
+
+        if(_currentAttackType == null) {
+            Debug.LogWarning($"Current attack type is null");
+            return;
+        }
+
         if(_currentWeaponHitter == null) return;
+        if(_isAttacking) return;
+
+        _isAttacking = true;
+
         _hitEntities.Clear();
-        _currentWeaponHitter.EnableHitbox();
+        _currentWeaponHitter.StartMinorTrail();
     }
 
     public void EndAttack() {
+        if(_currentWeaponData == null) {
+            Debug.LogWarning($"Current weapon is null");
+            return;
+        }
+        
         if(_currentWeaponHitter == null) return;
-        _currentWeaponHitter.DisableHitbox();
+        if(_currentAttackType == null) return;
+        if(!_isAttacking) return;
+
+        _isAttacking = false;
+
         _hitEntities.Clear();
+        _currentWeaponHitter.StopMinorTrail();
+        _currentAttackType = null;
+    }
+
+    public void EnableHitbox() {
+        if(_currentWeaponData == null) {
+            Debug.LogWarning($"Current weapon is null");
+            return;
+        }
+        
+        if(_currentWeaponHitter == null) return;
+
+        _currentWeaponHitter.EnableHitbox();
+        _currentWeaponHitter.StartMajorTrail();
+    }
+
+    public void DisableHitbox() {
+        if(_currentWeaponData == null) {
+            Debug.LogWarning($"Current weapon is null");
+            return;
+        }
+
+        if(_currentWeaponHitter == null) return;
+
+        _currentWeaponHitter.DisableHitbox();
+        _currentWeaponHitter.StopMajorTrail();
     }
 
     public void OnHit(LivingEntity victim) {
+        if(_currentWeaponData == null) {
+            Debug.LogError($"Current weapon is null, but hit was registered!");
+            return;
+        }
+
         if(PreventSelfDamage && victim == Self) return;
         if(!victim.Guild.IsHostileTowards(Self.Guild)) return;
+        if(_currentAttackType == null) return;
 
-        if(_currentWeaponData.DamageMax <= 0) {
-            Debug.LogWarning($"{Self.DebugName}: DamageMax is zero or negative. Current weapon is {_currentWeaponData.DisplayName}");
+        float damageMin = _currentAttackType.Value == AttackType.LIGHT ? _currentWeaponData.LightDamageMin : _currentWeaponData.HeavyDamageMin;
+        float damageMax = _currentAttackType.Value == AttackType.LIGHT ? _currentWeaponData.LightDamageMax : _currentWeaponData.HeavyDamageMax;
+
+        if(damageMax <= 0) {
+            Debug.LogWarning($"{Self.DebugName}: DamageMax is zero or negative. Current weapon is {_currentWeaponData.DisplayName}. Attack type is {_currentAttackType}");
             return;
         }
 
-        if(_currentWeaponData.DamageMin < 0) {
-            Debug.LogWarning($"{Self.DebugName}: DamageMin is negative. Current weapon is {_currentWeaponData.DisplayName}");
+        if(damageMin < 0) {
+            Debug.LogWarning($"{Self.DebugName}: DamageMin is negative. Current weapon is {_currentWeaponData.DisplayName}. Attack type is {_currentAttackType}");
             return;
         }
 
-        if(_currentWeaponData.DamageMax < _currentWeaponData.DamageMin) {
-            Debug.LogWarning($"{Self.DebugName}: DamageMax ({_currentWeaponData.DamageMax}) is less than DamageMin ({_currentWeaponData.DamageMin}). Current weapon is {_currentWeaponData.DisplayName}");
+        if(damageMax < damageMin) {
+            Debug.LogWarning($"{Self.DebugName}: DamageMax ({damageMax}) is less than DamageMin ({damageMin}). Current weapon is {_currentWeaponData.DisplayName}. Attack type is {_currentAttackType}");
             return;
         }
 
@@ -75,12 +156,18 @@ public class WeaponHolder : MonoBehaviour
             return;
         }
 
-        float damageValue = Random.Range(_currentWeaponData.DamageMin, _currentWeaponData.DamageMax);
+        float damageValue = Random.Range(damageMin, damageMax);
 
-        victim.TakeDamage(new Damage{
+        if (_currentAttackType == AttackType.LIGHT) {
+            damageValue = Self.ModifierSystem.CalculateForStatType(StatType.LIGHT_ATTACK_DAMAGE, damageValue);
+        } else {
+            damageValue = Self.ModifierSystem.CalculateForStatType(StatType.HEAVY_ATTACK_DAMAGE, damageValue);
+        }
+
+        Self.Attack(new Damage{
             Type = _currentWeaponData.DamageType,
             Value = damageValue
-        }, Self);
+        }, victim);
 
         _hitEntities.Add(victim);
     }

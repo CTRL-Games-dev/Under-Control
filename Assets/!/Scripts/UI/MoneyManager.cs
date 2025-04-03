@@ -4,7 +4,6 @@ using TMPro;
 
 public class MoneyAnimator : MonoBehaviour
 {
-    PlayerController PlayerController => UICanvas.Instance.PlayerController;
     private RectTransform _coinsRectTransform;
     private TextMeshProUGUI _coinsText;
     [SerializeField] private GameObject _coinsVisualizer;
@@ -26,23 +25,18 @@ public class MoneyAnimator : MonoBehaviour
     }
 
     void Start() {
-        UICanvas.Instance.PlayerController.CoinsChangeEvent.AddListener(OnCoinsChange);
+        Player.Instance.CoinsChangeEvent.AddListener(OnCoinsChange);
 
         OnCoinsChange(0);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     private void OnCoinsChange(int change) {
         if (change == 0) {
-            _coinsText.text = $"{PlayerController.Coins}";
+            _coinsText.text = $"{Player.Instance.Coins}";
             return;
         };
-        float coins = PlayerController.Coins;
+        float coins = Player.Instance.Coins;
         _coinsRectTransform.DOComplete();
         _changeRectTransform.DOComplete();
         _changeCanvasGroup.DOKill();
@@ -67,7 +61,7 @@ public class MoneyAnimator : MonoBehaviour
             });
         });
 
-        // _coinsText.text = $"{PlayerController.Coins + change}";
+        // _coinsText.text = $"{Player.Coins + change}";
         // StartCoroutine(animateCoins(change > 0));
     }
 }

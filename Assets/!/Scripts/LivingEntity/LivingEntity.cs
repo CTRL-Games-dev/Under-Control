@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(ModifierSystem))]
 [RequireComponent(typeof(EntityInventory))]
-public class LivingEntity : MonoBehaviour
-{
+[RequireComponent(typeof(HitFlashAnimator))]
+public class LivingEntity : MonoBehaviour {
     private struct EffectData {
         public Effect Effect;
         public float Expiration;
@@ -16,13 +17,15 @@ public class LivingEntity : MonoBehaviour
     public Guild Guild;
     public bool DropItemsOnDeath = true;
     public float TimeToRegenAfterDamage = 2;
-    public string DebugName => $"{DisplayName} ({Guild.Name}. {gameObject.name})";
+    public string DebugName => $"{DisplayName} ({Guild.Name} {gameObject.name})";
 
     public int Exp = 0;
     public float Level { get => 1 + Exp / 100f; }
 
     [Range(0, 2)]
     public int DroppedExpMultiplier = 1;
+
+    public bool DestroyOnDeath = true;
 
     [Header("Stats")]
     public DynamicStat Health = new DynamicStat(StatType.HEALTH, 100);
@@ -41,23 +44,27 @@ public class LivingEntity : MonoBehaviour
     private List<EffectData> _activeEffects = new List<EffectData>();
 
     private readonly int _hurtHash = Animator.StringToHash("hurt");
-    private readonly int _speedHash = Animator.StringToHash("speed");
-    private readonly int _dodgeHash = Animator.StringToHash("dodge");
-    private readonly int _lightAttackHash = Animator.StringToHash("light_attack");
-    private readonly int _heavyAttackHash = Animator.StringToHash("heavy_attack");
 
     // References
     public ModifierSystem ModifierSystem { get; private set; }
     public EntityInventory Inventory { get; private set; }
+    public HitFlashAnimator HitFlashAnimator { get; private set; }
 
     void Awake() {
         ModifierSystem = GetComponent<ModifierSystem>();
         Inventory = GetComponent<EntityInventory>();
+        HitFlashAnimator = GetComponent<HitFlashAnimator>();
+
+        ModifierSystem.RegisterStat(ref Health);
+        ModifierSystem.RegisterStat(ref MaxHealth);
+        ModifierSystem.RegisterStat(ref RegenRate);
+        ModifierSystem.RegisterStat(ref Armor);
+        ModifierSystem.RegisterStat(ref ElementalArmor);
+        ModifierSystem.RegisterStat(ref MovementSpeed);
     }
 
     void Update() {
         recheckEffects();
-        recalculateStats();
    
         // Regen
         if(Time.time - _lastDamageTime > TimeToRegenAfterDamage) {
@@ -78,20 +85,19 @@ public class LivingEntity : MonoBehaviour
         ItemEntity.SpawnThrownRelative(itemData, amount, transform.position + new Vector3(0, 1.2f, 0), transform.rotation, Vector3.forward * 2);
     }
 
-    protected void Attack(Damage damage, LivingEntity target) {
-        target.TakeDamage(damage, this);
+    public void Attack(Damage damage, LivingEntity target) {
+        target.takeDamage(damage, this);
     }
 
-    public void TakeDamage(Damage damage, LivingEntity source = null)
-    {
-        if (gameObject.GetComponent<PlayerController>() != null) {
-            if (gameObject.GetComponent<PlayerController>().DamageDisabled) return;
-        }
+    private void takeDamage(Damage damage, LivingEntity source = null) {
         if (gameObject.CompareTag("Boar")) {
             gameObject.GetComponent<Animator>()?.SetTrigger(_hurtHash);
         }
 
-        gameObject.GetComponent<HitFlashAnimator>()?.Flash();
+        if (gameObject.GetComponent<Rigidbody>() != null) {
+            gameObject.GetComponent<Rigidbody>().AddForce(-transform.forward * 10, ForceMode.Impulse);
+        }
+
         _lastDamageTime = Time.time;
 
         // Check if entity is dead
@@ -102,6 +108,17 @@ public class LivingEntity : MonoBehaviour
         float desiredDamageAmount = damage.Value;
         // TODO: Calculate damage based on damage type, current entity modifiers, spells and what not
 
+        float resistance = getDamageResistance(damage.Type);
+        if(resistance < 0) {
+            Debug.LogWarning($"Resistance for damage type {damage.Type} is negative. Resistance is floored to 0. Resistance is {resistance}");
+            resistance = 0;
+        } else if (resistance > 1) {
+            Debug.LogWarning($"Resistance for damage type {damage.Type} is greater than 1. Resistance is floored to 1. Resistance is {resistance}");
+            resistance = 1;
+        }
+
+        desiredDamageAmount *= 1 - resistance;
+
         float actualDamageAmount = desiredDamageAmount;
         if(actualDamageAmount > Health) {
             actualDamageAmount = Health;
@@ -109,15 +126,15 @@ public class LivingEntity : MonoBehaviour
 
         Health.Subtract(actualDamageAmount);
 
-        if (gameObject.GetComponent<BossHealthBar>() != null) {
-            gameObject.GetComponent<BossHealthBar>().SetHealth(Health / MaxHealth);
-        }
-
         OnDamageTaken.Invoke(new DamageTakenEventData {
             Damage = damage,
             DesiredDamageAmount = desiredDamageAmount,
-            ActualDamageAmount = actualDamageAmount
+            ActualDamageAmount = actualDamageAmount,
+            Attacker = source,
+            Victim = this
         });
+
+        HitFlashAnimator.Flash();
 
         if (Health == 0) {
             if(source != null) {
@@ -174,9 +191,21 @@ public class LivingEntity : MonoBehaviour
 
             OnDeath.Invoke();
 
-            if (gameObject.GetComponent<PlayerController>() != null) return;
-            Destroy(gameObject);
+            if (DestroyOnDeath) Destroy(gameObject);
         }
+    }
+
+    private float getDamageResistance(DamageType damageType) {
+        if(Inventory is not HumanoidInventory humanoidInventory) return 0;
+
+        float resistance = 0;
+
+        resistance += humanoidInventory.Helmet?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
+        resistance += humanoidInventory.Chestplate?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
+        resistance += humanoidInventory.Leggings?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
+        resistance += humanoidInventory.Boots?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
+
+        return resistance;
     }
 
     #region Effects
@@ -247,15 +276,6 @@ public class LivingEntity : MonoBehaviour
 
     public void RemoveModifier(Modifier modifier) {
         ModifierSystem.RemoveModifier(modifier);
-    }
-
-    private void recalculateStats() {
-        Health.Recalculate(ModifierSystem);
-        MaxHealth.Recalculate(ModifierSystem);
-        RegenRate.Recalculate(ModifierSystem);
-        Armor.Recalculate(ModifierSystem);
-        ElementalArmor.Recalculate(ModifierSystem);
-        MovementSpeed.Recalculate(ModifierSystem);
     }
 
     #endregion

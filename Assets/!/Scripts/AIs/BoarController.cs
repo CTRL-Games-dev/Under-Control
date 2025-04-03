@@ -23,6 +23,7 @@ public class BoarController : MonoBehaviour
         if(!PrimaryAttackCooldown.Execute()) return;
 
         WeaponHolder.UpdateWeapon(PrimaryAttackWeapon);
+        WeaponHolder.InitializeAttack(AttackType.LIGHT);
         _animator.SetTrigger(_primaryAttackHash);
     }
 
@@ -32,9 +33,11 @@ public class BoarController : MonoBehaviour
 
     public void OnAttackAnimationStart() {
         WeaponHolder.BeginAttack();
+        WeaponHolder.EnableHitbox();
     }
 
     public void OnAttackAnimationEnd() {
+        WeaponHolder.DisableHitbox();
         WeaponHolder.EndAttack();
     }
 }

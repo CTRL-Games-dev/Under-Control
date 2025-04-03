@@ -1,7 +1,12 @@
 using System;
+using UnityEngine;
 
 [Serializable]
 public struct Modifier {
+    public const string POSITIVE_COLOR = "#00FF00";
+    public const string NEUTRAL_COLOR = "#FFFFFF";
+    public const string NEGATIVE_COLOR = "#FF0000";
+
     public StatType StatType;
     public float Value;
     public ModifierType Type;
@@ -55,6 +60,52 @@ public struct Modifier {
         return $"{valueString} {StatType.GetDisplayName()}";
     }
 
+    public string ToRichTextString() {
+        string valueString;
+        switch(Type) {
+            case ModifierType.ADDITIVE:
+                if (Value > 0) {
+                    valueString = $"+{Value}";
+                } else {
+                    valueString = $"{Value}";
+                }
+
+                break;
+            case ModifierType.MULTIPLICATIVE:
+                valueString = $"{Value}x";
+                break;
+            case ModifierType.PERCENT_CHANGE:
+                if (Value > 0) {
+                    valueString = $"+{Value}%";
+                } else {
+                    valueString = $"{Value}%";
+                }
+
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        ModifierImpact impact = GetImpact();
+
+        string color;
+        switch(impact) {
+            case ModifierImpact.POSITIVE:
+                color = POSITIVE_COLOR;
+                break;
+            case ModifierImpact.NEUTRAL:
+                color = NEUTRAL_COLOR;
+                break;
+            case ModifierImpact.NEGATIVE:
+                color = NEGATIVE_COLOR;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        return $"<color={color}>{valueString}</color> {StatType.GetDisplayName()}";
+    }
+
     public ModifierImpact GetImpact() {
         switch(StatType) {
             case StatType.HEALTH:
@@ -82,7 +133,8 @@ public struct Modifier {
                     return ModifierImpact.NEUTRAL;
                 }
             default:
-                throw new ArgumentOutOfRangeException();
+                Debug.LogError($"Requested impact for stat type {StatType} but it is not implemented, returning NEUTRAL");
+                return ModifierImpact.NEUTRAL;
         }
     }
 }
