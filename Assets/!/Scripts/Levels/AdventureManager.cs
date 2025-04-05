@@ -27,9 +27,9 @@ public class AdventureManager : MonoBehaviour, ILevelManager
 
         Vector2 spawn = portal.LocationCenterInWorld;
 
-        Instantiate(_player, new(spawn.x, 0.2f, spawn.y - 2f), Quaternion.identity);
+        // Instantiate(_player, new(spawn.x, 0.2f, spawn.y - 2f), Quaternion.identity);
 
-        _cameraManager.SwitchCamera(UICanvas.Instance.PlayerController.PlayerTopDownCamera);
+        // _cameraManager.SwitchCamera(UICanvas.Instance.PlayerController.PlayerTopDownCamera);
 
         _navMeshSurface.BuildNavMesh();
     }
