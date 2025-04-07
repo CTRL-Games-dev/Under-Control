@@ -5,7 +5,6 @@ using UnityEngine;
 public class DialogueEntry
 {
     public bool IsPlayer;
-    public string Name;
     public string Text;
 }
 

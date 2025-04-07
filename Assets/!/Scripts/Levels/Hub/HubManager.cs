@@ -1,7 +1,7 @@
 using Unity.Cinemachine;
 using UnityEngine;
 
-public class HubManager : MonoBehaviour, ILevelManager
+public class HubManager : MonoBehaviour
 {
     public static CinemachineCamera MainMenuCamera;
 
@@ -13,6 +13,7 @@ public class HubManager : MonoBehaviour, ILevelManager
         CameraManager.Instance.SwitchCamera(MainMenuCamera);
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.MainMenu);
         Player.Instance.SetPlayerPosition(new Vector3(-0.7f, 0, -1.7f));
+        Player.Instance.MaxCameraDistance = 7f;
     }
 
     private void Update() {

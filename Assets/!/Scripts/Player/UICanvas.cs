@@ -1,5 +1,7 @@
 using DG.Tweening;
+using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Video;
 
 
@@ -169,6 +171,17 @@ public class UICanvas : MonoBehaviour
 
     public void PickupItemNotify(ItemData itemData, int amount) {
         _actionNotifierManager.SpawnActionNotifier(itemData.Icon, itemData.DisplayName, Color.white, amount);
+    }
+
+    #endregion
+    #region Misc Methods
+
+    public void StartTalking(Dialogue dialogue, Texture faceImage, FaceAnimator faceAnimator, string nameKey) {
+        TalkingCanvas.gameObject.SetActive(true);
+        if (dialogue == null) return;
+
+        TalkingCanvas.SetupDialogue(dialogue, faceImage, faceAnimator, nameKey);
+        ChangeUIBottomState(UIBottomState.Talking);
     }
 
     #endregion
