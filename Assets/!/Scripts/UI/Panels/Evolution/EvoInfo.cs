@@ -26,5 +26,4 @@ public class EvoInfo : MonoBehaviour
         _descriptionText.text = description;
         _canvasGroup.DOFade(1, 0.2f);
     }
-
 }

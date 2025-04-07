@@ -90,6 +90,21 @@ public class FaceAnimator : MonoBehaviour
         }
     }
 
+    public void StartTalk() {
+        CurrentFaceState = FaceState.Talk;
+        _index = 0;
+        _goalDuration = 0;
+        _durationTimer = 0;
+    }
+
+    public void EndTalk() {
+        CurrentFaceState = FaceState.Neutral;
+        _index = 0;
+        _goalDuration = 0;
+        _durationTimer = 0;
+    }
+
+
     public void Talk(float duration) {
         CurrentFaceState = FaceState.Talk;
         _index = 0;

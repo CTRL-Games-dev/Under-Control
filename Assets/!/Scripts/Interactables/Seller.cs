@@ -15,7 +15,7 @@ public class Seller : MonoBehaviour, IInteractableInventory
 
 
     public void Interact() {
-        Player.UICanvas.SetOtherInventory(Inventory.ItemContainer, _uiPrefab, this, "SELLER");
+        Player.UICanvas.SetOtherInventory(Inventory.ItemContainer, _uiPrefab, this, "interactable_name_seller_key");
     }
 
     public void EndInteract() {}

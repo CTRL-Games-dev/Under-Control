@@ -9,6 +9,9 @@ public class ItemInfoPanel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _itemValue;
     [SerializeField] private TextMeshProUGUI _itemAmount;
 
+    [SerializeField] private TextLocalizer _nameTextLocalizer;
+    [SerializeField] private TextLocalizer _descriptionTextLocalizer;
+
     private RectTransform _rectTransform;
 
     private void Awake() {
@@ -36,13 +39,16 @@ public class ItemInfoPanel : MonoBehaviour
             Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height, Screen.height)
         );
 
-        _itemName.text = item.ItemData.DisplayName;
-        _itemDescription.text = item.ItemData.Description;
+        _nameTextLocalizer.Key = item.ItemData.DisplayName;
+        _descriptionTextLocalizer.Key = item.ItemData.Description;
+
 
         int value = item.ItemData.Value / 2;
         if (itemUI.CurrentInventoryPanel != null && itemUI.CurrentInventoryPanel.IsSellerInventory) value *= 2;
 
         _itemValue.text = value + $" ({value * item.Amount})";
         _itemAmount.text = '×' + item.Amount.ToString();
+
+
     }
 }
