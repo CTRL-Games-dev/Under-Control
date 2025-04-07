@@ -28,12 +28,16 @@ public class LivingEntity : MonoBehaviour {
     public bool DestroyOnDeath = true;
 
     [Header("Stats")]
-    public DynamicStat Health = new DynamicStat(StatType.HEALTH, 100);
+    public float Health = 100;
+    public float Mana = 100f;
+   
     public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
-    public Stat RegenRate = new Stat(StatType.REGEN_RATE, 1);
+    public Stat HealthRegenRate = new Stat(StatType.HEALTH_REGEN_RATE, 1);
+    public Stat ManaRegenRate = new Stat(StatType.MANA_REGEN_RATE, 1);
     public Stat Armor = new Stat(StatType.ARMOR, 0);
     public Stat ElementalArmor = new Stat(StatType.ELEMENTAL_ARMOR, 0);
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
+    public Stat MaxMana = new Stat(StatType.MAX_MANA, 100f);
 
     [Header("Events")]
     public UnityEvent OnDeath;
@@ -55,23 +59,29 @@ public class LivingEntity : MonoBehaviour {
         Inventory = GetComponent<EntityInventory>();
         HitFlashAnimator = GetComponent<HitFlashAnimator>();
 
-        ModifierSystem.RegisterStat(ref Health);
         ModifierSystem.RegisterStat(ref MaxHealth);
-        ModifierSystem.RegisterStat(ref RegenRate);
+        ModifierSystem.RegisterStat(ref HealthRegenRate);
         ModifierSystem.RegisterStat(ref Armor);
         ModifierSystem.RegisterStat(ref ElementalArmor);
         ModifierSystem.RegisterStat(ref MovementSpeed);
+        ModifierSystem.RegisterStat(ref MaxMana);
     }
 
     void Update() {
         recheckEffects();
    
-        // Regen
+        // Health regen
         if(Time.time - _lastDamageTime > TimeToRegenAfterDamage) {
-            Health.Add(RegenRate * Time.deltaTime);
+            Health += HealthRegenRate * Time.deltaTime;
             if(Health > MaxHealth) {
-                Health.Set(MaxHealth);
+                Health = MaxHealth;
             }
+        }
+
+        // Mana regen
+        Mana += ManaRegenRate * Time.deltaTime;
+        if(Mana > MaxMana) {
+            Mana = MaxMana;
         }
     }
 
@@ -124,7 +134,7 @@ public class LivingEntity : MonoBehaviour {
             actualDamageAmount = Health;
         }
 
-        Health.Subtract(actualDamageAmount);
+        Health -= actualDamageAmount; 
 
         OnDamageTaken.Invoke(new DamageTakenEventData {
             Damage = damage,
