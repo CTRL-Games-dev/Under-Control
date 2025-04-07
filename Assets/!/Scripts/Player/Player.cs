@@ -24,7 +24,7 @@ public class Player : MonoBehaviour {
             if(!Cooldown.Execute()) return false;
 
             caster.Mana -= Spell.Mana; 
-            Spell.Cast(caster);
+            Spell.Cast();
 
             return true;
         }
@@ -384,8 +384,7 @@ public class Player : MonoBehaviour {
         if(_isAttacking) return;
             
         if (_canRotateOnClick) {
-            Vector2 dir = new Vector2(Input.mousePosition.x - Screen.width / 2, Input.mousePosition.y - Screen.height / 2).normalized;
-            Quaternion targetRotation = Quaternion.LookRotation(new Vector3(dir.x, 0, dir.y)) * Quaternion.Euler(0, 45, 0);
+            Quaternion targetRotation = Quaternion.LookRotation(GetMouseDirection()) * Quaternion.Euler(0, 45, 0);  
             transform.DORotateQuaternion(targetRotation, 0.05f).SetEase(Ease.OutSine);
         } 
 
@@ -532,4 +531,12 @@ public class Player : MonoBehaviour {
         Animator.applyRootMotion = true;
         Animator.speed = 1;
     }
+    
+    #region Utility
+
+    public static Vector3 GetMouseDirection() {
+        return new Vector3(Input.mousePosition.x - Screen.width / 2, 0, Input.mousePosition.y - Screen.height / 2).normalized;
+    }
+
+    #endregion
 }

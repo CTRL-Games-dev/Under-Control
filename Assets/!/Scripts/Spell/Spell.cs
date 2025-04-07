@@ -7,5 +7,5 @@ public abstract class Spell : ScriptableObject {
     public float Mana;
     public float CooldownTime;
 
-    public abstract void Cast(LivingEntity caster);
+    public abstract void Cast();
 }

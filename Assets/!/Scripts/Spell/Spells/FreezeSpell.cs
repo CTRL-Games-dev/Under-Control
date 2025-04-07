@@ -4,8 +4,13 @@ using UnityEngine;
 public class FreezeSpell : Spell {
     public FreezeBall BallPrefab;
 
-    public override void Cast(LivingEntity caster) {
-        FreezeBall ball = Instantiate(BallPrefab, caster.transform.position + Vector3.up, caster.transform.rotation);
-        ball.Initialize(caster, caster.transform.rotation * Vector3.forward);
+    public override void Cast() {
+        FreezeBall ball = Instantiate(
+            BallPrefab,
+            Player.Instance.transform.position + Vector3.up,
+            Player.Instance.transform.rotation
+        );
+        
+        ball.Initialize(Player.LivingEntity, Player.GetMouseDirection());
     }
 }
