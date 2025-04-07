@@ -9,7 +9,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshCollider))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(BetterGenerator))]
+[RequireComponent(typeof(WorldGenerator))]
 public class AdventureManager : MonoBehaviour, ILevelManager
 {
     private GameManager _gameManager;
@@ -20,17 +20,16 @@ public class AdventureManager : MonoBehaviour, ILevelManager
     {
         _gameManager = GameManager.Instance;
         
-        var generator = GetComponent<BetterGenerator>();
+        var generator = GetComponent<WorldGenerator>();
         generator.GenerateMap(GameManager.Instance.GetCurrentDimension());
         
-        ForestPortal portal = generator.Getlocation<ForestPortal>();
+        ForestPortalLocation portal = generator.Getlocation<ForestPortalLocation>();
 
-        Vector2 spawn = portal.GetAbsoluteCenter(generator.wd.Offset, generator.wd.Scale);
-        
-        Debug.Log($"Spawn: {spawn}");
-        Player.Instance.SetPlayerPosition(new Vector3(spawn.x, 1, spawn.y + 3));
+        Vector2 spawn = portal.LocationCenterInWorld;
 
-        // _cameraManager.SwitchCamera(Player.Instance.TopDownCamera);
+        // Instantiate(_player, new(spawn.x, 0.2f, spawn.y - 2f), Quaternion.identity);
+
+        // _cameraManager.SwitchCamera(UICanvas.Instance.PlayerController.PlayerTopDownCamera);
 
         _navMeshSurface.BuildNavMesh();
     }

@@ -81,6 +81,7 @@ public class ModifierSystem : MonoBehaviour
         for(int i = 0; i < _activeModifiers.Count; i++) {
             modifiers.Add(_activeModifiers[i].Modifier);
         }
+        
         return modifiers;
     }
 

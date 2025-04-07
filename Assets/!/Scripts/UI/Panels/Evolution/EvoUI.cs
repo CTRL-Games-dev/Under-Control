@@ -63,6 +63,7 @@ public class EvoUI : MonoBehaviour
         if (!_isAvailable || _isSelected || Player.Instance.EvolutionPoints <= 0) return;
         Player.Instance.EvolutionPoints--;
         Player.Instance.SelectedEvolutions.Add(this);
+        Player.Instance.OnEvolutionSelected.Invoke(this);
         float fillAmount = 0;
         DOTween.To(() => fillAmount, x => fillAmount = x, 1, 0.5f).SetEase(Ease.InOutSine).OnUpdate(() => {
             _lineImage.fillAmount = fillAmount;
@@ -74,5 +75,9 @@ public class EvoUI : MonoBehaviour
         foreach (EvoUI evoUI in _nextEvoUIs) {
             evoUI.SetAvailable();
         }
+    }
+
+    public List<Modifier> GetModifiers() {
+        return new List<Modifier>(_modifiers);
     }
 }
