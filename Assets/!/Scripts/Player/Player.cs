@@ -101,6 +101,9 @@ public class Player : MonoBehaviour {
     private InteractionType? _queuedInteraction;
     private Cooldown dodgeCooldown = new Cooldown(0);
 
+    private List<Modifier> _currentRingModifiers;
+    private List<Modifier> _currentAmuletModifiers;
+
     // Animator ids
     private readonly int _speedHash = Animator.StringToHash("speed");
     private readonly int _lightAttackHash = Animator.StringToHash("attack_light");
@@ -151,6 +154,34 @@ public class Player : MonoBehaviour {
                 LivingEntity.ApplyIndefiniteModifier(modifier);
             }
         });
+
+        // Amulet modifiers
+        Inventory.OnInventoryChanged.AddListener(() => {
+            foreach(var modifier in _currentAmuletModifiers) {
+                LivingEntity.RemoveModifier(modifier);
+            }
+
+            _currentAmuletModifiers = Inventory.Amulet?.Modifiers;
+
+            foreach(var modifier in _currentAmuletModifiers) {
+                LivingEntity.ApplyIndefiniteModifier(modifier);
+            }
+        });
+
+        // Ring modifiers
+        Inventory.OnInventoryChanged.AddListener(() => {
+            foreach(var modifier in _currentRingModifiers) {
+                LivingEntity.RemoveModifier(modifier);
+            }
+
+            _currentRingModifiers = Inventory.Ring?.Modifiers;
+
+            foreach(var modifier in _currentRingModifiers) {
+                LivingEntity.ApplyIndefiniteModifier(modifier);
+            }
+        });
+
+        ResetRun();
     }
 
     void Update() {
@@ -429,10 +460,21 @@ public class Player : MonoBehaviour {
     public void ResetRun() {
         ModifierSystem.Reset();
 
+        // Evolution modifiers
         foreach (EvoUI evoUI in SelectedEvolutions) {
             foreach (Modifier modifier in evoUI.GetModifiers()) {
                 LivingEntity.ApplyIndefiniteModifier(modifier);
             }
+        }
+
+        // Amulet modifiers
+        foreach(var modifier in _currentAmuletModifiers) {
+            LivingEntity.ApplyIndefiniteModifier(modifier);
+        }
+
+        // Ring modifiers
+        foreach(var modifier in _currentRingModifiers) {
+            LivingEntity.ApplyIndefiniteModifier(modifier);
         }
     }
 
