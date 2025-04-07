@@ -24,23 +24,27 @@ public class Weapon : MonoBehaviour {
     }
 
     public void StartMajorTrail() {
+        if (_majorTrail == null) return;
         _majorTrailObject.SetActive(true);
         _majorTrail.Clear();
         _majorTrail.Play();
     }
 
     public void StartMinorTrail() {
+        if (_majorTrail == null) return;
         _minorTrailObject.SetActive(true);
         _minorTrail.Clear();
         _minorTrail.Play();
     }
 
     public void StopMinorTrail() {
+        if (_majorTrail == null) return;
         _minorTrail.Stop();
         _minorTrailObject.SetActive(false);
     }
 
     public void StopMajorTrail() {
+        if (_majorTrail == null) return;
         _majorTrail.Stop();
         _majorTrailObject.SetActive(false);
     }
