@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class HoverTooltip : MonoBehaviour {
-    public Player Player;
-
     [Header("Tooltips")]
     public ItemEntityTooltip ItemEntityTooltip;
     public LivingEntityTooltip LivingEntityTooltip;

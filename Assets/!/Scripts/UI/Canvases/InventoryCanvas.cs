@@ -20,6 +20,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private GameObject _otherInventoryHolder;
     [SerializeField] private RectTransform _underlineRect;
     [SerializeField] private GameObject _armorBtnTabGO, _cardsBtnTabGO, _evoBtnTabGO, _questsBtnTabGO, _otherBtnTabGO;
+    [SerializeField] private TextLocalizer _otherTabTextLocalizer;
 
     [Header("Panel Game Objects")]
     [SerializeField] private GameObject _playerInventoryPanelGO;
@@ -243,8 +244,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     }
 
     public void SetOtherTabTitle(string text) {
-        _tabTexts[_tabPanelsIndex[InventoryTabs.Other]].text = text ?? "";
-        _tabTexts[_tabPanelsIndex[InventoryTabs.Other]].DOColor(text == null ? Color.gray : Color.white, 0.15f);
+        _otherTabTextLocalizer.Key = text ?? "";
         _tabButtonGameObjects[_tabPanelsIndex[InventoryTabs.Other]].GetComponent<Button>().interactable = text != null;
     }
 
