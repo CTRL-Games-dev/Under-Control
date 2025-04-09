@@ -162,27 +162,35 @@ public class Player : MonoBehaviour {
 
         // Amulet modifiers
         Inventory.OnInventoryChanged.AddListener(() => {
-            foreach(var modifier in _currentAmuletModifiers) {
-                LivingEntity.RemoveModifier(modifier);
+            if (_currentAmuletModifiers != null) {
+                foreach(var modifier in _currentAmuletModifiers) {
+                    LivingEntity.RemoveModifier(modifier);
+                }
             }
 
             _currentAmuletModifiers = Inventory.Amulet?.Modifiers;
 
-            foreach(var modifier in _currentAmuletModifiers) {
-                LivingEntity.ApplyIndefiniteModifier(modifier);
+            if (_currentAmuletModifiers != null) {
+                foreach(var modifier in _currentAmuletModifiers) {
+                    LivingEntity.ApplyIndefiniteModifier(modifier);
+                }
             }
         });
 
         // Ring modifiers
         Inventory.OnInventoryChanged.AddListener(() => {
-            foreach(var modifier in _currentRingModifiers) {
-                LivingEntity.RemoveModifier(modifier);
+            if (_currentRingModifiers != null) {
+                    foreach(var modifier in _currentRingModifiers) {
+                    LivingEntity.RemoveModifier(modifier);
+                }
             }
 
             _currentRingModifiers = Inventory.Ring?.Modifiers;
 
-            foreach(var modifier in _currentRingModifiers) {
-                LivingEntity.ApplyIndefiniteModifier(modifier);
+            if (_currentRingModifiers != null) {
+                foreach(var modifier in _currentRingModifiers) {
+                    LivingEntity.ApplyIndefiniteModifier(modifier);
+                }
             }
         });
 
@@ -559,13 +567,17 @@ public class Player : MonoBehaviour {
         }
 
         // Amulet modifiers
-        foreach(var modifier in _currentAmuletModifiers) {
-            LivingEntity.ApplyIndefiniteModifier(modifier);
+        if (_currentAmuletModifiers != null) {
+            foreach(var modifier in _currentAmuletModifiers) {
+                LivingEntity.ApplyIndefiniteModifier(modifier);
+            }
         }
 
         // Ring modifiers
-        foreach(var modifier in _currentRingModifiers) {
-            LivingEntity.ApplyIndefiniteModifier(modifier);
+        if (_currentRingModifiers != null) {
+            foreach(var modifier in _currentRingModifiers) {
+                LivingEntity.ApplyIndefiniteModifier(modifier);
+            }
         }
     }
 
