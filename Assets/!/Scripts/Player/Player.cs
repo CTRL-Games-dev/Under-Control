@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using Unity.Cinemachine;
@@ -50,6 +51,8 @@ public class Player : MonoBehaviour {
     [Header("Properties")]
     [SerializeField] private float _acceleration = 8f;
     [SerializeField] private float _deceleration = 4f;
+    [SerializeField] private float _attackAcceleration = 4f;
+    [SerializeField] private float _attackDeceleration = 12f;
     [SerializeField] private float _currentSpeed = 0f;
     [SerializeField] private float _turnSpeed = 260f;
 
@@ -125,6 +128,7 @@ public class Player : MonoBehaviour {
     [SerializeField] private LayerMask _groundLayerMask;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
 
+    private Vector3 _queuedRotation;
     
 
     #region Unity Methods
@@ -198,28 +202,11 @@ public class Player : MonoBehaviour {
     }
 
     void Update() {
-        // Nie mozna playerinputa wylaczyc? - nie mozna :)
-        if (InputDisabled) {
-            _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0, _deceleration * Time.deltaTime);
-            return;
-        }
-
-        // transform.rotation = Quaternion.LookRotation(new Vector3(Input.mousePosition.x, 1, Input.mousePosition.y));
-
-        float goalSpeed = Input.GetKey(KeyCode.LeftShift) ? MaxMovementSpeed : MaxMovementSpeed / 2; // do zmiany
-
-        var movementVector = Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
-        if (movementVector.magnitude > 0.1 || _isAttacking) {
-            _currentSpeed = Mathf.MoveTowards(_currentSpeed, goalSpeed, _acceleration * Time.deltaTime);
-        } else {
-            _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0, _deceleration * Time.deltaTime);
-        }
-
         handleInteraction();
+        handleRotation();
 
-        if (!_lockRotation) handleRotation();
-
-        CharacterController.SimpleMove(movementVector * _currentSpeed);
+        _currentSpeed = Mathf.MoveTowards(_currentSpeed, getGoalSpeed(), getSpeedChange() * Time.deltaTime);
+        CharacterController.SimpleMove(getGoalDirection() * _currentSpeed);
     }
 
     void FixedUpdate() {
@@ -230,22 +217,81 @@ public class Player : MonoBehaviour {
 
     #endregion
 
+    private float getSpeedChange() {
+        if (InputDisabled) return _deceleration;
+
+        switch (CurrentAnimationState) {
+            case AnimationState.Locomotion:
+                return _movementInputVector.magnitude > 0.1f ? _acceleration : _deceleration;
+
+            case AnimationState.Attack_Windup:
+            case AnimationState.Attack_Contact:
+                return _attackAcceleration;
+
+            case AnimationState.Attack_ComboWindow:
+                return _attackDeceleration;
+
+            case AnimationState.Attack_Recovery:
+            default:
+                return 0;
+        }
+    }
+
+    private Vector3 getGoalDirection() {
+        switch (CurrentAnimationState) {
+            case AnimationState.Attack_Windup:
+            case AnimationState.Attack_Contact:
+            case AnimationState.Attack_ComboWindow:
+                return _queuedRotation.normalized;
+
+            case AnimationState.Locomotion:
+            case AnimationState.Attack_Recovery:
+            default:
+                return Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y).normalized;
+        }
+    }
+
+
+    private float getGoalSpeed() {
+        if (InputDisabled) return 0;
+
+        switch (CurrentAnimationState) {
+            case AnimationState.Locomotion:
+                return _movementInputVector.magnitude > 0.1f ? MaxMovementSpeed : 0;
+
+            case AnimationState.Attack_Windup:
+                return MaxMovementSpeed * 1.5f;
+            case AnimationState.Attack_Contact:
+                return MaxMovementSpeed * 0.7f;
+            case AnimationState.Attack_ComboWindow:
+            case AnimationState.Attack_Recovery:
+                return 0;
+        }
+
+        return 0;
+    }
+
+
     private void handleRotation() {
+        if (_lockRotation) return;
         if (_movementInputVector.magnitude > 0.1f) {
             var targetRotation = Quaternion.Euler(0, 45, 0) * Quaternion.LookRotation(new Vector3(_movementInputVector.x, 0, _movementInputVector.y));
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
         }
     }
 
+
     private void onDeath() {
         UICanvas.ChangeUITopState(UITopState.Death);
     }
+
 
     // Input events
     #region Input Events
     void OnMove(InputValue value) {
         _movementInputVector = value.Get<Vector2>();
     }
+
 
     void OnLook(InputValue value) {
         Vector2 pointerVector = value.Get<Vector2>();
@@ -355,6 +401,7 @@ public class Player : MonoBehaviour {
         _queuedInteraction = null;
     }
 
+
     private void interact(InteractionType interactionType) {
         if(EventSystem.current.IsPointerOverGameObject()) {
             return;
@@ -368,10 +415,14 @@ public class Player : MonoBehaviour {
         if(CurrentWeapon == null) return;
 
         // Default to attacking if no interaction was commited
-        if(_isAttacking) return;
+        _queuedRotation = getMousePosition() - transform.position;
+        if(_isAttacking) {
             
+            return;
+        };
+        
         if (!_lockRotation) {
-            transform.LookAt(getMousePosition().position);
+            transform.LookAt(getMousePosition());
         }
 
         _lockRotation = true;
@@ -425,64 +476,19 @@ public class Player : MonoBehaviour {
     }
 
 
-    private (bool success, Vector3 position) getMousePosition() {
+    private Vector3 getMousePosition() {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _groundLayerMask)) {
-            return (true, hit.point);
+            Vector3 point = hit.point;
+            point.y = transform.position.y;
+            return point;
         } else {
-            return (false, Vector3.zero);
+            return Vector3.zero;
         }
 
     }
 
     // calluje sie z animacji jesli dodane jest AttackAnimationBehaviour w animatorze
-
-    #endregion
-
-    #region Animation Messages
-    // public void OnStartAttackAnimationsEnter() {
-    //     _isAttacking = true;
-    //     WeaponHolder.BeginAttack();
-    // }
-
-    // public void OnEndAttackAnimationsEnter() {
-    //     WeaponHolder.EndAttack();
-    //     _isAttacking = false;
-    // }
-
-    // public void OnDealDamageAnimationEnter() {
-    //     WeaponHolder.EnableHitbox();
-    // }
-
-    // public void OnDealDamageAnimationExit() {
-    //     WeaponHolder.DisableHitbox();
-    // }
-
-
-    // // public void OnDodgeAnimationStart() {
-    // //     _isDodging = true;
-    // //     Animator.SetBool(_lightAttackHash, false);
-    // //     Animator.SetBool(_heavyAttackHash, false);
-    // //     DamageDisabled = true;
-    // // }
-
-
-    // public void OnLockRotationAnimationEnter() {
-    //     _lockRotation = true;
-    // }
-
-    // public void OnUnLockRotationAnimationEnter() {
-    //     _lockRotation = false;
-    //     _canRotateOnClick = true;
-    // }
-
-    // public void OnLockRotationOnClickAnimationEnter() {
-    //     _canRotateOnClick = false;
-    // }
-
-    // public void OnUnLockRotationOnClickAnimationEnter() {
-    //     _canRotateOnClick = true;
-    // }
 
     #endregion
 
@@ -510,17 +516,16 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_Contact:
-                _isAttacking = false;
-                _lockRotation = false;
-                Animator.applyRootMotion = false;
-                WeaponHolder.EndAttack();
                 WeaponHolder.DisableHitbox();
+                _isAttacking = false;
                 break;
 
             case AnimationState.Attack_ComboWindow:
                 break;
 
             case AnimationState.Attack_Recovery:
+                _lockRotation = false;
+                WeaponHolder.EndAttack();
                 break;
         }
     }
@@ -535,7 +540,7 @@ public class Player : MonoBehaviour {
             case AnimationState.Attack_Windup:
                 _lockRotation = true;
                 _isAttacking = true;
-                Animator.applyRootMotion = true;
+                _currentSpeed = 0;
                 WeaponHolder.BeginAttack();
                 break;
 
@@ -544,9 +549,12 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_ComboWindow:
+                _lockRotation = false;
+                transform.LookAt(getMousePosition());
                 break;
 
             case AnimationState.Attack_Recovery:
+                _lockRotation = true;
                 break;
         }
     }
