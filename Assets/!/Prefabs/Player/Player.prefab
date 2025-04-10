@@ -6600,11 +6600,13 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   _coins: 0
-  _acceleration: 8
-  _deceleration: 4
+  _acceleration: 10
+  _deceleration: 20
+  _attackAcceleration: 60
+  _attackDeceleration: 100
   _currentSpeed: 0
-  _turnSpeed: 300
-  MaxMovementSpeed: 10
+  _turnSpeed: 1200
+  MaxMovementSpeed: 6
   MinCameraDistance: 4
   MaxCameraDistance: 15
   CameraDistanceSpeed: 1
@@ -6614,6 +6616,7 @@ MonoBehaviour:
   CinemachineObject: {fileID: 1577044056733285295}
   CameraTargetObject: {fileID: 4902519630981857668}
   TopDownCamera: {fileID: 1842100701194989401}
+  MainCamera: {fileID: 469925352793417921}
   InputDisabled: 1
   DamageDisabled: 0
   SelectedEvolutions: []
@@ -6654,6 +6657,10 @@ MonoBehaviour:
   CoinsChangeEvent:
     m_PersistentCalls:
       m_Calls: []
+  _groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
+  CurrentAnimationState: 0
 --- !u!114 &2932634121617026090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6758,7 +6765,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DisplayName: Player
   Guild: {fileID: 11400000, guid: 4fa148434442fd54886d354e664047b1, type: 2}
-  DropItemsOnDeath: 1
+  DropItemsOnDeath: 0
   TimeToRegenAfterDamage: 2
   Exp: 0
   DroppedExpMultiplier: 1
@@ -7284,6 +7291,8 @@ GameObject:
   - component: {fileID: 6400265513179402671}
   - component: {fileID: 4678303393387540116}
   - component: {fileID: 6303695169528976740}
+  - component: {fileID: 5902188753989011990}
+  - component: {fileID: 6373264528434940316}
   m_Layer: 6
   m_Name: LookingAtPlayer
   m_TagString: Untagged
@@ -7444,6 +7453,36 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &5902188753989011990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787047760564129640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68bb026fafb42b14791938953eaace77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NoiseProfile: {fileID: 11400000, guid: a3dacaec0287d7444b4bd276816e1666, type: 2}
+  PivotOffset: {x: 0, y: 0, z: 0}
+  AmplitudeGain: 1
+  FrequencyGain: 1
+  m_NoiseOffsets: {x: 0, y: 0, z: 0}
+--- !u!114 &6373264528434940316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787047760564129640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d71426f590c4dd9419387fbdc1114105, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  noice: {fileID: 5902188753989011990}
 --- !u!1 &811866029209575356
 GameObject:
   m_ObjectHideFlags: 0
@@ -11491,6 +11530,8 @@ GameObject:
   - component: {fileID: 1842100701194989401}
   - component: {fileID: 377544962510307046}
   - component: {fileID: 4289380660674024370}
+  - component: {fileID: 3582159393707406577}
+  - component: {fileID: 165093394598324328}
   m_Layer: 6
   m_Name: PlayerCamera
   m_TagString: Untagged
@@ -11506,8 +11547,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1577044056733285295}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.4226183, y: 0.00000006697869, z: -0.00000002233356, w: 0.9063078}
-  m_LocalPosition: {x: 0, y: 6.362311, z: -4.499513}
+  m_LocalRotation: {x: 0.39294195, y: -0.33362672, z: 0.15557271, w: 0.8426666}
+  m_LocalPosition: {x: 3.0800717, y: 6.362311, z: -3.280058}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11581,11 +11622,11 @@ MonoBehaviour:
       Offset: {x: 0, y: 0}
   CenterOnActivate: 1
   TargetOffset: {x: 0, y: 0, z: 0}
-  Damping: {x: 1, y: 1, z: 1}
+  Damping: {x: 1, y: 0, z: 1}
   Lookahead:
     Enabled: 0
-    Time: 0
-    Smoothing: 0
+    Time: 0.125
+    Smoothing: 2.6
     IgnoreY: 0
 --- !u!114 &4289380660674024370
 MonoBehaviour:
@@ -11614,13 +11655,43 @@ MonoBehaviour:
   TiltAxis:
     Value: 50
     Center: 0
-    Range: {x: -70, y: 70}
+    Range: {x: -90, y: 90}
     Wrap: 0
     Recentering:
       Enabled: 0
       Wait: 1
       Time: 2
     Restrictions: 0
+--- !u!114 &3582159393707406577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1577044056733285295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68bb026fafb42b14791938953eaace77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
+  PivotOffset: {x: 0, y: 0, z: 0}
+  AmplitudeGain: 0
+  FrequencyGain: 1
+  m_NoiseOffsets: {x: 0, y: 0, z: 0}
+--- !u!114 &165093394598324328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1577044056733285295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d71426f590c4dd9419387fbdc1114105, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  noice: {fileID: 3582159393707406577}
 --- !u!1 &1631846448118895265
 GameObject:
   m_ObjectHideFlags: 0
@@ -27096,8 +27167,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2942579809011625722}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.27384555, y: 0.052188475, z: -0.014883451, w: 0.9602414}
-  m_LocalPosition: {x: 0.16266882, y: 4.8064814, z: -2.4987063}
+  m_LocalRotation: {x: 0.39294195, y: -0.33362672, z: 0.15557271, w: 0.8426666}
+  m_LocalPosition: {x: 3.0800717, y: 6.362311, z: -3.280058}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -27203,7 +27274,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 5000
-  field of view: 60
+  field of view: 40
   orthographic: 0
   orthographic size: 10
   m_Depth: 0
@@ -49887,8 +49958,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: evo_desc_sample_key
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 23133f923764e004d9ef2dd3e5994269, type: 2}
+  m_sharedMaterial: {fileID: 5454843045806385122, guid: 23133f923764e004d9ef2dd3e5994269, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -53490,8 +53561,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: evo_title_sample_key
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 65c7b7fcda6d2844cb73bd5a47b9e955, type: 2}
+  m_sharedMaterial: {fileID: 9047626407427840220, guid: 65c7b7fcda6d2844cb73bd5a47b9e955, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -61664,9 +61735,6 @@ MonoBehaviour:
   CurrentUIBottomState: 1
   CurrentUIMiddleState: 4
   CurrentUITopState: 0
-  MainCamera: {fileID: 469925352793417921}
-  IsGamePaused: 0
-  PlayerInventoryPanel: {fileID: 284689467940606008}
   ActiveInventoryPanel: {fileID: 0}
   ItemInfoPanel: {fileID: 8625786131296700281}
   EvoInfo: {fileID: 8285158827386235749}
