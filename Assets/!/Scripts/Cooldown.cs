@@ -34,4 +34,8 @@ public class Cooldown
 
         return true;
     }
+
+    public void ForceExecute() {
+        _lastExecuteTime = Time.time;
+    }
 }
