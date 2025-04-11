@@ -12,6 +12,8 @@ public class SlimeAIController : MonoBehaviour {
     public const float MaxJumpDistance = 2.5f;
     public const float PreferredJumpDistance = 2f;
 
+    public WeaponHolder WeaponHolder;
+    public WeaponItemData WeaponItemData;
     public Cooldown JumpCooldown = new Cooldown(0.3f);
     public float AngularSpeed = 200;
     public bool IsJumping => _startingPoint.HasValue;
@@ -82,7 +84,6 @@ public class SlimeAIController : MonoBehaviour {
 
         // Punish small jump's speed
         float jumpSpeed = JumpSpeed * simpleJumpLength /  MaxJumpDistance;
-
 
         float totalDistX = _destinationPoint.Value.x - _startingPoint.Value.x;
         float totalDistZ = _destinationPoint.Value.z - _startingPoint.Value.z;
