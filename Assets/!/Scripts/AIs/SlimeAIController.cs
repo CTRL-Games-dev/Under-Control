@@ -1,4 +1,5 @@
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -39,10 +40,6 @@ public class SlimeAIController : MonoBehaviour {
     }
 
     void Update() {
-        for(int i = 0; i < _navMeshAgent.path.corners.Length-1; i++) {
-            Debug.DrawLine(_navMeshAgent.path.corners[i], _navMeshAgent.path.corners[i+1], Color.red);
-        }
-
         if (IsJumping) {
             _navMeshAgent.nextPosition = _startingPoint.Value;
             jumpUpdate();
@@ -55,7 +52,20 @@ public class SlimeAIController : MonoBehaviour {
             return;
         }
 
-        Vector3 closestCorner = _navMeshAgent.path.corners[1];
+        List<Vector3> corners = _navMeshAgent.path.corners.ToList();
+        float accountedDistance = 0;
+        for(int i = corners.Count - 1; i > 0; i--) {
+            float distance = Vector3.Distance(corners[i], corners[i - 1]);
+            if (distance > _navMeshAgent.stoppingDistance - accountedDistance) {
+                corners[i] = corners[i] - (corners[i] - corners[i - 1]).normalized * (_navMeshAgent.stoppingDistance - accountedDistance);
+                break;
+            } else {
+                accountedDistance += distance;
+                corners.RemoveAt(i);
+            }
+        }
+
+        Vector3 closestCorner = corners[1];
         Vector3 cornerDirection = closestCorner - transform.position;
         float cornerDistance = cornerDirection.magnitude;
         cornerDirection /= cornerDistance;
@@ -149,7 +159,7 @@ public class SlimeAIController : MonoBehaviour {
     }
 
     public void OnAttackAnimationEnd() {
-        WeaponHolder.EndAttack();
         WeaponHolder.DisableHitbox();
+        WeaponHolder.EndAttack();
     }
 }
