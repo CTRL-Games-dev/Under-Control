@@ -1,5 +1,7 @@
 using DG.Tweening;
+using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Video;
 
 
@@ -35,12 +37,6 @@ public class UICanvas : MonoBehaviour
     #region Fields
 
     [Header("References for children")]
-    public Camera MainCamera;
-    public bool IsGamePaused = false;
-
-    // UI elements
-    public InventoryPanel PlayerInventoryPanel;
-
     [HideInInspector] public InventoryPanel ActiveInventoryPanel;
     public ItemInfoPanel ItemInfoPanel;
     public EvoInfo EvoInfo;
@@ -87,6 +83,15 @@ public class UICanvas : MonoBehaviour
         }
     }
 
+    private void Update() {
+        if (Input.GetKeyDown(KeyCode.F1)) {
+            TextData.ChangeLanguage(Language.English);
+        }
+        if (Input.GetKeyDown(KeyCode.F2)) {
+            TextData.ChangeLanguage(Language.Polish);
+        }
+    }
+
     #endregion
 
     #region Callbacks
@@ -123,6 +128,8 @@ public class UICanvas : MonoBehaviour
         }
     }
 
+    
+
     #endregion
 
     #region Inventory Methods
@@ -158,6 +165,17 @@ public class UICanvas : MonoBehaviour
 
     public void PickupItemNotify(ItemData itemData, int amount) {
         _actionNotifierManager.SpawnActionNotifier(itemData.Icon, itemData.DisplayName, Color.white, amount);
+    }
+
+    #endregion
+    #region Misc Methods
+
+    public void StartTalking(Dialogue dialogue, Texture faceImage, FaceAnimator faceAnimator, string nameKey) {
+        TalkingCanvas.gameObject.SetActive(true);
+        if (dialogue == null) return;
+
+        TalkingCanvas.SetupDialogue(dialogue, faceImage, faceAnimator, nameKey);
+        ChangeUIBottomState(UIBottomState.Talking);
     }
 
     #endregion

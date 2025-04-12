@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class HoverTooltip : MonoBehaviour {
-    public Player Player;
-
     [Header("Tooltips")]
     public ItemEntityTooltip ItemEntityTooltip;
     public LivingEntityTooltip LivingEntityTooltip;
@@ -13,7 +11,7 @@ public class HoverTooltip : MonoBehaviour {
     private Camera _camera;
 
     void Start() {
-        _camera = Player.UICanvas.MainCamera;
+        _camera = Player.Instance.MainCamera;
     }
 
     void FixedUpdate() {
