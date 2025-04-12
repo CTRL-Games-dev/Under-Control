@@ -316,8 +316,8 @@ public class Player : MonoBehaviour {
     }
 
     
-    // Input events
     #region Input Events
+
     void OnCastSpellOne(InputValue value) {
         _spellDataOne.TryCast(LivingEntity);
     }
@@ -333,7 +333,6 @@ public class Player : MonoBehaviour {
     void OnMove(InputValue value) {
         _movementInputVector = value.Get<Vector2>();
     }
-
 
     void OnLook(InputValue value) {
         Vector2 pointerVector = value.Get<Vector2>();
@@ -431,6 +430,7 @@ public class Player : MonoBehaviour {
             }
         });
     }
+
     #endregion
 
     #region Interaction Methods
@@ -457,14 +457,14 @@ public class Player : MonoBehaviour {
         if(CurrentWeapon == null) return;
 
         // Default to attacking if no interaction was commited
-        _queuedRotation = getMousePosition() - transform.position;
+        _queuedRotation = GetMousePosition() - transform.position;
         if(_isAttacking) {
             
             return;
         };
         
         if (!_lockRotation) {
-            transform.LookAt(getMousePosition());
+            transform.LookAt(GetMousePosition());
         }
 
         _lockRotation = true;
@@ -518,7 +518,7 @@ public class Player : MonoBehaviour {
     }
 
 
-    private Vector3 getMousePosition() {
+    public Vector3 GetMousePosition() {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _groundLayerMask)) {
             Vector3 point = hit.point;
@@ -529,8 +529,6 @@ public class Player : MonoBehaviour {
         }
 
     }
-
-    // calluje sie z animacji jesli dodane jest AttackAnimationBehaviour w animatorze
 
     #endregion
 
@@ -592,7 +590,7 @@ public class Player : MonoBehaviour {
 
             case AnimationState.Attack_ComboWindow:
                 _lockRotation = false;
-                transform.LookAt(getMousePosition());
+                transform.LookAt(GetMousePosition());
                 break;
 
             case AnimationState.Attack_Recovery:
@@ -600,7 +598,6 @@ public class Player : MonoBehaviour {
                 break;
         }
     }
-
 
     #endregion
 

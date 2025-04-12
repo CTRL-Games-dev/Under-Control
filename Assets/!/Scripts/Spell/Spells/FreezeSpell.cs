@@ -11,6 +11,6 @@ public class FreezeSpell : Spell {
             Player.Instance.transform.rotation
         );
         
-        ball.Initialize(Player.LivingEntity, Player.GetMouseDirection());
+        ball.Initialize(Player.LivingEntity, Player.Instance.GetMousePosition() - Player.Instance.transform.position);
     }
 }

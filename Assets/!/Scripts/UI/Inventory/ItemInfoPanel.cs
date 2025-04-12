@@ -7,9 +7,6 @@ public class ItemInfoPanel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _itemLightDamage, _itemHeavyDamage, _itemValue, _itemAmount;
     [SerializeField] private TextLocalizer _nameTextLocalizer, _rarityTextLocalizer, _descriptionTextLocalizer;
 
-    [SerializeField] private TextLocalizer _nameTextLocalizer;
-    [SerializeField] private TextLocalizer _descriptionTextLocalizer;
-
     private RectTransform _rectTransform;
 
     private void Awake() {
@@ -58,7 +55,5 @@ public class ItemInfoPanel : MonoBehaviour
 
         _itemValue.text = value + $" ({value * item.Amount})";
         _itemAmount.text = '×' + item.Amount.ToString();
-
-
     }
 }
