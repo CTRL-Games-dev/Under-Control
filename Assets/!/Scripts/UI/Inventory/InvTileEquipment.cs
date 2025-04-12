@@ -2,13 +2,8 @@ using UnityEngine;
 
 public class InvTileEquipment : InvTile {
     private enum TileType {
-        Material,
-        Helmet,
-        Chestplate,
-        Leggings,
-        Boots,
+        Armor,
         Amulet,
-        Ring,
         Weapon,
     }
 
@@ -31,38 +26,15 @@ public class InvTileEquipment : InvTile {
 
         // cant really test this without the rest of the game 
         switch (_tileType) {
-            case TileType.Helmet:
-                if (Player.Inventory.Helmet != null) {
+            case TileType.Armor:
+                if (Player.Inventory.Armor != null) {
                     InventoryItem inventoryItem = new();
-                    inventoryItem.ItemData = Player.Inventory.Helmet;
+                    inventoryItem.ItemData = Player.Inventory.Armor;
                     createItemUI(inventoryItem);
                     IsEmpty = false;
                 }
                 break;
-            case TileType.Chestplate:
-                if (Player.Inventory.Chestplate != null) {
-                    InventoryItem inventoryItem = new();
-                    inventoryItem.ItemData = Player.Inventory.Chestplate;
-                    createItemUI(inventoryItem);
-                    IsEmpty = false;
-                }
-                break;
-            case TileType.Leggings:
-                if (Player.Inventory.Leggings != null) {
-                    InventoryItem inventoryItem = new();
-                    inventoryItem.ItemData = Player.Inventory.Leggings;
-                    createItemUI(inventoryItem);
-                    IsEmpty = false;
-                }
-                break;
-            case TileType.Boots:
-                if (Player.Inventory.Boots != null) {
-                    InventoryItem inventoryItem = new();
-                    inventoryItem.ItemData = Player.Inventory.Boots;
-                    createItemUI(inventoryItem);
-                    IsEmpty = false;
-                }
-                break;
+
             case TileType.Amulet:
                 if (Player.Inventory.Amulet != null) {
                     InventoryItem inventoryItem = new();
@@ -71,14 +43,7 @@ public class InvTileEquipment : InvTile {
                     IsEmpty = false;
                 }
                 break;
-            case TileType.Ring:
-                if (Player.Inventory.Ring != null) {
-                    InventoryItem inventoryItem = new();
-                    inventoryItem.ItemData = Player.Inventory.Ring;
-                    createItemUI(inventoryItem);
-                    IsEmpty = false;
-                }
-                break;
+
             case TileType.Weapon:
                 if (Player.Inventory.Weapon != null) {
                     InventoryItem inventoryItem = new();
@@ -102,23 +67,11 @@ public class InvTileEquipment : InvTile {
         
         if (itemUI == _itemUI) {
             switch (_tileType) {
-                case TileType.Helmet:
-                    Player.Inventory.Helmet = null;
-                    break;
-                case TileType.Chestplate:
-                    Player.Inventory.Chestplate = null;
-                    break;
-                case TileType.Leggings:
-                    Player.Inventory.Leggings = null;
-                    break;
-                case TileType.Boots:
-                    Player.Inventory.Boots = null;
+                case TileType.Armor:
+                    Player.Inventory.Armor = null;
                     break;
                 case TileType.Amulet:
                     Player.Inventory.Amulet = null;
-                    break;
-                case TileType.Ring:
-                    Player.Inventory.Ring = null;
                     break;
                 case TileType.Weapon:
                     Player.Inventory.Weapon = null;
@@ -141,36 +94,12 @@ public class InvTileEquipment : InvTile {
 
         
         try {
-            if (_tileType == TileType.Helmet) {
-                if (SelectedInventoryItem.ItemData is not HelmetItemData helmetItemData) {
+            if (_tileType == TileType.Armor) {
+                if (SelectedInventoryItem.ItemData is not ArmorItemData armorItemData) {
                     return;
                 }
 
-                Player.Inventory.Helmet = helmetItemData;
-            } else if (_tileType == TileType.Chestplate) {
-                if (SelectedInventoryItem.ItemData is not ChestplateItemData chestplateItemData) {
-                    return;
-                }
-
-                Player.Inventory.Chestplate = chestplateItemData;
-            } else if (_tileType == TileType.Leggings) {
-                if (SelectedInventoryItem.ItemData is not LeggingsItemData leggingsItemData) {
-                    return;
-                }
-
-                Player.Inventory.Leggings = leggingsItemData;
-            } else if (_tileType == TileType.Boots) {
-                if (SelectedInventoryItem.ItemData is not BootsItemData bootsItemData) {
-                    return;
-                }
-
-                Player.Inventory.Boots = bootsItemData;
-            } else if (_tileType == TileType.Ring) {
-                if (SelectedInventoryItem.ItemData is not RingItemData ringItemData) {
-                    return;
-                }
-
-                Player.Inventory.Ring = ringItemData;
+                Player.Inventory.Armor = armorItemData;
             } else if (_tileType == TileType.Amulet) {
                 if (SelectedInventoryItem.ItemData is not AmuletItemData amuletItemData) {
                     return;

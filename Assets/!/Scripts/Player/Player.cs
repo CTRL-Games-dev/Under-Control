@@ -181,23 +181,6 @@ public class Player : MonoBehaviour {
             }
         });
 
-        // Ring modifiers
-        Inventory.OnInventoryChanged.AddListener(() => {
-            if (_currentRingModifiers != null) {
-                    foreach(var modifier in _currentRingModifiers) {
-                    LivingEntity.RemoveModifier(modifier);
-                }
-            }
-
-            _currentRingModifiers = Inventory.Ring?.Modifiers;
-
-            if (_currentRingModifiers != null) {
-                foreach(var modifier in _currentRingModifiers) {
-                    LivingEntity.ApplyIndefiniteModifier(modifier);
-                }
-            }
-        });
-
         // ResetRun();
     }
 
@@ -223,16 +206,13 @@ public class Player : MonoBehaviour {
         switch (CurrentAnimationState) {
             case AnimationState.Locomotion:
                 return _movementInputVector.magnitude > 0.1f ? _acceleration : _deceleration;
-
+                
             case AnimationState.Attack_Windup:
-                return 100000;
             case AnimationState.Attack_Contact:
-                return _attackAcceleration;
-
             case AnimationState.Attack_ComboWindow:
+            case AnimationState.Attack_Recovery:
                 return _attackDeceleration;
 
-            case AnimationState.Attack_Recovery:
             default:
                 return 0;
         }
@@ -261,9 +241,7 @@ public class Player : MonoBehaviour {
                 return _movementInputVector.magnitude > 0.1f ? MaxMovementSpeed : 0;
 
             case AnimationState.Attack_Windup:
-                return MaxMovementSpeed * 1.5f;
             case AnimationState.Attack_Contact:
-                return MaxMovementSpeed * 0.7f;
             case AnimationState.Attack_ComboWindow:
             case AnimationState.Attack_Recovery:
                 return 0;

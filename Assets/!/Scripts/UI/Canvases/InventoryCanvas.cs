@@ -343,19 +343,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
             _armorSlotsRects[1].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
             _armorSlotsCanvasGroups[1].DOFade(1, fadeSpeed).OnComplete(() => {
                 _armorSlotsRects[2].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
-                _armorSlotsCanvasGroups[2].DOFade(1, fadeSpeed).OnComplete(() => {
-                    _armorSlotsRects[3].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
-                    _armorSlotsCanvasGroups[3].DOFade(1, fadeSpeed).OnComplete(() => {
-                        _armorSlotsRects[4].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
-                        _armorSlotsCanvasGroups[4].DOFade(1, fadeSpeed).OnComplete(() => {
-                            _armorSlotsRects[5].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
-                            _armorSlotsCanvasGroups[5].DOFade(1, fadeSpeed).OnComplete(() => {
-                                _armorSlotsRects[6].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
-                                _armorSlotsCanvasGroups[6].DOFade(1, fadeSpeed);
-                            });
-                        });
-                    });
-                });
+                _armorSlotsCanvasGroups[2].DOFade(1, fadeSpeed);
             });
         });
         
@@ -378,19 +366,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
             _armorSlotsCanvasGroups[1].DOFade(0, fadeSpeed);
             _armorSlotsRects[1].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
                 _armorSlotsCanvasGroups[2].DOFade(0, fadeSpeed);
-                _armorSlotsRects[2].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
-                    _armorSlotsCanvasGroups[3].DOFade(0, fadeSpeed);
-                    _armorSlotsRects[3].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
-                        _armorSlotsCanvasGroups[4].DOFade(0, fadeSpeed);
-                        _armorSlotsRects[4].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
-                            _armorSlotsCanvasGroups[5].DOFade(0, fadeSpeed);
-                            _armorSlotsRects[5].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
-                                _armorSlotsCanvasGroups[6].DOFade(0, fadeSpeed);
-                                _armorSlotsRects[6].DOScale(0, scaleSpeed).SetEase(Ease.InBack);
-                            });
-                        });
-                    });
-                });
+                _armorSlotsRects[2].DOScale(0, scaleSpeed).SetEase(Ease.InBack);
             });
         });        
 
