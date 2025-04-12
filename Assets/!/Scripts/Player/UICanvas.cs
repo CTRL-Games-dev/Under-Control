@@ -1,8 +1,5 @@
 using DG.Tweening;
-using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Video;
 
 
@@ -84,18 +81,6 @@ public class UICanvas : MonoBehaviour
         }
     }
 
-    private void Update() {
-        if (Input.GetKeyDown(KeyCode.F1)) {
-            TextData.ChangeLanguage(Language.English);
-        }
-        if (Input.GetKeyDown(KeyCode.F2)) {
-            TextData.ChangeLanguage(Language.Polish);
-        }
-        if (Input.GetKeyDown(KeyCode.C)) {
-            ChangeUIMiddleState(UIMiddleState.Choose);
-        }
-        
-    }
 
     #endregion
 
@@ -306,7 +291,7 @@ public class UICanvas : MonoBehaviour
 
                 _videoPlayer.gameObject.SetActive(true);
                 _videoPlayer.Play();
-                _videoPlayer.gameObject.GetComponent<CanvasGroup>().DOFade(1, 1).SetUpdate(true);
+                _videoPlayer.gameObject.GetComponent<CanvasGroup>().DOFade(1, 1 * Settings.AnimationSpeed).SetUpdate(true);
                 break;
         }
     }

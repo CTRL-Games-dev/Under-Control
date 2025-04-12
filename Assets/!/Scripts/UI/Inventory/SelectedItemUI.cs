@@ -71,7 +71,7 @@ public class SelectedItemUI : MonoBehaviour
         transform.position = Input.mousePosition;
 
         if (transform.rotation != _goalRotation) {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, _goalRotation, _rotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, _goalRotation, _rotationSpeed * Settings.AnimationSpeed * Time.deltaTime);
         }
 
         if (Input.GetMouseButtonUp(0) && Player.UICanvas.ActiveInventoryPanel != null) {

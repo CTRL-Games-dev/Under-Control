@@ -16,18 +16,20 @@ public class ResetAllBindsBtn : MonoBehaviour
     public void ResetAllBinds()
     {
         _rectTransform.DOKill();
-        _rectTransform.DOScale(new Vector3(0.9f, 0.9f, 1), _scaleSpeed / 4).SetEase(Ease.OutBack).SetUpdate(true).OnComplete(() => {
-            _rectTransform.DOScale(new Vector3(1, 1, 1), _scaleSpeed / 4).SetEase(Ease.OutBack).SetDelay(_scaleSpeed / 2).SetUpdate(true);
-        });
-        
+        _rectTransform.DOScale(new Vector3(0.9f, 0.9f, 1), (_scaleSpeed / 4) * Settings.AnimationSpeed)
+            .SetEase(Ease.OutBack).SetUpdate(true).OnComplete(() => {
+                _rectTransform.DOScale(new Vector3(1, 1, 1), (_scaleSpeed / 4) * Settings.AnimationSpeed)
+                    .SetEase(Ease.OutBack).SetDelay((_scaleSpeed / 2) * Settings.AnimationSpeed).SetUpdate(true);
+            });
 
         for (int i = 0; i < _resetBindBtns.Count; i++) {
             var resetBindBtn = _resetBindBtns[i];
 
             resetBindBtn.DOKill();
-            resetBindBtn.transform.DOScale(Vector3.one, 0.05f * i).SetUpdate(true).OnComplete(() => {
-                resetBindBtn.onClick.Invoke();
-            });
+            resetBindBtn.transform.DOScale(Vector3.one, (0.05f * i) * Settings.AnimationSpeed)
+                .SetUpdate(true).OnComplete(() => {
+                    resetBindBtn.onClick.Invoke();
+                });
         }
     }
 }

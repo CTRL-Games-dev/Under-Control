@@ -296,7 +296,7 @@ public class InventoryPanel : MonoBehaviour
 
     private IEnumerator redPanelShow() {
         _redPanel.gameObject.SetActive(true);
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.2f * Settings.AnimationSpeed);
         _redPanel.gameObject.SetActive(false);
     }
 

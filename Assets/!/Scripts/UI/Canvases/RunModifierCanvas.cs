@@ -30,7 +30,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
 
         _canvasGroup.DOComplete();
         _canvasGroup.DOKill();
-        _canvasGroup.DOFade(1, 0.5f).OnComplete(() => {
+        _canvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).OnComplete(() => {
             _canvasGroup.interactable = true;
             _canvasGroup.blocksRaycasts = true;
     
@@ -44,7 +44,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
 
     public void HideUI() {
         if (_canvasGroup == null) return;
-        _canvasGroup.DOFade(0, 0.5f).OnComplete(() => {
+        _canvasGroup.DOFade(0, 0.5f * Settings.AnimationSpeed).OnComplete(() => {
             gameObject.SetActive(false);
         });
     }
