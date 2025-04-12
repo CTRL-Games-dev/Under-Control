@@ -4,12 +4,7 @@ using UnityEngine;
 public class ActionNotifierManager : MonoBehaviour
 {
     [SerializeField] private GameObject _actionNotifierPrefab;
-    private RectTransform _rectTransform;
     private List<ActionNotifier> _actionNotifiers = new List<ActionNotifier>();
-
-    private void Awake() {
-        _rectTransform = GetComponent<RectTransform>();
-    }
 
 
     public void SpawnActionNotifier(Sprite icon, string text, Color color, int amount) {

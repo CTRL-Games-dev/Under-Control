@@ -1,5 +1,6 @@
 using DG.Tweening;
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
@@ -90,6 +91,10 @@ public class UICanvas : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F2)) {
             TextData.ChangeLanguage(Language.Polish);
         }
+        if (Input.GetKeyDown(KeyCode.C)) {
+            ChangeUIMiddleState(UIMiddleState.Choose);
+        }
+        
     }
 
     #endregion
@@ -99,11 +104,13 @@ public class UICanvas : MonoBehaviour
     private void OnItemUIHover(ItemUI itemUI) {
         if (SelectedItemUI.InventoryItem != null) return;
         ItemInfoPanel.ShowItemInfo(itemUI);
-    }    
+    }   
 
     private void OnInventoryToggle() {
         if (IsOtherUIOpen) return;
-        ChangeUIMiddleState(CurrentUIMiddleState == UIMiddleState.Inventory ? UIMiddleState.NotVisible : UIMiddleState.Inventory);
+        if (CurrentUIMiddleState == UIMiddleState.NotVisible || CurrentUIMiddleState == UIMiddleState.Inventory) {
+            ChangeUIMiddleState(CurrentUIMiddleState == UIMiddleState.Inventory ? UIMiddleState.NotVisible : UIMiddleState.Inventory);
+        }
     }
 
     private void OnUICancel() {

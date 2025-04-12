@@ -37,6 +37,10 @@ public class Cooldown
 
         return true;
     }
+
+    public void ForceExecute() {
+        _lastExecuteTime = Time.time;
+    }
 }
 
 #if UNITY_EDITOR

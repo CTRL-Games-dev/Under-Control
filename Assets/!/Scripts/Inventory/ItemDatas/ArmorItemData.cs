@@ -1,7 +1,8 @@
 using System;
 using UnityEngine;
 
-public abstract class ArmorItemData : ItemData {
+[CreateAssetMenu(fileName = "ArmorItemData", menuName = "Items/Armor")]
+public class ArmorItemData : ItemData {
     [Serializable]
     public struct DamageResistance {
         public DamageType DamageType;

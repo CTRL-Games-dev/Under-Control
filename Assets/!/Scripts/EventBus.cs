@@ -8,5 +8,5 @@ public static class EventBus {
     public static UnityEvent<ItemUI> ItemUIHoverEvent = new(); 
     public static UnityEvent TileSizeSetEvent = new();
 
-    public static UnityEvent<RunModifier> RunCardClickedEvent = new();
+    public static UnityEvent<Card> RunCardClickedEvent = new();
 }

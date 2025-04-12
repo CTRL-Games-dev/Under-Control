@@ -174,34 +174,14 @@ public class LivingEntity : MonoBehaviour {
 
                 // Drop equipment
                 if(Inventory is HumanoidInventory humanoidInventory) {
-                    if(humanoidInventory.Helmet != null) {
-                        dropItem(humanoidInventory.Helmet, 1);
-                        humanoidInventory.Helmet = null;
-                    }
-
-                    if(humanoidInventory.Chestplate != null) {
-                        dropItem(humanoidInventory.Chestplate, 1);
-                        humanoidInventory.Chestplate = null;
-                    }
-
-                    if(humanoidInventory.Leggings != null) {
-                        dropItem(humanoidInventory.Leggings, 1);
-                        humanoidInventory.Leggings = null;
-                    }
-
-                    if(humanoidInventory.Boots != null) {
-                        dropItem(humanoidInventory.Boots, 1);
-                        humanoidInventory.Boots = null;
+                    if(humanoidInventory.Armor != null) {
+                        dropItem(humanoidInventory.Armor, 1);
+                        humanoidInventory.Armor = null;
                     }
 
                     if(humanoidInventory.Amulet != null) {
                         dropItem(humanoidInventory.Amulet, 1);
                         humanoidInventory.Amulet = null;
-                    }
-
-                    if(humanoidInventory.Ring != null) {
-                        dropItem(humanoidInventory.Ring, 1);
-                        humanoidInventory.Ring = null;
                     }
 
                     if(humanoidInventory.Weapon != null) {
@@ -220,14 +200,7 @@ public class LivingEntity : MonoBehaviour {
     private float getDamageResistance(DamageType damageType) {
         if(Inventory is not HumanoidInventory humanoidInventory) return 0;
 
-        float resistance = 0;
-
-        resistance += humanoidInventory.Helmet?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
-        resistance += humanoidInventory.Chestplate?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
-        resistance += humanoidInventory.Leggings?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
-        resistance += humanoidInventory.Boots?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
-
-        return resistance;
+        return humanoidInventory.Armor?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
     }
 
     #region Effects

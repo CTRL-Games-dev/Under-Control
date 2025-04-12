@@ -6,11 +6,10 @@ using UnityEngine.UI;
 
 public class RunCardUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI _modifierName;
+    [SerializeField] private TextLocalizer _nameTextLocalizer, _descriptionTextLocalizer;
     [SerializeField] private Image _icon;
-    [SerializeField] private TextMeshProUGUI _modifierDescription;
 
-    private RunModifier _runModifier;
+    private Card _card;
     private CanvasGroup _canvasGroup;
     private RectTransform _rectTransform;
     private bool _isHovered = false;
@@ -23,6 +22,11 @@ public class RunCardUI : MonoBehaviour
         _rectTransform.localScale = Vector3.zero;
         _canvasGroup.alpha = 0;
     }
+
+    private void OnDestroy() {
+        EventBus.RunCardClickedEvent.RemoveListener(OnRunCardClicked);
+    }
+
 
     private void Start() {
         EventBus.RunCardClickedEvent.AddListener(OnRunCardClicked);
@@ -43,34 +47,35 @@ public class RunCardUI : MonoBehaviour
 
     public void Setup() {
         gameObject.SetActive(true);
+        Awake();
 
-        _modifierName.text = _runModifier.ModifierName;
-        _icon.sprite = _runModifier.Icon;
-        _modifierDescription.text = _runModifier.ModifierDescription;
+        _nameTextLocalizer.Key = _card.ModifierName;
+        _icon.sprite = _card.Icon;
+        _descriptionTextLocalizer.Key = _card.ModifierDescription;
         
         _rectTransform.DOScale(Vector3.one, 0.5f);
         _canvasGroup.DOFade(1, 0.3f);
     }
 
     public void DestroyCard() {
-        _rectTransform.DOScale(Vector3.zero, 0.5f);
-        _rectTransform.DOShakeRotation(0.5f, 90, 10, 90);
-        _canvasGroup.DOFade(0, 0.5f).OnComplete(() => Destroy(gameObject));
+        _rectTransform.DOScale(Vector3.zero, 0.3f);
+        _rectTransform.DOShakeRotation(0.3f, 90, 10, 90);
+        _canvasGroup.DOFade(0, 0.3f).OnComplete(() => Destroy(gameObject));
     }
 
-    public void SetRunModifier(RunModifier runModifier) {
-        _runModifier = runModifier;
+    public void SetCard(Card Card) {
+        _card = Card;
     }
 
-    private void OnRunCardClicked(RunModifier runModifier) {
-        gameObject.GetComponent<EventTrigger>().enabled = false;
+    private void OnRunCardClicked(Card Card) {
+        gameObject.GetComponent<EventTrigger>().enabled = false;        
         DestroyCard();
     }
 
 
     public void OnClick() {
         _rectTransform.DOScale(Vector3.one * 1.4f, 0.3f);
-        EventBus.RunCardClickedEvent?.Invoke(_runModifier);
+        EventBus.RunCardClickedEvent?.Invoke(_card);
     }
 
     public void OnPointerEnter() {

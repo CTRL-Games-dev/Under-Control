@@ -7,6 +7,7 @@ using System;
 public class ActionNotifier : MonoBehaviour
 {
     [SerializeField] private Image _icon;
+    [SerializeField] private TextLocalizer _nameTextLocalizer;
     [SerializeField] private TextMeshProUGUI _nameText;
     [SerializeField] private TextMeshProUGUI _amountText;
     private RectTransform _rectTransform;
@@ -22,7 +23,7 @@ public class ActionNotifier : MonoBehaviour
     public void Setup(Sprite icon, string text, Color color, int amount, ActionNotifierManager parent)
     {
         _icon.sprite = icon;
-        _nameText.text = text;
+        _nameTextLocalizer.Key = text;
         _nameText.color = color;
         _amountText.text = "×" + amount.ToString();
 

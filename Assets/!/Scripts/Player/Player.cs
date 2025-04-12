@@ -1,8 +1,8 @@
 using System;
-using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using Unity.Cinemachine;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -232,23 +232,6 @@ public class Player : MonoBehaviour {
             }
         });
 
-        // Ring modifiers
-        Inventory.OnInventoryChanged.AddListener(() => {
-            if (_currentRingModifiers != null) {
-                    foreach(var modifier in _currentRingModifiers) {
-                    LivingEntity.RemoveModifier(modifier);
-                }
-            }
-
-            _currentRingModifiers = Inventory.Ring?.Modifiers;
-
-            if (_currentRingModifiers != null) {
-                foreach(var modifier in _currentRingModifiers) {
-                    LivingEntity.ApplyIndefiniteModifier(modifier);
-                }
-            }
-        });
-
         // ResetRun();
     }
 
@@ -274,15 +257,13 @@ public class Player : MonoBehaviour {
         switch (CurrentAnimationState) {
             case AnimationState.Locomotion:
                 return _movementInputVector.magnitude > 0.1f ? _acceleration : _deceleration;
-
+                
             case AnimationState.Attack_Windup:
             case AnimationState.Attack_Contact:
-                return _attackAcceleration;
-
             case AnimationState.Attack_ComboWindow:
+            case AnimationState.Attack_Recovery:
                 return _attackDeceleration;
 
-            case AnimationState.Attack_Recovery:
             default:
                 return 0;
         }
@@ -311,9 +292,7 @@ public class Player : MonoBehaviour {
                 return _movementInputVector.magnitude > 0.1f ? MaxMovementSpeed : 0;
 
             case AnimationState.Attack_Windup:
-                return MaxMovementSpeed * 1.5f;
             case AnimationState.Attack_Contact:
-                return MaxMovementSpeed * 0.7f;
             case AnimationState.Attack_ComboWindow:
             case AnimationState.Attack_Recovery:
                 return 0;
@@ -336,7 +315,7 @@ public class Player : MonoBehaviour {
         UICanvas.ChangeUITopState(UITopState.Death);
     }
 
-
+    
     // Input events
     #region Input Events
     void OnCastSpellOne(InputValue value) {
