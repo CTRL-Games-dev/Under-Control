@@ -37,12 +37,6 @@ public class UICanvas : MonoBehaviour
     #region Fields
 
     [Header("References for children")]
-    public Camera MainCamera;
-    public bool IsGamePaused = false;
-
-    // UI elements
-    public InventoryPanel PlayerInventoryPanel;
-
     [HideInInspector] public InventoryPanel ActiveInventoryPanel;
     public ItemInfoPanel ItemInfoPanel;
     public EvoInfo EvoInfo;
