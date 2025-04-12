@@ -39,6 +39,10 @@ public class SlimeAIController : MonoBehaviour {
     }
 
     void Update() {
+        for(int i = 0; i < _navMeshAgent.path.corners.Length-1; i++) {
+            Debug.DrawLine(_navMeshAgent.path.corners[i], _navMeshAgent.path.corners[i+1], Color.red);
+        }
+
         if (IsJumping) {
             _navMeshAgent.nextPosition = _startingPoint.Value;
             jumpUpdate();
