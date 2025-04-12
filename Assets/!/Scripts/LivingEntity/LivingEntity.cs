@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -89,14 +90,25 @@ public class LivingEntity : MonoBehaviour {
         target.takeDamage(damage, this);
     }
 
+    private IEnumerator slowDown() {
+        Time.timeScale = 0f;
+        Debug.Log("Slowing down time for 0.1 seconds");
+        yield return new WaitForSecondsRealtime(0.04f);
+        Debug.Log("Resuming time");
+        Time.timeScale = 1f;
+    }
+
     private void takeDamage(Damage damage, LivingEntity source = null) {
+        
+        if (source.gameObject.CompareTag("Player")) {
+            StartCoroutine(nameof(slowDown));
+            CameraShake.Instance.Shake(2, 0.1f);
+        }
+
         if (gameObject.CompareTag("Boar")) {
             gameObject.GetComponent<Animator>()?.SetTrigger(_hurtHash);
         }
 
-        if (gameObject.GetComponent<Rigidbody>() != null) {
-            gameObject.GetComponent<Rigidbody>().AddForce(-transform.forward * 10, ForceMode.Impulse);
-        }
 
         _lastDamageTime = Time.time;
 

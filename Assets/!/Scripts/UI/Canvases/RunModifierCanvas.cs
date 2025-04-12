@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using System.Collections;
 
 public class ChooseCanvas : MonoBehaviour, IUICanvasState
 {
@@ -29,6 +28,8 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
             _currentCards.Add(AddCard(runModifier));
         }
 
+        _canvasGroup.DOComplete();
+        _canvasGroup.DOKill();
         _canvasGroup.DOFade(1, 0.5f).OnComplete(() => {
             _canvasGroup.interactable = true;
             _canvasGroup.blocksRaycasts = true;
@@ -42,6 +43,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
 
 
     public void HideUI() {
+        if (_canvasGroup == null) return;
         _canvasGroup.DOFade(0, 0.5f).OnComplete(() => {
             gameObject.SetActive(false);
         });
