@@ -1,12 +1,12 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SO_Spl_FreezeSpell", menuName = "Spells/FreezeSpell")]
-public class FreezeSpell : Spell {
-    public FreezeBall BallPrefab;
+public class IceshardSpell : Spell {
+    public IceShard IceShardPrefab;
 
     public override void Cast() {
         FreezeBall ball = Instantiate(
-            BallPrefab,
+            IceShardPrefab,
             Player.Instance.transform.position + Vector3.up,
             Player.Instance.transform.rotation
         );

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class FreezeBall : MonoBehaviour {
+public class IceShard : MonoBehaviour {
     public Effect FreezeEffect;
     public float Range;
     public float Speed;
