@@ -225,6 +225,7 @@ public class Player : MonoBehaviour {
                 return _movementInputVector.magnitude > 0.1f ? _acceleration : _deceleration;
 
             case AnimationState.Attack_Windup:
+                return 100000;
             case AnimationState.Attack_Contact:
                 return _attackAcceleration;
 
@@ -285,7 +286,7 @@ public class Player : MonoBehaviour {
         UICanvas.ChangeUITopState(UITopState.Death);
     }
 
-
+    
     // Input events
     #region Input Events
     void OnMove(InputValue value) {

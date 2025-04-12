@@ -24,6 +24,11 @@ public class RunCardUI : MonoBehaviour
         _canvasGroup.alpha = 0;
     }
 
+    private void OnDestroy() {
+        EventBus.RunCardClickedEvent.RemoveListener(OnRunCardClicked);
+    }
+
+
     private void Start() {
         EventBus.RunCardClickedEvent.AddListener(OnRunCardClicked);
     }
@@ -43,6 +48,7 @@ public class RunCardUI : MonoBehaviour
 
     public void Setup() {
         gameObject.SetActive(true);
+        Awake();
 
         _modifierName.text = _runModifier.ModifierName;
         _icon.sprite = _runModifier.Icon;
@@ -53,9 +59,9 @@ public class RunCardUI : MonoBehaviour
     }
 
     public void DestroyCard() {
-        _rectTransform.DOScale(Vector3.zero, 0.5f);
-        _rectTransform.DOShakeRotation(0.5f, 90, 10, 90);
-        _canvasGroup.DOFade(0, 0.5f).OnComplete(() => Destroy(gameObject));
+        _rectTransform.DOScale(Vector3.zero, 0.3f);
+        _rectTransform.DOShakeRotation(0.3f, 90, 10, 90);
+        _canvasGroup.DOFade(0, 0.3f).OnComplete(() => Destroy(gameObject));
     }
 
     public void SetRunModifier(RunModifier runModifier) {
@@ -63,7 +69,7 @@ public class RunCardUI : MonoBehaviour
     }
 
     private void OnRunCardClicked(RunModifier runModifier) {
-        gameObject.GetComponent<EventTrigger>().enabled = false;
+        gameObject.GetComponent<EventTrigger>().enabled = false;        
         DestroyCard();
     }
 
