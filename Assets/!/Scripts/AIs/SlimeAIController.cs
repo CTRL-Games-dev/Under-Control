@@ -139,6 +139,7 @@ public class SlimeAIController : MonoBehaviour {
     }
 
     public void OnAttackAnimationStart() {
+        WeaponHolder.InitializeAttack(AttackType.LIGHT);
         WeaponHolder.BeginAttack();
         WeaponHolder.EnableHitbox();
     }
