@@ -18,12 +18,12 @@ public class EvoInfo : MonoBehaviour
     public void SetInfo(string title, string description, Vector3 pos) {
         _canvasGroup.DOKill();
         if (title == null) {
-            _canvasGroup.DOFade(0, 0.2f);
+            _canvasGroup.DOFade(0, 0.2f * Settings.AnimationSpeed);
             return;
         }
         transform.position = pos + new Vector3(0, -50, 0);
         _titleText.text = title;
         _descriptionText.text = description;
-        _canvasGroup.DOFade(1, 0.2f);
+        _canvasGroup.DOFade(1, 0.2f * Settings.AnimationSpeed);
     }
 }

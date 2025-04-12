@@ -177,12 +177,20 @@ public class Player : MonoBehaviour {
 
     [SerializeField] private LayerMask _groundLayerMask;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
+    public InputActionAsset actions;
+
 
     private Vector3 _queuedRotation;
     
 
     #region Unity Methods
     void Awake() {
+
+        #if UNITY_EDITOR // zeby mi nie szumial laptop
+            QualitySettings.vSyncCount = 0;  // VSync must be disabled
+            Application.targetFrameRate = 30;
+        #endif
+
         LivingEntity = GetComponent<LivingEntity>();
         ModifierSystem = GetComponent<ModifierSystem>();
         CharacterController = GetComponent<CharacterController>();
@@ -232,6 +240,7 @@ public class Player : MonoBehaviour {
         });
 
         // ResetRun();
+        // LoadKeybinds();
     }
 
     void Update() {
@@ -429,6 +438,20 @@ public class Player : MonoBehaviour {
             }
         });
     }
+
+    // przeniesc do save systemu 
+
+    public void OnEnable() {
+        var rebinds = PlayerPrefs.GetString("rebinds");
+        if (!string.IsNullOrEmpty(rebinds))
+            actions.LoadBindingOverridesFromJson(rebinds);
+    }
+
+    public void OnDisable() {
+        var rebinds = actions.SaveBindingOverridesAsJson();
+        PlayerPrefs.SetString("rebinds", rebinds);
+    }
+
 
     #endregion
 

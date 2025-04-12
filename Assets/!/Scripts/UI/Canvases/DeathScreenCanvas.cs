@@ -7,9 +7,9 @@ public class DeathScreenCanvas : MonoBehaviour, IUICanvasState
 
     public void ShowUI() {
         gameObject.SetActive(true);
-        GetComponent<CanvasGroup>().DOFade(1, 1).OnComplete(() => 
-            _text.GetComponent<CanvasGroup>().DOFade(1, 1).OnComplete(() => 
-                _btn.GetComponent<CanvasGroup>().DOFade(1, 1)
+        GetComponent<CanvasGroup>().DOFade(1, 1 * Settings.AnimationSpeed).OnComplete(() => 
+            _text.GetComponent<CanvasGroup>().DOFade(1, 1 * Settings.AnimationSpeed).OnComplete(() => 
+                _btn.GetComponent<CanvasGroup>().DOFade(1, 1 * Settings.AnimationSpeed)
             )
         );
     }

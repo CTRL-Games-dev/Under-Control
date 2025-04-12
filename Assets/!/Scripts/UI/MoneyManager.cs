@@ -46,22 +46,19 @@ public class MoneyAnimator : MonoBehaviour
         _changeText.text = change > 0 ? $"+{change}" : $"{change}";
         _changeCanvasGroup.alpha = 0;
         _changeRectTransform.anchoredPosition = new Vector2(0, -100);
-        _changeCanvasGroup.DOFade(1, 0.2f).OnComplete(() => {
-            _changeRectTransform.DOAnchorPosY(-50, 0.5f).SetEase(Ease.InBack).OnComplete(() => {
-                _changeCanvasGroup.DOFade(0, 0.2f).OnComplete(() => {
+        _changeCanvasGroup.DOFade(1, 0.2f * Settings.AnimationSpeed).OnComplete(() => {
+            _changeRectTransform.DOAnchorPosY(-50, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InBack).OnComplete(() => {
+                _changeCanvasGroup.DOFade(0, 0.2f * Settings.AnimationSpeed).OnComplete(() => {
                     _changeRectTransform.anchoredPosition = new Vector2(0, -100);
                 });
-                _coinsRectTransform.DOScale(change > 0 ? 1.2f : 0.8f, 0.1f).SetEase(Ease.InExpo).OnComplete(() => {
-                    _coinsRectTransform.DOScale(1, 0.35f).SetEase(Ease.InOutSine);
+                _coinsRectTransform.DOScale(change > 0 ? 1.2f : 0.8f, 0.1f * Settings.AnimationSpeed).SetEase(Ease.InExpo).OnComplete(() => {
+                    _coinsRectTransform.DOScale(1, 0.35f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
                 });
-                _coinsRectTransform.DOShakeRotation(0.3f, _shakeStrength, (int)((change / coins) * _shakeVibratoMultiplier), 90, false, ShakeRandomnessMode.Harmonic);
-                DOTween.To(() => coins, x => coins = x, coins + change, 0.3f).SetEase(Ease.OutQuart).OnUpdate(() => {
+                _coinsRectTransform.DOShakeRotation(0.3f * Settings.AnimationSpeed, _shakeStrength, (int)((change / coins) * _shakeVibratoMultiplier), 90, false, ShakeRandomnessMode.Harmonic);
+                DOTween.To(() => coins, x => coins = x, coins + change, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutQuart).OnUpdate(() => {
                     _coinsText.text = $"{(int)coins}";
                 });
             });
         });
-
-        // _coinsText.text = $"{Player.Coins + change}";
-        // StartCoroutine(animateCoins(change > 0));
     }
 }
