@@ -108,14 +108,6 @@ public struct Modifier {
 
     public ModifierImpact GetImpact() {
         switch(StatType) {
-            case StatType.HEALTH:
-                if (Value > 0) {
-                    return ModifierImpact.POSITIVE;
-                } else if (Value < 0) {
-                    return ModifierImpact.NEGATIVE;
-                } else {
-                    return ModifierImpact.NEUTRAL;
-                }
             case StatType.MAX_HEALTH:
                 if (Value > 0) {
                     return ModifierImpact.POSITIVE;
@@ -124,7 +116,7 @@ public struct Modifier {
                 } else {
                     return ModifierImpact.NEUTRAL;
                 }
-            case StatType.REGEN_RATE:
+            case StatType.HEALTH_REGEN_RATE:
                 if (Value > 0) {
                     return ModifierImpact.POSITIVE;
                 } else if (Value < 0) {
