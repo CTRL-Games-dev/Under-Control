@@ -10,10 +10,10 @@ public class CardsPanel : MonoBehaviour
         EventBus.RunCardClickedEvent.AddListener(OnCardClicked);
     }
     
-    private void OnCardClicked(RunModifier runModifier) {
+    private void OnCardClicked(Card runCard) {
         GameObject card = Instantiate(_cardPrefab, _cardsParent);
         RunCardUI runCardUI = card.GetComponent<RunCardUI>();
-        runCardUI.SetRunModifier(runModifier);
+        runCardUI.SetCard(runCard);
         runCardUI.Setup();
     }
 

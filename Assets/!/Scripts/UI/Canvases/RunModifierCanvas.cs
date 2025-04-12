@@ -6,7 +6,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
 {
     [SerializeField] private GameObject _cardsHolder;
     [SerializeField] private GameObject _cardPrefab;
-    [SerializeField] private RunModifier[] _runModifiers;
+    [SerializeField] private Card[] _cards;
 
     private CanvasGroup _canvasGroup;
     private List<RunCardUI> _currentCards = new();
@@ -24,8 +24,8 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
 
     public void ShowUI() {
         gameObject.SetActive(true);
-        foreach (RunModifier runModifier in _runModifiers) {
-            _currentCards.Add(AddCard(runModifier));
+        foreach (Card card in _cards) {
+            _currentCards.Add(AddCard(card));
         }
 
         _canvasGroup.DOComplete();
@@ -49,15 +49,15 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
         });
     }
 
-    private void OnRunCardClicked(RunModifier runModifier) {
-        Player.LivingEntity.ApplyIndefiniteModifier(runModifier.Modifier);
+    private void OnRunCardClicked(Card card) {
+        Player.LivingEntity.ApplyIndefiniteModifier(card.Modifier);
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         _currentCards.Clear();
     }
 
-    public RunCardUI AddCard(RunModifier _runModifier) {
+    public RunCardUI AddCard(Card runCard) {
         RunCardUI card = Instantiate(_cardPrefab, _cardsHolder.transform).GetComponent<RunCardUI>();
-        card.SetRunModifier(_runModifier);
+        card.SetCard(runCard);
         return card;
     }
 

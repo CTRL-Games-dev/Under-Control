@@ -6,6 +6,7 @@ public class HoverTooltip : MonoBehaviour {
     public ItemEntityTooltip ItemEntityTooltip;
     public LivingEntityTooltip LivingEntityTooltip;
     public GenericInteractableTooltip GenericInteractableTooltip;
+    public TalkableTooltip TalkableTooltip;
 
     private GameObject _lastHoveredGameObject = null;
     private Camera _camera;
@@ -21,6 +22,7 @@ public class HoverTooltip : MonoBehaviour {
                 ItemEntityTooltip.Disable();
                 LivingEntityTooltip.Disable();
                 GenericInteractableTooltip.Disable();
+                TalkableTooltip.Disable();
             }
             return;
         }
@@ -41,6 +43,7 @@ public class HoverTooltip : MonoBehaviour {
         ItemEntityTooltip.Disable();
         LivingEntityTooltip.Disable();
         GenericInteractableTooltip.Disable();
+        TalkableTooltip.Disable();
 
         if(hit.transform.gameObject.TryGetComponent(out ItemEntity itemEntity)) {
             ItemEntityTooltip.Enable(itemEntity);
@@ -50,8 +53,10 @@ public class HoverTooltip : MonoBehaviour {
             }
 
             LivingEntityTooltip.Enable(livingEntity);
+        } else if(hit.transform.gameObject.TryGetComponent(out Talkable _)) {
+            TalkableTooltip.Enable(null);
         } else if(hit.transform.gameObject.TryGetComponent(out IInteractable _)) {
             GenericInteractableTooltip.Enable(null);
-        }
+        } 
     }
 }

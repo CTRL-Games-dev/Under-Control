@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "RunModifier", menuName = "RunModifiers/RunModifier")]
-public class RunModifier : ScriptableObject
+[CreateAssetMenu(fileName = "RunCard", menuName = "Cards/RunCard")]
+public class Card : ScriptableObject
 {
     public Sprite Icon;
     public string ModifierName;

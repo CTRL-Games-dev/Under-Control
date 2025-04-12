@@ -14,9 +14,9 @@ public abstract class HoverTooltipImpl<T> : MonoBehaviour where T : MonoBehaviou
     }
 
     public void Enable(T trackedObject) {
+        gameObject.SetActive(true);
         TrackedObject = trackedObject;
         UpdateTooltip(TrackedObject);
-        gameObject.SetActive(true);
     }
 
     public void Disable() {
