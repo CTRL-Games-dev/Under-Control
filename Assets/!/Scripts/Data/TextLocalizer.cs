@@ -29,6 +29,7 @@ public class TextLocalizer : MonoBehaviour
             TextData.OnLanguageChanged?.RemoveListener(UpdateText);
             TextData.OnLanguageChanged?.AddListener(UpdateText);
         }
+        
     }
 
 

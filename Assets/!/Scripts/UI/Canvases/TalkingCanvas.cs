@@ -73,6 +73,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
 
 
     public void HideUI() {
+
         _canvasGroup.DOFade(0, 0.7f).SetEase(Ease.InOutSine).OnComplete(() => {
             gameObject.SetActive(false);
         });

@@ -1,5 +1,4 @@
 using Unity.Cinemachine;
-using Unity.Mathematics;
 using UnityEngine;
 
 
@@ -18,7 +17,6 @@ public class CameraShake : MonoBehaviour{
             Destroy(gameObject);
             return;
         }
-        Debug.Log(gameObject.name); 
         Instance = this;
     }
 

@@ -2,6 +2,7 @@ using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
 using System.Collections;
+using TMPro;
 
 public class SettingsCanvas : MonoBehaviour, IUICanvasState
 {
@@ -37,6 +38,10 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
     [Header("Controls")]
     [SerializeField] private GameObject _controlsPanel;
     [SerializeField] private GameObject[] _controlsSettings;
+    [SerializeField] private Button _bindEventButton;
+    [SerializeField] private TextMeshProUGUI _bindEventText;
+    [SerializeField] private TextLocalizer _bindEventTextLocalizer;
+
     private CanvasGroup _controlsCanvasGroup;
     private CanvasGroup[] _controlsSettingsCanvasGroups;
 
@@ -80,6 +85,8 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
         for (int i = 0; i < _controlsSettings.Length; i++) {
             _controlsSettingsCanvasGroups[i] = _controlsSettings[i].GetComponent<CanvasGroup>();
         }
+
+        _bindEventButton.onClick.AddListener(() => onBindEvent());
     }
 
 #endregion
@@ -169,6 +176,10 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
         _audioCanvasGroup.alpha = 0;
         _videoCanvasGroup.alpha = 0;
         _controlsCanvasGroup.alpha = 0;
+    }
+
+    private void onBindEvent() {
+        _bindEventTextLocalizer.Key = _bindEventText.text;
     }
 
 #endregion
