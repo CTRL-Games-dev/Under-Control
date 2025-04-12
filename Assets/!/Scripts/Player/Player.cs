@@ -69,7 +69,6 @@ public class Player : MonoBehaviour {
     [Header("Properties")]
     [SerializeField] private float _acceleration = 8f;
     [SerializeField] private float _deceleration = 4f;
-    [SerializeField] private float _attackAcceleration = 4f;
     [SerializeField] private float _attackDeceleration = 12f;
     [SerializeField] private float _currentSpeed = 0f;
     [SerializeField] private float _turnSpeed = 260f;
