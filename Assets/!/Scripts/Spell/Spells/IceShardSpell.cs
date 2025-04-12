@@ -11,6 +11,8 @@ public class IceshardSpell : Spell {
             Player.Instance.transform.rotation
         );
         
+        // TODO
+
         shard.Initialize(Player.LivingEntity, Player.Instance.GetMousePosition() - Player.Instance.transform.position);
     }
 }
