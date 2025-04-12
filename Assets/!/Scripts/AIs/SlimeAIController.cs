@@ -34,6 +34,8 @@ public class SlimeAIController : MonoBehaviour {
         _navMeshAgent = GetComponent<NavMeshAgent>();
 
         _navMeshAgent.updatePosition = false;
+
+        WeaponHolder.UpdateWeapon(WeaponItemData);
     }
 
     void Update() {
@@ -134,5 +136,15 @@ public class SlimeAIController : MonoBehaviour {
 
             return;
         }
+    }
+
+    public void OnAttackAnimationStart() {
+        WeaponHolder.BeginAttack();
+        WeaponHolder.EnableHitbox();
+    }
+
+    public void OnAttackAnimationEnd() {
+        WeaponHolder.EndAttack();
+        WeaponHolder.DisableHitbox();
     }
 }
