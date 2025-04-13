@@ -133,17 +133,18 @@ public class Player : MonoBehaviour {
 
     #region Unity Methods
     void Awake() {
-        LivingEntity = GetComponent<LivingEntity>();
-        ModifierSystem = GetComponent<ModifierSystem>();
-        CharacterController = GetComponent<CharacterController>();
-        Animator = GetComponent<Animator>();
-        CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
 
         DontDestroyOnLoad(gameObject);
         if (Instance != null && Instance != this) {
             Destroy(gameObject);
             return;
         }
+
+        LivingEntity = GetComponent<LivingEntity>();
+        ModifierSystem = GetComponent<ModifierSystem>();
+        CharacterController = GetComponent<CharacterController>();
+        Animator = GetComponent<Animator>();
+        CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
 
         Instance = this;
 
