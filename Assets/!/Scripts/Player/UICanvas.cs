@@ -219,6 +219,7 @@ public class UICanvas : MonoBehaviour
                 break;
             case UIMiddleState.MainMenu:
                 Player.Instance.InputDisabled = false;
+                Player.Instance.LockRotation = false;
                 MainMenuCanvas.HideUI();
                 break;
             case UIMiddleState.Pause:
@@ -238,6 +239,7 @@ public class UICanvas : MonoBehaviour
             case UIMiddleState.MainMenu:
                 closeUIBottomState(CurrentUIBottomState);
                 Player.Instance.InputDisabled = true;
+                Player.Instance.LockRotation = true;
                 MainMenuCanvas.ShowUI();
                 break;
             case UIMiddleState.Pause:
@@ -245,6 +247,7 @@ public class UICanvas : MonoBehaviour
                 break;
             case UIMiddleState.NotVisible:
                 Player.Instance.InputDisabled = false;
+                Player.Instance.LockRotation = false;
                 InventoryPanel.IsItemJustBought = false;
                 DropItem();
                 InventoryCanvas.SetOtherInventory(null, null);

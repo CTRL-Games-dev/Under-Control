@@ -135,7 +135,7 @@ public class Player : MonoBehaviour {
     public WeaponItemData CurrentWeapon { get => Inventory.Weapon; }
 
     private bool _isAttacking = false;
-    private bool _lockRotation = false;
+    public bool LockRotation = false;
 
     [Header("Events")]
     public UnityEvent InventoryToggleEvent;
@@ -311,7 +311,7 @@ public class Player : MonoBehaviour {
 
 
     private void handleRotation() {
-        if (_lockRotation) return;
+        if (LockRotation) return;
         if (_movementInputVector.magnitude > 0.1f) {
             var targetRotation = Quaternion.Euler(0, 45, 0) * Quaternion.LookRotation(new Vector3(_movementInputVector.x, 0, _movementInputVector.y));
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
@@ -413,7 +413,9 @@ public class Player : MonoBehaviour {
             return;
         }
 
-        _lockRotation = true;
+        UICanvas.HUDCanvas.ShowDashCooldown();
+
+        LockRotation = true;
         DamageDisabled = true;
 
         if (_movementInputVector.magnitude > 0.1f) {
@@ -431,7 +433,7 @@ public class Player : MonoBehaviour {
             // Animator.applyRootMotion = true;
             Animator.speed = 1;
             DamageDisabled = false;
-            _lockRotation = false;
+            LockRotation = false;
             foreach (ParticleSystem trail in _trailParticles) {
                 trail.Clear();
                 trail.Stop();
@@ -485,11 +487,11 @@ public class Player : MonoBehaviour {
             return;
         };
         
-        if (!_lockRotation) {
+        if (!LockRotation) {
             transform.LookAt(GetMousePosition());
         }
 
-        _lockRotation = true;
+        LockRotation = true;
         switch(interactionType) {
             case InteractionType.Primary:
                 performLightAttack();
@@ -586,7 +588,7 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_Recovery:
-                _lockRotation = false;
+                LockRotation = false;
                 WeaponHolder.EndAttack();
                 break;
         }
@@ -596,11 +598,10 @@ public class Player : MonoBehaviour {
         CurrentAnimationState = state;
         switch (state) {
             case AnimationState.Locomotion:
-                _lockRotation = false;
                 break;
 
             case AnimationState.Attack_Windup:
-                _lockRotation = true;
+                LockRotation = true;
                 _isAttacking = true;
                 _currentSpeed = 0;
                 WeaponHolder.BeginAttack();
@@ -611,12 +612,12 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_ComboWindow:
-                _lockRotation = false;
+                LockRotation = false;
                 transform.LookAt(GetMousePosition());
                 break;
 
             case AnimationState.Attack_Recovery:
-                _lockRotation = true;
+                LockRotation = true;
                 break;
         }
     }
