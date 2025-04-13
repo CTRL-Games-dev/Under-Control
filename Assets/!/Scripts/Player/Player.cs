@@ -185,23 +185,22 @@ public class Player : MonoBehaviour {
 
     #region Unity Methods
     void Awake() {
-
         #if UNITY_EDITOR // zeby mi nie szumial laptop
             QualitySettings.vSyncCount = 0;  // VSync must be disabled
             Application.targetFrameRate = 30;
         #endif
-
-        LivingEntity = GetComponent<LivingEntity>();
-        ModifierSystem = GetComponent<ModifierSystem>();
-        CharacterController = GetComponent<CharacterController>();
-        Animator = GetComponent<Animator>();
-        CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
 
         DontDestroyOnLoad(gameObject);
         if (Instance != null && Instance != this) {
             Destroy(gameObject);
             return;
         }
+        
+        LivingEntity = GetComponent<LivingEntity>();
+        ModifierSystem = GetComponent<ModifierSystem>();
+        CharacterController = GetComponent<CharacterController>();
+        Animator = GetComponent<Animator>();
+        CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
 
         Instance = this;
 

@@ -20,28 +20,41 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: PurpleCarpet Variant
+  m_Name: SpawnSmoke
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
   m_Parent: {fileID: 2100000, guid: c7278c9e035e4344d8453003589f6595, type: 2}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ModifiedSerializedProperties: 16
+  m_ValidKeywords:
+  - _ALPHAPREMULTIPLY_ON
+  - _SPECULAR_SETUP
+  - _SURFACE_TYPE_TRANSPARENT
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 3000
   stringTagMap:
-    RenderType: Opaque
+    RenderType: Transparent
   disabledShaderPasses:
   - MOTIONVECTORS
+  - DepthOnly
+  - SHADOWCASTER
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
-    m_Floats: []
+    m_Floats:
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _DstBlend: 10
+    - _DstBlendAlpha: 10
+    - _Smoothness: 0.027
+    - _Surface: 1
+    - _WorkflowMode: 0
+    - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.27578273, g: 0.11338549, b: 0.49056596, a: 1}
-    - _Color: {r: 0.2757827, g: 0.11338546, b: 0.49056596, a: 1}
+    - _BaseColor: {r: 0.39607844, g: 0.33105624, b: 0.51993376, a: 1}
+    - _Color: {r: 0.3960784, g: 0.3310562, b: 0.51993376, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
