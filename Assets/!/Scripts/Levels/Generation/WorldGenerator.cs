@@ -164,7 +164,6 @@ public class WorldGenerator : MonoBehaviour {
 
         List<Location> allLocations = new()
         {   
-            // forestPortalPrefab,
             Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
             Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
             Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),

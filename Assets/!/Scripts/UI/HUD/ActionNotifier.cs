@@ -27,9 +27,9 @@ public class ActionNotifier : MonoBehaviour
         _nameText.color = color;
         _amountText.text = "×" + amount.ToString();
 
-        _rectTransform.DOScale(1f, 0.3f).SetEase(Ease.InExpo).OnComplete(() => {
-            _rectTransform.DOAnchorPosX(_rectTransform.anchoredPosition.x + _rectTransform.sizeDelta.x, 0.5f).SetDelay(3f).SetEase(Ease.InSine);
-            _canvasGroup.DOFade(0, 0.3f).SetDelay(3.2f).OnComplete(() => {
+        _rectTransform.DOScale(1f, 0.3f * Settings.AnimationSpeed).SetEase(Ease.InExpo).OnComplete(() => {
+            _rectTransform.DOAnchorPosX(_rectTransform.anchoredPosition.x + _rectTransform.sizeDelta.x, 0.5f * Settings.AnimationSpeed).SetDelay(3f * Settings.AnimationSpeed).SetEase(Ease.InSine);
+            _canvasGroup.DOFade(0, 0.3f * Settings.AnimationSpeed).SetDelay(3.2f * Settings.AnimationSpeed).OnComplete(() => {
                 parent.TryClearChildren(this);
             });
         });
@@ -38,7 +38,7 @@ public class ActionNotifier : MonoBehaviour
     public void MoveUp() {
         _rectTransform.DOAnchorPosY(_goalY, 0).OnComplete(() => {
             _goalY += 70;
-            _rectTransform.DOAnchorPosY(_goalY, 0.2f).SetEase(Ease.OutSine);
+            _rectTransform.DOAnchorPosY(_goalY, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutSine);
         });
     }
 

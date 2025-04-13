@@ -46,7 +46,7 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         gameObject.SetActive(true);
 
         _canvasGroup.alpha = 1;
-        _bgImage.DOFade(230.0f / 255.0f, 1f).OnComplete(() => {
+        _bgImage.DOFade(230.0f / 255.0f, 1f * Settings.AnimationSpeed).OnComplete(() => {
             animateButtons();
         });
     }
@@ -55,7 +55,7 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         killTweens();
         // CameraManager.Instance.SwitchCamera(Player.Instance.TopDownCamera);
 
-        _canvasGroup.DOFade(0, 1f).OnComplete(() => {
+        _canvasGroup.DOFade(0, 1f * Settings.AnimationSpeed).OnComplete(() => {
             _bgImage.DOFade(0, 0);
             _logoImage.DOFade(0, 0);
             resetBtnAlphas();
@@ -72,17 +72,17 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         resetBtnAlphas();
         resetBtnPositions();
 
-        _logoImage.DOFade(1, 0.6f).SetEase(Ease.InSine).OnComplete(() => {
-            _continueRect.DOAnchorPosX(_continueBtnStartingX -50, moveSpeed).SetEase(ease);
-            _continueGroup.DOFade(1, fadeSpeed).OnComplete(() => {
-                _newGameRect.DOAnchorPosX(_newGameBtnStartingX -50, moveSpeed).SetEase(ease);
-                _newGameGroup.DOFade(1, fadeSpeed).OnComplete(() => {
-                    _optionsRect.DOAnchorPosX(_optionsBtnStartingX -50, moveSpeed).SetEase(ease);
-                    _optionsGroup.DOFade(1, fadeSpeed).OnComplete(() => {
-                        _creditsRect.DOAnchorPosX(_creditsBtnStartingX -50, moveSpeed).SetEase(ease);
-                        _creditsGroup.DOFade(1, fadeSpeed).OnComplete(() => {
-                            _exitRect.DOAnchorPosX(_exitBtnStartingX -50, moveSpeed).SetEase(ease);
-                            _exitGroup.DOFade(1, 0.2f);
+        _logoImage.DOFade(1, 0.6f * Settings.AnimationSpeed).SetEase(Ease.InSine).OnComplete(() => {
+            _continueRect.DOAnchorPosX(_continueBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
+            _continueGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+                _newGameRect.DOAnchorPosX(_newGameBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
+                _newGameGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+                    _optionsRect.DOAnchorPosX(_optionsBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
+                    _optionsGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+                        _creditsRect.DOAnchorPosX(_creditsBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
+                        _creditsGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+                            _exitRect.DOAnchorPosX(_exitBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
+                            _exitGroup.DOFade(1, 0.2f * Settings.AnimationSpeed);
                         });
                     });
                 });
@@ -144,10 +144,10 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
     }
 
     public void OnPointerEnter(GameObject button) {
-        button.GetComponent<RectTransform>().DOScale(1.1f, 0.4f).SetEase(Ease.OutSine);
+        button.GetComponent<RectTransform>().DOScale(1.1f, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine);
     }
 
     public void OnPointerExit(GameObject button) {
-        button.GetComponent<RectTransform>().DOScale(1, 0.4f).SetEase(Ease.OutSine);
+        button.GetComponent<RectTransform>().DOScale(1, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine);
     }
 }

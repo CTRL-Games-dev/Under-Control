@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using Unity.Cinemachine;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -13,15 +14,32 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(LivingEntity))]
 [RequireComponent(typeof(HumanoidInventory))]
 public class Player : MonoBehaviour {
+    [Serializable]
+    private struct SpellData {
+        public Spell Spell;
+        public Cooldown Cooldown;
+
+        public bool TryCast(LivingEntity caster) {
+            if(Spell == null) return false;
+            if(caster.Mana < Spell.Mana) return false;
+            if(!Cooldown.Execute()) return false;
+
+            caster.Mana -= Spell.Mana; 
+            Spell.Cast();
+
+            return true;
+        }
+    }
+
     public static Player Instance;
 
     [Header("Stats")]
-    public Stat Health => LivingEntity.Health;
+    public float Health => LivingEntity.Health;
     public Stat MaxHealth => LivingEntity.MaxHealth;
-    public Stat RegenRate => LivingEntity.RegenRate;
+    public Stat RegenRate => LivingEntity.HealthRegenRate;
+    public Stat MaxMana => LivingEntity.MaxMana;
+    public float Mana => LivingEntity.Mana;
     public Stat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
-    public Stat MaxMana = new Stat(StatType.MAX_MANA, 100f);
-    public Stat Mana = new Stat(StatType.MANA, 100f);
     public Stat Armor = new Stat(StatType.ARMOR, 0f);
 
     // public Stat LightAttackDamage = new Stat(StatType.LIGHT_ATTACK_DAMAGE, 10f);
@@ -51,7 +69,6 @@ public class Player : MonoBehaviour {
     [Header("Properties")]
     [SerializeField] private float _acceleration = 8f;
     [SerializeField] private float _deceleration = 4f;
-    [SerializeField] private float _attackAcceleration = 4f;
     [SerializeField] private float _attackDeceleration = 12f;
     [SerializeField] private float _currentSpeed = 0f;
     [SerializeField] private float _turnSpeed = 260f;
@@ -79,24 +96,53 @@ public class Player : MonoBehaviour {
             UICanvas.InventoryCanvas.ChangeEvoPoints();
         }
     }
+
     public List<EvoUI> SelectedEvolutions;
 
-    [SerializeField] private UICanvas _uiCanvas;
-    [SerializeField] private ParticleSystem[] _trailParticles;
+    [Header("Spells")]
+    [SerializeField]
+    private SpellData _spellDataOne;
+    public Spell SpellSlotOne {
+        get => _spellDataOne.Spell;
+        set {
+            _spellDataOne.Spell = value;
+            _spellDataOne.Cooldown = new Cooldown(value.CooldownTime);
+        }
+    }
+
+    [SerializeField]
+    private SpellData _spellDataTwo;
+    public Spell SpellSlotTwo {
+        get => _spellDataTwo.Spell;
+        set {
+            _spellDataTwo.Spell = value;
+            _spellDataTwo.Cooldown = new Cooldown(value.CooldownTime);
+        }
+    }
+
+    [SerializeField]
+    private SpellData _spellDataThree;
+    public Spell SpellSlotThree {
+        get => _spellDataThree.Spell;
+        set {
+            _spellDataThree.Spell = value;
+            _spellDataThree.Cooldown = new Cooldown(value.CooldownTime);
+        }
+    }
 
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
     public WeaponItemData CurrentWeapon { get => Inventory.Weapon; }
 
     private bool _isAttacking = false;
-    private bool _lockRotation = false;
+    public bool LockRotation = false;
 
     [Header("Events")]
     public UnityEvent InventoryToggleEvent;
     public UnityEvent UICancelEvent;
     public UnityEvent ItemRotateEvent;
     public UnityEvent<EvoUI> OnEvolutionSelected = new();
-    [HideInInspector] public UnityEvent<int> CoinsChangeEvent;
+    public UnityEvent<int> CoinsChangeEvent;
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
@@ -117,6 +163,10 @@ public class Player : MonoBehaviour {
     private readonly int _movementSpeedHash = Animator.StringToHash("movement_speed");
 
     [Header("References")]
+    [SerializeField] private UICanvas _uiCanvas;
+    [SerializeField] private ParticleSystem[] _trailParticles;
+
+    // Static reference getters
     public static LivingEntity LivingEntity { get; private set; }
     public static ModifierSystem ModifierSystem { get; private set; }
     public static UICanvas UICanvas { get => Instance._uiCanvas; }
@@ -127,19 +177,25 @@ public class Player : MonoBehaviour {
 
     [SerializeField] private LayerMask _groundLayerMask;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
+    public InputActionAsset actions;
+
 
     private Vector3 _queuedRotation;
     
 
     #region Unity Methods
     void Awake() {
+        #if UNITY_EDITOR // zeby mi nie szumial laptop
+            QualitySettings.vSyncCount = 0;  // VSync must be disabled
+            Application.targetFrameRate = 30;
+        #endif
 
         DontDestroyOnLoad(gameObject);
         if (Instance != null && Instance != this) {
             Destroy(gameObject);
             return;
         }
-
+        
         LivingEntity = GetComponent<LivingEntity>();
         ModifierSystem = GetComponent<ModifierSystem>();
         CharacterController = GetComponent<CharacterController>();
@@ -183,6 +239,7 @@ public class Player : MonoBehaviour {
         });
 
         // ResetRun();
+        // LoadKeybinds();
     }
 
     void Update() {
@@ -253,7 +310,7 @@ public class Player : MonoBehaviour {
 
 
     private void handleRotation() {
-        if (_lockRotation) return;
+        if (LockRotation) return;
         if (_movementInputVector.magnitude > 0.1f) {
             var targetRotation = Quaternion.Euler(0, 45, 0) * Quaternion.LookRotation(new Vector3(_movementInputVector.x, 0, _movementInputVector.y));
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
@@ -266,12 +323,23 @@ public class Player : MonoBehaviour {
     }
 
     
-    // Input events
     #region Input Events
+
+    void OnCastSpellOne(InputValue value) {
+        _spellDataOne.TryCast(LivingEntity);
+    }
+
+    void OnCastSpellTwo(InputValue value) {
+        _spellDataTwo.TryCast(LivingEntity);
+    }
+
+    void OnCastSpellThree(InputValue value) {
+        _spellDataThree.TryCast(LivingEntity);
+    }
+
     void OnMove(InputValue value) {
         _movementInputVector = value.Get<Vector2>();
     }
-
 
     void OnLook(InputValue value) {
         Vector2 pointerVector = value.Get<Vector2>();
@@ -344,7 +412,9 @@ public class Player : MonoBehaviour {
             return;
         }
 
-        _lockRotation = true;
+        UICanvas.HUDCanvas.ShowDashCooldown();
+
+        LockRotation = true;
         DamageDisabled = true;
 
         if (_movementInputVector.magnitude > 0.1f) {
@@ -362,13 +432,28 @@ public class Player : MonoBehaviour {
             // Animator.applyRootMotion = true;
             Animator.speed = 1;
             DamageDisabled = false;
-            _lockRotation = false;
+            LockRotation = false;
             foreach (ParticleSystem trail in _trailParticles) {
                 trail.Clear();
                 trail.Stop();
             }
         });
     }
+
+    // przeniesc do save systemu 
+
+    public void OnEnable() {
+        var rebinds = PlayerPrefs.GetString("rebinds");
+        if (!string.IsNullOrEmpty(rebinds))
+            actions.LoadBindingOverridesFromJson(rebinds);
+    }
+
+    public void OnDisable() {
+        var rebinds = actions.SaveBindingOverridesAsJson();
+        PlayerPrefs.SetString("rebinds", rebinds);
+    }
+
+
     #endregion
 
     #region Interaction Methods
@@ -395,17 +480,17 @@ public class Player : MonoBehaviour {
         if(CurrentWeapon == null) return;
 
         // Default to attacking if no interaction was commited
-        _queuedRotation = getMousePosition() - transform.position;
+        _queuedRotation = GetMousePosition() - transform.position;
         if(_isAttacking) {
             
             return;
         };
         
-        if (!_lockRotation) {
-            transform.LookAt(getMousePosition());
+        if (!LockRotation) {
+            transform.LookAt(GetMousePosition());
         }
 
-        _lockRotation = true;
+        LockRotation = true;
         switch(interactionType) {
             case InteractionType.Primary:
                 performLightAttack();
@@ -456,7 +541,7 @@ public class Player : MonoBehaviour {
     }
 
 
-    private Vector3 getMousePosition() {
+    public Vector3 GetMousePosition() {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _groundLayerMask)) {
             Vector3 point = hit.point;
@@ -467,8 +552,6 @@ public class Player : MonoBehaviour {
         }
 
     }
-
-    // calluje sie z animacji jesli dodane jest AttackAnimationBehaviour w animatorze
 
     #endregion
 
@@ -504,7 +587,7 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_Recovery:
-                _lockRotation = false;
+                LockRotation = false;
                 WeaponHolder.EndAttack();
                 break;
         }
@@ -514,11 +597,10 @@ public class Player : MonoBehaviour {
         CurrentAnimationState = state;
         switch (state) {
             case AnimationState.Locomotion:
-                _lockRotation = false;
                 break;
 
             case AnimationState.Attack_Windup:
-                _lockRotation = true;
+                LockRotation = true;
                 _isAttacking = true;
                 _currentSpeed = 0;
                 WeaponHolder.BeginAttack();
@@ -529,16 +611,15 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_ComboWindow:
-                _lockRotation = false;
-                transform.LookAt(getMousePosition());
+                LockRotation = false;
+                transform.LookAt(GetMousePosition());
                 break;
 
             case AnimationState.Attack_Recovery:
-                _lockRotation = true;
+                LockRotation = true;
                 break;
         }
     }
-
 
     #endregion
 
@@ -571,8 +652,6 @@ public class Player : MonoBehaviour {
 
     private void registerStats() {
         ModifierSystem.RegisterStat(ref VekhtarControl);
-        ModifierSystem.RegisterStat(ref MaxMana);
-        ModifierSystem.RegisterStat(ref Mana);
         ModifierSystem.RegisterStat(ref Armor);
         // ModifierSystem.RegisterStat(ref LightAttackDamage);
         ModifierSystem.RegisterStat(ref LightAttackSpeed);

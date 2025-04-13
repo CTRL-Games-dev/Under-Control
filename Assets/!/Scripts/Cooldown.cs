@@ -1,5 +1,8 @@
 using System;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [Serializable]
 public class Cooldown
@@ -34,4 +37,24 @@ public class Cooldown
 
         return true;
     }
+
+    public void ForceExecute() {
+        _lastExecuteTime = Time.time;
+    }
 }
+
+#if UNITY_EDITOR
+[CustomPropertyDrawer(typeof(Cooldown))]
+public class CooldownDrawer : PropertyDrawer
+{
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    {
+        EditorGUI.BeginProperty(position, label, property);
+
+        float cooldownTime = property.FindPropertyRelative("CooldownTime").floatValue;
+        property.FindPropertyRelative("CooldownTime").floatValue = EditorGUI.FloatField(position, label, cooldownTime);
+
+        EditorGUI.EndProperty();
+    }
+}
+#endif

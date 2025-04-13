@@ -55,7 +55,5 @@ public class ItemInfoPanel : MonoBehaviour
 
         _itemValue.text = value + $" ({value * item.Amount})";
         _itemAmount.text = '×' + item.Amount.ToString();
-
-
     }
 }
