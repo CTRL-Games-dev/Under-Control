@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using Unity.Cinemachine;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -130,6 +129,16 @@ public class Player : MonoBehaviour {
         }
     }
 
+    [Header("Consumable")]
+    [SerializeField]
+    public ConsumableItemData ConsumableItemOne;
+
+    [SerializeField]
+    public ConsumableItemData ConsumableItemTwo;
+
+    [SerializeField]
+    public Cooldown ConsumableCooldown = new Cooldown(0.5f);
+
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
     public WeaponItemData CurrentWeapon { get => Inventory.Weapon; }
@@ -179,9 +188,7 @@ public class Player : MonoBehaviour {
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
 
-
     private Vector3 _queuedRotation;
-    
 
     #region Unity Methods
     void Awake() {
@@ -335,6 +342,20 @@ public class Player : MonoBehaviour {
 
     void OnCastSpellThree(InputValue value) {
         _spellDataThree.TryCast(LivingEntity);
+    }
+
+    void OnUseConsumableOne(InputValue value) {
+        if(ConsumableItemOne == null) return;
+        if(!ConsumableCooldown.Execute()) return;
+
+        ConsumableItemOne.Consume(LivingEntity);
+    }
+
+    void OnUseConsumableTwo(InputValue value) {
+        if(ConsumableItemTwo == null) return;
+        if(!ConsumableCooldown.Execute()) return;
+
+        ConsumableItemTwo.Consume(LivingEntity);
     }
 
     void OnMove(InputValue value) {
