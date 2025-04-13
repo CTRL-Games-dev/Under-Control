@@ -136,6 +136,9 @@ public class Player : MonoBehaviour {
     [SerializeField]
     public ConsumableItemData ConsumableItemTwo;
 
+    [SerializeField]
+    public Cooldown ConsumableCooldown = new Cooldown(0.5f);
+
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
     public WeaponItemData CurrentWeapon { get => Inventory.Weapon; }
@@ -342,13 +345,15 @@ public class Player : MonoBehaviour {
     }
 
     void OnUseConsumableOne(InputValue value) {
-        if (ConsumableItemOne == null) return;
+        if(ConsumableItemOne == null) return;
+        if(!ConsumableCooldown.Execute()) return;
 
         ConsumableItemOne.Consume(LivingEntity);
     }
 
     void OnUseConsumableTwo(InputValue value) {
-        if (ConsumableItemTwo == null) return;
+        if(ConsumableItemTwo == null) return;
+        if(!ConsumableCooldown.Execute()) return;
 
         ConsumableItemTwo.Consume(LivingEntity);
     }
