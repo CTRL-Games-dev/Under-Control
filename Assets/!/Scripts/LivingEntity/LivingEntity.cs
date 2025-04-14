@@ -27,8 +27,8 @@ public class LivingEntity : MonoBehaviour {
     public float Mana = 100f;
    
     public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
-    public Stat HealthRegenRate = new Stat(StatType.HEALTH_REGEN_RATE, 1);
-    public Stat ManaRegenRate = new Stat(StatType.MANA_REGEN_RATE, 1);
+    public Stat HealthRegenRate = new Stat(StatType.HEALTH_REGEN_RATE, 0);
+    public Stat ManaRegenRate = new Stat(StatType.MANA_REGEN_RATE, 0);
     public Stat Armor = new Stat(StatType.ARMOR, 0);
     public Stat ElementalArmor = new Stat(StatType.ELEMENTAL_ARMOR, 0);
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
