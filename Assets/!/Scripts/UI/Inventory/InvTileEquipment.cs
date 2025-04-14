@@ -5,6 +5,8 @@ public class InvTileEquipment : InvTile {
         Armor,
         Amulet,
         Weapon,
+        Consumeable1,
+        Consumeable2,
     }
 
     [SerializeField] private GameObject _itemPrefab;
@@ -24,7 +26,6 @@ public class InvTileEquipment : InvTile {
         // EventBus.InvTileClickEvent.AddListener(OnTileClick);
         OnTileSizeSetEvent();
 
-        // cant really test this without the rest of the game 
         switch (_tileType) {
             case TileType.Armor:
                 if (Player.Inventory.Armor != null) {
@@ -52,6 +53,25 @@ public class InvTileEquipment : InvTile {
                     IsEmpty = false;
                 }
                 break; 
+            
+            case TileType.Consumeable1:
+                if (Player.Instance.ConsumableItemOne != null) {
+                    InventoryItem inventoryItem = new();
+                    inventoryItem.ItemData = Player.Instance.ConsumableItemOne;
+                    createItemUI(inventoryItem);
+                    IsEmpty = false;
+                }
+                break;
+            
+            case TileType.Consumeable2:
+                if (Player.Instance.ConsumableItemTwo != null) {
+                    InventoryItem inventoryItem = new();
+                    inventoryItem.ItemData = Player.Instance.ConsumableItemTwo;
+                    createItemUI(inventoryItem);
+                    IsEmpty = false;
+                }
+                break;
+                
         }
     }
 
@@ -75,6 +95,12 @@ public class InvTileEquipment : InvTile {
                     break;
                 case TileType.Weapon:
                     Player.Inventory.Weapon = null;
+                    break;
+                case TileType.Consumeable1:
+                    Player.Instance.ConsumableItemOne = null;
+                    break;
+                case TileType.Consumeable2:
+                    Player.Instance.ConsumableItemTwo = null;
                     break;
             }
 
@@ -112,7 +138,21 @@ public class InvTileEquipment : InvTile {
                 }
 
                 Player.Inventory.Weapon = weaponItemData;
+            } else if (_tileType == TileType.Consumeable1) {
+                if (SelectedInventoryItem.ItemData is not ConsumableItemData consumableItemData) {
+                    return;
+                }
+
+                Player.Instance.ConsumableItemOne = consumableItemData;
+            } else if (_tileType == TileType.Consumeable2) {
+                if (SelectedInventoryItem.ItemData is not ConsumableItemData consumableItemData) {
+                    return;
+                }
+
+                Player.Instance.ConsumableItemTwo = consumableItemData;
             }
+
+
         } catch (System.Exception e) {
             Debug.Log(e);
             return;

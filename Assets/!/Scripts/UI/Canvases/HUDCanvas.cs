@@ -23,6 +23,15 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private RectTransform _dashCooldownRect;
 
 
+    [Header("Consumables")]
+
+    [SerializeField] private Image _consumable1Img;
+    [SerializeField] private Image _consumable2Img;
+
+    [SerializeField] private TextMeshProUGUI _consumable1Text;
+    [SerializeField] private TextMeshProUGUI _consumable2Text;
+
+
     private void Update() {
         UpdateHealthBar();
         UpdateManaBar();
