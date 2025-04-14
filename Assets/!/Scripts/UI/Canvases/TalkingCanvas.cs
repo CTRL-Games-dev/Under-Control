@@ -58,30 +58,31 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         _nameText.text = string.Empty;
         _dialogueText.text = string.Empty;
 
-        _canvasGroup.DOFade(1, 0.25f).SetEase(Ease.InOutSine).OnComplete(() => {
-            _topBar.DOScaleY(1, 1f).SetEase(Ease.InOutSine);
-            _topBarCanvasGroup.DOFade(1, 0.5f).SetEase(Ease.InOutSine);
+        _canvasGroup.DOFade(1, 0.25f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnComplete(() => {
+            _topBar.DOScaleY(1, 1f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
+            _topBarCanvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
             
-            _bottomBar.DOScaleY(1, 1f).SetEase(Ease.InOutSine).OnComplete(() => {
-                _middleCanvasGroup.DOFade(1, 0.5f).SetEase(Ease.InOutSine).OnComplete(() => {
+            _bottomBar.DOScaleY(1, 1f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnComplete(() => {
+                _middleCanvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnComplete(() => {
                     updateDialogueBox();
                 });
             });
-            _bottomBarCanvasGroup.DOFade(1, 0.5f).SetEase(Ease.InOutSine);
+            _bottomBarCanvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
         });
     }
 
 
     public void HideUI() {
-        _canvasGroup.DOFade(0, 0.7f).SetEase(Ease.InOutSine).OnComplete(() => {
+
+        _canvasGroup.DOFade(0, 0.7f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnComplete(() => {
             gameObject.SetActive(false);
         });
-        _middleCanvasGroup.DOFade(0, 0.5f).SetEase(Ease.InOutSine);
-        _otherImage.DOFade(0, 0.5f).SetEase(Ease.InOutSine);
-        _topBar.DOScaleY(0, 0.5f).SetEase(Ease.InOutSine);
-        _topBarCanvasGroup.DOFade(0, 1f).SetEase(Ease.InOutSine);
-        _bottomBar.DOScaleY(0, 0.5f).SetEase(Ease.InOutSine);
-        _bottomBarCanvasGroup.DOFade(0, 1f).SetEase(Ease.InOutSine);
+        _middleCanvasGroup.DOFade(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
+        _otherImage.DOFade(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
+        _topBar.DOScaleY(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
+        _topBarCanvasGroup.DOFade(0, 1f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
+        _bottomBar.DOScaleY(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
+        _bottomBarCanvasGroup.DOFade(0, 1f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
     }
 
 
@@ -153,8 +154,8 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         StopAllCoroutines();
         _dialogueText.text = string.Empty;
 
-        _playerImage.DOColor(_dialogue.dialogueEntries[_currentDialogueIndex].IsPlayer ? Color.white : new Color(0.2f, 0.2f, 0.2f, 1), 0.25f);
-        _otherImage.DOColor(_dialogue.dialogueEntries[_currentDialogueIndex].IsPlayer ? new Color(0.2f, 0.2f, 0.2f, 1) : Color.white, 0.25f);
+        _playerImage.DOColor(_dialogue.dialogueEntries[_currentDialogueIndex].IsPlayer ? Color.white : new Color(0.2f, 0.2f, 0.2f, 1), 0.25f * Settings.AnimationSpeed);
+        _otherImage.DOColor(_dialogue.dialogueEntries[_currentDialogueIndex].IsPlayer ? new Color(0.2f, 0.2f, 0.2f, 1) : Color.white, 0.25f * Settings.AnimationSpeed);
 
         if (_dialogue.dialogueEntries[_currentDialogueIndex].IsPlayer) {
             _playerFaceAnimator.StartTalk();

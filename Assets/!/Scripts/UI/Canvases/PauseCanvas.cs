@@ -37,8 +37,8 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
 
     #region Public Methods
     public void ShowUI() {
-        float fadeSpeed = 0.2f;
-        float moveSpeed = 0.4f;
+        float fadeSpeed = 0.2f * Settings.AnimationSpeed;
+        float moveSpeed = 0.4f * Settings.AnimationSpeed;
         
         gameObject.SetActive(true);
         killTweens();
@@ -47,9 +47,9 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
 
         StartCoroutine(slowdownTime());
         _canvasGroup.alpha = 1;
-        _bgImage.DOFade(1f, 0.8f).SetUpdate(true);
+        _bgImage.DOFade(1f, 0.8f * Settings.AnimationSpeed).SetUpdate(true);
 
-        _blackBarRect.DOAnchorPosY(-1080, 0.3f).SetEase(Ease.OutQuint).SetUpdate(true).OnComplete(() => {
+        _blackBarRect.DOAnchorPosY(-1080, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutQuint).SetUpdate(true).OnComplete(() => {
             _resumeRect.DOAnchorPosY(_resumeBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
             _resumeGroup.DOFade(1, fadeSpeed).SetAs(_tweenParams).OnComplete(() => {
                 _saveRect.DOAnchorPosY(_saveBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
@@ -77,8 +77,8 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
         StartCoroutine(speedupTime());
         killTweens();
 
-        _bgImage.DOFade(0f, 0.8f).SetUpdate(true);
-        return _blackBarRect.DOAnchorPosY(0, 0.6f).SetEase(Ease.InQuint).SetUpdate(true).OnComplete(() => {
+        _bgImage.DOFade(0f, 0.8f * Settings.AnimationSpeed).SetUpdate(true);
+        return _blackBarRect.DOAnchorPosY(0, 0.6f * Settings.AnimationSpeed).SetEase(Ease.InQuint).SetUpdate(true).OnComplete(() => {
             resetBtnPositions();
             resetBtnAlphas();
             StopCoroutine(speedupTime());
@@ -166,11 +166,11 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
     }
 
     public void OnPointerEnter(GameObject button) {
-        button.GetComponent<RectTransform>().DOScale(1.05f, 0.4f).SetEase(Ease.OutSine).SetUpdate(true);
+        button.GetComponent<RectTransform>().DOScale(1.05f, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
     }
 
     public void OnPointerExit(GameObject button) {
-        button.GetComponent<RectTransform>().DOScale(1, 0.4f).SetEase(Ease.OutSine).SetUpdate(true);
+        button.GetComponent<RectTransform>().DOScale(1, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
     }
 
 #endregion

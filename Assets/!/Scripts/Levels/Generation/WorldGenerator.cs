@@ -121,7 +121,7 @@ public class WorldGenerator : MonoBehaviour {
         public (bool, Vector2) HasFreeNeighbourSpace(List<LocationNode> allNodes)
         {
 
-            var shuffledDirections = ShuffleList<Vector2>(_directions);
+            var shuffledDirections = FluffyUtils.ShuffleList<Vector2>(_directions);
 
             foreach(var d in shuffledDirections) 
             {
@@ -132,7 +132,7 @@ public class WorldGenerator : MonoBehaviour {
         }
         public static Vector2 GetRandomFreeNeighbourSpace(List<LocationNode> nodes)
         {
-            List<LocationNode> randomOrderNodes = WorldGenerator.ShuffleList(nodes);
+            List<LocationNode> randomOrderNodes = FluffyUtils.ShuffleList(nodes);
 
             foreach(var n in randomOrderNodes)
             {
@@ -513,25 +513,6 @@ public class WorldGenerator : MonoBehaviour {
             Chunk chunk = Instantiate(_chunkPrefab, Vector3.zero, Quaternion.identity, _terrainChunkHolder.transform);
             chunk.GenerateChunkMesh(ci.TopLeftCorner, (int)ci.Width, (int)ci.Height);
         }
-    }
-
-    #endregion
-
-    #region Misc
-    public static List<T> ShuffleList<T>(List<T> list)
-    {
-        List<T> clonedList = new();
-        list.ForEach(item => clonedList.Add(item));
-
-        for (int i = clonedList.Count - 1; i > 0; i--)
-        {
-            var k = UnityEngine.Random.Range(0, i);
-            var value = clonedList[k];
-            clonedList[k] = clonedList[i];
-            clonedList[i] = value;
-        }
-
-        return clonedList;
     }
 
     #endregion

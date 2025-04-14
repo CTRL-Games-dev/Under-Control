@@ -118,7 +118,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     public void HideUI() {
         CloseAllTabs();
         
-        _canvasGroup.DOFade(0, 0.25f);
+        _canvasGroup.DOFade(0, 0.25f * Settings.AnimationSpeed);
         _canvasGroup.blocksRaycasts = false;
         _canvasGroup.interactable = false;
         SetOtherInventory(null, null);
@@ -129,7 +129,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
         _canvasGroup.DOComplete();
         _underlineRect.DOAnchorPosX(_tabRectTranforms[_tabPanelsIndex[_currentTab]].anchoredPosition.x, 0);
         SetCurrentTab(_currentTab);
-        _canvasGroup.DOFade(1, 0.25f);
+        _canvasGroup.DOFade(1, 0.25f * Settings.AnimationSpeed);
         _canvasGroup.blocksRaycasts = true;
         _canvasGroup.interactable = true;
     }
@@ -141,7 +141,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
         _currentTabButton = _tabButtons[_tabPanelsIndex[_currentTab]];
         _currentTabImage = _tabImages[_tabPanelsIndex[_currentTab]];
         _currentTabText = _tabTexts[_tabPanelsIndex[_currentTab]];
-        _underlineRect.DOAnchorPosX(_tabRectTranforms[_tabPanelsIndex[_currentTab]].anchoredPosition.x, 0.25f).SetEase(Ease.OutCubic);
+        _underlineRect.DOAnchorPosX(_tabRectTranforms[_tabPanelsIndex[_currentTab]].anchoredPosition.x, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
 
         foreach (InventoryTabs t in _tabPanelsIndex.Keys) {
             if (t == _currentTab) {
@@ -262,11 +262,11 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     public void ChangeEvoPoints() {
         foreach(RectTransform rect in _pointsHolderRect) {
             rect.DOKill();
-            rect.DOScale(0.9f, 0.2f).SetEase(Ease.OutCubic).OnComplete(() => {
-                rect.DOScale(1, 0.2f).SetDelay(0.4f).SetEase(Ease.OutCubic);
+            rect.DOScale(0.9f, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic).OnComplete(() => {
+                rect.DOScale(1, 0.2f * Settings.AnimationSpeed).SetDelay(0.4f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
             });
         }
-        _pointsHolderRect.DOAnchorPosY(Player.Instance.EvolutionPoints * 57, 0.4f).SetDelay(0.2f).SetEase(Ease.InOutBack);
+        _pointsHolderRect.DOAnchorPosY(Player.Instance.EvolutionPoints * 57, 0.4f * Settings.AnimationSpeed).SetDelay(0.2f * Settings.AnimationSpeed).SetEase(Ease.InOutBack);
     }
 
 
@@ -282,12 +282,12 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     
     public void HighlightButton(int index) {
         if (index == _tabPanelsIndex[_currentTab]) return;
-        _tabButtonGameObjects[index].transform.DOScale(1.1f, 0.75f);
+        _tabButtonGameObjects[index].transform.DOScale(1.1f, 0.75f * Settings.AnimationSpeed);
     }
 
     public void UnhighlightButton(int index) {
         if (index == _tabPanelsIndex[_currentTab]) return;
-        _tabButtonGameObjects[index].transform.DOScale(1f, 0.75f);
+        _tabButtonGameObjects[index].transform.DOScale(1f, 0.75f * Settings.AnimationSpeed);
     }
     #endregion
 
@@ -296,30 +296,30 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     private void highlightTab(InventoryTabs tab, bool value) {
         _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOKill();
         if (value) {
-            _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOScale(1.2f, 0.35f);
+            _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOScale(1.2f, 0.35f * Settings.AnimationSpeed);
             _tabTexts[_tabPanelsIndex[tab]].fontStyle = FontStyles.Bold;
         } else {
-            _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOScale(1, 0.35f);
+            _tabButtonGameObjects[_tabPanelsIndex[tab]].transform.DOScale(1, 0.35f * Settings.AnimationSpeed);
             _tabTexts[_tabPanelsIndex[tab]].fontStyle = FontStyles.Normal;
         } 
     }
 
     private Tween playerTabEnter() {
         _playerInventoryPanelGO.SetActive(true);
-        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-180, 0.5f).SetEase(Ease.OutExpo);
+        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-180, 0.5f * Settings.AnimationSpeed).SetEase(Ease.OutExpo);
     }
 
     private Tween playerTabExit() {
-        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(470, 0.5f).SetEase(Ease.OutExpo);
+        return _playerInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(470, 0.5f * Settings.AnimationSpeed).SetEase(Ease.OutExpo);
     }
 
     private Tween otherTabEnter() {
         _otherInventoryPanelGO.SetActive(true);
-        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(120, 0.5f).SetEase(Ease.OutExpo);
+        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(120, 0.5f * Settings.AnimationSpeed).SetEase(Ease.OutExpo);
     }
 
     private Tween otherTabExit() {
-        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-760, 0.5f).SetEase(Ease.OutExpo);
+        return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-760, 0.5f * Settings.AnimationSpeed).SetEase(Ease.OutExpo);
     }
 
     private Tween armorTabEnter() {
@@ -337,17 +337,17 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
 
         float scaleSpeed = 0.2f;
 
-        _armorSlotsRects[0].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
+        _armorSlotsRects[0].DOScale(1, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.OutBack);
         
-        _armorSlotsCanvasGroups[0].DOFade(1, fadeSpeed).OnComplete(() => {
-            _armorSlotsRects[1].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
-            _armorSlotsCanvasGroups[1].DOFade(1, fadeSpeed).OnComplete(() => {
-                _armorSlotsRects[2].DOScale(1, scaleSpeed).SetEase(Ease.OutBack);
-                _armorSlotsCanvasGroups[2].DOFade(1, fadeSpeed);
+        _armorSlotsCanvasGroups[0].DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+            _armorSlotsRects[1].DOScale(1, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.OutBack);
+            _armorSlotsCanvasGroups[1].DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+                _armorSlotsRects[2].DOScale(1, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.OutBack);
+                _armorSlotsCanvasGroups[2].DOFade(1, fadeSpeed * Settings.AnimationSpeed);
             });
         });
         
-        return _armorInventoryPanelGO.transform.DOScale(1, fadeSpeed * 7);
+        return _armorInventoryPanelGO.transform.DOScale(1, fadeSpeed * 3 * Settings.AnimationSpeed);
     }
 
     private Tween armorTabExit() {
@@ -360,44 +360,44 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
         float fadeSpeed = 0.3f;
         float scaleSpeed = 0.05f;
 
-        _playerPreviewGO.GetComponent<RawImage>().DOFade(0, 0.5f);
-        _armorSlotsCanvasGroups[0].DOFade(0, fadeSpeed);
-        _armorSlotsRects[0].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
-            _armorSlotsCanvasGroups[1].DOFade(0, fadeSpeed);
-            _armorSlotsRects[1].DOScale(0, scaleSpeed).SetEase(Ease.InBack).OnComplete(() => {
-                _armorSlotsCanvasGroups[2].DOFade(0, fadeSpeed);
-                _armorSlotsRects[2].DOScale(0, scaleSpeed).SetEase(Ease.InBack);
+        _playerPreviewGO.GetComponent<RawImage>().DOFade(0, 0.5f * Settings.AnimationSpeed);
+        _armorSlotsCanvasGroups[0].DOFade(0, fadeSpeed * Settings.AnimationSpeed);
+        _armorSlotsRects[0].DOScale(0, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.InBack).OnComplete(() => {
+            _armorSlotsCanvasGroups[1].DOFade(0, fadeSpeed * Settings.AnimationSpeed);
+            _armorSlotsRects[1].DOScale(0, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.InBack).OnComplete(() => {
+                _armorSlotsCanvasGroups[2].DOFade(0, fadeSpeed * Settings.AnimationSpeed);
+                _armorSlotsRects[2].DOScale(0, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.InBack);
             });
         });        
 
-        return _armorInventoryPanelGO.transform.DOScale(1, scaleSpeed * 7);
+        return _armorInventoryPanelGO.transform.DOScale(1, scaleSpeed * 3 * Settings.AnimationSpeed);
     }
 
     private Tween cardsTabEnter() {
         _cardsInventoryPanelGO.SetActive(true);
-        return _cardsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-1000, 0.25f);
+        return _cardsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-1000, 0.25f * Settings.AnimationSpeed);
     }
 
     private Tween cardsTabExit() {
-        return _cardsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f).OnComplete(() => _cardsInventoryPanelGO.SetActive(false));
+        return _cardsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f * Settings.AnimationSpeed).OnComplete(() => _cardsInventoryPanelGO.SetActive(false));
     }
 
     private Tween evoTabEnter() {
         _evoInventoryPanelGO.SetActive(true);
-        return _evoInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-1000, 0.25f);
+        return _evoInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-1000, 0.25f * Settings.AnimationSpeed);
     }
 
     private Tween evoTabExit() {
-        return _evoInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f).OnComplete(() => _evoInventoryPanelGO.SetActive(false));
+        return _evoInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f * Settings.AnimationSpeed).OnComplete(() => _evoInventoryPanelGO.SetActive(false));
     }
 
     private Tween questsTabEnter() {
         _questsInventoryPanelGO.SetActive(true);
-        return _questsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-630, 0.25f);
+        return _questsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-630, 0.25f * Settings.AnimationSpeed);
     }
 
     private Tween questsTabExit() {
-        return _questsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f).OnComplete(() => _questsInventoryPanelGO.SetActive(false));
+        return _questsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f * Settings.AnimationSpeed).OnComplete(() => _questsInventoryPanelGO.SetActive(false));
     }
 
     #endregion

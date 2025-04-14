@@ -60,8 +60,6 @@ public static class TextData
         LocalizationData data = JsonUtility.FromJson<LocalizationData>(json);
         _languages = data.Languages;
 
-        Debug.Log(data);
-
         foreach (LocalizationMapping map in data.Table) {
             _localizationTable[map.Key] = new Dictionary<string, string>();
             foreach (LocalizationValue value in map.Values) {

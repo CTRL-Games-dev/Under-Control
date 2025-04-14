@@ -56,4 +56,37 @@ public class Location : MonoBehaviour
         };
         return pos;
     }
+
+    public Vector3 GetTopRightCorner3()
+    {
+        Vector3 pos = new()
+        {
+            x = LocationCenterInWorld.x + (Width / 2),
+            y = 0,
+            z = LocationCenterInWorld.y - (Height / 2)
+        };
+        return pos;
+    }
+
+    public Vector3 GetBottomLeftCorner3()
+    {
+        Vector3 pos = new()
+        {
+            x = LocationCenterInWorld.x - (Width / 2),
+            y = 0,
+            z = LocationCenterInWorld.y + (Height / 2)
+        };
+        return pos;
+    }
+
+    public Vector3 GetBottomRightCorner3()
+    {
+        Vector3 pos = new()
+        {
+            x = LocationCenterInWorld.x + (Width / 2),
+            y = 0,
+            z = LocationCenterInWorld.y + (Height / 2)
+        };
+        return pos;
+    }
 }

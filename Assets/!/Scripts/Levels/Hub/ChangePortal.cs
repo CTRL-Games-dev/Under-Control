@@ -10,7 +10,6 @@ public class ChangePortal : MonoBehaviour, IInteractable
     [SerializeField] private Portal _portal;
     [SerializeField] private Renderer[] _ballRenderers;
     [SerializeField] private CinemachineCamera _ballCamera;
-    [SerializeField] private Material _portalMaterial;
 
     [Header("UI things")]
     [SerializeField] private GameObject _ui;
@@ -62,7 +61,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
         Player.UICanvas.IsOtherUIOpen = true;
         CameraManager.Instance.SwitchCamera(_ballCamera);
         _ui.SetActive(true);
-        _canvasGroup.DOFade(1, 1).SetDelay(1);
+        _canvasGroup.DOFade(1, 1 * Settings.AnimationSpeed).SetDelay(1 * Settings.AnimationSpeed);
         _opened = true;
     }
 
@@ -70,15 +69,14 @@ public class ChangePortal : MonoBehaviour, IInteractable
     {
         Player.Instance.UICancelEvent.RemoveListener(CloseUI);
         CameraManager.Instance.SwitchCamera(null); 
-        _canvasGroup.DOFade(0, 1).OnComplete(() => {
+        _canvasGroup.DOFade(0, 1 * Settings.AnimationSpeed).OnComplete(() => {
             Player.UICanvas.IsOtherUIOpen = false;
             _ui.SetActive(false);
         });
         _opened = false;
     }
 
-    public void SetPortal()
-    {
+    public void SetPortal() {
         Invoke(nameof(CloseUI), 1f);
     }
 
@@ -87,17 +85,17 @@ public class ChangePortal : MonoBehaviour, IInteractable
         _rightPanelCanvasGroup.DOComplete();
         if (dimension == null) {
             _whitePanelGO.SetActive(false);
-            _rightPanelCanvasGroup.DOFade(0, 0.3f).SetEase(Ease.OutSine);
+            _rightPanelCanvasGroup.DOFade(0, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutSine);
             return;    
         }
         // if (_currentDimension == dimension) return;
         _currentDimension = dimension;
         _portal.SetDimensionAndActivate(_currentDimension.WhatDimension);
-        _portalMaterial.DOColor(_currentDimension.Color, 0.3f);
+        _portal.FadePortalColor(_currentDimension.Color, 0.3f * Settings.AnimationSpeed);
 
         _whitePanelGO.SetActive(false);
         setupRightPanel(_currentDimension);
-        _rightPanelCanvasGroup.DOFade(1, 0.3f).SetEase(Ease.OutSine).OnComplete(() => {
+        _rightPanelCanvasGroup.DOFade(1, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutSine).OnComplete(() => {
             _whitePanelGO.SetActive(true);
         });
     
@@ -124,7 +122,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
     public void LockDimension(UIDimension dimension) {
         Locked = !Locked;
         Vector3 newSize = Locked ? _rightPanelBGRect.sizeDelta - new Vector2(12, 12) : _rightPanelBGRect.sizeDelta + new Vector2(12, 12);
-        _rightPanelBGRect.DOSizeDelta(newSize, 0.3f).SetEase(Ease.OutSine);
+        _rightPanelBGRect.DOSizeDelta(newSize, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutSine);
         SetDimensionInfo(dimension);
     }
 

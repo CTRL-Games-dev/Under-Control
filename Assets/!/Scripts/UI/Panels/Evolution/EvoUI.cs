@@ -39,8 +39,8 @@ public class EvoUI : MonoBehaviour
     public void SetAvailable() {
         _isAvailable = true;
         _eventTrigger.enabled = true;
-        _bgImage.DOColor(Color.white, 0.2f);
-        _rectTransform.DOScale(1f, 0.2f);
+        _bgImage.DOColor(Color.white, 0.2f * Settings.AnimationSpeed);
+        _rectTransform.DOScale(1f, 0.2f * Settings.AnimationSpeed);
     }
 
 
@@ -49,14 +49,14 @@ public class EvoUI : MonoBehaviour
         Player.UICanvas.EvoInfo.SetInfo(_title, _description, transform.position);
         if (!_isAvailable) return;
         _rectTransform.DOKill();
-        _rectTransform.DOScale(1.1f, 0.2f);
+        _rectTransform.DOScale(1.1f, 0.2f * Settings.AnimationSpeed);
     }
 
     public void OnPointerExit() {
         Player.UICanvas.EvoInfo.SetInfo(null, null, transform.position);
         if (!_isAvailable) return;
         _rectTransform.DOKill();
-        _rectTransform.DOScale(1f, 0.2f);
+        _rectTransform.DOScale(1f, 0.2f * Settings.AnimationSpeed);
     }
 
     public void OnPointerClick() {
@@ -65,10 +65,10 @@ public class EvoUI : MonoBehaviour
         Player.Instance.SelectedEvolutions.Add(this);
         Player.Instance.OnEvolutionSelected.Invoke(this);
         float fillAmount = 0;
-        DOTween.To(() => fillAmount, x => fillAmount = x, 1, 0.5f).SetEase(Ease.InOutSine).OnUpdate(() => {
+        DOTween.To(() => fillAmount, x => fillAmount = x, 1, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnUpdate(() => {
             _lineImage.fillAmount = fillAmount;
         }).OnComplete(() => {
-            _bgImage.DOColor(Color.green, 0.2f);
+            _bgImage.DOColor(Color.green, 0.2f * Settings.AnimationSpeed);
         });
         _isSelected = true;
         _rectTransform.DOKill();

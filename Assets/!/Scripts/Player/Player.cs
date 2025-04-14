@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using Unity.Cinemachine;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -130,12 +129,22 @@ public class Player : MonoBehaviour {
         }
     }
 
+    [Header("Consumable")]
+    [SerializeField]
+    public ConsumableItemData ConsumableItemOne;
+
+    [SerializeField]
+    public ConsumableItemData ConsumableItemTwo;
+
+    [SerializeField]
+    public Cooldown ConsumableCooldown = new Cooldown(0.5f);
+
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
     public WeaponItemData CurrentWeapon { get => Inventory.Weapon; }
 
     private bool _isAttacking = false;
-    private bool _lockRotation = false;
+    public bool LockRotation = false;
 
     [Header("Events")]
     public UnityEvent InventoryToggleEvent;
@@ -177,23 +186,23 @@ public class Player : MonoBehaviour {
 
     [SerializeField] private LayerMask _groundLayerMask;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
+    public InputActionAsset actions;
 
     private Vector3 _queuedRotation;
-    
 
     #region Unity Methods
     void Awake() {
-        LivingEntity = GetComponent<LivingEntity>();
-        ModifierSystem = GetComponent<ModifierSystem>();
-        CharacterController = GetComponent<CharacterController>();
-        Animator = GetComponent<Animator>();
-        CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
-
         DontDestroyOnLoad(gameObject);
         if (Instance != null && Instance != this) {
             Destroy(gameObject);
             return;
         }
+        
+        LivingEntity = GetComponent<LivingEntity>();
+        ModifierSystem = GetComponent<ModifierSystem>();
+        CharacterController = GetComponent<CharacterController>();
+        Animator = GetComponent<Animator>();
+        CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
 
         Instance = this;
 
@@ -232,6 +241,7 @@ public class Player : MonoBehaviour {
         });
 
         // ResetRun();
+        // LoadKeybinds();
     }
 
     void Update() {
@@ -302,7 +312,7 @@ public class Player : MonoBehaviour {
 
 
     private void handleRotation() {
-        if (_lockRotation) return;
+        if (LockRotation) return;
         if (_movementInputVector.magnitude > 0.1f) {
             var targetRotation = Quaternion.Euler(0, 45, 0) * Quaternion.LookRotation(new Vector3(_movementInputVector.x, 0, _movementInputVector.y));
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
@@ -327,6 +337,20 @@ public class Player : MonoBehaviour {
 
     void OnCastSpellThree(InputValue value) {
         _spellDataThree.TryCast(LivingEntity);
+    }
+
+    void OnUseConsumableOne(InputValue value) {
+        if(ConsumableItemOne == null) return;
+        if(!ConsumableCooldown.Execute()) return;
+
+        ConsumableItemOne.Consume(LivingEntity);
+    }
+
+    void OnUseConsumableTwo(InputValue value) {
+        if(ConsumableItemTwo == null) return;
+        if(!ConsumableCooldown.Execute()) return;
+
+        ConsumableItemTwo.Consume(LivingEntity);
     }
 
     void OnMove(InputValue value) {
@@ -404,7 +428,9 @@ public class Player : MonoBehaviour {
             return;
         }
 
-        _lockRotation = true;
+        UICanvas.HUDCanvas.ShowDashCooldown();
+
+        LockRotation = true;
         DamageDisabled = true;
 
         if (_movementInputVector.magnitude > 0.1f) {
@@ -422,13 +448,27 @@ public class Player : MonoBehaviour {
             // Animator.applyRootMotion = true;
             Animator.speed = 1;
             DamageDisabled = false;
-            _lockRotation = false;
+            LockRotation = false;
             foreach (ParticleSystem trail in _trailParticles) {
                 trail.Clear();
                 trail.Stop();
             }
         });
     }
+
+    // przeniesc do save systemu 
+
+    public void OnEnable() {
+        var rebinds = PlayerPrefs.GetString("rebinds");
+        if (!string.IsNullOrEmpty(rebinds))
+            actions.LoadBindingOverridesFromJson(rebinds);
+    }
+
+    public void OnDisable() {
+        var rebinds = actions.SaveBindingOverridesAsJson();
+        PlayerPrefs.SetString("rebinds", rebinds);
+    }
+
 
     #endregion
 
@@ -462,11 +502,11 @@ public class Player : MonoBehaviour {
             return;
         };
         
-        if (!_lockRotation) {
+        if (!LockRotation) {
             transform.LookAt(GetMousePosition());
         }
 
-        _lockRotation = true;
+        LockRotation = true;
         switch(interactionType) {
             case InteractionType.Primary:
                 performLightAttack();
@@ -563,7 +603,7 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_Recovery:
-                _lockRotation = false;
+                LockRotation = false;
                 WeaponHolder.EndAttack();
                 break;
         }
@@ -573,11 +613,10 @@ public class Player : MonoBehaviour {
         CurrentAnimationState = state;
         switch (state) {
             case AnimationState.Locomotion:
-                _lockRotation = false;
                 break;
 
             case AnimationState.Attack_Windup:
-                _lockRotation = true;
+                LockRotation = true;
                 _isAttacking = true;
                 _currentSpeed = 0;
                 WeaponHolder.BeginAttack();
@@ -588,12 +627,12 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_ComboWindow:
-                _lockRotation = false;
+                LockRotation = false;
                 transform.LookAt(GetMousePosition());
                 break;
 
             case AnimationState.Attack_Recovery:
-                _lockRotation = true;
+                LockRotation = true;
                 break;
         }
     }
