@@ -8,9 +8,11 @@ public class ItemInfoPanel : MonoBehaviour
     [SerializeField] private TextLocalizer _nameTextLocalizer, _rarityTextLocalizer, _descriptionTextLocalizer;
 
     private RectTransform _rectTransform;
+    private CanvasGroup _canvasGroup;
 
     private void Awake() {
         _rectTransform = GetComponent<RectTransform>();
+        _canvasGroup = GetComponent<CanvasGroup>();
     }
     
     private void Update() {
@@ -23,9 +25,13 @@ public class ItemInfoPanel : MonoBehaviour
     }
 
     public void ShowItemInfo(ItemUI itemUI) {
-        gameObject.SetActive(itemUI != null);
+        if (gameObject.activeSelf) _canvasGroup.alpha = 0;
 
+        gameObject.SetActive(itemUI != null);
+        
         if (itemUI == null) return;
+        
+        _canvasGroup.alpha = 0;
 
         InventoryItem item = itemUI.InventoryItem;
 
@@ -35,6 +41,7 @@ public class ItemInfoPanel : MonoBehaviour
             Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width), 
             Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height, Screen.height)
         );
+        _canvasGroup.alpha = 1;
 
         _nameTextLocalizer.Key = item.ItemData.DisplayName;
         _descriptionTextLocalizer.Key = item.ItemData.Description;
