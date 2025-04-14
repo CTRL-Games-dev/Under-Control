@@ -292,7 +292,6 @@ public class Player : MonoBehaviour {
         }
     }
 
-
     private float getGoalSpeed() {
         if (InputDisabled) return 0;
 
@@ -310,7 +309,6 @@ public class Player : MonoBehaviour {
         return 0;
     }
 
-
     private void handleRotation() {
         if (LockRotation) return;
         if (_movementInputVector.magnitude > 0.1f) {
@@ -318,7 +316,6 @@ public class Player : MonoBehaviour {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
         }
     }
-
 
     private void onDeath() {
         UICanvas.ChangeUITopState(UITopState.Death);
@@ -498,9 +495,8 @@ public class Player : MonoBehaviour {
         // Default to attacking if no interaction was commited
         _queuedRotation = GetMousePosition() - transform.position;
         if(_isAttacking) {
-            
             return;
-        };
+        }
         
         if (!LockRotation) {
             transform.LookAt(GetMousePosition());
@@ -514,7 +510,7 @@ public class Player : MonoBehaviour {
             case InteractionType.Secondary:
                 performHeavyAttack();
                 break;
-        };
+        }
     }
 
     private bool tryInteract(InteractionType interactionType) {
@@ -540,13 +536,11 @@ public class Player : MonoBehaviour {
     }
 
     private void performLightAttack() {
-        WeaponHolder.InitializeAttack(AttackType.LIGHT);
         Animator.SetBool(_heavyAttackHash, false);
         Animator.SetTrigger(_lightAttackHash);
     }
 
     private void performHeavyAttack() {
-        WeaponHolder.InitializeAttack(AttackType.HEAVY);
         Animator.SetBool(_lightAttackHash, false);
         Animator.SetTrigger(_heavyAttackHash);
     }
@@ -555,7 +549,6 @@ public class Player : MonoBehaviour {
         WeaponHolder.UpdateWeapon(CurrentWeapon);
         Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.WeaponType ?? WeaponType.None));
     }
-
 
     public Vector3 GetMousePosition() {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
@@ -604,7 +597,6 @@ public class Player : MonoBehaviour {
 
             case AnimationState.Attack_Recovery:
                 LockRotation = false;
-                WeaponHolder.EndAttack();
                 break;
         }
     }
@@ -635,6 +627,14 @@ public class Player : MonoBehaviour {
                 LockRotation = true;
                 break;
         }
+    }
+
+    public void OnAttackAnimationStart(AttackType attackType) {
+        WeaponHolder.InitializeAttack(attackType);
+    }
+
+    public void OnAttackAnimationEnd(AttackType _) {
+        WeaponHolder.EndAttack();
     }
 
     #endregion
