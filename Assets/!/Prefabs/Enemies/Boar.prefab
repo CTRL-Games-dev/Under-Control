@@ -78,16 +78,9 @@ MonoBehaviour:
   Guild: {fileID: 11400000, guid: 734b0a650a008d14ab9d8696640c3a05, type: 2}
   DropItemsOnDeath: 1
   TimeToRegenAfterDamage: 3
-  Exp: 0
-  DroppedExpMultiplier: 1
   DestroyOnDeath: 1
-  Health:
-    _raw: 15
-    _adjusted: 100
-    _initValue: 100
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
+  Health: 100
+  Mana: 100
   MaxHealth:
     _raw: 15
     _adjusted: 100
@@ -95,7 +88,14 @@ MonoBehaviour:
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
-  RegenRate:
+  HealthRegenRate:
+    _raw: 1
+    _adjusted: 1
+    _initValue: 1
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  ManaRegenRate:
     _raw: 1
     _adjusted: 1
     _initValue: 1
@@ -120,6 +120,13 @@ MonoBehaviour:
     _raw: 1
     _adjusted: 1
     _initValue: 1
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  MaxMana:
+    _raw: 100
+    _adjusted: 100
+    _initValue: 100
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
@@ -169,7 +176,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DropOnDeath: 1
   PossibleLoot:
-  - Item: {fileID: 11400000, guid: 76cc4ac11506f5949ad88e652d5100fb, type: 2}
+  - Item: {fileID: 11400000, guid: b125bd877215e4418ba08244717254e4, type: 2}
     MinAmount: 1
     MaxAmount: 4
     Chance: 1
@@ -181,10 +188,6 @@ MonoBehaviour:
     MinAmount: 0
     MaxAmount: 2
     Chance: 1
-  - Item: {fileID: 11400000, guid: 7f3a1b5152c312642aa6e38b9609647c, type: 2}
-    MinAmount: 1
-    MaxAmount: 1
-    Chance: 0.1
 --- !u!195 &8974613204039339173
 NavMeshAgent:
   m_ObjectHideFlags: 0

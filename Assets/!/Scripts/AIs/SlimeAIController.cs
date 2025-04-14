@@ -53,19 +53,19 @@ public class SlimeAIController : MonoBehaviour {
         }
 
         List<Vector3> corners = _navMeshAgent.path.corners.ToList();
-        if (corners.Count > 2) {
-            float accountedDistance = 0;
-            for(int i = corners.Count - 1; i > 0; i--) {
-                float distance = Vector3.Distance(corners[i], corners[i - 1]);
-                if (distance > _navMeshAgent.stoppingDistance - accountedDistance) {
-                    corners[i] = corners[i] - (corners[i] - corners[i - 1]).normalized * (_navMeshAgent.stoppingDistance - accountedDistance);
-                    break;
-                } else {
-                    accountedDistance += distance;
-                    corners.RemoveAt(i);
-                }
+        float accountedDistance = 0;
+        for(int i = corners.Count - 1; i > 0; i--) {
+            float distance = Vector3.Distance(corners[i], corners[i - 1]);
+            if (distance > _navMeshAgent.stoppingDistance - accountedDistance) {
+                corners[i] = corners[i] - (corners[i] - corners[i - 1]).normalized * (_navMeshAgent.stoppingDistance - accountedDistance);
+                break;
+            } else {
+                accountedDistance += distance;
+                corners.RemoveAt(i);
             }
         }
+
+        if(corners.Count == 1) return;
 
         Vector3 closestCorner = corners[1];
         Vector3 cornerDirection = closestCorner - transform.position;

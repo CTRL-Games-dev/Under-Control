@@ -585,7 +585,7 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_Windup:
-                break;
+                break; 
 
             case AnimationState.Attack_Contact:
                 WeaponHolder.DisableHitbox();
@@ -611,7 +611,6 @@ public class Player : MonoBehaviour {
                 LockRotation = true;
                 _isAttacking = true;
                 _currentSpeed = 0;
-                WeaponHolder.BeginAttack();
                 break;
 
             case AnimationState.Attack_Contact:
@@ -631,6 +630,7 @@ public class Player : MonoBehaviour {
 
     public void OnAttackAnimationStart(AttackType attackType) {
         WeaponHolder.InitializeAttack(attackType);
+        WeaponHolder.BeginAttack();
     }
 
     public void OnAttackAnimationEnd(AttackType _) {
