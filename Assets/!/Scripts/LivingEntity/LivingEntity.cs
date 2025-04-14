@@ -20,12 +20,6 @@ public class LivingEntity : MonoBehaviour {
     public float TimeToRegenAfterDamage = 2;
     public string DebugName => $"{DisplayName} ({Guild.Name} {gameObject.name})";
 
-    public int Exp = 0;
-    public float Level { get => 1 + Exp / 100f; }
-
-    [Range(0, 2)]
-    public int DroppedExpMultiplier = 1;
-
     public bool DestroyOnDeath = true;
 
     [Header("Stats")]
@@ -100,7 +94,7 @@ public class LivingEntity : MonoBehaviour {
         target.takeDamage(damage, this);
     }
 
-    private IEnumerator slowDown() {
+    private static IEnumerator slowDown() {
         Time.timeScale = 0f;
         Debug.Log("Slowing down time for 0.1 seconds");
         yield return new WaitForSecondsRealtime(0.04f);
@@ -109,9 +103,8 @@ public class LivingEntity : MonoBehaviour {
     }
 
     private void takeDamage(Damage damage, LivingEntity source = null) {
-        
         if (source.gameObject.CompareTag("Player")) {
-            StartCoroutine(nameof(slowDown));
+            // StartCoroutine(nameof(slowDown));
             CameraShake.Instance.Shake(2, 0.1f);
         }
 
@@ -159,10 +152,6 @@ public class LivingEntity : MonoBehaviour {
         HitFlashAnimator.Flash();
 
         if (Health == 0) {
-            if(source != null) {
-                source.Exp += Exp * DroppedExpMultiplier;
-            }
-
             // Drop items
             if(DropItemsOnDeath) {
                 // Drop common slots

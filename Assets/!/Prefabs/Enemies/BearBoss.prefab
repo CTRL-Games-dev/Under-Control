@@ -1,5 +1,58 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1529299546331488152
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8791278583047625777}
+  - component: {fileID: 7485732653336253065}
+  m_Layer: 0
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8791278583047625777
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529299546331488152}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1500122702648906675}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &7485732653336253065
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1529299546331488152}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 1024
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.72, y: 0.7138556, z: 1.29}
+  m_Center: {x: 0.0011971792, y: 0.46692795, z: -0.51874065}
 --- !u!1 &3220416968736363468
 GameObject:
   m_ObjectHideFlags: 0
@@ -328,7 +381,6 @@ GameObject:
   - component: {fileID: 4352187923124067570}
   - component: {fileID: 9095445479408834461}
   - component: {fileID: 5110650778633388141}
-  - component: {fileID: 8472433838717334783}
   - component: {fileID: 6349992580616093917}
   - component: {fileID: 7615824002244005713}
   - component: {fileID: 4628315109957373728}
@@ -357,6 +409,7 @@ Transform:
   m_Children:
   - {fileID: 3926590864870927350}
   - {fileID: 5472333992600338931}
+  - {fileID: 8791278583047625777}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7598900371050870576
@@ -392,26 +445,58 @@ MonoBehaviour:
   Guild: {fileID: 11400000, guid: 734b0a650a008d14ab9d8696640c3a05, type: 2}
   DropItemsOnDeath: 1
   TimeToRegenAfterDamage: 2
-  Exp: 0
-  DroppedExpMultiplier: 1
-  Health:
-    _raw: 200
-    _adjusted: 100
+  DestroyOnDeath: 1
+  Health: 100
+  Mana: 100
   MaxHealth:
     _raw: 200
     _adjusted: 100
-  RegenRate:
+    _initValue: 100
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  HealthRegenRate:
     _raw: 1
     _adjusted: 1
+    _initValue: 1
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  ManaRegenRate:
+    _raw: 1
+    _adjusted: 1
+    _initValue: 1
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   Armor:
     _raw: 0
     _adjusted: 0
+    _initValue: 0
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   ElementalArmor:
     _raw: 0
     _adjusted: 0
+    _initValue: 0
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   MovementSpeed:
     _raw: 1
     _adjusted: 1
+    _initValue: 1
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  MaxMana:
+    _raw: 100
+    _adjusted: 100
+    _initValue: 100
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -443,6 +528,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _activeModifiers: []
+  _stats: []
 --- !u!114 &1058399873178564285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -534,27 +620,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.55434704, y: 0.7028601, z: 1.110625}
   m_Center: {x: -0.000032265983, y: 0.4380554, z: -0.52077806}
---- !u!65 &8472433838717334783
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6519855406994269912}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 1024
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.72, y: 0.7138556, z: 1.29}
-  m_Center: {x: 0.0011971792, y: 0.46692795, z: -0.51874065}
 --- !u!114 &6349992580616093917
 MonoBehaviour:
   m_ObjectHideFlags: 0
