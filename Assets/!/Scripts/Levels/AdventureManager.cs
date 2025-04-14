@@ -12,7 +12,7 @@ public class AdventureManager : MonoBehaviour
     private void Start()
     {
         var generator = GetComponent<WorldGenerator>();
-        generator.GenerateMap(GameManager.Instance.GetCurrentDimension());
+        generator.GenerateMap(GameManager.Instance.CurrentDimension);
         
         ForestPortalLocation portal = generator.Getlocation<ForestPortalLocation>();
 

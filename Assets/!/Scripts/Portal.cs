@@ -2,18 +2,25 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(Collider))]
-public class Portal : MonoBehaviour
+public abstract class Portal : MonoBehaviour
 {
     [SerializeField] private Dimension _dimension = Dimension.HUB;
     [SerializeField] private GameObject _portalInside;
     [SerializeField] private BoxCollider _collider;
     public UnityEvent<Dimension> PlayerEnteredPortal;
-    
+    [HideInInspector] public float Influence;
+
+    void Start()
+    {
+        setInfluence();
+    }
+
+    protected abstract void setInfluence();
 
     void OnTriggerEnter(Collider other)
     {
         Debug.Log("Player entered portal to: " + _dimension.ToString());
-        GameManager.Instance.ChangeDimension(_dimension);
+        GameManager.Instance.ChangeDimension(_dimension, Influence);
     }
     
     public void ChangeDimension(Dimension d) {

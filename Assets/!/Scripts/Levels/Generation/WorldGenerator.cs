@@ -158,31 +158,37 @@ public class WorldGenerator : MonoBehaviour {
     public (List<Location>, Grid) PlaceLocationsForest()
     {
         ForestPortalLocation forestPortalPrefab = Resources.Load<ForestPortalLocation>("Prefabs/Forest/Locations/ForestPortal");
-        MeadowLocation[] meadowsPrefabs = Resources.LoadAll<MeadowLocation>("Prefabs/Forest/Locations/Meadows");
+        Location forestSpawnPrefab = Resources.Load<Location>("Prefabs/Forest/Locations/ForestSpawn");
+        Location[] meadowsPrefabs = Resources.LoadAll<Location>("Prefabs/Forest/Locations/Meadows");
+        Location[] rockyFieldsPrefabs = Resources.LoadAll<Location>("Prefabs/Forest/Locations/RockyFields");
+        // Location forestWell = Resources.Load<ForestPortalLocation>("Prefabs/Forest/Locations/Well");
 
         Debug.Log("Loaded location prefabs");
 
-        List<Location> allLocations = new()
-        {   
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-            Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform),
-        };
+        List<Location> allLocations = new();
+
+        int numberOfMeadows = UnityEngine.Random.Range(4, 7);
+        int numberOfRockyFields = UnityEngine.Random.Range(1, 3);
+        int numberofPortals = UnityEngine.Random.Range(2, 4);
+
+        for(int i = 0; i < numberOfMeadows; i++)
+        {
+            allLocations.Add(Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform));
+        }
+
+        for(int i = 0; i < numberOfMeadows; i++)
+        {
+            allLocations.Add(Instantiate(rockyFieldsPrefabs[UnityEngine.Random.Range(0, rockyFieldsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform));
+        }
+
+        for(int i = 0; i < numberofPortals; i++)
+        {
+            allLocations.Add(Instantiate(forestPortalPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform));
+        }
 
         List<LocationNode> nodes = new()
         {
-            new(Instantiate(forestPortalPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform), new(0,0)),
+            new(Instantiate(forestSpawnPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform), new(0,0)),
         };
 
         // Get place in a grid of locations

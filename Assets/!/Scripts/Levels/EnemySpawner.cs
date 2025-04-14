@@ -19,12 +19,13 @@ public class EnemySpawner : MonoBehaviour
         FightEnded,
     }
     private SpawnerState _state = SpawnerState.BeforeFight;
-    public List<Transform> SpawnPoints;
+    public Transform SpawnPointsParent;
+    [HideInInspector] public List<Transform> SpawnPoints;
     private Location _location;
     private List<Wall> _activeWalls = new();
     public List<WaveInfo> Waves;
-    public int WaveNumber = 0;
-    public int EnemyCount = 0;
+    [HideInInspector] public int WaveNumber = 0;
+    [HideInInspector] public int EnemyCount = 0;
     void Awake()
     {
         _location = GetComponent<Location>();
@@ -32,6 +33,7 @@ public class EnemySpawner : MonoBehaviour
 
     void Start()
     {
+        foreach(Transform child in SpawnPointsParent) SpawnPoints.Add(child);
         if(MaxExitsAtOnce > SpawnPoints.Count)
         {
             Debug.LogWarning($"Maximum number of exit locations used at once was set to {MaxExitsAtOnce}, but number of them is only {SpawnPoints.Count}");
