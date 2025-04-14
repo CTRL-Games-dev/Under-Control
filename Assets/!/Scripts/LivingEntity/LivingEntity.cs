@@ -20,12 +20,6 @@ public class LivingEntity : MonoBehaviour {
     public float TimeToRegenAfterDamage = 2;
     public string DebugName => $"{DisplayName} ({Guild.Name} {gameObject.name})";
 
-    public int Exp = 0;
-    public float Level { get => 1 + Exp / 100f; }
-
-    [Range(0, 2)]
-    public int DroppedExpMultiplier = 1;
-
     public bool DestroyOnDeath = true;
 
     [Header("Stats")]
@@ -159,10 +153,6 @@ public class LivingEntity : MonoBehaviour {
         HitFlashAnimator.Flash();
 
         if (Health == 0) {
-            if(source != null) {
-                source.Exp += Exp * DroppedExpMultiplier;
-            }
-
             // Drop items
             if(DropItemsOnDeath) {
                 // Drop common slots
