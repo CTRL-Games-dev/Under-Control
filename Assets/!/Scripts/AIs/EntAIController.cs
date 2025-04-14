@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
@@ -18,6 +20,8 @@ public class EntAIController : MonoBehaviour {
 
     private Animator _animator;
     private NavMeshAgent _navMeshAgent;
+    private BehaviorGraphAgent _behaviorGraphAgent;
+    private LivingEntity _livingEntity;
 
     private static readonly int _isRealHash = Animator.StringToHash("isReal");
     private static readonly int _speedHash = Animator.StringToHash("speed");
@@ -25,6 +29,8 @@ public class EntAIController : MonoBehaviour {
     void Awake() {
         _animator = GetComponent<Animator>();
         _navMeshAgent = GetComponent<NavMeshAgent>();
+        _behaviorGraphAgent = GetComponent<BehaviorGraphAgent>();
+        _livingEntity = GetComponent<LivingEntity>();
 
         RealEnt.SetActive(false);
         FakeEnt.SetActive(true);
@@ -57,21 +63,25 @@ public class EntAIController : MonoBehaviour {
         }
     }
 
-    public void OnAttackAnimationStart() {
-        LeftWeaponHolder.InitializeAttack(AttackType.LIGHT);
-        LeftWeaponHolder.BeginAttack();
-        LeftWeaponHolder.EnableHitbox();
-
+    public void OnRightHandAttackStart() {
         RightWeaponHolder.InitializeAttack(AttackType.LIGHT);
         RightWeaponHolder.BeginAttack();
         RightWeaponHolder.EnableHitbox();
     }
 
-    public void OnAttackAnimationEnd() {
-        LeftWeaponHolder.EndAttack();
-        LeftWeaponHolder.DisableHitbox();
-
+    public void OnRightHandAttackEnd() {
         RightWeaponHolder.EndAttack();
         RightWeaponHolder.DisableHitbox();
+    }
+
+    public void OnLeftHandAttackStart() {
+        LeftWeaponHolder.InitializeAttack(AttackType.LIGHT);
+        LeftWeaponHolder.BeginAttack();
+        LeftWeaponHolder.EnableHitbox();
+    }
+
+    public void OnLeftHandAttackEnd() {
+        LeftWeaponHolder.EndAttack();
+        LeftWeaponHolder.DisableHitbox();
     }
 }
