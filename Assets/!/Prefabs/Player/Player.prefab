@@ -5960,8 +5960,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14
-  m_fontSizeBase: 14
+  m_fontSize: 18
+  m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -6300,8 +6300,16 @@ MonoBehaviour:
     Spell: {fileID: 0}
     Cooldown:
       CooldownTime: 0
-  ConsumableItemOne: {fileID: 0}
-  ConsumableItemTwo: {fileID: 0}
+  ConsumableItemOne:
+    ItemData: {fileID: 0}
+    Amount: 0
+    Position: {x: 0, y: 0}
+    Rotated: 0
+  ConsumableItemTwo:
+    ItemData: {fileID: 0}
+    Amount: 0
+    Position: {x: 0, y: 0}
+    Rotated: 0
   ConsumableCooldown:
     CooldownTime: 0.5
   WeaponHolder: {fileID: 4515968852176714420}
@@ -6331,6 +6339,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   CoinsChangeEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  UpdateConsumablesEvent:
     m_PersistentCalls:
       m_Calls: []
   _uiCanvas: {fileID: 3006076035978592924}
@@ -6462,8 +6473,8 @@ MonoBehaviour:
   DropItemsOnDeath: 0
   TimeToRegenAfterDamage: 2
   DestroyOnDeath: 0
-  Health: 100
-  Mana: 100
+  Health: 17
+  Mana: 12
   MaxHealth:
     _raw: 100
     _adjusted: 100
@@ -6472,14 +6483,14 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   HealthRegenRate:
-    _raw: 1
+    _raw: 0
     _adjusted: 1
     _initValue: 1
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
   ManaRegenRate:
-    _raw: 1
+    _raw: 0
     _adjusted: 1
     _initValue: 1
     OnValueChanged:
@@ -12557,6 +12568,81 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &1965788301052602900
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 402830565679279513}
+  - component: {fileID: 5154471304198850040}
+  - component: {fileID: 5710004613568526826}
+  m_Layer: 6
+  m_Name: Cooldown2Img
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &402830565679279513
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1965788301052602900}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8295601238109672657}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -4, y: -4}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &5154471304198850040
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1965788301052602900}
+  m_CullTransparentMesh: 1
+--- !u!114 &5710004613568526826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1965788301052602900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.4392157, g: 0.4392157, b: 0.4392157, a: 0.29411766}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 965d1c39ae8a6b44ab2ad33345e0e57e, type: 3}
+  m_Type: 3
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 1
+  m_FillAmount: 0
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &2022345899250620392
 GameObject:
   m_ObjectHideFlags: 0
@@ -25707,8 +25793,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14
-  m_fontSizeBase: 14
+  m_fontSize: 18
+  m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -26823,6 +26909,81 @@ MonoBehaviour:
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!1 &3046251127777557542
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1821853051612860643}
+  - component: {fileID: 4588337957526595472}
+  - component: {fileID: 3379961750086831099}
+  m_Layer: 6
+  m_Name: Cooldown1Img
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1821853051612860643
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3046251127777557542}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2587767953315088769}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -4, y: -4}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &4588337957526595472
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3046251127777557542}
+  m_CullTransparentMesh: 1
+--- !u!114 &3379961750086831099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3046251127777557542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.4392157, g: 0.4392157, b: 0.4392157, a: 0.29411766}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 965d1c39ae8a6b44ab2ad33345e0e57e, type: 3}
+  m_Type: 3
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 1
+  m_FillAmount: 0
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
@@ -52586,6 +52747,13 @@ MonoBehaviour:
   _consumable2Img: {fileID: 6254343491011720995}
   _consumable1Text: {fileID: 5740576159036842284}
   _consumable2Text: {fileID: 2505590464846899473}
+  _consumable1Rect: {fileID: 623521511905721509}
+  _consumable2Rect: {fileID: 783530136989185608}
+  _consumable1CooldownImg: {fileID: 3379961750086831099}
+  _consumable2CooldownImg: {fileID: 5710004613568526826}
+  _defaultColor: {r: 0.3490566, g: 0.3490566, b: 0.3490566, a: 0.29411766}
+  _manaColor: {r: 0, g: 0.26666668, b: 0.5411765, a: 0.29411766}
+  _healthColor: {r: 0.5019608, g: 0, b: 0, a: 0.29411766}
 --- !u!1 &7311586478101612950
 GameObject:
   m_ObjectHideFlags: 0
@@ -60138,6 +60306,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 623521511905721509}
+  - {fileID: 1821853051612860643}
   m_Father: {fileID: 3235675722773798664}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -61816,6 +61985,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 783530136989185608}
+  - {fileID: 402830565679279513}
   m_Father: {fileID: 3235675722773798664}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

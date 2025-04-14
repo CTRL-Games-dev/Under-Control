@@ -55,18 +55,20 @@ public class InvTileEquipment : InvTile {
                 break; 
             
             case TileType.Consumeable1:
-                if (Player.Instance.ConsumableItemOne != null) {
+                Player.Instance.UpdateConsumablesEvent.AddListener(OnConsumablesUpdate);
+                if (Player.Instance.ConsumableItemOne.ItemData != null) {
                     InventoryItem inventoryItem = new();
-                    inventoryItem.ItemData = Player.Instance.ConsumableItemOne;
+                    inventoryItem.ItemData = Player.Instance.ConsumableItemOne.ItemData;
                     createItemUI(inventoryItem);
                     IsEmpty = false;
                 }
                 break;
             
             case TileType.Consumeable2:
-                if (Player.Instance.ConsumableItemTwo != null) {
+                Player.Instance.UpdateConsumablesEvent.AddListener(OnConsumablesUpdate);
+                if (Player.Instance.ConsumableItemTwo.ItemData != null) {
                     InventoryItem inventoryItem = new();
-                    inventoryItem.ItemData = Player.Instance.ConsumableItemTwo;
+                    inventoryItem.ItemData = Player.Instance.ConsumableItemTwo.ItemData;
                     createItemUI(inventoryItem);
                     IsEmpty = false;
                 }
@@ -77,6 +79,14 @@ public class InvTileEquipment : InvTile {
 
     private void OnTileSizeSetEvent() {
         _rectTransform.sizeDelta = new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize);
+    }
+
+    public void UpdateInvTile() {
+        if (_itemUI.InventoryItem.Amount <= 0) {
+            Destroy(_itemUI.gameObject);
+            _itemUI = null;
+            IsEmpty = true;
+        } 
     }
 
     private void OnItemUIClickEvent(ItemUI itemUI) {
@@ -98,9 +108,11 @@ public class InvTileEquipment : InvTile {
                     break;
                 case TileType.Consumeable1:
                     Player.Instance.ConsumableItemOne = null;
+                    Player.UICanvas.HUDCanvas.OnUpdateConsumables();
                     break;
                 case TileType.Consumeable2:
                     Player.Instance.ConsumableItemTwo = null;
+                    Player.UICanvas.HUDCanvas.OnUpdateConsumables();
                     break;
             }
 
@@ -119,7 +131,7 @@ public class InvTileEquipment : InvTile {
         if(!IsEmpty) return;
 
         
-        try {
+        
             if (_tileType == TileType.Armor) {
                 if (SelectedInventoryItem.ItemData is not ArmorItemData armorItemData) {
                     return;
@@ -143,26 +155,40 @@ public class InvTileEquipment : InvTile {
                     return;
                 }
 
-                Player.Instance.ConsumableItemOne = consumableItemData;
+                Player.Instance.ConsumableItemOne = SelectedInventoryItem;
+                Player.UICanvas.HUDCanvas.OnUpdateConsumables();
             } else if (_tileType == TileType.Consumeable2) {
                 if (SelectedInventoryItem.ItemData is not ConsumableItemData consumableItemData) {
                     return;
                 }
 
-                Player.Instance.ConsumableItemTwo = consumableItemData;
+                Player.Instance.ConsumableItemTwo = SelectedInventoryItem;
+                Player.UICanvas.HUDCanvas.OnUpdateConsumables();
             }
 
 
-        } catch (System.Exception e) {
-            Debug.Log(e);
-            return;
-        }
+        
 
         createItemUI(SelectedInventoryItem);
 
         EventBus.ItemPlacedEvent?.Invoke();
         IsEmpty = false;
         Player.UICanvas.SelectedItemUI.InventoryItem = null;
+    }
+
+    private void OnConsumablesUpdate() {
+        InventoryItem consumable = _tileType == TileType.Consumeable1 ? Player.Instance.ConsumableItemOne : Player.Instance.ConsumableItemTwo;
+
+        if (consumable.ItemData == null) {
+            if (_itemUI != null) {
+                Destroy(_itemUI.gameObject);
+                _itemUI = null;
+                IsEmpty = true;
+            }
+        }  else {
+            _itemUI.InventoryItem = consumable;
+            _itemUI.UpdateAmount();
+        }
     }
 
     private GameObject createItemUI(InventoryItem inventoryItem){
