@@ -11,17 +11,12 @@ public abstract class Portal : MonoBehaviour
     [SerializeField] private BoxCollider _collider;
     public UnityEvent<Dimension> PlayerEnteredPortal;
     [HideInInspector] public float Influence;
-
-    void Start()
-    {
-        setInfluence();
-    }
-
     protected abstract void setInfluence();
 
     private Renderer _portalInsideRenderer;
 
     void Start() {
+        setInfluence();
         _portalInsideRenderer = _portalInside.GetComponent<Renderer>();
     }
 
