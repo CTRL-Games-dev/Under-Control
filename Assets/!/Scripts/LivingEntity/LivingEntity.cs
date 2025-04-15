@@ -37,7 +37,6 @@ public class LivingEntity : MonoBehaviour {
     public UnityEvent<DamageTakenEventData> OnDamageTaken;
 
     // State
-    private float _lastDamageTime = 0;
     private List<EffectData> _activeEffects = new List<EffectData>();
 
     private readonly int _hurtHash = Animator.StringToHash("hurt");
@@ -95,8 +94,6 @@ public class LivingEntity : MonoBehaviour {
             gameObject.GetComponent<Animator>()?.SetTrigger(_hurtHash);
         }
 
-
-        _lastDamageTime = Time.time;
 
         // Check if entity is dead
         if(Health == 0) {
