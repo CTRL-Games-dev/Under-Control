@@ -35,7 +35,6 @@ public class Player : MonoBehaviour {
     [Header("Stats")]
     public float Health => LivingEntity.Health;
     public Stat MaxHealth => LivingEntity.MaxHealth;
-    public Stat RegenRate => LivingEntity.HealthRegenRate;
     public Stat MaxMana => LivingEntity.MaxMana;
     public float Mana => LivingEntity.Mana;
     public Stat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);

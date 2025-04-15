@@ -27,8 +27,6 @@ public class LivingEntity : MonoBehaviour {
     public float Mana = 100f;
    
     public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
-    public Stat HealthRegenRate = new Stat(StatType.HEALTH_REGEN_RATE, 0);
-    public Stat ManaRegenRate = new Stat(StatType.MANA_REGEN_RATE, 0);
     public Stat Armor = new Stat(StatType.ARMOR, 0);
     public Stat ElementalArmor = new Stat(StatType.ELEMENTAL_ARMOR, 0);
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
@@ -55,7 +53,6 @@ public class LivingEntity : MonoBehaviour {
         HitFlashAnimator = GetComponent<HitFlashAnimator>();
 
         ModifierSystem.RegisterStat(ref MaxHealth);
-        ModifierSystem.RegisterStat(ref HealthRegenRate);
         ModifierSystem.RegisterStat(ref Armor);
         ModifierSystem.RegisterStat(ref ElementalArmor);
         ModifierSystem.RegisterStat(ref MovementSpeed);
@@ -64,20 +61,6 @@ public class LivingEntity : MonoBehaviour {
 
     void Update() {
         recheckEffects();
-   
-        // Health regen
-        if(Time.time - _lastDamageTime > TimeToRegenAfterDamage) {
-            Health += HealthRegenRate * Time.deltaTime;
-            if(Health > MaxHealth) {
-                Health = MaxHealth;
-            }
-        }
-
-        // Mana regen
-        Mana += ManaRegenRate * Time.deltaTime;
-        if(Mana > MaxMana) {
-            Mana = MaxMana;
-        }
     }
 
     public void DropItem(InventoryItem item) {
