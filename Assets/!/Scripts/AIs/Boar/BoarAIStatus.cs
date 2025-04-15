@@ -5,5 +5,4 @@ public enum BoarAIStatus {
     Patrolling,
     Chasing,
     Charging,
-	Attacking
 }

@@ -31,7 +31,10 @@ public class WeaponHolder : MonoBehaviour
 
         _currentWeaponData = weaponData;
 
-        _currentWeaponHitter.gameObject.layer = gameObject.layer;
+        if (_currentWeaponHitter.gameObject.layer == LayerMask.NameToLayer("Default")) {
+            _currentWeaponHitter.gameObject.layer = gameObject.layer;
+        }
+
         _currentWeaponHitter.OnHit.AddListener(OnHit);
     }
 

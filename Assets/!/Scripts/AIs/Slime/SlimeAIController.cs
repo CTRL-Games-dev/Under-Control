@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -40,8 +41,12 @@ public class SlimeAIController : MonoBehaviour {
     }
 
     void Update() {
+        for(int i = 1; i < _navMeshAgent.path.corners.Length; i++) {
+            Debug.DrawLine(_navMeshAgent.path.corners[i - 1], _navMeshAgent.path.corners[i], Color.red);
+        }
+
         if (IsJumping) {
-            _navMeshAgent.nextPosition = _startingPoint.Value;
+            _navMeshAgent.nextPosition = _destinationPoint.Value;
             jumpUpdate();
             return;
         }
@@ -64,6 +69,8 @@ public class SlimeAIController : MonoBehaviour {
                 corners.RemoveAt(i);
             }
         }
+
+        if(corners.Count == 1) return;
 
         Vector3 closestCorner = corners[1];
         Vector3 cornerDirection = closestCorner - transform.position;
@@ -132,7 +139,22 @@ public class SlimeAIController : MonoBehaviour {
 
         float baseY = Mathf.Lerp(_startingPoint.Value.y, _destinationPoint.Value.y, progress);
 
+        if(float.IsNaN(baseY + arc)) {
+            Debug.LogWarning($"baseY + arc is NaN. baseY: {baseY} | arc: {arc}");
+            Debug.LogWarning($"totalDistXZ: {totalDistXZ} | distNextXZ: {distNextXZ}");
+            Debug.LogWarning($"progress: {progress}");
+            Debug.LogWarning($"a: {a}");
+            Debug.LogWarning($"height: {height}");
+            Debug.LogWarning($"JumpMaxHeight: {JumpMaxHeight}");
+            Debug.LogWarning($"JumpMinHeight: {JumpMinHeight}");
+            Debug.LogWarning($"_startingPoint: {_startingPoint.Value}");
+            Debug.LogWarning($"_destinationPoint: {_destinationPoint.Value}");
+            Debug.LogError("BLAD! ZGLOS LONDONOWI BO NIE MIAL REPRO");
+            Debug.Break();
+        }
+
         //
+        // Debug.Log($"Jump speed: {jumpSpeed} | Arc: {arc} | BaseY: {baseY} | Progress: {progress}");
 
         transform.position = new Vector3(nextPosFlat.x, baseY + arc, nextPosFlat.y);
 
@@ -147,6 +169,9 @@ public class SlimeAIController : MonoBehaviour {
             _startingPoint = null;
             _destinationPoint = null;
             _landingTriggered = false;
+
+            _navMeshAgent.ResetPath();
+            _navMeshAgent.isStopped = true;
 
             return;
         }

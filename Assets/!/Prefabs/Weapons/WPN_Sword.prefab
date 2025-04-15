@@ -9817,6 +9817,59 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!1 &7915021602662526299
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5161559795156419774}
+  - component: {fileID: 2415674084415426748}
+  m_Layer: 10
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5161559795156419774
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7915021602662526299}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7852637608027754507}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2415674084415426748
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7915021602662526299}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.45314735, y: 0.99495494, z: 0.5706833}
+  m_Center: {x: 0.0063847536, y: 0.6337056, z: -0.006923114}
 --- !u!1 &8535552215001740518
 GameObject:
   m_ObjectHideFlags: 0
@@ -9827,7 +9880,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7852637608027754507}
   - component: {fileID: 1112600818115852129}
-  - component: {fileID: 5293541011113893143}
+  - component: {fileID: 4719605140184552348}
   m_Layer: 0
   m_Name: WPN_Sword
   m_TagString: Untagged
@@ -9849,6 +9902,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3583261276872506604}
+  - {fileID: 5161559795156419774}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -14.408, y: 105.537, z: 31.785}
 --- !u!114 &1112600818115852129
@@ -9866,32 +9920,38 @@ MonoBehaviour:
   OnHit:
     m_PersistentCalls:
       m_Calls: []
-  Hitbox: {fileID: 5293541011113893143}
+  Hitbox: {fileID: 2415674084415426748}
   _majorTrail: {fileID: 9209775254172133561}
   _majorTrailObject: {fileID: 473400662497668128}
   _minorTrail: {fileID: 4260520005167713073}
   _minorTrailObject: {fileID: 1150157432029336216}
---- !u!65 &5293541011113893143
-BoxCollider:
+--- !u!54 &4719605140184552348
+Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8535552215001740518}
-  m_Material: {fileID: 0}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.45314735, y: 0.99495494, z: 0.5706833}
-  m_Center: {x: 0.0063847536, y: 0.6337056, z: -0.006923114}
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &3904889535856155399
 PrefabInstance:
   m_ObjectHideFlags: 0

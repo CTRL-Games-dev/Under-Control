@@ -1,8 +1,8 @@
 public enum StatType {
     // HEALTH,
     MAX_HEALTH,
-    HEALTH_REGEN_RATE,
-    MANA_REGEN_RATE,
+    // HEALTH_REGEN_RATE,
+    // MANA_REGEN_RATE,
     // MANA,
     ARMOR,
     VEKTHAR_CONTROL,
