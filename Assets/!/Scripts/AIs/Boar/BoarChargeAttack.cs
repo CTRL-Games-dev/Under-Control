@@ -12,5 +12,6 @@ public class BoarChargeAttack : MonoBehaviour {
 
     private void OnHit(LivingEntity victim) {
         victim.ApplyEffect(StunEffect);
+        victim.OnStunned.Invoke(StunEffect.Duration);
     }
 }

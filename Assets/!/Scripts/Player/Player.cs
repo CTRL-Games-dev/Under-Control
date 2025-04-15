@@ -71,8 +71,6 @@ public class Player : MonoBehaviour {
     [SerializeField] private float _currentSpeed = 0f;
     [SerializeField] private float _turnSpeed = 260f;
 
-    public float MaxMovementSpeed = 10;
-    
     public float MinCameraDistance = 10f;
     public float MaxCameraDistance = 30f;
     public float CameraDistanceSpeed = 1f;
@@ -167,7 +165,6 @@ public class Player : MonoBehaviour {
     private readonly int _weaponTypeHash = Animator.StringToHash("weapon_type");
     private readonly int _lightAttackSpeedHash = Animator.StringToHash("attack_light_speed");
     private readonly int _heavyAttackSpeedHash = Animator.StringToHash("attack_heavy_speed");
-    private readonly int _movementSpeedHash = Animator.StringToHash("movement_speed");
 
     [Header("References")]
     [SerializeField] private UICanvas _uiCanvas;
@@ -205,7 +202,6 @@ public class Player : MonoBehaviour {
         Instance = this;
 
         LivingEntity.OnDeath.AddListener(onDeath);
-        MovementSpeed.OnValueChanged.AddListener(onMovementSpeedChanged);
         
         _cameraDistance = MinCameraDistance;
 
@@ -251,7 +247,8 @@ public class Player : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        Animator.SetFloat(_speedHash, _currentSpeed / MaxMovementSpeed);
+        // Magiczna liczba to predkosc animacji biegu
+        Animator.SetFloat(_speedHash, _currentSpeed / 6);
         Animator.SetFloat(_lightAttackSpeedHash, Instance.LightAttackSpeed);
         Animator.SetFloat(_heavyAttackSpeedHash, Instance.HeavyAttackSpeed);
     }
@@ -295,7 +292,7 @@ public class Player : MonoBehaviour {
 
         switch (CurrentAnimationState) {
             case AnimationState.Locomotion:
-                return _movementInputVector.magnitude > 0.1f ? MaxMovementSpeed : 0;
+                return _movementInputVector.magnitude > 0.1f ? MovementSpeed : 0;
 
             case AnimationState.Attack_Windup:
             case AnimationState.Attack_Contact:
@@ -700,11 +697,6 @@ public class Player : MonoBehaviour {
         ModifierSystem.RegisterStat(ref DashSpeed);
         ModifierSystem.RegisterStat(ref DashCooldown);
         ModifierSystem.RegisterStat(ref DashDistance);
-    }
-
-    private void onMovementSpeedChanged() {
-        // Calculates movement speed multiplier
-        Animator.SetFloat(_movementSpeedHash, MovementSpeed / MaxMovementSpeed);
     }
 
     public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {

@@ -35,6 +35,7 @@ public class LivingEntity : MonoBehaviour {
     [Header("Events")]
     public UnityEvent OnDeath;
     public UnityEvent<DamageTakenEventData> OnDamageTaken;
+    public UnityEvent<float> OnStunned; // float - stun duration
 
     // State
     private List<EffectData> _activeEffects = new List<EffectData>();
@@ -74,14 +75,6 @@ public class LivingEntity : MonoBehaviour {
 
     public void Attack(Damage damage, LivingEntity target) {
         target.takeDamage(damage, this);
-    }
-
-    private static IEnumerator slowDown() {
-        Time.timeScale = 0f;
-        Debug.Log("Slowing down time for 0.1 seconds");
-        yield return new WaitForSecondsRealtime(0.04f);
-        Debug.Log("Resuming time");
-        Time.timeScale = 1f;
     }
 
     private void takeDamage(Damage damage, LivingEntity source = null) {
