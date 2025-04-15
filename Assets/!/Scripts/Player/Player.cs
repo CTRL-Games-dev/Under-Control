@@ -130,11 +130,9 @@ public class Player : MonoBehaviour {
     }
 
     [Header("Consumable")]
-    [SerializeField]
-    public ConsumableItemData ConsumableItemOne;
+    public InventoryItem ConsumableItemOne = null;
 
-    [SerializeField]
-    public ConsumableItemData ConsumableItemTwo;
+    public InventoryItem ConsumableItemTwo = null;
 
     [SerializeField]
     public Cooldown ConsumableCooldown = new Cooldown(0.5f);
@@ -152,6 +150,7 @@ public class Player : MonoBehaviour {
     public UnityEvent ItemRotateEvent;
     public UnityEvent<EvoUI> OnEvolutionSelected = new();
     public UnityEvent<int> CoinsChangeEvent;
+    public UnityEvent UpdateConsumablesEvent;
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
@@ -339,15 +338,38 @@ public class Player : MonoBehaviour {
     void OnUseConsumableOne(InputValue value) {
         if(ConsumableItemOne == null) return;
         if(!ConsumableCooldown.Execute()) return;
+        if(ConsumableItemOne.Amount <= 0) return;
 
-        ConsumableItemOne.Consume(LivingEntity);
+        ConsumableItemData c =  ConsumableItemOne.ItemData as ConsumableItemData;
+
+        if(c == null) return;
+        c.Consume(LivingEntity);
+        ConsumableItemOne.Amount--;
+
+        if (ConsumableItemOne.Amount <= 0) {
+            ConsumableItemOne.ItemData = null;
+        }
+
+        UICanvas.HUDCanvas.UseConsumable1();
+        UpdateConsumablesEvent?.Invoke();
     }
 
     void OnUseConsumableTwo(InputValue value) {
         if(ConsumableItemTwo == null) return;
         if(!ConsumableCooldown.Execute()) return;
+        if(ConsumableItemTwo.Amount <= 0) return;
 
-        ConsumableItemTwo.Consume(LivingEntity);
+        ConsumableItemData c =  ConsumableItemTwo.ItemData as ConsumableItemData;
+        
+        if(c == null) return;
+        c.Consume(LivingEntity);
+        ConsumableItemTwo.Amount--;
+        if (ConsumableItemTwo.Amount <= 0) {
+            ConsumableItemTwo.ItemData = null;
+        }
+
+        UICanvas.HUDCanvas.UseConsumable2();
+        UpdateConsumablesEvent?.Invoke();
     }
 
     void OnMove(InputValue value) {
