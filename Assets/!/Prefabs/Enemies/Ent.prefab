@@ -226,29 +226,13 @@ MonoBehaviour:
   Guild: {fileID: 11400000, guid: 734b0a650a008d14ab9d8696640c3a05, type: 2}
   DropItemsOnDeath: 1
   TimeToRegenAfterDamage: 2
-  Exp: 0
-  DroppedExpMultiplier: 1
   DestroyOnDeath: 1
-  Health: 100
-  Mana: 100
+  _startingHealth: 100
+  _startingMana: 100
   MaxHealth:
     _raw: 100
     _adjusted: 100
     _initValue: 100
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  HealthRegenRate:
-    _raw: 1
-    _adjusted: 1
-    _initValue: 1
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  ManaRegenRate:
-    _raw: 1
-    _adjusted: 1
-    _initValue: 1
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
@@ -284,6 +268,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
+  OnStunned:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &5458015506996832666
@@ -322,7 +309,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4141503403699130468}
   m_Enabled: 1
-  m_AgentTypeID: -1372625422
+  m_AgentTypeID: 0
   m_Radius: 1
   m_Speed: 3.5
   m_Acceleration: 8
