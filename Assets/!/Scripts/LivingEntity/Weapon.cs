@@ -13,14 +13,10 @@ public class Weapon : MonoBehaviour {
     [SerializeField] private ParticleSystem _minorTrail;
     [SerializeField] private GameObject _minorTrailObject;
 
-    void Start() {
-        DisableHitbox();
-    }
-
     public void OnTriggerEnter(Collider other) {
         LivingEntity victim = other.GetComponentInParent<LivingEntity>(includeInactive: true);
 
-        // Debug.Log($"Hitbox hit {victim} by {GetComponentInParent<LivingEntity>()}");
+        Debug.Log($"Hitbox hit {victim} by {GetComponentInParent<LivingEntity>()}");
 
         if(victim == null) return;
 

@@ -60,8 +60,6 @@ MonoBehaviour:
   WeaponHolder: {fileID: 7325248888980292534}
   PrimaryAttackWeapon: {fileID: 11400000, guid: 9173602b75e548144affb6902ca69630, type: 2}
   ChargeAttackWeapon: {fileID: 11400000, guid: bdb86404e6f3f3e4ea8d1356a2e9136a, type: 2}
-  PrimaryAttackCooldown:
-    CooldownTime: 1
 --- !u!114 &774350751942770471
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -270,6 +268,7 @@ MonoBehaviour:
   - rid: 66372152999281401
   - rid: 66372178578768466
   - rid: 66372240719479674
+  - rid: 8155108857593463546
   m_IsInitialised: 0
   m_IsStarted: 0
   references:
@@ -298,7 +297,15 @@ MonoBehaviour:
           m_Value0: 10149414230425188516
           m_Value1: 17553428434321282803
         Name: ChargingDistance
-        m_Value: 7
+        m_Value: 10
+    - rid: 8155108857593463546
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 12828204401175963333
+          m_Value1: 6865838896028614789
+        Name: ChargingInterestedRange
+        m_Value: 13
 --- !u!114 &944497780338279808
 MonoBehaviour:
   m_ObjectHideFlags: 0
