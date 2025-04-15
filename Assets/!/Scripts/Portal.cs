@@ -10,20 +10,32 @@ public abstract class Portal : MonoBehaviour
     [SerializeField] private GameObject _portalInside;
     [SerializeField] private BoxCollider _collider;
     public UnityEvent<Dimension> PlayerEnteredPortal;
+    [SerializeField] private Renderer[] _portalInsideRenderers;
     [HideInInspector] public float Influence;
 
-    void Start()
-    {
+    private void Awake() {
+        _portalInsideRenderer = _portalInside.GetComponent<Renderer>();        
+    }
+
+    void Start() {
         setInfluence();
+    }
+
+    protected void FixedUpdate() {
+        if (_portalInsideRenderers.Length == 0) return;
+
+        float xOffset = Mathf.Sin(Time.time) * 0.2f;
+        float yOffset = Mathf.Cos(Time.time) * 0.2f;
+        
+        foreach (Renderer r in _portalInsideRenderers) {
+            r.material.mainTextureOffset = new Vector2(xOffset, yOffset);
+        }
     }
 
     protected abstract void setInfluence();
 
     private Renderer _portalInsideRenderer;
 
-    void Start() {
-        _portalInsideRenderer = _portalInside.GetComponent<Renderer>();
-    }
 
     void OnTriggerEnter(Collider other) {
         Debug.Log("Player entered portal to: " + _dimension.ToString());
