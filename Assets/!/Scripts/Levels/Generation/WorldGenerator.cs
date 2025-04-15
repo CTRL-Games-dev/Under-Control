@@ -221,17 +221,9 @@ public class WorldGenerator : MonoBehaviour {
                 currentNode.Location.ConnectedLocations.Add(neighbour.Location);
 
                 if(neighbour.AlreadyPlaced) continue;
-                
-
-
-                // Distance between centers of both locations
-                Vector2 diff = new(
-                    (currentNode.Location.Width / 2) + (neighbour.Location.Width / 2),
-                     (currentNode.Location.Height / 2) + (neighbour.Location.Height / 2)
-                    );
 
                 // Additional padding for distance between locations
-                diff += new Vector2(20,20);
+                Vector2 diff = new Vector2(60,60);
                 
                 // This is very important.
                 // Diff by default applies to all axis and can only have positive value.
@@ -254,7 +246,7 @@ public class WorldGenerator : MonoBehaviour {
             if(node.Location.GetTopLeftCorner().y < minY) minY = node.Location.GetTopLeftCorner().y;  
         }
 
-        int padding = 50;
+        int padding = 60;
         maxX += padding;
         maxY += padding;
         minX -= padding;
@@ -354,20 +346,20 @@ public class WorldGenerator : MonoBehaviour {
             }
         }
 
-        int num = 0;
+        // int num = 0;
         foreach(var path in uniquePaths)
         {
-            Debug.Log("=== LINE " + num + " ===");
+            // Debug.Log("=== LINE " + num + " ===");
 
-            Debug.Log("First point " + path.Point1);
-            Debug.Log("Second point " + path.Point2);
+            // Debug.Log("First point " + path.Point1);
+            // Debug.Log("Second point " + path.Point2);
 
-            num++;
+            // num++;
             Vector2 point1 = path.Point1.x < path.Point2.x ? path.Point1 : path.Point2;
             Vector2 point2 = path.Point1.x >= path.Point2.x ? path.Point1 : path.Point2;
 
-            Debug.Log("First point " + point1);
-            Debug.Log("Second point " + point2);
+            // Debug.Log("First point " + point1);
+            // Debug.Log("Second point " + point2);
 
             int thickness = UnityEngine.Random.Range(20, 21);
 
@@ -381,7 +373,7 @@ public class WorldGenerator : MonoBehaviour {
                 yLength = yLength < 1 ? 1 : yLength; // yLength cannot be smaller than 1
                 int ySymbol = a > 0 ? 1 : -1;
 
-                Debug.LogFormat("yLen = {0}, a = {1}, b = {2}", yLength, a, b);
+                // Debug.LogFormat("yLen = {0}, a = {1}, b = {2}", yLength, a, b);
 
                 for(int ix = (int)Math.Floor(point1.x); ix < (int)Math.Floor(point2.x); ix++)
                 {
@@ -406,7 +398,6 @@ public class WorldGenerator : MonoBehaviour {
             }
             else
             {
-                Debug.Log("Dupa");
                 // Handle vertical line separately
                 int startY = Mathf.FloorToInt(Mathf.Min(point1.y, point2.y));
                 int endY = Mathf.FloorToInt(Mathf.Max(point1.y, point2.y));

@@ -25,8 +25,8 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public GameDifficulty Difficulty { get; private set; }
     [HideInInspector]  public Dimension CurrentDimension { get; private set; }
     [Range(0, 1)]
-    [HideInInspector]  public float TotalInfluence {get; private set; }
-    [HideInInspector]  public float InfluenceDelta {get; private set; }
+    public float TotalInfluence {get; private set; }
+    public float InfluenceDelta {get; private set; }
 
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
@@ -62,9 +62,17 @@ public class GameManager : MonoBehaviour {
 
     public void ChangeDimension(Dimension dimension, float newInfluence)
     {
+        Debug.Log($"New influence: {newInfluence}");
+        if(newInfluence <= TotalInfluence)
+        {
+            Debug.LogError("New influence is smaller that previous influence!");
+        }
+
         CurrentDimension = dimension;
         InfluenceDelta = newInfluence - TotalInfluence;
         TotalInfluence = newInfluence;
+
+        Debug.Log($"Influence delta: {InfluenceDelta}");
 
         Debug.Log("Loading new scene: " + CurrentDimension.ToString());
 

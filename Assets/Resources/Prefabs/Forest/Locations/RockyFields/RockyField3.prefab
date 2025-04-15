@@ -31,6 +31,7 @@ Transform:
   m_Children:
   - {fileID: 7126796370664396706}
   - {fileID: 5061148623969107988}
+  - {fileID: 940679549236129258}
   m_Father: {fileID: 1998973436841956113}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1323788137657761978
@@ -371,7 +372,6 @@ GameObject:
   - component: {fileID: 3616457168340162411}
   - component: {fileID: 3395872064586831231}
   - component: {fileID: 5315511650625251396}
-  - component: {fileID: 2111413430297658857}
   m_Layer: 0
   m_Name: RockyField3
   m_TagString: Untagged
@@ -396,7 +396,6 @@ Transform:
   - {fileID: 5623490272620873452}
   - {fileID: 1331042509071344312}
   - {fileID: 6839124241341242379}
-  - {fileID: 940679549236129258}
   - {fileID: 8605096548340663394}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -436,8 +435,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.9495678, y: 1, z: 2.9587367}
-  m_Center: {x: -0.003374863, y: 0, z: -0.004531352}
+  m_Size: {x: 2.8311834, y: 1, z: 2.7111263}
+  m_Center: {x: 0.009085846, y: 0, z: 0.01459338}
 --- !u!114 &5315511650625251396
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -455,25 +454,10 @@ MonoBehaviour:
   MaxExitsAtOnce: 4
   SpawnPointsParent: {fileID: 8605096548340663394}
   SpawnPoints: []
-  Waves: []
+  Waves:
+  - {fileID: 11400000, guid: 133bb9471cf3cd23bb49585f8c0157ed, type: 2}
   WaveNumber: 0
   EnemyCount: 0
---- !u!114 &2111413430297658857
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6317135611276971681}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55743b6d1075688deb8fb313b178a8d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  RandomizeTrees: 1
-  RandomizeRocks: 1
-  TreeHolder: {fileID: 0}
-  RockHolder: {fileID: 0}
 --- !u!1 &6929810418271841151
 GameObject:
   m_ObjectHideFlags: 0
@@ -1860,7 +1844,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1998973436841956113}
+    m_TransformParent: {fileID: 6839124241341242379}
     m_Modifications:
     - target: {fileID: 669698340248128330, guid: 5b3418bce72802645a0524798221152a, type: 3}
       propertyPath: m_Name
@@ -1868,15 +1852,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5515505694135943043, guid: 5b3418bce72802645a0524798221152a, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.29
+      value: 0.29000002
       objectReference: {fileID: 0}
     - target: {fileID: 5515505694135943043, guid: 5b3418bce72802645a0524798221152a, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.29
+      value: 0.29000002
       objectReference: {fileID: 0}
     - target: {fileID: 5515505694135943043, guid: 5b3418bce72802645a0524798221152a, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.29
+      value: 0.29000002
       objectReference: {fileID: 0}
     - target: {fileID: 5515505694135943043, guid: 5b3418bce72802645a0524798221152a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1888,7 +1872,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5515505694135943043, guid: 5b3418bce72802645a0524798221152a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.832
+      value: -0.8320001
       objectReference: {fileID: 0}
     - target: {fileID: 5515505694135943043, guid: 5b3418bce72802645a0524798221152a, type: 3}
       propertyPath: m_LocalRotation.w

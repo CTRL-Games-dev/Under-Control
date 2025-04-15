@@ -91,17 +91,13 @@ public class EnemySpawner : MonoBehaviour
             int randomIndex = UnityEngine.Random.Range(0, currentWave.EnemyInfo.Count);
             EnemySpawnInfo enemy = currentWave.EnemyInfo[randomIndex];
 
-            int firstEnemiesDelay = 3;
-            int delayBetweenSpawns = 1;
-            
-            if(batch != 0)
-            {
-                StartCoroutine(spawnEnemy(enemy.EnemyPrefab, spawnPoint.position, (delayBetweenSpawns*batch)-1 + firstEnemiesDelay, delayBetweenSpawns));
-            }
-            else
-            {
-                StartCoroutine(spawnEnemy(enemy.EnemyPrefab, spawnPoint.position, 0, firstEnemiesDelay));
-            }
+            float firstBatchDelay = 3f;
+            float delayBetweenEach = 1f;
+
+            // Total delay = initial delay + time based on batch index
+            float totalSmokeDelay = firstBatchDelay + (batch * delayBetweenEach);
+
+            StartCoroutine(spawnEnemy(enemy.EnemyPrefab, spawnPoint.position, totalSmokeDelay, delayBetweenEach));
         }
 
         EnemyCount = numberOfEnemies;
