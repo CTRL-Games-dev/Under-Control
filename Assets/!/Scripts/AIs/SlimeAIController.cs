@@ -65,6 +65,8 @@ public class SlimeAIController : MonoBehaviour {
             }
         }
 
+        if(corners.Count == 1) return;
+
         Vector3 closestCorner = corners[1];
         Vector3 cornerDirection = closestCorner - transform.position;
         float cornerDistance = cornerDirection.magnitude;
@@ -133,6 +135,7 @@ public class SlimeAIController : MonoBehaviour {
         float baseY = Mathf.Lerp(_startingPoint.Value.y, _destinationPoint.Value.y, progress);
 
         //
+        // Debug.Log($"Jump speed: {jumpSpeed} | Arc: {arc} | BaseY: {baseY} | Progress: {progress}");
 
         transform.position = new Vector3(nextPosFlat.x, baseY + arc, nextPosFlat.y);
 

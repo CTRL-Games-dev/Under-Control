@@ -46,6 +46,59 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Self: {fileID: 1259368281537823718}
   PreventSelfDamage: 1
+--- !u!1 &1274206853137930167
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8580386617105963349}
+  - component: {fileID: 4248762910866899357}
+  m_Layer: 10
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8580386617105963349
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274206853137930167}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4296666173679900469}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &4248762910866899357
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274206853137930167}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.25, y: 2, z: 1.25}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &8136527368806167904
 GameObject:
   m_ObjectHideFlags: 0
@@ -63,6 +116,7 @@ GameObject:
   - component: {fileID: 8528608844679578767}
   - component: {fileID: 521736618556922946}
   - component: {fileID: 2067770035702373121}
+  - component: {fileID: 4752538227665094709}
   m_Layer: 0
   m_Name: Slime
   m_TagString: Untagged
@@ -84,6 +138,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7375074307627776715}
+  - {fileID: 8580386617105963349}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &7991884007475633377
@@ -164,24 +219,24 @@ MonoBehaviour:
   Guild: {fileID: 11400000, guid: 734b0a650a008d14ab9d8696640c3a05, type: 2}
   DropItemsOnDeath: 1
   TimeToRegenAfterDamage: 2
-  Exp: 0
-  DroppedExpMultiplier: 1
   DestroyOnDeath: 1
-  Health:
-    _raw: 1000
-    _adjusted: 100
-    _initValue: 100
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
+  Health: 50
+  Mana: 100
   MaxHealth:
-    _raw: 1000
+    _raw: 50
     _adjusted: 100
     _initValue: 100
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
-  RegenRate:
+  HealthRegenRate:
+    _raw: 1
+    _adjusted: 1
+    _initValue: 1
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  ManaRegenRate:
     _raw: 1
     _adjusted: 1
     _initValue: 1
@@ -206,6 +261,13 @@ MonoBehaviour:
     _raw: 1
     _adjusted: 1
     _initValue: 1
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  MaxMana:
+    _raw: 100
+    _adjusted: 100
+    _initValue: 100
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
@@ -291,6 +353,33 @@ MonoBehaviour:
   JumpCooldown:
     CooldownTime: 0.5
   AngularSpeed: 200
+--- !u!54 &4752538227665094709
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8136527368806167904}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &7049046558909537568
 PrefabInstance:
   m_ObjectHideFlags: 0

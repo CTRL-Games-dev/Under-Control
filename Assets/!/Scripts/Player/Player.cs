@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using Unity.Cinemachine;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -130,6 +129,14 @@ public class Player : MonoBehaviour {
         }
     }
 
+    [Header("Consumable")]
+    public InventoryItem ConsumableItemOne = null;
+
+    public InventoryItem ConsumableItemTwo = null;
+
+    [SerializeField]
+    public Cooldown ConsumableCooldown = new Cooldown(0.5f);
+
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
     public WeaponItemData CurrentWeapon { get => Inventory.Weapon; }
@@ -143,6 +150,7 @@ public class Player : MonoBehaviour {
     public UnityEvent ItemRotateEvent;
     public UnityEvent<EvoUI> OnEvolutionSelected = new();
     public UnityEvent<int> CoinsChangeEvent;
+    public UnityEvent UpdateConsumablesEvent;
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
@@ -179,17 +187,10 @@ public class Player : MonoBehaviour {
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
 
-
     private Vector3 _queuedRotation;
-    
 
     #region Unity Methods
     void Awake() {
-        #if UNITY_EDITOR // zeby mi nie szumial laptop
-            QualitySettings.vSyncCount = 0;  // VSync must be disabled
-            Application.targetFrameRate = 30;
-        #endif
-
         DontDestroyOnLoad(gameObject);
         if (Instance != null && Instance != this) {
             Destroy(gameObject);
@@ -290,7 +291,6 @@ public class Player : MonoBehaviour {
         }
     }
 
-
     private float getGoalSpeed() {
         if (InputDisabled) return 0;
 
@@ -308,7 +308,6 @@ public class Player : MonoBehaviour {
         return 0;
     }
 
-
     private void handleRotation() {
         if (LockRotation) return;
         if (_movementInputVector.magnitude > 0.1f) {
@@ -316,7 +315,6 @@ public class Player : MonoBehaviour {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
         }
     }
-
 
     private void onDeath() {
         UICanvas.ChangeUITopState(UITopState.Death);
@@ -335,6 +333,43 @@ public class Player : MonoBehaviour {
 
     void OnCastSpellThree(InputValue value) {
         _spellDataThree.TryCast(LivingEntity);
+    }
+
+    void OnUseConsumableOne(InputValue value) {
+        if(ConsumableItemOne == null) return;
+        if(!ConsumableCooldown.Execute()) return;
+        if(ConsumableItemOne.Amount <= 0) return;
+
+        ConsumableItemData c =  ConsumableItemOne.ItemData as ConsumableItemData;
+
+        if(c == null) return;
+        c.Consume(LivingEntity);
+        ConsumableItemOne.Amount--;
+
+        if (ConsumableItemOne.Amount <= 0) {
+            ConsumableItemOne.ItemData = null;
+        }
+
+        UICanvas.HUDCanvas.UseConsumable1();
+        UpdateConsumablesEvent?.Invoke();
+    }
+
+    void OnUseConsumableTwo(InputValue value) {
+        if(ConsumableItemTwo == null) return;
+        if(!ConsumableCooldown.Execute()) return;
+        if(ConsumableItemTwo.Amount <= 0) return;
+
+        ConsumableItemData c =  ConsumableItemTwo.ItemData as ConsumableItemData;
+        
+        if(c == null) return;
+        c.Consume(LivingEntity);
+        ConsumableItemTwo.Amount--;
+        if (ConsumableItemTwo.Amount <= 0) {
+            ConsumableItemTwo.ItemData = null;
+        }
+
+        UICanvas.HUDCanvas.UseConsumable2();
+        UpdateConsumablesEvent?.Invoke();
     }
 
     void OnMove(InputValue value) {
@@ -482,9 +517,8 @@ public class Player : MonoBehaviour {
         // Default to attacking if no interaction was commited
         _queuedRotation = GetMousePosition() - transform.position;
         if(_isAttacking) {
-            
             return;
-        };
+        }
         
         if (!LockRotation) {
             transform.LookAt(GetMousePosition());
@@ -498,7 +532,7 @@ public class Player : MonoBehaviour {
             case InteractionType.Secondary:
                 performHeavyAttack();
                 break;
-        };
+        }
     }
 
     private bool tryInteract(InteractionType interactionType) {
@@ -524,13 +558,11 @@ public class Player : MonoBehaviour {
     }
 
     private void performLightAttack() {
-        WeaponHolder.InitializeAttack(AttackType.LIGHT);
         Animator.SetBool(_heavyAttackHash, false);
         Animator.SetTrigger(_lightAttackHash);
     }
 
     private void performHeavyAttack() {
-        WeaponHolder.InitializeAttack(AttackType.HEAVY);
         Animator.SetBool(_lightAttackHash, false);
         Animator.SetTrigger(_heavyAttackHash);
     }
@@ -539,7 +571,6 @@ public class Player : MonoBehaviour {
         WeaponHolder.UpdateWeapon(CurrentWeapon);
         Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.WeaponType ?? WeaponType.None));
     }
-
 
     public Vector3 GetMousePosition() {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
@@ -576,7 +607,7 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_Windup:
-                break;
+                break; 
 
             case AnimationState.Attack_Contact:
                 WeaponHolder.DisableHitbox();
@@ -588,7 +619,6 @@ public class Player : MonoBehaviour {
 
             case AnimationState.Attack_Recovery:
                 LockRotation = false;
-                WeaponHolder.EndAttack();
                 break;
         }
     }
@@ -603,7 +633,6 @@ public class Player : MonoBehaviour {
                 LockRotation = true;
                 _isAttacking = true;
                 _currentSpeed = 0;
-                WeaponHolder.BeginAttack();
                 break;
 
             case AnimationState.Attack_Contact:
@@ -619,6 +648,15 @@ public class Player : MonoBehaviour {
                 LockRotation = true;
                 break;
         }
+    }
+
+    public void OnAttackAnimationStart(AttackType attackType) {
+        WeaponHolder.InitializeAttack(attackType);
+        WeaponHolder.BeginAttack();
+    }
+
+    public void OnAttackAnimationEnd(AttackType _) {
+        WeaponHolder.EndAttack();
     }
 
     #endregion
