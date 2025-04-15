@@ -32,8 +32,6 @@ public partial class CheckAngleCondition : Condition
             angle = Mathf.Abs(angle);
         }
 
-        Debug.Log($"{ConditionUtils.Evaluate(angle, Operator, Threshold.Value)} {Operator.Value} {angle} {Threshold.Value}");
-
         return ConditionUtils.Evaluate(angle, Operator, Threshold.Value);
     }
 }
