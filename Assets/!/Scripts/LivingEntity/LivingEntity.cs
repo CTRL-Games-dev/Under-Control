@@ -23,8 +23,26 @@ public class LivingEntity : MonoBehaviour {
     public bool DestroyOnDeath = true;
 
     [Header("Stats")]
-    public float Health = 100;
-    public float Mana = 100f;
+    [SerializeField] 
+    private float _startingHealth = 100;
+    [SerializeField]
+    private float _startingMana = 100f;
+    private float _health = 0;
+    public float Health {
+        get => _health;
+        set {
+            _health = value;
+            if (_isPlayer) Player.UICanvas.HUDCanvas.UpdateHealthBar();
+        }
+    }
+    private float _mana = 100f;
+    public float Mana {
+        get => _mana;
+        set {
+            _mana = value;
+            if (_isPlayer) Player.UICanvas.HUDCanvas.UpdateManaBar();
+        }
+    }
    
     public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
     public Stat HealthRegenRate = new Stat(StatType.HEALTH_REGEN_RATE, 0);
@@ -49,6 +67,8 @@ public class LivingEntity : MonoBehaviour {
     public EntityInventory Inventory { get; private set; }
     public HitFlashAnimator HitFlashAnimator { get; private set; }
 
+    private bool _isPlayer = false;
+
     void Awake() {
         ModifierSystem = GetComponent<ModifierSystem>();
         Inventory = GetComponent<EntityInventory>();
@@ -60,6 +80,10 @@ public class LivingEntity : MonoBehaviour {
         ModifierSystem.RegisterStat(ref ElementalArmor);
         ModifierSystem.RegisterStat(ref MovementSpeed);
         ModifierSystem.RegisterStat(ref MaxMana);
+
+        _isPlayer = gameObject.GetComponent<Player>() != null;
+        _health = _startingHealth;
+        _mana = _startingMana;
     }
 
     void Update() {
