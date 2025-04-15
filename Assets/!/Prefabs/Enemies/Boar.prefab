@@ -43,6 +43,7 @@ Transform:
   m_Children:
   - {fileID: 6559264273061427110}
   - {fileID: 7495280357175526758}
+  - {fileID: 36042086885959320}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7394919420481039315
@@ -83,20 +84,6 @@ MonoBehaviour:
     _raw: 15
     _adjusted: 100
     _initValue: 100
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  HealthRegenRate:
-    _raw: 1
-    _adjusted: 1
-    _initValue: 1
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  ManaRegenRate:
-    _raw: 1
-    _adjusted: 1
-    _initValue: 1
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
@@ -245,11 +232,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.5, y: 2, z: 1.1}
+  m_Size: {x: 0.3, y: 2, z: 0.8}
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &4198091276035405759
 MonoBehaviour:
@@ -263,18 +250,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Graph: {fileID: 8078069181644382187, guid: 5a0ea431db4e168499496b34d0a3f2be, type: 2}
+  m_Graph: {fileID: 6484197610909628980, guid: 5a0ea431db4e168499496b34d0a3f2be, type: 2}
   m_BlackboardVariableOverridesList:
-  - rid: 66372152999281401
-  - rid: 66372178578768466
-  - rid: 66372240719479674
-  - rid: 8155108857593463546
+  - rid: 4560525000716845981
+  - rid: 4560525000716845982
+  - rid: 4560525000716845983
+  - rid: 4560525000716845984
+  - rid: 4560525001742090852
   m_IsInitialised: 0
   m_IsStarted: 0
   references:
     version: 2
     RefIds:
-    - rid: 66372152999281401
+    - rid: 4560525000716845981
       type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -282,15 +270,15 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 3366227734027736264}
-    - rid: 66372178578768466
+    - rid: 4560525000716845982
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
-          m_Value0: 2265413484952062061
-          m_Value1: 4070940651504048903
-        Name: DetectionRange
-        m_Value: 15
-    - rid: 66372240719479674
+          m_Value0: 12828204401175963333
+          m_Value1: 6865838896028614789
+        Name: ChargingInterestedRange
+        m_Value: 10
+    - rid: 4560525000716845983
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -298,14 +286,22 @@ MonoBehaviour:
           m_Value1: 17553428434321282803
         Name: ChargingDistance
         m_Value: 10
-    - rid: 8155108857593463546
+    - rid: 4560525000716845984
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
-          m_Value0: 12828204401175963333
-          m_Value1: 6865838896028614789
-        Name: ChargingInterestedRange
-        m_Value: 13
+          m_Value0: 2265413484952062061
+          m_Value1: 4070940651504048903
+        Name: DetectionRange
+        m_Value: 15
+    - rid: 4560525001742090852
+      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 1103610761703750975
+          m_Value1: 216533586867579016
+        Name: WallHitbox
+        m_Value: {fileID: 8487048513762263559}
 --- !u!114 &944497780338279808
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -328,8 +324,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: -0.0024745278
-      value: 0.2246964
+      time: 0
+      value: 0.1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -337,7 +333,7 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 1
+      time: 3
       value: 1
       inSlope: 0
       outSlope: 0
@@ -490,6 +486,100 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.6032457, z: 2}
   m_Center: {x: 0, y: 1.411623, z: 0}
+--- !u!1 &8487048513762263559
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 36042086885959320}
+  - component: {fileID: 8961537929052236914}
+  - component: {fileID: 2754360274329829290}
+  - component: {fileID: 1447326557600246681}
+  m_Layer: 0
+  m_Name: WallHitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &36042086885959320
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8487048513762263559}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.94}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 977731813342315884}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &8961537929052236914
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8487048513762263559}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.2, y: 0.2, z: 0.5}
+  m_Center: {x: 0, y: 0.6, z: 0}
+--- !u!54 &2754360274329829290
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8487048513762263559}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &1447326557600246681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8487048513762263559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79d6981d1afede546b9486fdc610605c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6669137702589419597
 PrefabInstance:
   m_ObjectHideFlags: 0

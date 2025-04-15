@@ -3,7 +3,7 @@ using Unity.Behavior;
 using UnityEngine;
 
 [Serializable, Unity.Properties.GeneratePropertyBag]
-[Condition(name: "Check Horizontal Angle", story: "horizontal Angle between [Source] and [Target] is [Operator] [Threshold] use absolute [Absolute]", category: "Conditions", id: "3c2e8409b0b35eb79d568d86faff1ed1")]
+[Condition(name: "Check Horizontal Angle", story: "horizontal angle between [Source] and [Target] is [Operator] [Threshold] use absolute [Absolute]", category: "Conditions", id: "3c2e8409b0b35eb79d568d86faff1ed1")]
 public partial class CheckAngleCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<Transform> Source;
@@ -31,6 +31,8 @@ public partial class CheckAngleCondition : Condition
         if(Absolute.Value) {
             angle = Mathf.Abs(angle);
         }
+
+        Debug.Log($"{ConditionUtils.Evaluate(angle, Operator, Threshold.Value)} {Operator.Value} {angle} {Threshold.Value}");
 
         return ConditionUtils.Evaluate(angle, Operator, Threshold.Value);
     }
