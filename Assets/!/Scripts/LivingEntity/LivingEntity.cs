@@ -45,8 +45,6 @@ public class LivingEntity : MonoBehaviour {
     }
    
     public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
-    public Stat HealthRegenRate = new Stat(StatType.HEALTH_REGEN_RATE, 0);
-    public Stat ManaRegenRate = new Stat(StatType.MANA_REGEN_RATE, 0);
     public Stat Armor = new Stat(StatType.ARMOR, 0);
     public Stat ElementalArmor = new Stat(StatType.ELEMENTAL_ARMOR, 0);
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
@@ -55,9 +53,9 @@ public class LivingEntity : MonoBehaviour {
     [Header("Events")]
     public UnityEvent OnDeath;
     public UnityEvent<DamageTakenEventData> OnDamageTaken;
+    public UnityEvent<float> OnStunned; // float - stun duration
 
     // State
-    private float _lastDamageTime = 0;
     private List<EffectData> _activeEffects = new List<EffectData>();
 
     private readonly int _hurtHash = Animator.StringToHash("hurt");
@@ -75,7 +73,6 @@ public class LivingEntity : MonoBehaviour {
         HitFlashAnimator = GetComponent<HitFlashAnimator>();
 
         ModifierSystem.RegisterStat(ref MaxHealth);
-        ModifierSystem.RegisterStat(ref HealthRegenRate);
         ModifierSystem.RegisterStat(ref Armor);
         ModifierSystem.RegisterStat(ref ElementalArmor);
         ModifierSystem.RegisterStat(ref MovementSpeed);
@@ -88,20 +85,6 @@ public class LivingEntity : MonoBehaviour {
 
     void Update() {
         recheckEffects();
-   
-        // Health regen
-        if(Time.time - _lastDamageTime > TimeToRegenAfterDamage) {
-            Health += HealthRegenRate * Time.deltaTime;
-            if(Health > MaxHealth) {
-                Health = MaxHealth;
-            }
-        }
-
-        // Mana regen
-        Mana += ManaRegenRate * Time.deltaTime;
-        if(Mana > MaxMana) {
-            Mana = MaxMana;
-        }
     }
 
     public void DropItem(InventoryItem item) {
@@ -118,14 +101,6 @@ public class LivingEntity : MonoBehaviour {
         target.takeDamage(damage, this);
     }
 
-    private static IEnumerator slowDown() {
-        Time.timeScale = 0f;
-        Debug.Log("Slowing down time for 0.1 seconds");
-        yield return new WaitForSecondsRealtime(0.04f);
-        Debug.Log("Resuming time");
-        Time.timeScale = 1f;
-    }
-
     private void takeDamage(Damage damage, LivingEntity source = null) {
         if (source.gameObject.CompareTag("Player")) {
             // StartCoroutine(nameof(slowDown));
@@ -136,8 +111,6 @@ public class LivingEntity : MonoBehaviour {
             gameObject.GetComponent<Animator>()?.SetTrigger(_hurtHash);
         }
 
-
-        _lastDamageTime = Time.time;
 
         // Check if entity is dead
         if(Health == 0) {
