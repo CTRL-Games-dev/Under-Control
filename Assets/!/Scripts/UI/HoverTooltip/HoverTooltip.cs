@@ -16,6 +16,8 @@ public class HoverTooltip : MonoBehaviour {
     }
 
     void FixedUpdate() {
+        if(!InputUtility.IsMousePositionAvailable()) return;
+       
         if (EventSystem.current.IsPointerOverGameObject()) {
             if (_lastHoveredGameObject != null) {
                 _lastHoveredGameObject = null;
