@@ -6198,6 +6198,7 @@ Transform:
   - {fileID: 1301075717094423770}
   - {fileID: 6547174382860265059}
   - {fileID: 1680530961393609627}
+  - {fileID: 3749826582555647716}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
 --- !u!114 &862517588485659023
@@ -6471,26 +6472,12 @@ MonoBehaviour:
   DropItemsOnDeath: 0
   TimeToRegenAfterDamage: 2
   DestroyOnDeath: 0
-  Health: 17
-  Mana: 12
+  _startingHealth: 20
+  _startingMana: 15
   MaxHealth:
     _raw: 100
     _adjusted: 100
     _initValue: 100
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  HealthRegenRate:
-    _raw: 0
-    _adjusted: 1
-    _initValue: 1
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  ManaRegenRate:
-    _raw: 0
-    _adjusted: 1
-    _initValue: 1
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
@@ -20080,6 +20067,59 @@ MonoBehaviour:
   m_FillOrigin: 1
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &2601160869794862040
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3749826582555647716}
+  - component: {fileID: 2562469177931392414}
+  m_Layer: 10
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3749826582555647716
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2601160869794862040}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 144433619801425869}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2562469177931392414
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2601160869794862040}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 2, z: 1}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &2639647563108611044
 GameObject:
   m_ObjectHideFlags: 0
@@ -41032,7 +41072,7 @@ GameObject:
   - component: {fileID: 8970042923754235561}
   - component: {fileID: 7383627835020710190}
   - component: {fileID: 8625786131296700281}
-  - component: {fileID: 3695742113990653086}
+  - component: {fileID: 7578973310726622407}
   m_Layer: 6
   m_Name: ItemInfoPanel
   m_TagString: Untagged
@@ -41185,7 +41225,7 @@ MonoBehaviour:
   _nameTextLocalizer: {fileID: 1838928249029021558}
   _rarityTextLocalizer: {fileID: 2595498167144179416}
   _descriptionTextLocalizer: {fileID: 5152448720020899987}
---- !u!225 &3695742113990653086
+--- !u!225 &7578973310726622407
 CanvasGroup:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

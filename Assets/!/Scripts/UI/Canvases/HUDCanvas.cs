@@ -45,20 +45,18 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
 
     private void Start() {
         Player.Instance.UpdateConsumablesEvent.AddListener(OnUpdateConsumables);
-    }
 
-
-    private void Update() {
         UpdateHealthBar();
         UpdateManaBar();
     }
 
-    private void UpdateHealthBar() {
+
+    public void UpdateHealthBar() {
         _healthBarImg.fillAmount = Player.LivingEntity.Health / Player.LivingEntity.MaxHealth;
         _healthText.text = $"{(int)Player.LivingEntity.Health}/{(int)Player.LivingEntity.MaxHealth}";
     }
 
-    private void UpdateManaBar() {
+    public void UpdateManaBar() {
         _manaBarImg.fillAmount = Player.Instance.Mana / Player.Instance.MaxMana;
         _manaText.text = $"{(int)Player.Instance.Mana}/{(int)Player.Instance.MaxMana}";
     }

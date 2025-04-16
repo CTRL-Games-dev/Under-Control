@@ -116,14 +116,6 @@ public struct Modifier {
                 } else {
                     return ModifierImpact.NEUTRAL;
                 }
-            case StatType.HEALTH_REGEN_RATE:
-                if (Value > 0) {
-                    return ModifierImpact.POSITIVE;
-                } else if (Value < 0) {
-                    return ModifierImpact.NEGATIVE;
-                } else {
-                    return ModifierImpact.NEUTRAL;
-                }
             default:
                 Debug.LogError($"Requested impact for stat type {StatType} but it is not implemented, returning NEUTRAL");
                 return ModifierImpact.NEUTRAL;

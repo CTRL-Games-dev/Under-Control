@@ -150,7 +150,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 8136527368806167904}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 1
   m_Speed: 3
   m_Acceleration: 3
   avoidancePriority: 50
@@ -220,26 +220,12 @@ MonoBehaviour:
   DropItemsOnDeath: 1
   TimeToRegenAfterDamage: 2
   DestroyOnDeath: 1
-  Health: 50
-  Mana: 100
+  _startingHealth: 100
+  _startingMana: 100
   MaxHealth:
     _raw: 50
     _adjusted: 100
     _initValue: 100
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  HealthRegenRate:
-    _raw: 1
-    _adjusted: 1
-    _initValue: 1
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  ManaRegenRate:
-    _raw: 1
-    _adjusted: 1
-    _initValue: 1
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
@@ -275,6 +261,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
+  OnStunned:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &8528608844679578767
