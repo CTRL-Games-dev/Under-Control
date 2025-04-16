@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ItemInfoPanel : MonoBehaviour
 {
@@ -8,11 +9,9 @@ public class ItemInfoPanel : MonoBehaviour
     [SerializeField] private TextLocalizer _nameTextLocalizer, _rarityTextLocalizer, _descriptionTextLocalizer;
 
     private RectTransform _rectTransform;
-    private CanvasGroup _canvasGroup;
 
     private void Awake() {
         _rectTransform = GetComponent<RectTransform>();
-        _canvasGroup = GetComponent<CanvasGroup>();
     }
     
     private void Update() {
@@ -25,29 +24,16 @@ public class ItemInfoPanel : MonoBehaviour
     }
 
     public void ShowItemInfo(ItemUI itemUI) {
-        if (gameObject.activeSelf) _canvasGroup.alpha = 0;
-
         gameObject.SetActive(itemUI != null);
         
         if (itemUI == null) return;
-        
-        _canvasGroup.alpha = 0;
 
         InventoryItem item = itemUI.InventoryItem;
-
-        
-
-        transform.position = new Vector2(
-            Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width), 
-            Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height, Screen.height)
-        );
-        _canvasGroup.alpha = 1;
 
         _nameTextLocalizer.Key = item.ItemData.DisplayName;
         _descriptionTextLocalizer.Key = item.ItemData.Description;
 
-        if (itemUI.InventoryItem.ItemData.GetType() == typeof(WeaponItemData)) {
-            WeaponItemData weaponItemData = (WeaponItemData)item.ItemData;
+        if (itemUI.InventoryItem.ItemData is WeaponItemData weaponItemData) {
             _lightAttackHolder.SetActive(true);
             _heavyAttackHolder.SetActive(true);
             _itemLightDamage.text = $"{weaponItemData.LightDamageMin} - {weaponItemData.LightDamageMax}";
@@ -58,7 +44,9 @@ public class ItemInfoPanel : MonoBehaviour
         }
 
         int value = item.ItemData.Value / 2;
-        if (itemUI.CurrentInventoryPanel != null && itemUI.CurrentInventoryPanel.IsSellerInventory) value *= 2;
+        if (itemUI.CurrentInventoryPanel != null && itemUI.CurrentInventoryPanel.IsSellerInventory) {
+            value *= 2;
+        }
 
         _itemValue.text = value + $" ({value * item.Amount})";
         _itemAmount.text = '×' + item.Amount.ToString();
