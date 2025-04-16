@@ -288,6 +288,8 @@ MonoBehaviour:
   m_Graph: {fileID: 8078069181644382187, guid: eb7dcd0c76c54264d96719725c9c340c, type: 2}
   m_BlackboardVariableOverridesList:
   - rid: 4560524960635289868
+  - rid: 4560525005210779974
+  - rid: 4560525005210779975
   m_IsInitialised: 0
   m_IsStarted: 0
   references:
@@ -301,6 +303,22 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 4141503403699130468}
+    - rid: 4560525005210779974
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 2265413484952062061
+          m_Value1: 4070940651504048903
+        Name: DetectionRange
+        m_Value: 2
+    - rid: 4560525005210779975
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 18166684473313673894
+          m_Value1: 11155060751079094850
+        Name: ChaseRange
+        m_Value: 15
 --- !u!195 &6443226412821821657
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -314,7 +332,7 @@ NavMeshAgent:
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
-  m_AngularSpeed: 70
+  m_AngularSpeed: 40
   m_StoppingDistance: 1
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
