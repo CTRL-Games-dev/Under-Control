@@ -11,8 +11,10 @@ public class AdventureManager : MonoBehaviour
     [SerializeField] private NavMeshSurface _navMeshSurface;
     private void Start()
     {
+        Player.Instance.enabled = false;
+
         var generator = GetComponent<WorldGenerator>();
-        generator.GenerateMap(GameManager.Instance.GetCurrentDimension());
+        generator.GenerateMap(GameManager.Instance.CurrentDimension);
         
         ForestPortalLocation portal = generator.Getlocation<ForestPortalLocation>();
 
@@ -20,6 +22,9 @@ public class AdventureManager : MonoBehaviour
 
         Player.Instance.MaxCameraDistance = 30f;
         Player.Instance.SetPlayerPosition(new Vector3(spawn.x, 1, spawn.y));
+
+        Player.Instance.enabled = true;
+        
         CameraManager.Instance.SwitchCamera(Player.Instance.TopDownCamera);
 
         _navMeshSurface.BuildNavMesh();
