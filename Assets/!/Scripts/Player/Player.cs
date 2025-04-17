@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.VFX;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Animator))]
@@ -15,7 +13,6 @@ using UnityEngine.VFX;
 [RequireComponent(typeof(LivingEntity))]
 [RequireComponent(typeof(HumanoidInventory))]
 public class Player : MonoBehaviour {
-    [SerializeField] private float _gameSped = 1f;
     [Serializable]
     private struct SpellData {
         public Spell Spell;
@@ -186,9 +183,6 @@ public class Player : MonoBehaviour {
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
 
-
-    public GameObject[] Slashes;
-
     private Vector3 _queuedRotation;
 
     #region Unity Methods
@@ -198,9 +192,7 @@ public class Player : MonoBehaviour {
             Destroy(gameObject);
             return;
         }
-
-        Time.timeScale = _gameSped;
-
+        
         LivingEntity = GetComponent<LivingEntity>();
         ModifierSystem = GetComponent<ModifierSystem>();
         CharacterController = GetComponent<CharacterController>();
@@ -578,7 +570,7 @@ public class Player : MonoBehaviour {
 
     public Vector3 GetMousePosition() {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit)) {
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _groundLayerMask)) {
             Vector3 point = hit.point;
             point.y = transform.position.y;
             return point;
@@ -600,10 +592,7 @@ public class Player : MonoBehaviour {
         Attack_Recovery
     }
 
-    private int _lastSlashId = -1;
-
-    public void SetAnimationState(AnimationState state, int slashId = -1) {
-        _lastSlashId = slashId;
+    public void SetAnimationState(AnimationState state) {
         exitAnimationState(CurrentAnimationState);
         enterAnimationState(state);
     }
@@ -619,7 +608,6 @@ public class Player : MonoBehaviour {
             case AnimationState.Attack_Contact:
                 WeaponHolder.DisableHitbox();
                 _isAttacking = false;
-                
                 break;
 
             case AnimationState.Attack_ComboWindow:
@@ -635,7 +623,6 @@ public class Player : MonoBehaviour {
         CurrentAnimationState = state;
         switch (state) {
             case AnimationState.Locomotion:
-                LockRotation = false;
                 break;
 
             case AnimationState.Attack_Windup:
@@ -645,16 +632,12 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_Contact:
-                if (_lastSlashId >= 0) {
-                    Slashes[_lastSlashId].SetActive(true);
-                }
+                WeaponHolder.EnableHitbox();
                 break;
 
             case AnimationState.Attack_ComboWindow:
                 LockRotation = false;
-                if (_lastSlashId >= 0) {
-                    Slashes[_lastSlashId].SetActive(false);
-                }
+                transform.LookAt(GetMousePosition());
                 break;
 
             case AnimationState.Attack_Recovery:
