@@ -22,10 +22,8 @@ public class LivingEntity : MonoBehaviour {
     public bool DestroyOnDeath = true;
 
     [Header("Stats")]
-    [SerializeField] 
-    private float _startingHealth = 100;
-    [SerializeField]
-    private float _startingMana = 100f;
+    public float StartingHealth = 100;
+    public float StartingMana = 100f;
     private float _health = 0;
     public float Health {
         get => _health;
@@ -78,8 +76,8 @@ public class LivingEntity : MonoBehaviour {
         ModifierSystem.RegisterStat(ref MaxMana);
 
         _isPlayer = gameObject.GetComponent<Player>() != null;
-        _health = _startingHealth;
-        _mana = _startingMana;
+        _health = StartingHealth;
+        _mana = StartingMana;
     }
 
     void Update() {

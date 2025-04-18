@@ -11,7 +11,6 @@ public class LoadingScreen : MonoBehaviour
     public static LoadingScreen Instance;
     [SerializeField] private GameObject _imageGO;
     [SerializeField] private Image _image;
-    [SerializeField] private Image _fillImage;
     [SerializeField] private List<Sprite> _sprites;
     private CanvasGroup _canvasGroup;
     public static bool IsLoading = false;
@@ -39,9 +38,9 @@ public class LoadingScreen : MonoBehaviour
         Instance._canvasGroup.alpha = 0;
         Instance._imageGO.SetActive(true);
         IsLoading = true;
+        Instance.StartCoroutine(Instance.animateImages());
         Instance._canvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => Instance.StartCoroutine(Instance.loadSceneAsync(sceneName))); 
         Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
-        Instance.StartCoroutine(Instance.animateImages());
     }
 
 
@@ -49,7 +48,6 @@ public class LoadingScreen : MonoBehaviour
         AsyncOperation operation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName);
 
         while (!operation.isDone) {
-            _fillImage.fillAmount = Mathf.Clamp01(operation.progress / 0.9f);
 
             if (operation.progress >= 0.9f) {
                 yield return new WaitForSeconds(0.5f);
