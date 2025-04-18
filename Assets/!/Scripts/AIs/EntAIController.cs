@@ -20,8 +20,6 @@ public class EntAIController : MonoBehaviour {
 
     private Animator _animator;
     private NavMeshAgent _navMeshAgent;
-    private BehaviorGraphAgent _behaviorGraphAgent;
-    private LivingEntity _livingEntity;
 
     private static readonly int _isRealHash = Animator.StringToHash("isReal");
     private static readonly int _speedHash = Animator.StringToHash("speed");
@@ -29,8 +27,6 @@ public class EntAIController : MonoBehaviour {
     void Awake() {
         _animator = GetComponent<Animator>();
         _navMeshAgent = GetComponent<NavMeshAgent>();
-        _behaviorGraphAgent = GetComponent<BehaviorGraphAgent>();
-        _livingEntity = GetComponent<LivingEntity>();
 
         RealEnt.SetActive(false);
         FakeEnt.SetActive(true);
@@ -54,13 +50,6 @@ public class EntAIController : MonoBehaviour {
     public void MorphToFake() {
         _animator.SetBool(_isRealHash, false);
         _animator.SetFloat(_speedHash, 0);
-      
-        RealEnt.SetActive(false);
-        FakeEnt.SetActive(true);
-
-        if(_navMeshAgent.isOnNavMesh) {
-            _navMeshAgent.ResetPath();
-        }
     }
 
     public void OnRightHandAttackStart() {
@@ -83,5 +72,14 @@ public class EntAIController : MonoBehaviour {
     public void OnLeftHandAttackEnd() {
         LeftWeaponHolder.EndAttack();
         LeftWeaponHolder.DisableHitbox();
+    }
+
+    public void OnDisappearEnded() {
+        RealEnt.SetActive(false);
+        FakeEnt.SetActive(true);
+
+        if(_navMeshAgent.isOnNavMesh) {
+            _navMeshAgent.ResetPath();
+        }
     }
 }

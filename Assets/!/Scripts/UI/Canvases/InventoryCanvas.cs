@@ -343,7 +343,13 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
             _armorSlotsRects[1].DOScale(1, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.OutBack);
             _armorSlotsCanvasGroups[1].DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
                 _armorSlotsRects[2].DOScale(1, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.OutBack);
-                _armorSlotsCanvasGroups[2].DOFade(1, fadeSpeed * Settings.AnimationSpeed);
+                _armorSlotsCanvasGroups[2].DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+                    _armorSlotsRects[3].DOScale(1, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.OutBack);
+                    _armorSlotsCanvasGroups[3].DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+                        _armorSlotsRects[4].DOScale(1, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.OutBack);
+                        _armorSlotsCanvasGroups[4].DOFade(1, fadeSpeed * Settings.AnimationSpeed);
+                    });
+                });
             });
         });
         
@@ -366,7 +372,13 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
             _armorSlotsCanvasGroups[1].DOFade(0, fadeSpeed * Settings.AnimationSpeed);
             _armorSlotsRects[1].DOScale(0, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.InBack).OnComplete(() => {
                 _armorSlotsCanvasGroups[2].DOFade(0, fadeSpeed * Settings.AnimationSpeed);
-                _armorSlotsRects[2].DOScale(0, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.InBack);
+                _armorSlotsRects[2].DOScale(0, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.InBack).OnComplete(() => {
+                    _armorSlotsCanvasGroups[3].DOFade(0, fadeSpeed * Settings.AnimationSpeed);
+                    _armorSlotsRects[3].DOScale(0, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.InBack).OnComplete(() => {
+                        _armorSlotsCanvasGroups[4].DOFade(0, fadeSpeed * Settings.AnimationSpeed);
+                        _armorSlotsRects[4].DOScale(0, scaleSpeed * Settings.AnimationSpeed).SetEase(Ease.InBack);
+                    });
+                });
             });
         });        
 

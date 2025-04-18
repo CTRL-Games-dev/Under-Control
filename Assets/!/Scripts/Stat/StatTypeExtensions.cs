@@ -5,8 +5,6 @@ public static class StatTypeExtensions {
         switch (statType) {
             case StatType.MAX_HEALTH:
                 return "Max Health";
-            case StatType.HEALTH_REGEN_RATE:
-                return "Regen Rate";
             case StatType.ARMOR:
                 return "Armor";
             case StatType.ELEMENTAL_ARMOR:
