@@ -3,6 +3,7 @@ using System.Linq;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.VFX;
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(NavMeshAgent))]
@@ -17,6 +18,9 @@ public class EntAIController : MonoBehaviour {
     [Header("Ents")]
     public GameObject RealEnt;
     public GameObject FakeEnt;
+
+    [Header("VFX")]
+    public VisualEffect MorphVFX;
 
     private Animator _animator;
     private NavMeshAgent _navMeshAgent;
@@ -36,20 +40,25 @@ public class EntAIController : MonoBehaviour {
     }
 
     public void MorphToReal() {
+        MorphVFX.Play();
+
         _animator.SetBool(_isRealHash, true);
         _animator.SetFloat(_speedHash, 0);
 
-        RealEnt.SetActive(true);
-        FakeEnt.SetActive(false);
- 
         if(_navMeshAgent.isOnNavMesh) {
             _navMeshAgent.ResetPath();
         }
     }
 
     public void MorphToFake() {
+        MorphVFX.Play();
+
         _animator.SetBool(_isRealHash, false);
         _animator.SetFloat(_speedHash, 0);
+    
+        if(_navMeshAgent.isOnNavMesh) {
+            _navMeshAgent.ResetPath();
+        }
     }
 
     public void OnRightHandAttackStart() {
@@ -74,12 +83,28 @@ public class EntAIController : MonoBehaviour {
         LeftWeaponHolder.DisableHitbox();
     }
 
+    public void OnAppearStarted() {
+        RealEnt.SetActive(true);
+    }
+
+    public void OnAppearEnded() {
+        FakeEnt.SetActive(false);
+        MorphVFX.Stop();
+    }
+
     public void OnDisappearEnded() {
+        MorphVFX.Stop();
+        MorphVFX.SendEvent("StopOrbs");
+
         RealEnt.SetActive(false);
         FakeEnt.SetActive(true);
 
         if(_navMeshAgent.isOnNavMesh) {
             _navMeshAgent.ResetPath();
         }
+    }
+
+    public void OnEntireAppearEnded() {
+        MorphVFX.SendEvent("StopOrbs");
     }
 }
