@@ -42,6 +42,8 @@ public class HoverTooltip : MonoBehaviour {
 
         _lastHoveredGameObject = hit.transform.gameObject;
 
+        Debug.Log($"Hovered: {hit.transform.gameObject.name}");
+
         ItemEntityTooltip.Disable();
         LivingEntityTooltip.Disable();
         GenericInteractableTooltip.Disable();
@@ -49,7 +51,7 @@ public class HoverTooltip : MonoBehaviour {
 
         if(hit.transform.gameObject.TryGetComponent(out ItemEntity itemEntity)) {
             ItemEntityTooltip.Enable(itemEntity);
-        } else if(hit.transform.gameObject.TryGetComponent(out LivingEntity livingEntity)) {
+        } else if(hit.transform.gameObject.TryGetComponentInParent(out LivingEntity livingEntity)) {
             if(livingEntity == Player.LivingEntity) {
                 return;
             }
