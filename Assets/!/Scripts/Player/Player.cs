@@ -50,7 +50,7 @@ public class Player : MonoBehaviour {
 
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 10f);
 
-    public Stat DashSpeed = new Stat(StatType.DASH_SPEED, 10f);
+    public Stat DashSpeed = new Stat(StatType.DASH_SPEED, 0.2f);
     public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 5f);
     public Stat DashDistance = new Stat(StatType.DASH_DISTANCE, 5f);
 
@@ -140,6 +140,7 @@ public class Player : MonoBehaviour {
 
     private bool _isAttacking = false;
     public bool LockRotation = false;
+    public bool UpdateDisabled = false;
 
     [Header("Events")]
     public UnityEvent InventoryToggleEvent;
@@ -148,10 +149,10 @@ public class Player : MonoBehaviour {
     public UnityEvent<EvoUI> OnEvolutionSelected = new();
     public UnityEvent<int> CoinsChangeEvent;
     public UnityEvent UpdateConsumablesEvent;
+    public float CameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
-    private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
     private InteractionType? _queuedInteraction;
     private Cooldown dashCooldown = new Cooldown(0);
 
@@ -203,7 +204,7 @@ public class Player : MonoBehaviour {
 
         LivingEntity.OnDeath.AddListener(onDeath);
         
-        _cameraDistance = MinCameraDistance;
+        CameraDistance = MinCameraDistance;
 
         registerStats();
 
@@ -239,6 +240,8 @@ public class Player : MonoBehaviour {
     }
 
     void Update() {
+        if (UpdateDisabled) return;
+
         handleInteraction();
         handleRotation();
 
@@ -248,7 +251,7 @@ public class Player : MonoBehaviour {
 
     void FixedUpdate() {
         // Magiczna liczba to predkosc animacji biegu
-        Animator.SetFloat(_speedHash, _currentSpeed / 6);
+        Animator.SetFloat(_speedHash, _currentSpeed / Instance.MovementSpeed);
         Animator.SetFloat(_lightAttackSpeedHash, Instance.LightAttackSpeed);
         Animator.SetFloat(_heavyAttackSpeedHash, Instance.HeavyAttackSpeed);
     }
@@ -314,6 +317,8 @@ public class Player : MonoBehaviour {
 
     private void onDeath() {
         UICanvas.ChangeUITopState(UITopState.Death);
+        Animator.SetTrigger("die");
+        UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
     }
 
     
@@ -413,12 +418,12 @@ public class Player : MonoBehaviour {
 
     void OnScrollWheel(InputValue value) {
         var delta = value.Get<Vector2>();
-        _cameraDistance -= delta.y * CameraDistanceSpeed;
-        if (_cameraDistance < MinCameraDistance) {
-            _cameraDistance = MinCameraDistance;
+        CameraDistance -= delta.y * CameraDistanceSpeed;
+        if (CameraDistance < MinCameraDistance) {
+            CameraDistance = MinCameraDistance;
         }
-        if (_cameraDistance > MaxCameraDistance) {
-            _cameraDistance = MaxCameraDistance;
+        if (CameraDistance > MaxCameraDistance) {
+            CameraDistance = MaxCameraDistance;
         }
     }
 
@@ -460,6 +465,8 @@ public class Player : MonoBehaviour {
         foreach (ParticleSystem trail in _trailParticles) { trail.Play(); }
 
         transform.DOMove(transform.position + transform.forward * Instance.DashDistance, Instance.DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
+            Debug.Log(Instance.DashDistance);
+            Debug.Log(Instance.DashSpeed);
             // Animator.applyRootMotion = true;
             Animator.speed = 1;
             DamageDisabled = false;
@@ -700,8 +707,12 @@ public class Player : MonoBehaviour {
     }
 
     public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
-        gameObject.transform.position = position;
-        gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
+        UpdateDisabled = true;
+        Animator.animatePhysics = false;
+        Instance.gameObject.transform.position = position;
+        Animator.animatePhysics = true;
+        UpdateDisabled = false;
+        Instance.gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
 
     #endregion
