@@ -17,9 +17,10 @@ public class LivingEntity : MonoBehaviour {
     public string DisplayName;
     public Guild Guild;
     public bool DropItemsOnDeath = true;
-    public string DebugName => $"{DisplayName} ({Guild.Name} {gameObject.name})";
-
     public bool DestroyOnDeath = true;
+    public bool IsInvisible = false;
+
+    public string DebugName => $"{DisplayName} ({Guild.Name} {gameObject.name})";
 
     [Header("Stats")]
     public float StartingHealth = 100;

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SO_Spl_IceShardSpell", menuName = "Spells/IceShardSpell")]
-public class IceshardSpell : Spell {
+public class IceShardSpell : Spell {
     public IceShard IceShardPrefab;
 
     public override void Cast() {

@@ -6,12 +6,12 @@ public class HitFlashAnimator : MonoBehaviour
     [SerializeField] private float _flashDuration = 0.1f;
     [SerializeField] private bool _isPlayer;
     private SkinnedMeshRenderer _meshRenderer;
-    private Material _originalMaterial;
+    private Material[] _originalMaterials;
 
-    private void Awake() {
+    private void Start() {
         if (_isPlayer) return;
-        _meshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
-        _originalMaterial = _meshRenderer.materials[0];
+        _meshRenderer = GetComponentInChildren<SkinnedMeshRenderer>(includeInactive:true);
+        _originalMaterials = _meshRenderer.materials;
     }
 
     public void Flash() {
@@ -22,6 +22,6 @@ public class HitFlashAnimator : MonoBehaviour
 
     private void resetMaterial() {
         if (_isPlayer) return;
-        _meshRenderer.materials = new Material[] {_originalMaterial};
+        _meshRenderer.materials = _originalMaterials;
     }
 }

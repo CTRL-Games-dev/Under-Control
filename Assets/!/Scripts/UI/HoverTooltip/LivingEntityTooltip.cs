@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine.UI;
 
 public class LivingEntityTooltip : HoverTooltipImpl<LivingEntity> {
