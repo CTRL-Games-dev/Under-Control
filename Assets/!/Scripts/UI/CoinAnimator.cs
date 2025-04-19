@@ -2,7 +2,7 @@ using UnityEngine;
 using DG.Tweening;
 using TMPro;
 
-public class MoneyAnimator : MonoBehaviour
+public class CoinAnimator : MonoBehaviour
 {
     private RectTransform _coinsRectTransform;
     private TextMeshProUGUI _coinsText;
