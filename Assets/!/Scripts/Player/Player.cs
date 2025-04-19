@@ -464,10 +464,13 @@ public class Player : MonoBehaviour {
 
         foreach (ParticleSystem trail in _trailParticles) { trail.Play(); }
 
-        transform.DOMove(transform.position + transform.forward * Instance.DashDistance, Instance.DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
-            Debug.Log(Instance.DashDistance);
-            Debug.Log(Instance.DashSpeed);
+        UpdateDisabled = true;
+        Animator.animatePhysics = false;
+
+        Instance.transform.DOMove(transform.position + transform.forward * Instance.DashDistance, Instance.DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
             // Animator.applyRootMotion = true;
+            Animator.animatePhysics = true;
+            UpdateDisabled = false;
             Animator.speed = 1;
             DamageDisabled = false;
             LockRotation = false;
