@@ -15,6 +15,10 @@ public class HoverTooltip : MonoBehaviour {
         _camera = Player.Instance.MainCamera;
     }
 
+    void Update() {
+        transform.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+    }
+
     void FixedUpdate() {
         if(!InputUtility.IsMousePositionAvailable()) return;
        
@@ -29,8 +33,6 @@ public class HoverTooltip : MonoBehaviour {
             return;
         }
 
-        transform.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
         if (!Physics.Raycast(ray, out RaycastHit hit, 100)) {
             return;
@@ -41,8 +43,6 @@ public class HoverTooltip : MonoBehaviour {
         }
 
         _lastHoveredGameObject = hit.transform.gameObject;
-
-        Debug.Log($"Hovered: {hit.transform.gameObject.name}");
 
         ItemEntityTooltip.Disable();
         LivingEntityTooltip.Disable();
