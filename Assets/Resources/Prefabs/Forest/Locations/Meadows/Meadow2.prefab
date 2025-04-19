@@ -219,7 +219,6 @@ GameObject:
   - component: {fileID: 6263548039437644976}
   - component: {fileID: 1683225739445585321}
   - component: {fileID: 3762160354113897002}
-  - component: {fileID: 7075015026033956302}
   m_Layer: 0
   m_Name: Meadow2
   m_TagString: Untagged
@@ -277,7 +276,7 @@ BoxCollider:
     m_Bits: 64
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 24503
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
@@ -294,33 +293,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 4648212090980894802}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e7c5df9aba868477b22e6c9d333c089, type: 3}
+  m_Script: {fileID: 11500000, guid: 608df02b3c8b648b19b8597aa8c417d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _wallPrefab: {fileID: 7933533010527225458, guid: 08113381a5b65ad73af162181a7d8392, type: 3}
   _enemySpawnerExitPrefab: {fileID: 6897201124479605952, guid: 3a1253432af8415f1911889d926fc58e, type: 3}
+  _entPrefab: {fileID: 430965844354737387, guid: 175022efad6a6384fa0383a3f74bb53d, type: 3}
   MaxExitsAtOnce: 2
+  Waves: []
   SpawnPointsParent: {fileID: 1527191014470596022}
   SpawnPoints: []
-  Waves:
-  - {fileID: 11400000, guid: 133bb9471cf3cd23bb49585f8c0157ed, type: 2}
   WaveNumber: 0
-  EnemyCount: 0
---- !u!114 &7075015026033956302
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4648212090980894802}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55743b6d1075688deb8fb313b178a8d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  RandomizeTrees: 1
-  TreeHolder: {fileID: 0}
-  RockHolder: {fileID: 0}
 --- !u!1 &6202082914564323158
 GameObject:
   m_ObjectHideFlags: 0

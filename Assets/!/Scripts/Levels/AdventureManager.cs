@@ -11,7 +11,7 @@ public class AdventureManager : MonoBehaviour
     [SerializeField] private NavMeshSurface _navMeshSurface;
     private void Start()
     {
-        Player.Instance.enabled = false;
+        Player.Instance.gameObject.SetActive(false);
 
         var generator = GetComponent<WorldGenerator>();
         generator.GenerateMap(GameManager.Instance.CurrentDimension);
@@ -26,7 +26,7 @@ public class AdventureManager : MonoBehaviour
         Player.UICanvas.ChangeUITopState(UITopState.NotVisible);
         Player.Instance.SetPlayerPosition(new Vector3(spawn.x, 1, spawn.y));
 
-        Player.Instance.enabled = true;
+        Player.Instance.gameObject.SetActive(true);
         
         CameraManager.Instance.SwitchCamera(Player.Instance.TopDownCamera);
 
