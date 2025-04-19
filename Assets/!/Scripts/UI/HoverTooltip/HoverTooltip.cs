@@ -42,8 +42,6 @@ public class HoverTooltip : MonoBehaviour {
             return;
         }
 
-        _lastHoveredGameObject = hit.transform.gameObject;
-
         ItemEntityTooltip.Disable();
         LivingEntityTooltip.Disable();
         GenericInteractableTooltip.Disable();
@@ -56,11 +54,17 @@ public class HoverTooltip : MonoBehaviour {
                 return;
             }
 
+            if(livingEntity.IsInvisible) {
+                return;
+            }
+
             LivingEntityTooltip.Enable(livingEntity);
         } else if(hit.transform.gameObject.TryGetComponent(out Talkable _)) {
             TalkableTooltip.Enable(null);
         } else if(hit.transform.gameObject.TryGetComponent(out IInteractable _)) {
             GenericInteractableTooltip.Enable(null);
-        } 
+        }
+
+        _lastHoveredGameObject = hit.transform.gameObject;
     }
 }
