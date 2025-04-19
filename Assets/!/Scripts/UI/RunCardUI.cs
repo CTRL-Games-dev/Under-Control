@@ -53,7 +53,7 @@ public class RunCardUI : MonoBehaviour
         _icon.sprite = _card.Icon;
         _descriptionTextLocalizer.Key = _card.ModifierDescription;
         
-        _rectTransform.DOScale(Vector3.one, 0.5f * Settings.AnimationSpeed);
+        _rectTransform.DOScale(Vector3.one * 0.5f, 0.5f * Settings.AnimationSpeed);
         _canvasGroup.DOFade(1, 0.3f * Settings.AnimationSpeed);
     }
 
@@ -74,19 +74,19 @@ public class RunCardUI : MonoBehaviour
 
 
     public void OnClick() {
-        _rectTransform.DOScale(Vector3.one * 1.4f, 0.3f * Settings.AnimationSpeed);
+        _rectTransform.DOScale(Vector3.one * 0.7f, 0.3f * Settings.AnimationSpeed);
         EventBus.RunCardClickedEvent?.Invoke(_card);
     }
 
     public void OnPointerEnter() {
         _isHovered = true;
-        _rectTransform.DOScale(Vector3.one * 1.1f, 0.3f * Settings.AnimationSpeed);
+        _rectTransform.DOScale(Vector3.one * 0.6f, 0.3f * Settings.AnimationSpeed);
     }
 
     public void OnPointerExit() {
         _isHovered = false;
         _rectTransform.DORotate(Vector3.zero, 0.1f * Settings.AnimationSpeed);
-        _rectTransform.DOScale(Vector3.one, 0.3f * Settings.AnimationSpeed);
+        _rectTransform.DOScale(Vector3.one * 0.5f, 0.3f * Settings.AnimationSpeed);
     }
 
     
