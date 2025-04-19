@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
@@ -24,6 +22,7 @@ public class EntAIController : MonoBehaviour {
 
     private Animator _animator;
     private NavMeshAgent _navMeshAgent;
+    private LivingEntity _livingEntity;
 
     private static readonly int _isRealHash = Animator.StringToHash("isReal");
     private static readonly int _speedHash = Animator.StringToHash("speed");
@@ -31,12 +30,15 @@ public class EntAIController : MonoBehaviour {
     void Awake() {
         _animator = GetComponent<Animator>();
         _navMeshAgent = GetComponent<NavMeshAgent>();
+        _livingEntity = GetComponent<LivingEntity>();
 
         RealEnt.SetActive(false);
         FakeEnt.SetActive(true);
 
         LeftWeaponHolder.UpdateWeapon(PrimaryWeapon);
         RightWeaponHolder.UpdateWeapon(PrimaryWeapon);
+
+        _livingEntity.IsInvisible = true;
     }
 
     public void MorphToReal() {
@@ -48,6 +50,8 @@ public class EntAIController : MonoBehaviour {
         if(_navMeshAgent.isOnNavMesh) {
             _navMeshAgent.ResetPath();
         }
+
+        _livingEntity.IsInvisible = false;
     }
 
     public void MorphToFake() {
@@ -59,6 +63,8 @@ public class EntAIController : MonoBehaviour {
         if(_navMeshAgent.isOnNavMesh) {
             _navMeshAgent.ResetPath();
         }
+
+        _livingEntity.IsInvisible = true;
     }
 
     public void OnRightHandAttackStart() {
