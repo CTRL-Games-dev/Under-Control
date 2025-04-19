@@ -301,7 +301,7 @@ public class Player : MonoBehaviour {
             case AnimationState.Attack_Contact:
             case AnimationState.Attack_ComboWindow:
             case AnimationState.Attack_Recovery:
-                return 0;
+                return _movementInputVector.magnitude > 0.1f ? MovementSpeed * 0.3f : 0;
         }
 
         return 0;
