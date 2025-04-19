@@ -700,17 +700,8 @@ public class Player : MonoBehaviour {
     }
 
     public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
-        // Animator.applyRootMotion = false;
-        Animator.speed = 0;
         gameObject.transform.position = position;
-        gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time).SetEase(Ease.OutSine).OnComplete(() => {
-            applyRootMotion();
-        });
-    }
-
-    private void applyRootMotion() {
-        // Animator.applyRootMotion = true;
-        Animator.speed = 1;
+        gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
 
     #endregion

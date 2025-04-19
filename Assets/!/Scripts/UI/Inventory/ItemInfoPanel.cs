@@ -28,6 +28,13 @@ public class ItemInfoPanel : MonoBehaviour
         
         if (itemUI == null) return;
 
+        Vector2 scale = new(Screen.width / 1920f, Screen.height / 1080f);
+
+        transform.position = new Vector2(
+            Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width * scale.x), 
+            Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height * scale.y, Screen.height)
+        );
+
         InventoryItem item = itemUI.InventoryItem;
 
         _nameTextLocalizer.Key = item.ItemData.DisplayName;

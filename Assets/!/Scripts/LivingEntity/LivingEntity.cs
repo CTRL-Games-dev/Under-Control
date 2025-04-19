@@ -17,7 +17,6 @@ public class LivingEntity : MonoBehaviour {
     public string DisplayName;
     public Guild Guild;
     public bool DropItemsOnDeath = true;
-    public float TimeToRegenAfterDamage = 2;
     public string DebugName => $"{DisplayName} ({Guild.Name} {gameObject.name})";
 
     public bool DestroyOnDeath = true;

@@ -3,22 +3,43 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(Collider))]
-public class Portal : MonoBehaviour {
-    public UnityEvent<Dimension> PlayerEnteredPortal;
-  
+
+public abstract class Portal : MonoBehaviour
+{
     [SerializeField] private Dimension _dimension = Dimension.HUB;
     [SerializeField] private GameObject _portalInside;
     [SerializeField] private BoxCollider _collider;
+    public UnityEvent<Dimension> PlayerEnteredPortal;
+    [SerializeField] private Renderer[] _portalInsideRenderers;
+    [HideInInspector] public float Influence;
+
+    private void Awake() {
+        _portalInsideRenderer = _portalInside.GetComponent<Renderer>();        
+    }
+
+    void Start() {
+        setInfluence();
+    }
+
+    protected void FixedUpdate() {
+        if (_portalInsideRenderers.Length == 0) return;
+
+        float xOffset = Mathf.Sin(Time.time) * 0.2f;
+        float yOffset = Mathf.Cos(Time.time) * 0.2f;
+        
+        foreach (Renderer r in _portalInsideRenderers) {
+            r.material.mainTextureOffset = new Vector2(xOffset, yOffset);
+        }
+    }
+
+    protected abstract void setInfluence();
 
     private Renderer _portalInsideRenderer;
 
-    void Start() {
-        _portalInsideRenderer = _portalInside.GetComponent<Renderer>();
-    }
 
     void OnTriggerEnter(Collider other) {
         Debug.Log("Player entered portal to: " + _dimension.ToString());
-        GameManager.Instance.ChangeDimension(_dimension);
+        GameManager.Instance.ChangeDimension(_dimension, Influence);
     }
     
     public void ChangeDimension(Dimension d) {

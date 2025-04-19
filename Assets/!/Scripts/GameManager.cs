@@ -22,16 +22,20 @@ public class GameManager : MonoBehaviour {
         {Dimension.FOREST_BOSS, "Adventure"},
     };
 
+    [HideInInspector] public GameDifficulty Difficulty { get; private set; }
+    [HideInInspector]  public Dimension CurrentDimension { get; private set; }
+    [Range(0, 1)]
+    public float TotalInfluence {get; private set; }
+    public float InfluenceDelta {get; private set; }
+
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
 
     [Header("State")]
-    [SerializeField] private GameContext _context;
     private MusicPlayer _musicPlayer;
     
     private void Awake() 
     {
-        DontDestroyOnLoad(this);
         // SceneManager.sceneLoaded += OnLevelChange;
 
         // We need to check if there is already existing manager
@@ -43,9 +47,12 @@ public class GameManager : MonoBehaviour {
             Destroy(gameObject);
         }
 
+        DontDestroyOnLoad(this);
+        SetDefault();
+
         _musicPlayer = GetComponent<MusicPlayer>();
 
-        playMusicForDimension(_context.CurrentDimension);
+        playMusicForDimension(CurrentDimension);
     }
     private void Start()
     {
@@ -53,25 +60,25 @@ public class GameManager : MonoBehaviour {
         // ConnectPortals();
     }
 
-    public void ChangeDimension(Dimension dimension)
+    public void ChangeDimension(Dimension dimension, float newInfluence)
     {
-        _context.CurrentDimension = dimension;
+        Debug.Log($"New influence: {newInfluence}");
+        if(newInfluence <= TotalInfluence)
+        {
+            Debug.LogError("New influence is smaller that previous influence!");
+        }
 
-        Debug.Log("Loading new scene: " + _context.CurrentDimension.ToString());
+        CurrentDimension = dimension;
+        InfluenceDelta = newInfluence - TotalInfluence;
+        TotalInfluence = newInfluence;
 
-        LoadingScreen.LoadScene(SceneDictionary[_context.CurrentDimension]);
+        Debug.Log($"Influence delta: {InfluenceDelta}");
+
+        Debug.Log("Loading new scene: " + CurrentDimension.ToString());
+
+        LoadingScreen.LoadScene(SceneDictionary[CurrentDimension]);
 
         playMusicForDimension(dimension);
-    }
-
-    public Dimension GetCurrentDimension()
-    {
-        return _context.CurrentDimension;
-    }
-
-    public float GetInfluence()
-    {
-        return _context.Influence;
     }
 
     private void playMusicForDimension(Dimension dimension) {
@@ -82,5 +89,12 @@ public class GameManager : MonoBehaviour {
             _musicPlayer.MusicClips = MusicPalette[dimensionMusicIndex].Clips;
             _musicPlayer.Play();
         }
+    }
+
+    public void SetDefault() {
+        Difficulty = GameDifficulty.NORMAL;
+        CurrentDimension = Dimension.HUB;
+        TotalInfluence = 0;
+        InfluenceDelta = 0;
     }
 }
