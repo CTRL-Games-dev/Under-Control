@@ -116,6 +116,8 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
         gameObject.SetActive(true);
 
+        _canvasGroup.interactable = true;
+        _canvasGroup.blocksRaycasts = true;
         _canvasGroup.alpha = 0;
         _logoImg.DOFade(0, 0);
         killTweens();
@@ -147,6 +149,9 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
     }
 
     public void HideUI() {
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
+        
         killTweens();
         _canvasGroup.DOFade(0, 0.8f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
             resetBtnAlphas();

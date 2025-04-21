@@ -3,15 +3,12 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum Language
-{
+public enum Language {
     English,
     Polish
 }
 
-
-public static class TextData
-{
+public static class TextData {
     public static UnityEvent OnLanguageChanged = new UnityEvent();
 
     public static void ChangeLanguage(Language lang) {
@@ -50,14 +47,12 @@ public static class TextData
     private static void loadLocalizationData() {
         _localizationTable = new Dictionary<string, Dictionary<string, string>>();
         
-        string json = readFromFile(Path.Combine(
-            Application.dataPath,
-            "!",
-            "JSON",
-            "localization_data.json")
-        );
+        TextAsset localizationAsset = Resources.Load<TextAsset>("localization_data");
+        if (localizationAsset == null) {
+            throw new System.Exception("Localization data not found");
+        }
 
-        LocalizationData data = JsonUtility.FromJson<LocalizationData>(json);
+        LocalizationData data = JsonUtility.FromJson<LocalizationData>(localizationAsset.text);
         _languages = data.Languages;
 
         foreach (LocalizationMapping map in data.Table) {
@@ -67,19 +62,4 @@ public static class TextData
             }
         }
     }
-
-    private static string readFromFile(string filePath) {
-        if (File.Exists(filePath)) {
-            using (StreamReader reader = new StreamReader(filePath)) {
-                string json = reader.ReadToEnd();
-                reader.Close();
-                return json;
-            }
-        } else {
-            Debug.LogWarning("File not found: " + filePath);
-            return null;
-        }
-            
-    }
-
 }

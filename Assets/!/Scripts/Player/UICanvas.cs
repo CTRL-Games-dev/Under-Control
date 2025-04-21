@@ -220,6 +220,7 @@ public class UICanvas : MonoBehaviour
             case UIMiddleState.MainMenu:
                 Player.Instance.InputDisabled = false;
                 Player.Instance.LockRotation = false;
+                Player.Instance.UpdateDisabled = false;
                 MainMenuCanvas.HideUI();
                 break;
             case UIMiddleState.Pause:
