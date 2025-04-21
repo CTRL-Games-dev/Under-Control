@@ -10,12 +10,40 @@ public class CameraManager : MonoBehaviour
 
     public static CameraManager Instance;
 
+
+    private CinemachineBasicMultiChannelPerlin _noise;
+
+    private float _startingIntensity;
+    private float _shakeTimer;
+    private float _shakeTimerTotal;
+
+
     private void Awake() {
-        if (Instance != null) {
-            Destroy(this);
+        DontDestroyOnLoad(this);
+        if (Instance == null) {
+            Instance = this;
+        } else if (Instance != this) {
+            Destroy(gameObject);
             return;
         }
-        Instance = this;
+    }
+
+    private void Start() {
+        _noise = Player.Instance.CameraNoise;
+    }
+
+    void Update() {
+    if (_shakeTimer > 0) {
+        _shakeTimer -= Time.deltaTime;
+        _noise.AmplitudeGain = Mathf.Lerp(_startingIntensity, 0f, 1 - _shakeTimer / _shakeTimerTotal);
+        }
+    }
+
+    private void shake(float intensity, float time) {
+        _noise.AmplitudeGain = intensity;
+        _startingIntensity = intensity;
+        _shakeTimerTotal = time;
+        _shakeTimer = time;
     }
 
 
@@ -38,6 +66,13 @@ public class CameraManager : MonoBehaviour
 
         setCamerasPriority();
     }
+
+    public void ShakeCamera(float strength, float time) {
+        if (_currentCamera != null) {
+            shake(strength, time);
+        }
+    }
+
 
     private void setCamerasPriority() {
         List<CinemachineCamera> cameras = new List<CinemachineCamera>(FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None));
