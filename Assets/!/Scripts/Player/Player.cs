@@ -80,6 +80,7 @@ public class Player : MonoBehaviour {
     public GameObject CinemachineObject;
     public GameObject CameraTargetObject;
     public CinemachineCamera TopDownCamera;
+    public CinemachineBasicMultiChannelPerlin CameraNoise;
     public Camera MainCamera;
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
@@ -203,6 +204,7 @@ public class Player : MonoBehaviour {
         Instance = this;
 
         LivingEntity.OnDeath.AddListener(onDeath);
+        LivingEntity.OnStunned.AddListener(onStunned);
         
         CameraDistance = MinCameraDistance;
 
@@ -239,6 +241,8 @@ public class Player : MonoBehaviour {
         // LoadKeybinds();
     }
 
+
+
     void Update() {
         if (UpdateDisabled) return;
 
@@ -254,6 +258,8 @@ public class Player : MonoBehaviour {
         Animator.SetFloat(_speedHash, _currentSpeed / Instance.MovementSpeed);
         Animator.SetFloat(_lightAttackSpeedHash, Instance.LightAttackSpeed);
         Animator.SetFloat(_heavyAttackSpeedHash, Instance.HeavyAttackSpeed);
+
+        ModifierSystem.GetActiveModifiers();
     }
 
     #endregion
@@ -319,6 +325,10 @@ public class Player : MonoBehaviour {
         UICanvas.ChangeUITopState(UITopState.Death);
         Animator.SetTrigger("die");
         UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
+    }
+
+    private void onStunned(float duration) {
+        CameraManager.Instance.ShakeCamera(2, duration);
     }
 
     
