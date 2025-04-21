@@ -17,7 +17,7 @@ public class EvoUI : MonoBehaviour
     [SerializeField] private bool _isSelected = false;
 
     [SerializeField] private List<Modifier> _modifiers = new List<Modifier>();
-    [SerializeField] private EvoType _evoType;
+    [SerializeField] private ElementalType _elementalType;
 
     private RectTransform _rectTransform;
     private EventTrigger _eventTrigger;
@@ -29,6 +29,7 @@ public class EvoUI : MonoBehaviour
         _rectTransform.localScale = _isAvailable ? Vector3.one : Vector3.one * 0.95f;
         _bgImage.color = _isAvailable ? Color.white : Color.gray;
         _lineImage.fillAmount = _isSelected ? 1 : 0;
+        _lineImage.color = ElementalInfo.GetColor(_elementalType);
     }
 
 
@@ -40,7 +41,7 @@ public class EvoUI : MonoBehaviour
     }
 
     public void OnPointerEnter() {
-        Player.UICanvas.InventoryCanvas.EvoInfo.SetInfo(_title, _desc, _evoType);
+        Player.UICanvas.InventoryCanvas.EvoInfo.SetInfo(_title, _desc, _elementalType);
         if (!_isAvailable) return;
         _rectTransform.DOKill();
         _rectTransform.DOScale(1.1f, 0.2f * Settings.AnimationSpeed);

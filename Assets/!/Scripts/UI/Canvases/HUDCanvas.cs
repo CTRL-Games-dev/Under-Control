@@ -43,6 +43,19 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private Color _healthColor;
 
 
+    [Header("Spell Slots")]
+    [SerializeField] private Image _spellSlot1Icon;
+    [SerializeField] private Image _spellSlot2Icon;
+    [SerializeField] private Image _spellSlot3Icon;
+    [SerializeField] private Image _spellSlot1CooldownImg;
+    [SerializeField] private Image _spellSlot2CooldownImg;
+    [SerializeField] private Image _spellSlot3CooldownImg;
+    [SerializeField] private RectTransform _spellSlot1Rect;
+    [SerializeField] private RectTransform _spellSlot2Rect;
+    [SerializeField] private RectTransform _spellSlot3Rect;
+
+
+
     private void Start() {
         Player.Instance.UpdateConsumablesEvent.AddListener(OnUpdateConsumables);
 
@@ -59,6 +72,73 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
     public void UpdateManaBar() {
         _manaBarImg.fillAmount = Player.Instance.Mana / Player.Instance.MaxMana;
         _manaText.text = $"{(int)Player.Instance.Mana}/{(int)Player.Instance.MaxMana}";
+    }
+
+    public void UpdateSpellSlots() {
+        if (Player.Instance.SpellSlotOne != null) {
+            _spellSlot1Icon.sprite = Player.Instance.SpellSlotOne.Icon;
+            _spellSlot1Icon.gameObject.SetActive(true);
+        } else {
+            _spellSlot1Icon.gameObject.SetActive(false);
+        }
+
+        if (Player.Instance.SpellSlotTwo != null) {
+            _spellSlot2Icon.sprite = Player.Instance.SpellSlotTwo.Icon;
+            _spellSlot2Icon.gameObject.SetActive(true);
+        } else {
+            _spellSlot2Icon.gameObject.SetActive(false);
+        }
+
+        if (Player.Instance.SpellSlotThree != null) {
+            _spellSlot3Icon.sprite = Player.Instance.SpellSlotThree.Icon;
+            _spellSlot3Icon.gameObject.SetActive(true);
+        } else {
+            _spellSlot3Icon.gameObject.SetActive(false);
+        }
+    }
+
+    public void SetSpellCooldownColor(int spellSlot, Color color) {
+        Color c = color;
+        c.a = 75f / 255f;
+        switch (spellSlot) {
+            case 1:
+                _spellSlot1CooldownImg.color = c;
+                break;
+            case 2:
+                _spellSlot2CooldownImg.color = c;
+                break;
+            case 3:
+                _spellSlot3CooldownImg.color = c;
+                break;
+        }
+    }
+
+    public void UseSpell1() {
+        useSpell(_spellSlot1CooldownImg, _spellSlot1Rect, Player.Instance.SpellSlotOne);
+    }
+
+    public void UseSpell2() {
+        useSpell(_spellSlot2CooldownImg, _spellSlot2Rect, Player.Instance.SpellSlotTwo);
+    }
+
+    public void UseSpell3() {
+        useSpell(_spellSlot3CooldownImg, _spellSlot3Rect, Player.Instance.SpellSlotThree);
+    }
+
+    private void useSpell(Image fillImg, RectTransform rect, Spell spell) {
+        fillImg.DOKill();
+        rect.DOKill();
+        rect.DOShakeRotation(0.1f * Settings.AnimationSpeed, 10, 10, 90, false);
+        fillImg.DOFillAmount(1, 0.05f * Settings.AnimationSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
+            fillImg.DOFillAmount(0, spell.CooldownTime - 0.05f * Settings.AnimationSpeed).SetEase(Ease.Linear).OnComplete(() => {
+                rect.DOShakeRotation(0.1f * Settings.AnimationSpeed, 10, 10, 90, false);
+                rect.DOScale(Vector3.one * 1.05f, 0.1f * Settings.AnimationSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
+                    rect.DOScale(Vector3.one, 0.1f * Settings.AnimationSpeed).SetEase(Ease.OutQuint);
+                    rect.localRotation = Quaternion.identity;
+                });
+            });
+        });
+
     }
 
 

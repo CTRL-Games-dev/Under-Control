@@ -287,6 +287,8 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
     private void openGeneralPanel() {
         _generalPanel.SetActive(true);
+        _generalCanvasGroup.interactable = true;
+        _generalCanvasGroup.blocksRaycasts = true;
         _generalButtonRect.DOScale(1.1f, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
         foreach (var canvasGroup in _generalSettingsCanvasGroups) {
             canvasGroup.alpha = 0;
@@ -299,6 +301,8 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
     private void openAudioPanel() {
         _audioPanel.SetActive(true);
+        _audioCanvasGroup.interactable = true;
+        _audioCanvasGroup.blocksRaycasts = true;
         _audioButtonRect.DOScale(1.1f, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
         foreach (var canvasGroup in _audioSettingsCanvasGroups) {
             canvasGroup.alpha = 0;
@@ -310,6 +314,8 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
     private void openVideoPanel() {
         _videoPanel.SetActive(true);
+        _videoCanvasGroup.interactable = true;
+        _videoCanvasGroup.blocksRaycasts = true;
         _videoButtonRect.DOScale(1.1f, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
         foreach (var canvasGroup in _videoSettingsCanvasGroups) {
             canvasGroup.alpha = 0;
@@ -321,6 +327,8 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
     private void openControlsPanel() {
         _controlsPanel.SetActive(true);
+        _controlsCanvasGroup.interactable = true;
+        _controlsCanvasGroup.blocksRaycasts = true;
         _controlsButtonRect.DOScale(1.1f, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
         foreach (var canvasGroup in _controlsSettingsCanvasGroups) {
             canvasGroup.alpha = 0;
@@ -339,6 +347,8 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
             foreach (var canvasGroup in _audioSettingsCanvasGroups) {
                 canvasGroup.alpha = 0;
             }
+            _audioCanvasGroup.interactable = false;
+            _audioCanvasGroup.blocksRaycasts = false;
             _audioPanel.SetActive(false);
         });
     }
@@ -351,6 +361,8 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
             foreach (var canvasGroup in _videoSettingsCanvasGroups) {
                 canvasGroup.alpha = 0;
             }
+            _videoCanvasGroup.interactable = false;
+            _videoCanvasGroup.blocksRaycasts = false;
             _videoPanel.SetActive(false);
         });
     }
@@ -363,6 +375,8 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
             foreach (var canvasGroup in _controlsSettingsCanvasGroups) {
                 canvasGroup.alpha = 0;
             }
+            _controlsCanvasGroup.interactable = false;
+            _controlsCanvasGroup.blocksRaycasts = false;
             _controlsPanel.SetActive(false);
         });
     }
@@ -375,6 +389,8 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
             foreach (var canvasGroup in _generalSettingsCanvasGroups) {
                 canvasGroup.alpha = 0;
             }
+            _generalCanvasGroup.interactable = false;
+            _generalCanvasGroup.blocksRaycasts = false;
             _generalPanel.SetActive(false);
         });
     }

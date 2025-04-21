@@ -23,7 +23,7 @@ public static class TextData {
         OnLanguageChanged.Invoke();
     }
 
-    public static string CurrentLanguage = "en";
+    public static string CurrentLanguage = "pl";
 
     private static string[] _languages;
     public static string[] Languages
