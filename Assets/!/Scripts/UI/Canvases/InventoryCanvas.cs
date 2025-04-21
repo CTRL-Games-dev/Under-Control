@@ -387,7 +387,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
 
     private Tween cardsTabEnter() {
         _cardsInventoryPanelGO.SetActive(true);
-        return _cardsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-910, 0.25f * Settings.AnimationSpeed);
+        return _cardsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-1000, 0.25f * Settings.AnimationSpeed);
     }
 
     private Tween cardsTabExit() {
