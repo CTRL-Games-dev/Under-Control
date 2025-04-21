@@ -29,7 +29,11 @@ public class TextLocalizer : MonoBehaviour
     }
 
 
-    public void UpdateText() {        
+    public void UpdateText() {
+        if (string.IsNullOrEmpty(Key)) {
+            _textMeshPro.text = string.Empty;
+            return;
+        }
         try {
             _ = TextData.LocalizationTable[Key][TextData.CurrentLanguage];
         } catch (KeyNotFoundException) {

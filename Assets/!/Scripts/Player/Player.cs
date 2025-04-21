@@ -85,7 +85,7 @@ public class Player : MonoBehaviour {
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
 
-    private int _evolutionPoints = 4;
+    private int _evolutionPoints = 9;
     public int EvolutionPoints {
         get{ return _evolutionPoints; }
         set {
@@ -98,12 +98,13 @@ public class Player : MonoBehaviour {
 
     [Header("Spells")]
     [SerializeField]
-    private SpellData _spellDataOne;
+    private SpellData _spellDataOne; 
     public Spell SpellSlotOne {
         get => _spellDataOne.Spell;
         set {
             _spellDataOne.Spell = value;
-            _spellDataOne.Cooldown = new Cooldown(value.CooldownTime);
+            // _spellDataOne.Cooldown = new Cooldown(value.CooldownTime); 
+            UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
 
@@ -113,7 +114,8 @@ public class Player : MonoBehaviour {
         get => _spellDataTwo.Spell;
         set {
             _spellDataTwo.Spell = value;
-            _spellDataTwo.Cooldown = new Cooldown(value.CooldownTime);
+            // _spellDataTwo.Cooldown = new Cooldown(value.CooldownTime);
+            UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
 
@@ -123,7 +125,8 @@ public class Player : MonoBehaviour {
         get => _spellDataThree.Spell;
         set {
             _spellDataThree.Spell = value;
-            _spellDataThree.Cooldown = new Cooldown(value.CooldownTime);
+            // _spellDataThree.Cooldown = new Cooldown(value.CooldownTime);
+            UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
 
@@ -335,15 +338,18 @@ public class Player : MonoBehaviour {
     #region Input Events
 
     void OnCastSpellOne(InputValue value) {
-        _spellDataOne.TryCast(LivingEntity);
+        if (SpellSlotOne != null) UICanvas.HUDCanvas.UseSpell1();
+        // _spellDataOne.TryCast(LivingEntity);
     }
 
     void OnCastSpellTwo(InputValue value) {
-        _spellDataTwo.TryCast(LivingEntity);
+        if (SpellSlotTwo != null) UICanvas.HUDCanvas.UseSpell2();
+        // _spellDataTwo.TryCast(LivingEntity);
     }
 
     void OnCastSpellThree(InputValue value) {
-        _spellDataThree.TryCast(LivingEntity);
+        if (SpellSlotThree != null) UICanvas.HUDCanvas.UseSpell3();
+        // _spellDataThree.TryCast(LivingEntity);
     }
 
     void OnUseConsumableOne(InputValue value) {
