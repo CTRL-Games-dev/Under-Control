@@ -258,6 +258,8 @@ public class Player : MonoBehaviour {
         Animator.SetFloat(_speedHash, _currentSpeed / Instance.MovementSpeed);
         Animator.SetFloat(_lightAttackSpeedHash, Instance.LightAttackSpeed);
         Animator.SetFloat(_heavyAttackSpeedHash, Instance.HeavyAttackSpeed);
+
+        ModifierSystem.GetActiveModifiers();
     }
 
     #endregion
