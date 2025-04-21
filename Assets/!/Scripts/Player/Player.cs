@@ -84,7 +84,7 @@ public class Player : MonoBehaviour {
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
 
-    private int _evolutionPoints = 4;
+    private int _evolutionPoints = 9;
     public int EvolutionPoints {
         get{ return _evolutionPoints; }
         set {

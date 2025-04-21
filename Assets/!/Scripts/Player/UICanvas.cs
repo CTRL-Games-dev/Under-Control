@@ -37,7 +37,6 @@ public class UICanvas : MonoBehaviour
     [Header("References for children")]
     [HideInInspector] public InventoryPanel ActiveInventoryPanel;
     public ItemInfoPanel ItemInfoPanel;
-    public EvoInfo EvoInfo;
     public SelectedItemUI SelectedItemUI;
 
 

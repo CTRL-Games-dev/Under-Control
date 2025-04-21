@@ -33,6 +33,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     private CanvasGroup[] _armorSlotsCanvasGroups = new CanvasGroup[7];
 
     [Header("Evolution panel parts")]
+    public EvoInfo EvoInfo;
     [SerializeField] private GameObject _evoPointsGO;
     [SerializeField] private RectTransform _pointsHolderRect;
 
@@ -353,7 +354,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
             });
         });
         
-        return _armorInventoryPanelGO.transform.DOScale(1, fadeSpeed * 3 * Settings.AnimationSpeed);
+        return _armorInventoryPanelGO.transform.DOScale(1, fadeSpeed * 5 * Settings.AnimationSpeed);
     }
 
     private Tween armorTabExit() {
@@ -382,7 +383,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
             });
         });        
 
-        return _armorInventoryPanelGO.transform.DOScale(1, scaleSpeed * 3 * Settings.AnimationSpeed);
+        return _armorInventoryPanelGO.transform.DOScale(1, scaleSpeed * 5 * Settings.AnimationSpeed);
     }
 
     private Tween cardsTabEnter() {
@@ -396,11 +397,11 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
 
     private Tween evoTabEnter() {
         _evoInventoryPanelGO.SetActive(true);
-        return _evoInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-1000, 0.25f * Settings.AnimationSpeed);
+        return _evoInventoryPanelGO.GetComponent<CanvasGroup>().DOFade(1, 0.25f * Settings.AnimationSpeed);
     }
 
     private Tween evoTabExit() {
-        return _evoInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f * Settings.AnimationSpeed).OnComplete(() => _evoInventoryPanelGO.SetActive(false));
+        return _evoInventoryPanelGO.GetComponent<CanvasGroup>().DOFade(0, 0.25f * Settings.AnimationSpeed).OnComplete(() => _evoInventoryPanelGO.SetActive(false));
     }
 
     private Tween questsTabEnter() {
