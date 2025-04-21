@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(Location))]
 [RequireComponent(typeof(Collider))]
@@ -27,7 +28,9 @@ public class EnemySpawner : MonoBehaviour
     private List<Wall> _activeWalls = new();
     private GameObject _enemies;
     [HideInInspector] public List<Transform> SpawnPoints;
+    [HideInInspector] public int NumberOfEnemies { get; private set; }
     [HideInInspector] public int WaveNumber = 0;
+    public UnityEvent DefeatedEnemies;
     void Awake()
     {
         _location = GetComponent<Location>();
@@ -107,25 +110,26 @@ public class EnemySpawner : MonoBehaviour
 
     private void duringFight()
     {
-        int enemyCount = GetEnemiesCountWithoutEnts();
-        if(enemyCount == 0 && Waves.Count == WaveNumber)
+        if(NumberOfEnemies == 0 && Waves.Count == WaveNumber)
         {
             Debug.Log("Last wave has ended");
             _state = SpawnerState.TriggerEnts;
             return;
         }
 
-        if(enemyCount != 0) return;
+        if(NumberOfEnemies != 0) return;
 
         WaveInfo currentWave = Waves[WaveNumber];
         WaveNumber++;
 
-        int numberOfEnemies = UnityEngine.Random.Range(currentWave.MinEnemies, currentWave.MaxEnemies + 1);
+        int newNumberOfEnemies = UnityEngine.Random.Range(currentWave.MinEnemies, currentWave.MaxEnemies + 1);
 
-        Debug.Log($"Number of all enemies enemies: {numberOfEnemies}");
+        Debug.Log($"Number of all enemies enemies: {newNumberOfEnemies}");
         Debug.Log($"=== Wave {WaveNumber} ===");
 
-        for(int i = 0; i < numberOfEnemies; i++)
+        NumberOfEnemies = newNumberOfEnemies;
+
+        for(int i = 0; i < NumberOfEnemies; i++)
         {
             List<Transform> randomSpawnPoints = FluffyUtils.ShuffleList(SpawnPoints)
                 .Select(x=>x)
@@ -160,6 +164,7 @@ public class EnemySpawner : MonoBehaviour
     {
         Debug.Log("Fight has ended");
         removeWalls();
+        DefeatedEnemies.Invoke();
         Destroy(this);
     }
 
@@ -184,7 +189,12 @@ public class EnemySpawner : MonoBehaviour
         GameObject newEnemy = Instantiate(enemy, position, Quaternion.identity, _enemies.transform);
         newEnemy.transform.parent = _enemies.transform;
         Debug.Log($"Spawned new enemy at: {newEnemy.transform.position}");
-        // newEnemy.GetComponent<LivingEntity>().OnDeath.AddListener(enemyIsKilled);
+        newEnemy.GetComponent<LivingEntity>().OnDeath.AddListener(enemyDied);
+    }
+
+    private void enemyDied()
+    {
+        NumberOfEnemies--;
     }
     private void spawnWalls()
     {
@@ -238,15 +248,15 @@ public class EnemySpawner : MonoBehaviour
         return enemyCount;
     }
 
-    public int GetEnemiesCountWithoutEnts()
-    {
-        int enemyCount = 0;
-        foreach(Transform e in _enemies.transform)
-        {
-            if(e.tag != "Ent") enemyCount++;
-        }
-        return enemyCount;
-    }
+    // public int GetEnemiesCountWithoutEnts()
+    // {
+    //     int enemyCount = 0;
+    //     foreach(Transform e in _enemies.transform)
+    //     {
+    //         if(e.tag != "Ent") enemyCount++;
+    //     }
+    //     return enemyCount;
+    // }
 
     public List<EntAIController> GetEnts()
     {

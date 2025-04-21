@@ -161,7 +161,7 @@ public class WorldGenerator : MonoBehaviour {
         Location forestSpawnPrefab = Resources.Load<Location>("Prefabs/Forest/Locations/ForestSpawn");
         Location[] meadowsPrefabs = Resources.LoadAll<Location>("Prefabs/Forest/Locations/Meadows");
         Location[] rockyFieldsPrefabs = Resources.LoadAll<Location>("Prefabs/Forest/Locations/RockyFields");
-        // Location forestWell = Resources.Load<ForestPortalLocation>("Prefabs/Forest/Locations/Well");
+        Location forestWell = Resources.Load<ForestPortalLocation>("Prefabs/Forest/Locations/Well");
 
         Debug.Log("Loaded location prefabs");
 
@@ -176,7 +176,7 @@ public class WorldGenerator : MonoBehaviour {
             allLocations.Add(Instantiate(meadowsPrefabs[UnityEngine.Random.Range(0, meadowsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform));
         }
 
-        for(int i = 0; i < numberOfMeadows; i++)
+        for(int i = 0; i < numberOfRockyFields; i++)
         {
             allLocations.Add(Instantiate(rockyFieldsPrefabs[UnityEngine.Random.Range(0, rockyFieldsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform));
         }
@@ -190,6 +190,12 @@ public class WorldGenerator : MonoBehaviour {
         {
             new(Instantiate(forestSpawnPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform), new(0,0)),
         };
+
+        // Location[] testLocationsPrefabs = Resources.LoadAll<Location>("Prefabs/Forest/Locations/TestLocations");
+        // for(int i = 0; i < 10; i++)
+        // {
+        //     allLocations.Add(Instantiate(testLocationsPrefabs[UnityEngine.Random.Range(0, testLocationsPrefabs.Length)], Vector3.zero, Quaternion.identity, _terrainHolder.transform));
+        // }
 
         // Get place in a grid of locations
         while(allLocations.Count != 0)
