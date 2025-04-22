@@ -8,10 +8,10 @@ public class Weapon : MonoBehaviour {
     [SerializeField]
     private Collider Hitbox;
 
-    [SerializeField] private ParticleSystem _majorTrail;
-    [SerializeField] private GameObject _majorTrailObject;
-    [SerializeField] private ParticleSystem _minorTrail;
-    [SerializeField] private GameObject _minorTrailObject;
+    // [SerializeField] private ParticleSystem _majorTrail;
+    // [SerializeField] private GameObject _majorTrailObject;
+    // [SerializeField] private ParticleSystem _minorTrail;
+    // [SerializeField] private GameObject _minorTrailObject;
 
     public void OnTriggerEnter(Collider other) {
         LivingEntity victim = other.GetComponentInParent<LivingEntity>(includeInactive: true);
@@ -24,29 +24,29 @@ public class Weapon : MonoBehaviour {
     }
 
     public void StartMajorTrail() {
-        if (_majorTrail == null) return;
-        _majorTrailObject.SetActive(true);
-        _majorTrail.Clear();
-        _majorTrail.Play();
+        // if (_majorTrail == null) return;
+        // _majorTrailObject.SetActive(true);
+        // _majorTrail.Clear();
+        // _majorTrail.Play();
     }
 
     public void StartMinorTrail() {
-        if (_majorTrail == null) return;
-        _minorTrailObject.SetActive(true);
-        _minorTrail.Clear();
-        _minorTrail.Play();
+        // if (_majorTrail == null) return;
+        // _minorTrailObject.SetActive(true);
+        // _minorTrail.Clear();
+        // _minorTrail.Play();
     }
 
     public void StopMinorTrail() {
-        if (_majorTrail == null) return;
-        _minorTrail.Stop();
-        _minorTrailObject.SetActive(false);
+        // if (_majorTrail == null) return;
+        // _minorTrail.Stop();
+        // _minorTrailObject.SetActive(false);
     }
 
     public void StopMajorTrail() {
-        if (_majorTrail == null) return;
-        _majorTrail.Stop();
-        _majorTrailObject.SetActive(false);
+        // if (_majorTrail == null) return;
+        // _majorTrail.Stop();
+        // _majorTrailObject.SetActive(false);
     }
 
     public void EnableHitbox() {
