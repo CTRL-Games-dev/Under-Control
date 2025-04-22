@@ -44,7 +44,6 @@ public class LivingEntity : MonoBehaviour {
    
     public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
     public Stat Armor = new Stat(StatType.ARMOR, 0);
-    public Stat ElementalArmor = new Stat(StatType.ELEMENTAL_ARMOR, 0);
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
     public Stat MaxMana = new Stat(StatType.MAX_MANA, 100f);
 
@@ -76,7 +75,6 @@ public class LivingEntity : MonoBehaviour {
 
         ModifierSystem.RegisterStat(ref MaxHealth);
         ModifierSystem.RegisterStat(ref Armor);
-        ModifierSystem.RegisterStat(ref ElementalArmor);
         ModifierSystem.RegisterStat(ref MovementSpeed);
         ModifierSystem.RegisterStat(ref MaxMana);
 
