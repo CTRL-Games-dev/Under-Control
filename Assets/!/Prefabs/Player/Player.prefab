@@ -6877,13 +6877,13 @@ MonoBehaviour:
   MinCameraDistance: 4
   MaxCameraDistance: 15
   CameraDistanceSpeed: 1
-  MaxInteractionRange: 2
+  MaxInteractionRange: 3
   CameraTargetObjectBounds: {x: 0, y: 0}
   MainCameraObject: {fileID: 2942579809011625722}
   CinemachineObject: {fileID: 1577044056733285295}
   CameraTargetObject: {fileID: 4902519630981857668}
   TopDownCamera: {fileID: 1842100701194989401}
-  CameraNoise: {fileID: 0}
+  CameraNoise: {fileID: 3582159393707406577}
   MainCamera: {fileID: 469925352793417921}
   InputDisabled: 1
   DamageDisabled: 0
@@ -6955,6 +6955,7 @@ MonoBehaviour:
   _groundLayerMask:
     serializedVersion: 2
     m_Bits: 256
+  FaceAnimator: {fileID: 4932158786382918275}
   CurrentAnimationState: 0
   actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!114 &2932634121617026090
@@ -14013,7 +14014,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 8565112724246989343}
   m_Direction: 2
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.9998042
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -14214,7 +14215,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 7294056453409053838}
   m_Direction: 2
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.9998042
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -14258,7 +14259,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.4749756, y: -0.0005302258}
+  m_AnchoredPosition: {x: 0.4749756, y: -0.00015129738}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6274736155342227322
@@ -15154,7 +15155,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5667783115067739898}
   m_Direction: 2
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.999738
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -24322,9 +24323,9 @@ MonoBehaviour:
   m_fontSize: 30
   m_fontSizeBase: 30
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 30
   m_fontStyle: 16
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -24335,7 +24336,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -24903,7 +24904,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.4749756, y: -0.0005302258}
+  m_AnchoredPosition: {x: 0.4749756, y: -0.00015129738}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2779757702894924477
@@ -25367,12 +25368,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
+  m_fontSize: 19.35
   m_fontSizeBase: 30
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 30
   m_fontStyle: 16
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -25383,7 +25384,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -26954,23 +26955,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _faceRenderer: {fileID: 143016111162663737}
-  _blinkSprite: {x: 1, y: 0}
+  _sheetSize: 5
+  _defaultAnimation:
+    AnimationName: DEFAULT
+    Positions:
+    - {x: 0, y: 2}
+    - {x: 1, y: 2}
+    Speed: 0.2
+    IsRandomized: 0
+    CanBlink: 1
+  _blinkPosition: {x: 1, y: 0}
   _blinkInterval: 2
   _blinkSpeed: 0.1
-  _talkSprites:
-  - {x: 0, y: 3}
-  - {x: 1, y: 3}
-  - {x: 2, y: 3}
-  _talkSpeed: 0.1
-  _excitedSprites:
-  - {x: 0, y: 1}
-  - {x: 1, y: 1}
-  _excitedSpeed: 0.1
-  _neutralSprites:
-  - {x: 0, y: 2}
-  - {x: 1, y: 2}
-  _neutralSpeed: 0.1
-  CurrentFaceState: 0
+  _customAnimations:
+  - AnimationName: TALK
+    Positions:
+    - {x: 1, y: 3}
+    - {x: 2, y: 3}
+    Speed: 0.2
+    IsRandomized: 1
+    CanBlink: 1
+  - AnimationName: EXCITED
+    Positions:
+    - {x: 0, y: 1}
+    - {x: 1, y: 1}
+    Speed: 0.2
+    IsRandomized: 0
+    CanBlink: 0
 --- !u!1 &3565727479081693049
 GameObject:
   m_ObjectHideFlags: 0
@@ -32480,7 +32491,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 2.4, y: -0.00052876555}
+  m_AnchoredPosition: {x: 2.4, y: -0.0000986538}
   m_SizeDelta: {x: 1121.5598, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6049122339610106530
@@ -46778,8 +46789,8 @@ CanvasGroup:
   m_GameObject: {fileID: 7311586478101612950}
   m_Enabled: 1
   m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!1 &7319044788504758795
 GameObject:
@@ -48075,12 +48086,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
+  m_fontSize: 19.35
   m_fontSizeBase: 30
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 30
   m_fontStyle: 16
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -48091,7 +48102,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -56486,12 +56497,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
+  m_fontSize: 19
   m_fontSizeBase: 30
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 30
   m_fontStyle: 16
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -56502,7 +56513,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -68415,7 +68426,7 @@ PrefabInstance:
     - target: {fileID: -1206874426333947015, guid: db172ca504e21aa49981864cf256b39d, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: 013210169a67f9e4699e88e54c3e04e3, type: 2}
+      objectReference: {fileID: 2100000, guid: 2855c140dc0ad76408e4e8b2c242bf21, type: 2}
     - target: {fileID: -1186978294735129684, guid: db172ca504e21aa49981864cf256b39d, type: 3}
       propertyPath: m_Layer
       value: 6

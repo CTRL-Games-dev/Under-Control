@@ -48,6 +48,7 @@ public class CameraManager : MonoBehaviour
 
 
     public void SwitchCamera(CinemachineCamera camera) {
+
         if (camera == _currentCamera) {
             return;
         }
