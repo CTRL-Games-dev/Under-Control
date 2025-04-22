@@ -25,6 +25,7 @@ public class Player : MonoBehaviour {
 
             caster.Mana -= Spell.Mana; 
             Spell.Cast();
+            Animator.SetTrigger(Instance._spellHash);
 
             return true;
         }
@@ -167,6 +168,7 @@ public class Player : MonoBehaviour {
     private readonly int _weaponTypeHash = Animator.StringToHash("weapon_type");
     private readonly int _lightAttackSpeedHash = Animator.StringToHash("attack_light_speed");
     private readonly int _heavyAttackSpeedHash = Animator.StringToHash("attack_heavy_speed");
+    private readonly int _spellHash = Animator.StringToHash("spell");
 
     [Header("References")]
     [SerializeField] private UICanvas _uiCanvas;
@@ -186,7 +188,9 @@ public class Player : MonoBehaviour {
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
 
-    private Vector3 _queuedRotation;
+    public GameObject SlashGO;
+    public Material SlashMaterial;
+    private Vector3 _queuedRotation = Vector3.zero;
 
     #region Unity Methods
     void Awake() {
@@ -286,9 +290,13 @@ public class Player : MonoBehaviour {
     private Vector3 getGoalDirection() {
         switch (CurrentAnimationState) {
             case AnimationState.Attack_Windup:
+                if (_queuedRotation == Vector3.zero) return transform.forward;
+                Vector3 dir = _queuedRotation;
+                _queuedRotation = Vector3.zero;
+                return dir.normalized;
             case AnimationState.Attack_Contact:
             case AnimationState.Attack_ComboWindow:
-                return _queuedRotation.normalized;
+                return transform.forward;
 
             case AnimationState.Locomotion:
             case AnimationState.Attack_Recovery:
@@ -535,13 +543,15 @@ public class Player : MonoBehaviour {
         if(CurrentWeapon == null) return;
 
         // Default to attacking if no interaction was commited
-        _queuedRotation = GetMousePosition() - transform.position;
-        if(_isAttacking) {
+        if (CurrentAnimationState == AnimationState.Attack_ComboWindow) {
+            _queuedRotation = GetMousePosition() - transform.position;
+            LockRotation = false;
+        } else if(_isAttacking) {
             return;
         }
         
         if (!LockRotation) {
-            transform.LookAt(GetMousePosition());
+            transform.LookAt(GetMousePosition());   
         }
 
         LockRotation = true;
@@ -630,14 +640,14 @@ public class Player : MonoBehaviour {
                 break; 
 
             case AnimationState.Attack_Contact:
-                WeaponHolder.DisableHitbox();
-                _isAttacking = false;
                 break;
 
             case AnimationState.Attack_ComboWindow:
+                _isAttacking = false;
                 break;
 
             case AnimationState.Attack_Recovery:
+                _isAttacking = false;
                 LockRotation = false;
                 break;
         }
@@ -647,25 +657,35 @@ public class Player : MonoBehaviour {
         CurrentAnimationState = state;
         switch (state) {
             case AnimationState.Locomotion:
+                WeaponHolder.DisableHitbox();
+                SlashMaterial.color = Color.white;
                 break;
 
             case AnimationState.Attack_Windup:
+                SlashMaterial.color = Color.white;
                 LockRotation = true;
                 _isAttacking = true;
                 _currentSpeed = 0;
+                // SlashGO.SetActive(true);
+
                 break;
 
             case AnimationState.Attack_Contact:
+                SlashMaterial.color = Color.cyan;
                 WeaponHolder.EnableHitbox();
                 break;
 
             case AnimationState.Attack_ComboWindow:
-                LockRotation = false;
-                transform.LookAt(GetMousePosition());
+                SlashMaterial.color = Color.yellow;
                 break;
 
             case AnimationState.Attack_Recovery:
-                LockRotation = true;
+                WeaponHolder.DisableHitbox();
+                SlashMaterial.color = Color.green;
+                // SlashGO.SetActive(false);
+                LockRotation = false;
+
+                // LockRotation = true;
                 break;
         }
     }

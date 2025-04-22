@@ -195,7 +195,7 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
         _moreInfoRect.DOKill();
         LivingEntity.EffectData effectData = effectUI.EffectData;
 
-        _moreInfoRect.localPosition = new Vector3(effectUI.transform.position.x - 185, _moreInfoRect.localPosition.y, _moreInfoRect.localPosition.z);
+        _moreInfoRect.localPosition = new Vector3(effectUI.transform.position.x - 235, _moreInfoRect.localPosition.y, _moreInfoRect.localPosition.z);
         _moreInfoRect.DOScale(1, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutQuint);
 
         _nameTextLocalizer.Key = effectData.Effect.Name;

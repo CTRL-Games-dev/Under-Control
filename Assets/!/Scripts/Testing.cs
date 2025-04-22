@@ -13,5 +13,8 @@ public class Testing : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F2)) {
             Player.Instance.FaceAnimator.StartAnimation("EXCITED", 1.5f); 
         }
+        if (Input.GetKeyDown(KeyCode.F3)) {
+            Player.LivingEntity.ApplyEffect(Effects[0]);
+        }
     }
 }
