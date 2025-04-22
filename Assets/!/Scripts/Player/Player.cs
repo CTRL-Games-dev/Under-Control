@@ -127,16 +127,16 @@ public class Player : MonoBehaviour {
     }
 
     [Header("Consumable")]
-    public InventoryItem ConsumableItemOne = null;
+    public InventoryItem<ConsumableItemData> ConsumableItemOne = null;
 
-    public InventoryItem ConsumableItemTwo = null;
+    public InventoryItem<ConsumableItemData> ConsumableItemTwo = null;
 
     [SerializeField]
     public Cooldown ConsumableCooldown = new Cooldown(0.5f);
 
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
-    public WeaponItemData CurrentWeapon { get => Inventory.Weapon; }
+    public InventoryItem<WeaponItemData> CurrentWeapon { get => Inventory.Weapon; }
 
     private bool _isAttacking = false;
     public bool LockRotation = false;
@@ -209,7 +209,7 @@ public class Player : MonoBehaviour {
         registerStats();
 
         if (CurrentWeapon != null) {
-            WeaponHolder.UpdateWeapon(CurrentWeapon);
+            WeaponHolder.UpdateWeapon(CurrentWeapon.ItemData);
         }
 
         OnEvolutionSelected.AddListener((evoUI) => {
@@ -226,7 +226,7 @@ public class Player : MonoBehaviour {
                 }
             }
 
-            _currentAmuletModifiers = Inventory.Amulet?.Modifiers;
+            _currentAmuletModifiers = Inventory.Amulet?.ItemData.Modifiers;
 
             if (_currentAmuletModifiers != null) {
                 foreach(var modifier in _currentAmuletModifiers) {
@@ -574,8 +574,8 @@ public class Player : MonoBehaviour {
     }
 
     public void OnInventoryChanged() {
-        WeaponHolder.UpdateWeapon(CurrentWeapon);
-        Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.WeaponType ?? WeaponType.None));
+        WeaponHolder.UpdateWeapon(CurrentWeapon?.ItemData);
+        Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData.WeaponType ?? WeaponType.None));
     }
 
     public Vector3 GetMousePosition() {

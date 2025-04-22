@@ -30,7 +30,7 @@ public class InvTileEquipment : InvTile {
             case TileType.Armor:
                 if (Player.Inventory.Armor != null) {
                     InventoryItem inventoryItem = new();
-                    inventoryItem.ItemData = Player.Inventory.Armor;
+                    inventoryItem = Player.Inventory.Armor;
                     createItemUI(inventoryItem);
                     IsEmpty = false;
                 }
@@ -39,7 +39,7 @@ public class InvTileEquipment : InvTile {
             case TileType.Amulet:
                 if (Player.Inventory.Amulet != null) {
                     InventoryItem inventoryItem = new();
-                    inventoryItem.ItemData = Player.Inventory.Amulet;
+                    inventoryItem = Player.Inventory.Amulet;
                     createItemUI(inventoryItem);
                     IsEmpty = false;
                 }
@@ -48,7 +48,7 @@ public class InvTileEquipment : InvTile {
             case TileType.Weapon:
                 if (Player.Inventory.Weapon != null) {
                     InventoryItem inventoryItem = new();
-                    inventoryItem.ItemData = Player.Inventory.Weapon;
+                    inventoryItem = Player.Inventory.Weapon;
                     createItemUI(inventoryItem);
                     IsEmpty = false;
                 }
@@ -129,45 +129,39 @@ public class InvTileEquipment : InvTile {
         if (SelectedInventoryItem == null && _itemUI == null) return;        
         if (SelectedInventoryItem != null && _itemUI != null) return;
         if(!IsEmpty) return;
-
-        
-        
             if (_tileType == TileType.Armor) {
-                if (SelectedInventoryItem.ItemData is not ArmorItemData armorItemData) {
+                if(!SelectedInventoryItem.TryAs(out InventoryItem<ArmorItemData> armorItem)) {
                     return;
                 }
 
-                Player.Inventory.Armor = armorItemData;
+                Player.Inventory.Armor = armorItem;
             } else if (_tileType == TileType.Amulet) {
-                if (SelectedInventoryItem.ItemData is not AmuletItemData amuletItemData) {
+                if(!SelectedInventoryItem.TryAs(out InventoryItem<AmuletItemData> amuletItem)) {
                     return;
                 }
 
-                Player.Inventory.Amulet = amuletItemData;
+                Player.Inventory.Amulet = amuletItem;
             } else if (_tileType == TileType.Weapon) {
-                if (SelectedInventoryItem.ItemData is not WeaponItemData weaponItemData) {
+                if(!SelectedInventoryItem.TryAs(out InventoryItem<WeaponItemData> weaponItem)) {
                     return;
                 }
 
-                Player.Inventory.Weapon = weaponItemData;
+                Player.Inventory.Weapon = weaponItem;
             } else if (_tileType == TileType.Consumeable1) {
-                if (SelectedInventoryItem.ItemData is not ConsumableItemData consumableItemData) {
+                if(!SelectedInventoryItem.TryAs(out InventoryItem<ConsumableItemData> consumableItem)) {
                     return;
                 }
 
-                Player.Instance.ConsumableItemOne = SelectedInventoryItem;
+                Player.Instance.ConsumableItemOne = consumableItem;
                 Player.UICanvas.HUDCanvas.OnUpdateConsumables();
             } else if (_tileType == TileType.Consumeable2) {
-                if (SelectedInventoryItem.ItemData is not ConsumableItemData consumableItemData) {
+                if(!SelectedInventoryItem.TryAs(out InventoryItem<ConsumableItemData> consumableItem)) {
                     return;
                 }
 
-                Player.Instance.ConsumableItemTwo = SelectedInventoryItem;
+                Player.Instance.ConsumableItemTwo = consumableItem;
                 Player.UICanvas.HUDCanvas.OnUpdateConsumables();
             }
-
-
-        
 
         createItemUI(SelectedInventoryItem);
 

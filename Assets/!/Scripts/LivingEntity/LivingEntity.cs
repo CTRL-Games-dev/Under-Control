@@ -95,6 +95,10 @@ public class LivingEntity : MonoBehaviour {
         ItemEntity.SpawnThrownRelative(itemData, amount, transform.position + new Vector3(0, 1.2f, 0), transform.rotation, Vector3.forward * 2);
     }
 
+    private void dropItem(InventoryItem inventoryItem) {
+        dropItem(inventoryItem.ItemData, inventoryItem.Amount);
+    }
+
     public void Attack(Damage damage, LivingEntity target) {
         target.takeDamage(damage, this);
     }
@@ -159,17 +163,17 @@ public class LivingEntity : MonoBehaviour {
                 // Drop equipment
                 if(Inventory is HumanoidInventory humanoidInventory) {
                     if(humanoidInventory.Armor != null) {
-                        dropItem(humanoidInventory.Armor, 1);
+                        dropItem(humanoidInventory.Armor);
                         humanoidInventory.Armor = null;
                     }
 
                     if(humanoidInventory.Amulet != null) {
-                        dropItem(humanoidInventory.Amulet, 1);
+                        dropItem(humanoidInventory.Amulet);
                         humanoidInventory.Amulet = null;
                     }
 
                     if(humanoidInventory.Weapon != null) {
-                        dropItem(humanoidInventory.Weapon, 1);
+                        dropItem(humanoidInventory.Weapon);
                         humanoidInventory.Weapon = null;
                     }
                 }
@@ -184,7 +188,7 @@ public class LivingEntity : MonoBehaviour {
     private float getDamageResistance(DamageType damageType) {
         if(Inventory is not HumanoidInventory humanoidInventory) return 0;
 
-        return humanoidInventory.Armor?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
+        return humanoidInventory.Armor?.ItemData.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
     }
 
     #region Effects
