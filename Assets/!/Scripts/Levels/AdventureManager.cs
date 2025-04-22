@@ -21,6 +21,9 @@ public class AdventureManager : MonoBehaviour
         Vector2 spawn = portal.LocationCenterInWorld;
 
         Player.Instance.MaxCameraDistance = 30f;
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
+        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
+        Player.UICanvas.ChangeUITopState(UITopState.NotVisible);
         Player.Instance.SetPlayerPosition(new Vector3(spawn.x, 1, spawn.y));
 
         Player.Instance.enabled = true;

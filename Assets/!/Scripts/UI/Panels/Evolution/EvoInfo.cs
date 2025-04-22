@@ -1,29 +1,34 @@
+using TMPro;
 using UnityEngine;
 using DG.Tweening;
-using TMPro;
+using UnityEngine.UI;
+
+
 
 public class EvoInfo : MonoBehaviour
 {
+    [SerializeField] private TextLocalizer _titleTextLocalizer, _descText;
     [SerializeField] private TextMeshProUGUI _titleText;
-    [SerializeField] private TextMeshProUGUI _descriptionText;
+    [SerializeField] private Image _outlineImg, _barImg;
+    [SerializeField] private RectTransform _barRect;
+    private ElementalType _currentEvoType;
 
-    private CanvasGroup _canvasGroup;
+    public void SetInfo(string title, string desc, ElementalType elementalType) {
+        _titleTextLocalizer.Key = title;
+        _descText.Key = desc;
 
-    private void Awake() {
-        _canvasGroup = GetComponent<CanvasGroup>();
-        _canvasGroup.alpha = 0;
+        _titleText.DOKill();
+        _outlineImg.DOKill();
+        _barRect.DOKill();
+        
+        _titleText.DOColor(ElementalInfo.GetColor(elementalType), 0.6f * Settings.AnimationSpeed).SetEase(Ease.InOutCirc);
+        _outlineImg.DOColor(ElementalInfo.GetColor(elementalType), 0.6f * Settings.AnimationSpeed).SetEase(Ease.InOutCirc);
+        _barRect.DOScaleY(0, 0.3f * Settings.AnimationSpeed).SetEase(Ease.InOutCirc).OnComplete(() => {
+            _barImg.sprite = ElementalInfo.GetBarSprite(elementalType);
+            _barRect.DOScaleY(1, 0.3f * Settings.AnimationSpeed);
+        });
+
+        _currentEvoType = elementalType;
     }
 
-
-    public void SetInfo(string title, string description, Vector3 pos) {
-        _canvasGroup.DOKill();
-        if (title == null) {
-            _canvasGroup.DOFade(0, 0.2f * Settings.AnimationSpeed);
-            return;
-        }
-        transform.position = pos + new Vector3(0, -50, 0);
-        _titleText.text = title;
-        _descriptionText.text = description;
-        _canvasGroup.DOFade(1, 0.2f * Settings.AnimationSpeed);
-    }
 }

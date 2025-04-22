@@ -8,7 +8,7 @@ using UnityEngine.Events;
 [RequireComponent(typeof(EntityInventory))]
 [RequireComponent(typeof(HitFlashAnimator))]
 public class LivingEntity : MonoBehaviour {
-    private struct EffectData {
+    public struct EffectData {
         public Effect Effect;
         public float Expiration;
     }
@@ -17,15 +17,14 @@ public class LivingEntity : MonoBehaviour {
     public string DisplayName;
     public Guild Guild;
     public bool DropItemsOnDeath = true;
+    public bool DestroyOnDeath = true;
+    public bool IsInvisible = false;
+
     public string DebugName => $"{DisplayName} ({Guild.Name} {gameObject.name})";
 
-    public bool DestroyOnDeath = true;
-
     [Header("Stats")]
-    [SerializeField] 
-    private float _startingHealth = 100;
-    [SerializeField]
-    private float _startingMana = 100f;
+    public float StartingHealth = 100;
+    public float StartingMana = 100f;
     private float _health = 0;
     public float Health {
         get => _health;
@@ -56,6 +55,10 @@ public class LivingEntity : MonoBehaviour {
 
     // State
     private List<EffectData> _activeEffects = new List<EffectData>();
+    public List<EffectData> ActiveEffects {
+        get { return _activeEffects; }
+        private set { _activeEffects = value; }
+    }
 
     private readonly int _hurtHash = Animator.StringToHash("hurt");
 
@@ -64,7 +67,7 @@ public class LivingEntity : MonoBehaviour {
     public EntityInventory Inventory { get; private set; }
     public HitFlashAnimator HitFlashAnimator { get; private set; }
 
-    private bool _isPlayer = false;
+    public bool _isPlayer = false;
 
     void Awake() {
         ModifierSystem = GetComponent<ModifierSystem>();
@@ -78,8 +81,8 @@ public class LivingEntity : MonoBehaviour {
         ModifierSystem.RegisterStat(ref MaxMana);
 
         _isPlayer = gameObject.GetComponent<Player>() != null;
-        _health = _startingHealth;
-        _mana = _startingMana;
+        _health = StartingHealth;
+        _mana = StartingMana;
     }
 
     void Update() {
@@ -103,7 +106,7 @@ public class LivingEntity : MonoBehaviour {
     private void takeDamage(Damage damage, LivingEntity source = null) {
         if (source.gameObject.CompareTag("Player")) {
             // StartCoroutine(nameof(slowDown));
-            CameraShake.Instance.Shake(2, 0.1f);
+            CameraManager.Instance.ShakeCamera(2, 0.1f);
         }
 
         if (gameObject.CompareTag("Boar")) {
@@ -191,7 +194,7 @@ public class LivingEntity : MonoBehaviour {
     #region Effects
 
     public void ApplyEffect(Effect effect) {
-        _activeEffects.Add(new EffectData {
+        ActiveEffects.Add(new EffectData {
             Effect = effect,
             Expiration = Time.time + effect.Duration
         });
@@ -207,8 +210,8 @@ public class LivingEntity : MonoBehaviour {
     }
 
     public void RemoveEffect(Effect effect) {
-        for(int i = 0; i < _activeEffects.Count; i++) {
-            if(!_activeEffects[i].Effect.Equals(effect)) {
+        for(int i = 0; i < ActiveEffects.Count; i++) {
+            if(!ActiveEffects[i].Effect.Equals(effect)) {
                 continue;
             }
 
@@ -217,8 +220,12 @@ public class LivingEntity : MonoBehaviour {
                 ModifierSystem.RemoveModifier(modifier);
             }
 
-            _activeEffects.RemoveAt(i);
+            ActiveEffects.RemoveAt(i);
         }
+    }
+
+    public List<EffectData> GetActiveEffects() {
+        return ActiveEffects;
     }
 
     // public void RemoveAllEffectsLike(Effect effect) {
@@ -239,7 +246,7 @@ public class LivingEntity : MonoBehaviour {
     // }
 
     private void recheckEffects() {
-        _activeEffects.RemoveAll(x => x.Expiration < Time.time);
+        ActiveEffects.RemoveAll(x => x.Expiration < Time.time);
     }
 
     #endregion
