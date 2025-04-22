@@ -25,6 +25,7 @@ public class Player : MonoBehaviour {
 
             caster.Mana -= Spell.Mana; 
             Spell.Cast();
+            Animator.SetTrigger(Instance._spellHash);
 
             return true;
         }
@@ -170,6 +171,7 @@ public class Player : MonoBehaviour {
     private readonly int _weaponTypeHash = Animator.StringToHash("weapon_type");
     private readonly int _lightAttackSpeedHash = Animator.StringToHash("attack_light_speed");
     private readonly int _heavyAttackSpeedHash = Animator.StringToHash("attack_heavy_speed");
+    private readonly int _spellHash = Animator.StringToHash("spell");
 
     [Header("References")]
     [SerializeField] private UICanvas _uiCanvas;
