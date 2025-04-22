@@ -16,7 +16,7 @@ public class InventoryItem {
     public Vector2Int Position;
 
     [Range(0, 2)]
-    public float PowerScale;
+    public float PowerScale = 1;
     public bool Rotated;
 
     public Vector2Int Size { get => ItemData.Size; }
