@@ -8,16 +8,10 @@ public class Testing : MonoBehaviour
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.F1)) {
-            Player.LivingEntity.ApplyEffect(Effects[0]);
+            Player.Instance.FaceAnimator.StartAnimation("TALK", 5f); 
         }
         if (Input.GetKeyDown(KeyCode.F2)) {
-            Player.LivingEntity.ApplyEffect(Effects[1]);
-        }
-        if (Input.GetKeyDown(KeyCode.F3)) {
-            Player.LivingEntity.ApplyEffect(Effects[2]);
-        }
-        if (Input.GetKeyDown(KeyCode.C)) {
-            Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Choose);
+            Player.Instance.FaceAnimator.StartAnimation("EXCITED", 1.5f); 
         }
     }
 }
