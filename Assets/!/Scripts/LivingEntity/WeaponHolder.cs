@@ -10,11 +10,16 @@ public class WeaponHolder : MonoBehaviour
 
     private Weapon _currentWeaponHitter;
     private WeaponItemData _currentWeaponData;
+    private float _currentWeaponPowerScale;
     private List<LivingEntity> _hitEntities = new List<LivingEntity>();
     private AttackType? _currentAttackType;
     private bool _isAttacking = false;
 
-    public void UpdateWeapon(WeaponItemData weaponData) {
+    public void UpdateWeapon(InventoryItem<WeaponItemData> weaponItem) {
+        UpdateWeapon(weaponItem.ItemData, weaponItem.PowerScale);
+    }
+
+    public void UpdateWeapon(WeaponItemData weaponData, float powerScale = 1) {
         if (_currentWeaponHitter != null) {
             Destroy(_currentWeaponHitter.gameObject);
             _currentWeaponHitter = null;
@@ -22,6 +27,8 @@ public class WeaponHolder : MonoBehaviour
         }
 
         if(weaponData == null) return;
+
+        _currentWeaponPowerScale = powerScale;
 
         if (weaponData.WeaponPrefab != null) {
             _currentWeaponHitter = InstantiateWeapon(weaponData);
@@ -138,6 +145,9 @@ public class WeaponHolder : MonoBehaviour
 
         float damageMin = _currentAttackType.Value == AttackType.LIGHT ? _currentWeaponData.LightDamageMin : _currentWeaponData.HeavyDamageMin;
         float damageMax = _currentAttackType.Value == AttackType.LIGHT ? _currentWeaponData.LightDamageMax : _currentWeaponData.HeavyDamageMax;
+
+        damageMin *= _currentWeaponPowerScale;
+        damageMax *= _currentWeaponPowerScale;
 
         if(damageMax <= 0) {
             Debug.LogWarning($"{Self.DebugName}: DamageMax is zero or negative. Current weapon is {_currentWeaponData.DisplayName}. Attack type is {_currentAttackType}");

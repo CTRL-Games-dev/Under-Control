@@ -69,7 +69,6 @@ public class ItemUI : MonoBehaviour
         Amount = InventoryItem.Amount;
     }
 
-
     public void OnPointerEnter() {
         _imageRectTransform.localScale = new Vector3(1.1f, 1.1f, 1);
         EventBus.ItemUIHoverEvent.Invoke(this);

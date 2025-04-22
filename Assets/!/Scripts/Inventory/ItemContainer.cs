@@ -55,7 +55,7 @@ public class ItemContainer
         return true;
     }
 
-    public bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position) {
+    public bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position, float powerScale) {
         var inventoryItem = GetInventoryItem(position);
         if(inventoryItem == null) {
             return DoesFitWithin(position, itemData.Size);
@@ -66,6 +66,10 @@ public class ItemContainer
         }
 
         if(inventoryItem.Amount + quantity > inventoryItem.ItemData.MaxQuantity) {
+            return false;
+        }
+
+        if(!Mathf.Approximately(inventoryItem.PowerScale, powerScale)) {
             return false;
         }
 
@@ -110,40 +114,24 @@ public class ItemContainer
     }
 
     // Returns true if the item was added
-    public bool AddItem(ItemData itemData, int amount, Vector2Int position, bool rotated) {
+    public bool AddItem(ItemData itemData, int amount, Vector2Int position, float powerScale = 1, bool rotated = false) {
         if(!IsWithinBounds(position)) {
             throw new Exception("Position is out of bounds");
         }
 
-        // if(!CanBeAdded(itemData, amount, position)) { // TODO: check if can be added when rotated
-        //     return false;
-        // }
-
-        return addItem(itemData, amount, position, rotated);
-    }
-
-    public bool AddItem(ItemData itemData, int amount, Vector2Int position) {
-        if(!IsWithinBounds(position)) {
-            throw new Exception("Position is out of bounds");
-        }
-
-        if(!CanBeAdded(itemData, amount, position)) {
+        if(!CanBeAdded(itemData, amount, position, powerScale)) {
             return false;
         }
 
-        return addItem(itemData, amount, position);
-    }
-
-    public bool AddItem(ItemData itemData, Vector2Int position) {
-        return AddItem(itemData, 1, position);
+        return addItem(itemData, amount, position, powerScale, rotated);
     }
 
     // Adds item anywhere in the inventory
     // Searches for space by columns then rows
-    public bool AddItem(ItemData itemData, int amount) {
+    public bool AddItem(ItemData itemData, int amount = 1, float powerScale = 1) {
         for(int y = 0; y < _size.y; y++) {
             for(int x = 0; x < _size.x; x++) {
-                if(CanBeAdded(itemData, amount, new Vector2Int(x, y))) {
+                if(CanBeAdded(itemData, amount, new Vector2Int(x, y), powerScale)) {
                     return addItem(itemData, amount, new Vector2Int(x, y));
                 }
             }
@@ -152,13 +140,7 @@ public class ItemContainer
         return false;
     }
 
-    // Adds item anywhere in the inventory
-    // Searches for space by columns then rows
-    public bool AddItem(ItemData itemData) {
-        return AddItem(itemData, 1);
-    }
-
-    private bool addItem(ItemData itemData, int amount, Vector2Int position, bool rotated = false) {
+    private bool addItem(ItemData itemData, int amount, Vector2Int position, float powerScale = 1, bool rotated = false) {
         var inventoryItem = GetInventoryItem(position);
         if(inventoryItem != null) {
             if(!inventoryItem.ItemData.Equals(itemData)) {
@@ -178,6 +160,7 @@ public class ItemContainer
             ItemData = itemData,
             Amount = amount,
             Position = position,
+            PowerScale = powerScale,
             Rotated = rotated
         };
 

@@ -132,16 +132,13 @@ public class Player : MonoBehaviour {
     }
 
     [Header("Consumable")]
-    public InventoryItem ConsumableItemOne = null;
-
-    public InventoryItem ConsumableItemTwo = null;
-
-    [SerializeField]
+    public InventoryItem<ConsumableItemData> ConsumableItemOne = null;
+    public InventoryItem<ConsumableItemData> ConsumableItemTwo = null;
     public Cooldown ConsumableCooldown = new Cooldown(0.5f);
 
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
-    public WeaponItemData CurrentWeapon { get => Inventory.Weapon; }
+    public InventoryItem<WeaponItemData> CurrentWeapon { get => Inventory.Weapon; }
 
     private bool _isAttacking = false;
     public bool LockRotation = false;
@@ -218,7 +215,7 @@ public class Player : MonoBehaviour {
 
         registerStats();
 
-        if (CurrentWeapon != null) {
+        if (CurrentWeapon.ItemData != null) {
             WeaponHolder.UpdateWeapon(CurrentWeapon);
         }
 
@@ -236,7 +233,7 @@ public class Player : MonoBehaviour {
                 }
             }
 
-            _currentAmuletModifiers = Inventory.Amulet?.Modifiers;
+            _currentAmuletModifiers = Inventory.Amulet?.ItemData?.Modifiers;
 
             if (_currentAmuletModifiers != null) {
                 foreach(var modifier in _currentAmuletModifiers) {
@@ -373,7 +370,7 @@ public class Player : MonoBehaviour {
         ConsumableItemOne.Amount--;
 
         if (ConsumableItemOne.Amount <= 0) {
-            ConsumableItemOne.ItemData = null;
+            ConsumableItemOne = null;
         }
 
         UICanvas.HUDCanvas.UseConsumable1();
@@ -391,7 +388,7 @@ public class Player : MonoBehaviour {
         c.Consume(LivingEntity);
         ConsumableItemTwo.Amount--;
         if (ConsumableItemTwo.Amount <= 0) {
-            ConsumableItemTwo.ItemData = null;
+            ConsumableItemTwo = null;
         }
 
         UICanvas.HUDCanvas.UseConsumable2();
@@ -543,7 +540,7 @@ public class Player : MonoBehaviour {
         bool interacted = tryInteract(interactionType);
         
         if(interacted) return;
-        if(CurrentWeapon == null) return;
+        if(CurrentWeapon.ItemData == null) return;
 
         // Default to attacking if no interaction was commited
         if (CurrentAnimationState == AnimationState.Attack_ComboWindow) {
@@ -602,7 +599,7 @@ public class Player : MonoBehaviour {
 
     public void OnInventoryChanged() {
         WeaponHolder.UpdateWeapon(CurrentWeapon);
-        Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.WeaponType ?? WeaponType.None));
+        Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
     }
 
     public Vector3 GetMousePosition() {
