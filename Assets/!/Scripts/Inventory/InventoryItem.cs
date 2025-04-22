@@ -1,14 +1,14 @@
 using System;
 using UnityEngine;
-
+using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 [Serializable]
 public class InventoryItem {
-    // This ensures InventoryItem<T> window remains valid
-    [SerializeField]
+    // init-setter ensures InventoryItem<T> window remains valid
+    [SerializeField, FormerlySerializedAs("ItemData")]
     private ItemData _itemData;
     public ItemData ItemData { get => _itemData; init => _itemData = value; }
 
