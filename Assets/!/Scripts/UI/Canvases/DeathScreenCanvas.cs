@@ -20,7 +20,7 @@ public class DeathScreenCanvas : MonoBehaviour, IUICanvasState
     public void ShowUI() {
         gameObject.SetActive(true);
         
-        CameraShake.Instance.Shake(1, 0.1f);
+        CameraManager.Instance.ShakeCamera(1, 0.1f);
         CameraManager.Instance.SwitchCamera(_deathCamera);
         Player.Instance.LockRotation = true;
         Player.Instance.InputDisabled = true;
