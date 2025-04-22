@@ -215,8 +215,8 @@ public class Player : MonoBehaviour {
 
         registerStats();
 
-        if (CurrentWeapon != null) {
-            WeaponHolder.UpdateWeapon(CurrentWeapon.ItemData);
+        if (CurrentWeapon.ItemData != null) {
+            WeaponHolder.UpdateWeapon(CurrentWeapon);
         }
 
         OnEvolutionSelected.AddListener((evoUI) => {
@@ -598,7 +598,7 @@ public class Player : MonoBehaviour {
     }
 
     public void OnInventoryChanged() {
-        WeaponHolder.UpdateWeapon(CurrentWeapon?.ItemData);
+        WeaponHolder.UpdateWeapon(CurrentWeapon);
         Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
     }
 
