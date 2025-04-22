@@ -20,4 +20,18 @@ public class Chest : MonoBehaviour, IInteractableInventory
     public void EndInteract() {
         _animator.SetTrigger("close");
     }
+
+    public bool FindFirstEmptySpot(ItemData item, int quantity)
+    {
+        for (int x = 0; x < _inventory.Size.x; x++)
+        {
+            for(int y = 0; y < _inventory.Size.y; y++)
+            {
+                Vector2Int position = new(x,y);
+                if(_inventory.AddItem(item, quantity, position)) return true;
+            }
+        }
+
+        return false;
+    }
 }
