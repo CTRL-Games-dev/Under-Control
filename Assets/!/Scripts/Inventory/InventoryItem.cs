@@ -7,9 +7,12 @@ public class InventoryItem {
     public int Amount;
     public Vector2Int Position;
 
+    [Range(0, 2)]
+    public float PowerScale;
+    public bool Rotated;
+
     public Vector2Int Size { get => ItemData.Size; }
 
-    public bool Rotated;
     public ItemUI ItemUI { get; set; }
     public RectTransform RectTransform { get; set; }
 }

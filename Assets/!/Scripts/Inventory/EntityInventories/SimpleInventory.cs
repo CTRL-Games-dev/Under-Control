@@ -12,26 +12,14 @@ public class SimpleInventory : EntityInventory
     // Does not guarantee that inventory WAS indeed changed
     public UnityEvent OnInventoryChanged;
 
-    public override bool AddItem(ItemData itemData, int amount, Vector2Int position, bool rotated = false) {
-        bool wasAdded = ItemContainer.AddItem(itemData, amount, position, rotated);
+    public override bool AddItem(ItemData itemData, int amount, Vector2Int position, float powerScale = 1, bool rotated = false) {
+        bool wasAdded = ItemContainer.AddItem(itemData, amount, position, powerScale, rotated);
         if (wasAdded) OnInventoryChanged?.Invoke();
         return wasAdded;
     }
 
-    public override bool AddItem(ItemData itemData, int amount, Vector2Int position) {
-        bool wasAdded = ItemContainer.AddItem(itemData, amount, position);
-        if (wasAdded) OnInventoryChanged?.Invoke();
-        return wasAdded;
-    }
-
-    public override bool AddItem(ItemData itemData, int amount) {
-        bool wasAdded = ItemContainer.AddItem(itemData, amount);
-        if (wasAdded) OnInventoryChanged?.Invoke();
-        return wasAdded;
-    }
-
-    public override bool AddItem(ItemData itemData) {
-        bool wasAdded = ItemContainer.AddItem(itemData);
+    public override bool AddItem(ItemData itemData, int amount = 1, float powerScale = 1) {
+        bool wasAdded = ItemContainer.AddItem(itemData, amount, powerScale);
         if (wasAdded) OnInventoryChanged?.Invoke();
         return wasAdded;
     }
@@ -52,8 +40,8 @@ public class SimpleInventory : EntityInventory
         return ItemContainer.FitsWithinBounds(position, size);
     }
 
-    public override bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position) {
-        return ItemContainer.CanBeAdded(itemData, quantity, position);
+    public override bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position, float powerScale) {
+        return ItemContainer.CanBeAdded(itemData, quantity, position, powerScale);
     }
 
     public override bool RemoveInventoryItem(InventoryItem inventoryItem) {
