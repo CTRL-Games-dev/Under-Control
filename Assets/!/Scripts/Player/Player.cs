@@ -80,11 +80,12 @@ public class Player : MonoBehaviour {
     public GameObject CinemachineObject;
     public GameObject CameraTargetObject;
     public CinemachineCamera TopDownCamera;
+    public CinemachineBasicMultiChannelPerlin CameraNoise;
     public Camera MainCamera;
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
 
-    private int _evolutionPoints = 4;
+    private int _evolutionPoints = 9;
     public int EvolutionPoints {
         get{ return _evolutionPoints; }
         set {
@@ -97,12 +98,13 @@ public class Player : MonoBehaviour {
 
     [Header("Spells")]
     [SerializeField]
-    private SpellData _spellDataOne;
+    private SpellData _spellDataOne; 
     public Spell SpellSlotOne {
         get => _spellDataOne.Spell;
         set {
             _spellDataOne.Spell = value;
-            _spellDataOne.Cooldown = new Cooldown(value.CooldownTime);
+            // _spellDataOne.Cooldown = new Cooldown(value.CooldownTime); 
+            UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
 
@@ -112,7 +114,8 @@ public class Player : MonoBehaviour {
         get => _spellDataTwo.Spell;
         set {
             _spellDataTwo.Spell = value;
-            _spellDataTwo.Cooldown = new Cooldown(value.CooldownTime);
+            // _spellDataTwo.Cooldown = new Cooldown(value.CooldownTime);
+            UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
 
@@ -122,7 +125,8 @@ public class Player : MonoBehaviour {
         get => _spellDataThree.Spell;
         set {
             _spellDataThree.Spell = value;
-            _spellDataThree.Cooldown = new Cooldown(value.CooldownTime);
+            // _spellDataThree.Cooldown = new Cooldown(value.CooldownTime);
+            UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
 
@@ -181,6 +185,7 @@ public class Player : MonoBehaviour {
     public static HumanoidInventory Inventory => LivingEntity.Inventory as HumanoidInventory;
 
     [SerializeField] private LayerMask _groundLayerMask;
+    public FaceAnimator FaceAnimator;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
 
@@ -203,6 +208,7 @@ public class Player : MonoBehaviour {
         Instance = this;
 
         LivingEntity.OnDeath.AddListener(onDeath);
+        LivingEntity.OnStunned.AddListener(onStunned);
         
         CameraDistance = MinCameraDistance;
 
@@ -239,6 +245,8 @@ public class Player : MonoBehaviour {
         // LoadKeybinds();
     }
 
+
+
     void Update() {
         if (UpdateDisabled) return;
 
@@ -254,6 +262,8 @@ public class Player : MonoBehaviour {
         Animator.SetFloat(_speedHash, _currentSpeed / Instance.MovementSpeed);
         Animator.SetFloat(_lightAttackSpeedHash, Instance.LightAttackSpeed);
         Animator.SetFloat(_heavyAttackSpeedHash, Instance.HeavyAttackSpeed);
+
+        ModifierSystem.GetActiveModifiers();
     }
 
     #endregion
@@ -301,7 +311,7 @@ public class Player : MonoBehaviour {
             case AnimationState.Attack_Contact:
             case AnimationState.Attack_ComboWindow:
             case AnimationState.Attack_Recovery:
-                return 0;
+                return _movementInputVector.magnitude > 0.1f ? MovementSpeed * 0.3f : 0;
         }
 
         return 0;
@@ -321,19 +331,26 @@ public class Player : MonoBehaviour {
         UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
     }
 
+    private void onStunned(float duration) {
+        CameraManager.Instance.ShakeCamera(2, duration);
+    }
+
     
     #region Input Events
 
     void OnCastSpellOne(InputValue value) {
-        _spellDataOne.TryCast(LivingEntity);
+        if (SpellSlotOne != null) UICanvas.HUDCanvas.UseSpell1();
+        // _spellDataOne.TryCast(LivingEntity);
     }
 
     void OnCastSpellTwo(InputValue value) {
-        _spellDataTwo.TryCast(LivingEntity);
+        if (SpellSlotTwo != null) UICanvas.HUDCanvas.UseSpell2();
+        // _spellDataTwo.TryCast(LivingEntity);
     }
 
     void OnCastSpellThree(InputValue value) {
-        _spellDataThree.TryCast(LivingEntity);
+        if (SpellSlotThree != null) UICanvas.HUDCanvas.UseSpell3();
+        // _spellDataThree.TryCast(LivingEntity);
     }
 
     void OnUseConsumableOne(InputValue value) {

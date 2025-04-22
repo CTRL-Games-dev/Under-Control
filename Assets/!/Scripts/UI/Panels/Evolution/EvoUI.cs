@@ -9,15 +9,15 @@ public class EvoUI : MonoBehaviour
     
     [SerializeField] private Image _bgImage;
     [SerializeField] private Image _lineImage;
-    [SerializeField] private List<EvoUI> _nextEvoUIs;
+    [SerializeField] private EvoUI _nextEvoUI;
 
     [SerializeField] private string _title;
-    private string _description = "";
-
+    [SerializeField, Multiline] private string _desc;
     [SerializeField] private bool _isAvailable = false;
     [SerializeField] private bool _isSelected = false;
 
     [SerializeField] private List<Modifier> _modifiers = new List<Modifier>();
+    [SerializeField] private ElementalType _elementalType;
 
     private RectTransform _rectTransform;
     private EventTrigger _eventTrigger;
@@ -26,13 +26,10 @@ public class EvoUI : MonoBehaviour
         _rectTransform = GetComponent<RectTransform>();
         _eventTrigger = GetComponent<EventTrigger>();
 
-        _rectTransform.localScale = _isAvailable ? Vector3.one : Vector3.one * 0.9f;
+        _rectTransform.localScale = _isAvailable ? Vector3.one : Vector3.one * 0.95f;
         _bgImage.color = _isAvailable ? Color.white : Color.gray;
         _lineImage.fillAmount = _isSelected ? 1 : 0;
-
-        foreach (Modifier modifier in _modifiers) {
-            _description += modifier.ToRichTextString() + "\n";
-        }
+        _lineImage.color = ElementalInfo.GetColor(_elementalType);
     }
 
 
@@ -43,17 +40,14 @@ public class EvoUI : MonoBehaviour
         _rectTransform.DOScale(1f, 0.2f * Settings.AnimationSpeed);
     }
 
-
-
     public void OnPointerEnter() {
-        Player.UICanvas.EvoInfo.SetInfo(_title, _description, transform.position);
+        Player.UICanvas.InventoryCanvas.EvoInfo.SetInfo(_title, _desc, _elementalType);
         if (!_isAvailable) return;
         _rectTransform.DOKill();
         _rectTransform.DOScale(1.1f, 0.2f * Settings.AnimationSpeed);
     }
 
     public void OnPointerExit() {
-        Player.UICanvas.EvoInfo.SetInfo(null, null, transform.position);
         if (!_isAvailable) return;
         _rectTransform.DOKill();
         _rectTransform.DOScale(1f, 0.2f * Settings.AnimationSpeed);
@@ -65,16 +59,14 @@ public class EvoUI : MonoBehaviour
         Player.Instance.SelectedEvolutions.Add(this);
         Player.Instance.OnEvolutionSelected.Invoke(this);
         float fillAmount = 0;
-        DOTween.To(() => fillAmount, x => fillAmount = x, 1, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnUpdate(() => {
+        DOTween.To(() => fillAmount, x => fillAmount = x, 1, 0.8f * Settings.AnimationSpeed).SetEase(Ease.OutSine).OnUpdate(() => {
             _lineImage.fillAmount = fillAmount;
         }).OnComplete(() => {
-            _bgImage.DOColor(Color.green, 0.2f * Settings.AnimationSpeed);
+            _rectTransform.DOScale(1.05f, 0.2f * Settings.AnimationSpeed);
         });
         _isSelected = true;
         _rectTransform.DOKill();
-        foreach (EvoUI evoUI in _nextEvoUIs) {
-            evoUI.SetAvailable();
-        }
+        if (_nextEvoUI != null) _nextEvoUI.SetAvailable();
     }
 
     public List<Modifier> GetModifiers() {

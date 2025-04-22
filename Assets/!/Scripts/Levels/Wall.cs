@@ -20,9 +20,9 @@ public class Wall : MonoBehaviour
         float wallLength = Vector3.Distance(start, end);
         wallLength += offset * 2;
 
-        Debug.Log("=====");
-        Debug.Log($"Start {start}, end {end}");
-        Debug.Log($"Wall length {wallLength}");
+        // Debug.Log("=====");
+        // Debug.Log($"Start {start}, end {end}");
+        // Debug.Log($"Wall length {wallLength}");
 
         transform.position += new Vector3(offset * positionDelta.x, 0, offset * positionDelta.z);
         transform.localScale = new(transform.localScale.x, transform.localScale.y, wallLength);

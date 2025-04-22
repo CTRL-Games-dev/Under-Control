@@ -32,8 +32,6 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         _exitBtnStartingX = _exitRect.anchoredPosition.x;
     }
 
-    public void PlayGame() {
-    }
 
     public void QuitGame() {
         Application.Quit();

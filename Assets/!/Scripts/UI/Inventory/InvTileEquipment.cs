@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using DG.Tweening;
 
 public class InvTileEquipment : InvTile {
     private enum TileType {
@@ -11,7 +13,10 @@ public class InvTileEquipment : InvTile {
 
     [SerializeField] private GameObject _itemPrefab;
     [SerializeField] private TileType _tileType;
-
+    [SerializeField] private GameObject _hintImage;
+    [SerializeField] private Image _bgImage, _highlightImg;
+    [SerializeField] private Sprite _singleBg, _doubleBg, _tripleBg;
+    [SerializeField] private Sprite _singleHighlight, _doubleHighlight, _tripleHighlight;
     private RectTransform _rectTransform;
     private ItemUI _itemUI;
     
@@ -49,6 +54,7 @@ public class InvTileEquipment : InvTile {
                 if (Player.Inventory.Weapon != null) {
                     InventoryItem inventoryItem = new();
                     inventoryItem = Player.Inventory.Weapon;
+                    inventoryItem.Rotated = false;
                     createItemUI(inventoryItem);
                     IsEmpty = false;
                 }
@@ -78,7 +84,7 @@ public class InvTileEquipment : InvTile {
     }
 
     private void OnTileSizeSetEvent() {
-        _rectTransform.sizeDelta = new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize);
+        _rectTransform.sizeDelta = new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize * (_tileType == TileType.Weapon ? 3 : 1));
     }
 
     public void UpdateInvTile() {
@@ -117,6 +123,16 @@ public class InvTileEquipment : InvTile {
             }
 
             IsEmpty = true;
+            _hintImage.SetActive(true);
+
+            if (_tileType == TileType.Weapon) {
+                _rectTransform.DOKill();
+                _rectTransform.DOSizeDelta(new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize * 3), 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutBack).OnComplete(() => {
+                    _bgImage.sprite = _tripleBg;
+                    _highlightImg.sprite = _tripleHighlight;
+                });
+            }
+
             if (_itemUI != null) {
                 Player.UICanvas.SetSelectedItemUI(_itemUI);
                 Destroy(_itemUI.gameObject);
@@ -163,7 +179,37 @@ public class InvTileEquipment : InvTile {
                 Player.UICanvas.HUDCanvas.OnUpdateConsumables();
             }
 
+
+        _hintImage.SetActive(false);
+        
+        InventoryItem item = SelectedInventoryItem;
+        item.Rotated = _tileType == TileType.Weapon ? false : SelectedInventoryItem.Rotated;
+
+        if (_tileType == TileType.Weapon) {
+
+            Sprite goalSprite;
+
+            if (item.Size.y == 1) {
+                goalSprite = _singleBg;
+                _highlightImg.sprite = _singleHighlight;
+            } else if (item.Size.y == 2) {
+                goalSprite = _doubleBg;
+                _highlightImg.sprite = _doubleHighlight;
+            } else {
+                goalSprite = _tripleBg;
+                _highlightImg.sprite = _tripleHighlight;
+            }
+
+            
+            _rectTransform.DOKill();
+            _rectTransform.DOSizeDelta(new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize * item.Size.y), 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutBack).OnComplete(() => {
+                _bgImage.sprite = goalSprite;
+            });
+        }
+
         createItemUI(SelectedInventoryItem);
+
+        
 
         EventBus.ItemPlacedEvent?.Invoke();
         IsEmpty = false;

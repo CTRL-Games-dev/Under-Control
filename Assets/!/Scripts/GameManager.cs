@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour {
     [Range(0, 1)]
     public float TotalInfluence {get; private set; }
     public float InfluenceDelta {get; private set; }
+    [HideInInspector] public readonly float MaxInfluenceDelta = 5f; 
 
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
@@ -74,6 +75,8 @@ public class GameManager : MonoBehaviour {
 
         Debug.Log($"Influence delta: {InfluenceDelta}");
 
+        if(MaxInfluenceDelta < InfluenceDelta) Debug.LogWarning("Influence delta is bigger that maximum allowed influence delta");
+
         Debug.Log("Loading new scene: " + CurrentDimension.ToString());
 
         LoadingScreen.LoadScene(SceneDictionary[CurrentDimension]);
@@ -96,5 +99,10 @@ public class GameManager : MonoBehaviour {
         CurrentDimension = Dimension.HUB;
         TotalInfluence = 0;
         InfluenceDelta = 0;
+    }
+
+    public float GetInfluenceModifier()
+    {
+        return (InfluenceDelta / MaxInfluenceDelta) + 0.5f;
     }
 }
