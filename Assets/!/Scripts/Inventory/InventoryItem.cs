@@ -1,9 +1,17 @@
 using System;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 [Serializable]
 public class InventoryItem {
-    public ItemData ItemData;
+    // This ensures InventoryItem<T> window remains valid
+    [SerializeField]
+    private ItemData _itemData;
+    public ItemData ItemData { get => _itemData; init => _itemData = value; }
+
     public int Amount;
     public Vector2Int Position;
 
@@ -26,17 +34,7 @@ public class InventoryItem {
 
     public bool TryAs<T>(out InventoryItem<T> inventoryItem) where T : ItemData {
         if(ItemData is T itemData) {
-            inventoryItem = new InventoryItem<T> {
-                ItemData = itemData,
-                Amount = Amount,
-                Position = Position,
-                PowerScale = PowerScale,
-                Rotated = Rotated
-            };
-
-            inventoryItem.ItemUI = ItemUI;
-            inventoryItem.RectTransform = RectTransform;
-
+            inventoryItem = new InventoryItem<T>(this, itemData);
             return true;
         }
 
@@ -45,33 +43,62 @@ public class InventoryItem {
     }
 }
 
+// It's a window into the InventoryItem!!!
 [Serializable]
 public class InventoryItem<T> where T : ItemData {
-    public T ItemData;
-    public int Amount;
-    public Vector2Int Position;
+    [SerializeField]
+    private InventoryItem _inventoryItem;
+
+    public T ItemData { get; private init; }
+    public int Amount { get => _inventoryItem.Amount; set => _inventoryItem.Amount = value; }
+    public Vector2Int Position { get => _inventoryItem.Position; set => _inventoryItem.Position = value; }
 
     [Range(0, 2)]
-    public float PowerScale;
-    public bool Rotated;
+    public float PowerScale { get => _inventoryItem.PowerScale; set => _inventoryItem.PowerScale = value; }
+    public bool Rotated { get => _inventoryItem.Rotated; set => _inventoryItem.Rotated = value; }
 
     public Vector2Int Size { get => ItemData.Size; }
 
-    public ItemUI ItemUI { get; set; }
-    public RectTransform RectTransform { get; set; }
+    public ItemUI ItemUI { get => _inventoryItem.ItemUI; set => _inventoryItem.ItemUI = value; }
+    public RectTransform RectTransform { get => _inventoryItem.RectTransform; set => _inventoryItem.RectTransform = value; }
+
+    public InventoryItem(InventoryItem source) {
+        _inventoryItem = source;
+        ItemData = source.ItemData as T;
+    }
+
+    public InventoryItem(InventoryItem source, T itemData) {
+        _inventoryItem = source;
+        ItemData = itemData;
+    }
 
     public static implicit operator InventoryItem(InventoryItem<T> inventoryItem) {
-        InventoryItem newInventoryItem = new InventoryItem {
-            ItemData = inventoryItem.ItemData,
-            Amount = inventoryItem.Amount,
-            Position = inventoryItem.Position,
-            PowerScale = inventoryItem.PowerScale,
-            Rotated = inventoryItem.Rotated
-        };
-
-        newInventoryItem.ItemUI = inventoryItem.ItemUI;
-        newInventoryItem.RectTransform = inventoryItem.RectTransform;
-
-        return newInventoryItem;
+        return inventoryItem._inventoryItem;
     }
 }
+
+#if UNITY_EDITOR
+[CustomPropertyDrawer(typeof(InventoryItem<>))]
+public class InventoryItemDrawer : PropertyDrawer
+{
+    private string _genericName;
+
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+        if(_genericName == null) {
+            _genericName = property.boxedValue.GetType().GenericTypeArguments[0].Name;
+        }
+
+        label.text = $"{label.text} (Restricted to {_genericName})";
+
+        SerializedProperty innerProperty = property.FindPropertyRelative("_inventoryItem");
+
+        EditorGUI.PropertyField(position, innerProperty, label, true);
+    }
+
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
+        SerializedProperty innerProperty = property.FindPropertyRelative("_inventoryItem");
+
+        return EditorGUI.GetPropertyHeight(innerProperty);
+    }
+}
+#endif

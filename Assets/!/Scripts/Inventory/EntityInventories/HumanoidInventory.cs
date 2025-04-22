@@ -1,8 +1,10 @@
 using System;
+using UnityEngine;
 
 [Serializable]
 public class HumanoidInventory : SimpleInventory
 {
+    [SerializeField]
     private InventoryItem<AmuletItemData> _amulet;
     public InventoryItem<AmuletItemData> Amulet
     {
@@ -14,6 +16,7 @@ public class HumanoidInventory : SimpleInventory
         }
     }
 
+    [SerializeField]
     private InventoryItem<ArmorItemData> _armor;
     public InventoryItem<ArmorItemData> Armor
     {
@@ -25,6 +28,7 @@ public class HumanoidInventory : SimpleInventory
         }
     }
 
+    [SerializeField]
     private InventoryItem<WeaponItemData> _weapon;
     public InventoryItem<WeaponItemData> Weapon
     {

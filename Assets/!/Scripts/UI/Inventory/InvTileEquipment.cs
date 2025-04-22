@@ -31,9 +31,14 @@ public class InvTileEquipment : InvTile {
         // EventBus.InvTileClickEvent.AddListener(OnTileClick);
         OnTileSizeSetEvent();
 
+        /*
+            Checking by ItemData, because SerializeField serializes into
+            concrete value and not into reference, therefore null is not possible.
+            We should move to structs for items...
+        */
         switch (_tileType) {
             case TileType.Armor:
-                if (Player.Inventory.Armor != null) {
+                if (Player.Inventory.Armor.ItemData != null) {
                     InventoryItem inventoryItem = new();
                     inventoryItem = Player.Inventory.Armor;
                     createItemUI(inventoryItem);
@@ -42,7 +47,7 @@ public class InvTileEquipment : InvTile {
                 break;
 
             case TileType.Amulet:
-                if (Player.Inventory.Amulet != null) {
+                if (Player.Inventory.Amulet.ItemData != null) {
                     InventoryItem inventoryItem = new();
                     inventoryItem = Player.Inventory.Amulet;
                     createItemUI(inventoryItem);
@@ -51,7 +56,7 @@ public class InvTileEquipment : InvTile {
                 break;
 
             case TileType.Weapon:
-                if (Player.Inventory.Weapon != null) {
+                if (Player.Inventory.Weapon.ItemData != null) {
                     InventoryItem inventoryItem = new();
                     inventoryItem = Player.Inventory.Weapon;
                     inventoryItem.Rotated = false;
@@ -64,7 +69,7 @@ public class InvTileEquipment : InvTile {
                 Player.Instance.UpdateConsumablesEvent.AddListener(OnConsumablesUpdate);
                 if (Player.Instance.ConsumableItemOne.ItemData != null) {
                     InventoryItem inventoryItem = new();
-                    inventoryItem.ItemData = Player.Instance.ConsumableItemOne.ItemData;
+                    inventoryItem = Player.Instance.ConsumableItemOne;
                     createItemUI(inventoryItem);
                     IsEmpty = false;
                 }
@@ -74,7 +79,7 @@ public class InvTileEquipment : InvTile {
                 Player.Instance.UpdateConsumablesEvent.AddListener(OnConsumablesUpdate);
                 if (Player.Instance.ConsumableItemTwo.ItemData != null) {
                     InventoryItem inventoryItem = new();
-                    inventoryItem.ItemData = Player.Instance.ConsumableItemTwo.ItemData;
+                    inventoryItem = Player.Instance.ConsumableItemTwo;
                     createItemUI(inventoryItem);
                     IsEmpty = false;
                 }

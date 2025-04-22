@@ -132,10 +132,7 @@ public class Player : MonoBehaviour {
 
     [Header("Consumable")]
     public InventoryItem<ConsumableItemData> ConsumableItemOne = null;
-
     public InventoryItem<ConsumableItemData> ConsumableItemTwo = null;
-
-    [SerializeField]
     public Cooldown ConsumableCooldown = new Cooldown(0.5f);
 
     [Header("Weapon")]
@@ -232,7 +229,7 @@ public class Player : MonoBehaviour {
                 }
             }
 
-            _currentAmuletModifiers = Inventory.Amulet?.ItemData.Modifiers;
+            _currentAmuletModifiers = Inventory.Amulet?.ItemData?.Modifiers;
 
             if (_currentAmuletModifiers != null) {
                 foreach(var modifier in _currentAmuletModifiers) {
@@ -365,7 +362,7 @@ public class Player : MonoBehaviour {
         ConsumableItemOne.Amount--;
 
         if (ConsumableItemOne.Amount <= 0) {
-            ConsumableItemOne.ItemData = null;
+            ConsumableItemOne = null;
         }
 
         UICanvas.HUDCanvas.UseConsumable1();
@@ -383,7 +380,7 @@ public class Player : MonoBehaviour {
         c.Consume(LivingEntity);
         ConsumableItemTwo.Amount--;
         if (ConsumableItemTwo.Amount <= 0) {
-            ConsumableItemTwo.ItemData = null;
+            ConsumableItemTwo = null;
         }
 
         UICanvas.HUDCanvas.UseConsumable2();
@@ -592,7 +589,7 @@ public class Player : MonoBehaviour {
 
     public void OnInventoryChanged() {
         WeaponHolder.UpdateWeapon(CurrentWeapon?.ItemData);
-        Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData.WeaponType ?? WeaponType.None));
+        Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
     }
 
     public Vector3 GetMousePosition() {
