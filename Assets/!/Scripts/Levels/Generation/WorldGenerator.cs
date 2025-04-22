@@ -367,7 +367,7 @@ public class WorldGenerator : MonoBehaviour {
             // Debug.Log("First point " + point1);
             // Debug.Log("Second point " + point2);
 
-            int thickness = UnityEngine.Random.Range(20, 21);
+            int thickness = UnityEngine.Random.Range(10, 15);
 
             if(point2.x != point1.x)
             {
