@@ -250,7 +250,7 @@ public class InventoryPanel : MonoBehaviour
         GameObject item = createItemUI(_currentEntityInventory.GetInventoryItem(selectedTilePos));
         
         if (item.GetComponent<ItemUI>().CurrentInventoryPanel.IsSellerInventory) {
-            Player.Instance.Coins += (IsItemJustBought ? _selectedInventoryItem.ItemData.Value : _selectedInventoryItem.ItemData.Value / 2) * _selectedInventoryItem.Amount;
+            Player.Instance.Coins += (IsItemJustBought ? _selectedInventoryItem.ScaledValue : _selectedInventoryItem.ScaledValue / 2) * _selectedInventoryItem.Amount;
         }
         IsItemJustBought = false;
 
@@ -308,10 +308,10 @@ public class InventoryPanel : MonoBehaviour
         // if (Player.UICanvas.SelectedItemUI.InventoryItem != null) return; 
         if (_inventory.Contains(itemUI.InventoryItem)) {
             if (Player.UICanvas.SelectedItemUI.InventoryItem != null) return; 
-            if (Player.Instance.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
+            if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
             Player.UICanvas.SetSelectedItemUI(itemUI);
             if (IsSellerInventory) {
-                Player.Instance.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
+                Player.Instance.Coins -= itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount;
                 IsItemJustBought = true;
             }
             destroyAndRemoveItemUI(itemUI.InventoryItem);
@@ -324,33 +324,33 @@ public class InventoryPanel : MonoBehaviour
 
         if (_inventory.Contains(itemUI.InventoryItem)) {
             if (Player.UICanvas.SelectedItemUI.InventoryItem == null) {
-                if (Player.Instance.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
+                if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
                 Player.UICanvas.SetSelectedItemUI(itemUI);
                 if (IsSellerInventory) {
-                    if (Player.Instance.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0) return;
-                    Player.Instance.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
+                    if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount < 0) return;
+                    Player.Instance.Coins -= itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount;
                     IsItemJustBought = true;
                 }
                 destroyAndRemoveItemUI(itemUI.InventoryItem);
             } else {
                 if (Player.UICanvas.SelectedItemUI.InventoryItem.ItemData == itemUI.InventoryItem.ItemData) {
                     if (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount >= Player.UICanvas.SelectedItemUI.InventoryItem.Amount) {
-                        if (Player.Instance.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
+                        if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
                         itemUI.InventoryItem.Amount += Player.UICanvas.SelectedItemUI.InventoryItem.Amount;
                         if (IsSellerInventory) {
-                            Player.Instance.Coins -= itemUI.InventoryItem.ItemData.Value * Player.UICanvas.SelectedItemUI.InventoryItem.Amount;
+                            Player.Instance.Coins -= itemUI.InventoryItem.ScaledValue * Player.UICanvas.SelectedItemUI.InventoryItem.Amount;
                             IsItemJustBought = true;
                         }
                         itemUI.UpdateAmount();
                         Player.UICanvas.SelectedItemUI.InventoryItem = null;
                     } else {
-                        if (Player.Instance.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
+                        if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
                         Player.UICanvas.SelectedItemUI.InventoryItem.Amount = Player.UICanvas.SelectedItemUI.InventoryItem.Amount - (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount);
                         itemUI.InventoryItem.Amount = itemUI.InventoryItem.ItemData.MaxQuantity;
                         itemUI.UpdateAmount();
                         Player.UICanvas.SelectedItemUI.UpdateAmount();
                         if (IsSellerInventory) {
-                            Player.Instance.Coins -= itemUI.InventoryItem.ItemData.Value * (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount);
+                            Player.Instance.Coins -= itemUI.InventoryItem.ScaledValue * (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount);
                             IsItemJustBought = true;
                         }
                     }
@@ -366,7 +366,7 @@ public class InventoryPanel : MonoBehaviour
             if (Player.UICanvas.SelectedItemUI.InventoryItem == null) {
                 if (itemUI.InventoryItem.Amount > 1) {
                     int half = itemUI.InventoryItem.Amount / 2;
-                    if (Player.Instance.Coins - itemUI.InventoryItem.ItemData.Value * (half + itemUI.InventoryItem.Amount % 2) < 0 && IsSellerInventory) return;
+                    if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * (half + itemUI.InventoryItem.Amount % 2) < 0 && IsSellerInventory) return;
                     
                     InventoryItem inventoryItem = new(){
                         ItemData = itemUI.InventoryItem.ItemData,
@@ -380,14 +380,14 @@ public class InventoryPanel : MonoBehaviour
                     itemUI.InventoryItem.Amount = half;
                     itemUI.UpdateAmount();
                     if (IsSellerInventory) {
-                        Player.Instance.Coins -= itemUI.InventoryItem.ItemData.Value * (half + itemUI.InventoryItem.Amount % 2);
+                        Player.Instance.Coins -= itemUI.InventoryItem.ScaledValue * (half + itemUI.InventoryItem.Amount % 2);
                         IsItemJustBought = true;
                     }
                 } else {
-                    if (Player.Instance.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
+                    if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
                     Player.UICanvas.SetSelectedItemUI(itemUI);
                     if (IsSellerInventory) {
-                        Player.Instance.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
+                        Player.Instance.Coins -= itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount;
                         IsItemJustBought = true;
                     }
                     destroyAndRemoveItemUI(itemUI.InventoryItem);
@@ -400,7 +400,7 @@ public class InventoryPanel : MonoBehaviour
                         Player.UICanvas.SelectedItemUI.InventoryItem.Amount = Player.UICanvas.SelectedItemUI.InventoryItem.Amount - 1;
                         Player.UICanvas.SelectedItemUI.UpdateAmount();
                         if (IsSellerInventory) {
-                            Player.Instance.Coins += itemUI.InventoryItem.ItemData.Value;
+                            Player.Instance.Coins += itemUI.InventoryItem.ScaledValue;
                             IsItemJustBought = true;
                         }
                     }

@@ -20,6 +20,7 @@ public class InventoryItem {
     public bool Rotated;
 
     public Vector2Int Size { get => ItemData.Size; }
+    public int ScaledValue { get => (int)(ItemData.Value * PowerScale); }
 
     public ItemUI ItemUI { get; set; }
     public RectTransform RectTransform { get; set; }
@@ -58,6 +59,7 @@ public class InventoryItem<T> where T : ItemData {
     public bool Rotated { get => _inventoryItem.Rotated; set => _inventoryItem.Rotated = value; }
 
     public Vector2Int Size { get => ItemData.Size; }
+    public int ScaledValue { get => _inventoryItem.ScaledValue; }
 
     public ItemUI ItemUI { get => _inventoryItem.ItemUI; set => _inventoryItem.ItemUI = value; }
     public RectTransform RectTransform { get => _inventoryItem.RectTransform; set => _inventoryItem.RectTransform = value; }
