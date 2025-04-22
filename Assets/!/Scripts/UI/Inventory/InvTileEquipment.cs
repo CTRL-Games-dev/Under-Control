@@ -79,7 +79,6 @@ public class InvTileEquipment : InvTile {
                     IsEmpty = false;
                 }
                 break;
-                
         }
     }
 
