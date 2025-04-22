@@ -644,11 +644,11 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_ComboWindow:
-                WeaponHolder.DisableHitbox();
                 _isAttacking = false;
                 break;
 
             case AnimationState.Attack_Recovery:
+                _isAttacking = false;
                 LockRotation = false;
                 break;
         }
@@ -658,6 +658,7 @@ public class Player : MonoBehaviour {
         CurrentAnimationState = state;
         switch (state) {
             case AnimationState.Locomotion:
+                WeaponHolder.DisableHitbox();
                 SlashMaterial.color = Color.white;
                 break;
 
@@ -680,6 +681,7 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_Recovery:
+                WeaponHolder.DisableHitbox();
                 SlashMaterial.color = Color.green;
                 // SlashGO.SetActive(false);
                 LockRotation = false;
