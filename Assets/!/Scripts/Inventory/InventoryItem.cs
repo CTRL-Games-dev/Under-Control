@@ -33,6 +33,10 @@ public class InventoryItem {
                 PowerScale = PowerScale,
                 Rotated = Rotated
             };
+
+            inventoryItem.ItemUI = ItemUI;
+            inventoryItem.RectTransform = RectTransform;
+
             return true;
         }
 
@@ -57,12 +61,17 @@ public class InventoryItem<T> where T : ItemData {
     public RectTransform RectTransform { get; set; }
 
     public static implicit operator InventoryItem(InventoryItem<T> inventoryItem) {
-        return new InventoryItem {
+        InventoryItem newInventoryItem = new InventoryItem {
             ItemData = inventoryItem.ItemData,
             Amount = inventoryItem.Amount,
             Position = inventoryItem.Position,
             PowerScale = inventoryItem.PowerScale,
             Rotated = inventoryItem.Rotated
         };
+
+        newInventoryItem.ItemUI = inventoryItem.ItemUI;
+        newInventoryItem.RectTransform = inventoryItem.RectTransform;
+
+        return newInventoryItem;
     }
 }
