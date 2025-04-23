@@ -23,11 +23,4 @@ public class HubManager : MonoBehaviour
         Player.Animator.SetTrigger("live");
         Player.Instance.InputDisabled = true;
     }
-
-    private void Update() {
-        if (Input.GetKeyDown(KeyCode.O)) {
-            Player.UICanvas.ChangeUIMiddleState(UIMiddleState.MainMenu);
-            CameraManager.Instance.SwitchCamera(MainMenuCamera);
-        }
-    }
 }
