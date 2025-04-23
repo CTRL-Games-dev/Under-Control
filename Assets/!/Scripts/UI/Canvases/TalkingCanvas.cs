@@ -90,8 +90,8 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         if (_isTalking) {
             StopAllCoroutines();
             _dialogueText.text = _goalString;
-            _playerFaceAnimator.EndTalk();
-            _otherFaceAnimator.EndTalk();
+            _playerFaceAnimator.EndAnimation();
+            _otherFaceAnimator.EndAnimation();
             _isTalking = false;
         } else {
             if (_currentDialogueIndex >= _dialogue.dialogueEntries.Count) {
@@ -134,9 +134,9 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
             yield return new WaitForSeconds(_letterInterval);
         }
 
-        _playerFaceAnimator.EndTalk();
+        _playerFaceAnimator.EndAnimation();
         if (_otherFaceAnimator != null)
-            _otherFaceAnimator.EndTalk();
+            _otherFaceAnimator.EndAnimation();
         _isTalking = false;
     }
 
@@ -149,8 +149,8 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
 
         _goalString = TextLocalizer.GetFormattedString(TextData.LocalizationTable[_dialogueTextLocalizer.Key][TextData.CurrentLanguage]);
 
-        _playerFaceAnimator.EndTalk();
-        _otherFaceAnimator.EndTalk();
+        _playerFaceAnimator.EndAnimation();
+        _otherFaceAnimator.EndAnimation();
         StopAllCoroutines();
         _dialogueText.text = string.Empty;
 
@@ -158,9 +158,9 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         _otherImage.DOColor(_dialogue.dialogueEntries[_currentDialogueIndex].IsPlayer ? new Color(0.2f, 0.2f, 0.2f, 1) : Color.white, 0.25f * Settings.AnimationSpeed);
 
         if (_dialogue.dialogueEntries[_currentDialogueIndex].IsPlayer) {
-            _playerFaceAnimator.StartTalk();
+            _playerFaceAnimator.StartInfiniteAnimation("TALK");
         } else {
-            _otherFaceAnimator.StartTalk();
+            _otherFaceAnimator.StartInfiniteAnimation("TALK");
         }
         StartCoroutine(animateText());
     }

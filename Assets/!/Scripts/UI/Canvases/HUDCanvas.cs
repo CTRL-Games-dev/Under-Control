@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using System.Collections.Generic;
 
 public class HUDCanvas : MonoBehaviour, IUICanvasState
 {
@@ -42,6 +43,31 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private Color _manaColor;
     [SerializeField] private Color _healthColor;
 
+    [Header("Active Effects")]
+    [SerializeField] private GameObject _effectsHolder;
+    [SerializeField] private GameObject _effectPrefab;
+    [SerializeField] private RectTransform _moreInfoRect;
+    [SerializeField] private TextMeshProUGUI _moreInfoText;
+    [SerializeField] private TextLocalizer _nameTextLocalizer;
+    [SerializeField] private TextMeshProUGUI _durationText;
+    [SerializeField] private TextMeshProUGUI _descriptionText;
+    [SerializeField] private GameObject _infinityGO;
+
+    private List<EffectUI> _handledEffects = new();
+    
+
+    [Header("Spell Slots")]
+    [SerializeField] private Image _spellSlot1Icon;
+    [SerializeField] private Image _spellSlot2Icon;
+    [SerializeField] private Image _spellSlot3Icon;
+    [SerializeField] private Image _spellSlot1CooldownImg;
+    [SerializeField] private Image _spellSlot2CooldownImg;
+    [SerializeField] private Image _spellSlot3CooldownImg;
+    [SerializeField] private RectTransform _spellSlot1Rect;
+    [SerializeField] private RectTransform _spellSlot2Rect;
+    [SerializeField] private RectTransform _spellSlot3Rect;
+
+
 
     private void Start() {
         Player.Instance.UpdateConsumablesEvent.AddListener(OnUpdateConsumables);
@@ -49,6 +75,42 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
         UpdateHealthBar();
         UpdateManaBar();
     }
+
+    private void FixedUpdate() {
+        if (Player.Instance == null) return;
+        
+        List<LivingEntity.EffectData> activeEffects = Player.LivingEntity.ActiveEffects;
+        if (activeEffects.Count == 0) return;
+
+        List<EffectUI> handledEffects = _handledEffects;
+        foreach (LivingEntity.EffectData effectData in activeEffects) {
+            if (handledEffects.Count == 0) {
+                handleEffect(effectData);
+            } else {
+                bool isHandled = false;
+                foreach (EffectUI handledEffect in handledEffects) {
+                    if (effectData.Equals(handledEffect.EffectData)) {
+                        isHandled = true;
+                        break;
+                    }
+                }
+                if (!isHandled) handleEffect(effectData);
+            }
+        }
+    }
+
+
+    private void handleEffect(LivingEntity.EffectData effectData) {
+        EffectUI effectUI = Instantiate(_effectPrefab, _effectsHolder.transform).GetComponent<EffectUI>();
+        effectUI.Setup(effectData);
+        _handledEffects.Add(effectUI);
+    }
+
+    public void RemoveEffectUI(EffectUI effectUI) {
+        _handledEffects.Remove(effectUI);
+    }
+
+
 
 
     public void UpdateHealthBar() {
@@ -59,6 +121,106 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
     public void UpdateManaBar() {
         _manaBarImg.fillAmount = Player.Instance.Mana / Player.Instance.MaxMana;
         _manaText.text = $"{(int)Player.Instance.Mana}/{(int)Player.Instance.MaxMana}";
+    }
+
+    public void UpdateSpellSlots() {
+        if (Player.Instance.SpellSlotOne != null) {
+            _spellSlot1Icon.sprite = Player.Instance.SpellSlotOne.Icon;
+            _spellSlot1Icon.gameObject.SetActive(true);
+        } else {
+            _spellSlot1Icon.gameObject.SetActive(false);
+        }
+
+        if (Player.Instance.SpellSlotTwo != null) {
+            _spellSlot2Icon.sprite = Player.Instance.SpellSlotTwo.Icon;
+            _spellSlot2Icon.gameObject.SetActive(true);
+        } else {
+            _spellSlot2Icon.gameObject.SetActive(false);
+        }
+
+        if (Player.Instance.SpellSlotThree != null) {
+            _spellSlot3Icon.sprite = Player.Instance.SpellSlotThree.Icon;
+            _spellSlot3Icon.gameObject.SetActive(true);
+        } else {
+            _spellSlot3Icon.gameObject.SetActive(false);
+        }
+    }
+
+    public void SetSpellCooldownColor(int spellSlot, Color color) {
+        Color c = color;
+        c.a = 75f / 255f;
+        switch (spellSlot) {
+            case 1:
+                _spellSlot1CooldownImg.color = c;
+                break;
+            case 2:
+                _spellSlot2CooldownImg.color = c;
+                break;
+            case 3:
+                _spellSlot3CooldownImg.color = c;
+                break;
+        }
+    }
+
+    public void UseSpell1() {
+        useSpell(_spellSlot1CooldownImg, _spellSlot1Rect, Player.Instance.SpellSlotOne);
+    }
+
+    public void UseSpell2() {
+        useSpell(_spellSlot2CooldownImg, _spellSlot2Rect, Player.Instance.SpellSlotTwo);
+    }
+
+    public void UseSpell3() {
+        useSpell(_spellSlot3CooldownImg, _spellSlot3Rect, Player.Instance.SpellSlotThree);
+    }
+
+    private void useSpell(Image fillImg, RectTransform rect, Spell spell) {
+        fillImg.DOKill();
+        rect.DOKill();
+        rect.DOShakeRotation(0.1f * Settings.AnimationSpeed, 10, 10, 90, false);
+        fillImg.DOFillAmount(1, 0.05f * Settings.AnimationSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
+            fillImg.DOFillAmount(0, spell.CooldownTime - 0.05f * Settings.AnimationSpeed).SetEase(Ease.Linear).OnComplete(() => {
+                rect.DOShakeRotation(0.1f * Settings.AnimationSpeed, 10, 10, 90, false);
+                rect.DOScale(Vector3.one * 1.05f, 0.1f * Settings.AnimationSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
+                    rect.DOScale(Vector3.one, 0.1f * Settings.AnimationSpeed).SetEase(Ease.OutQuint);
+                    rect.localRotation = Quaternion.identity;
+                });
+            });
+        });
+
+    }
+
+
+    public void ShowMoreInfo(EffectUI effectUI) {
+        _moreInfoRect.DOKill();
+        LivingEntity.EffectData effectData = effectUI.EffectData;
+
+        _moreInfoRect.localPosition = new Vector3(effectUI.transform.position.x - 235, _moreInfoRect.localPosition.y, _moreInfoRect.localPosition.z);
+        _moreInfoRect.DOScale(1, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutQuint);
+
+        _nameTextLocalizer.Key = effectData.Effect.Name;
+        
+        if (effectData.Effect.Modifiers.Length <= 0) return;
+
+        _descriptionText.text = "";
+        foreach (Modifier m in effectData.Effect.Modifiers) {
+            _descriptionText.text += m.ToString() + "\n";
+        }
+    }
+
+    public void HideMoreInfo() {
+        _moreInfoRect.DOKill();
+        _moreInfoRect.DOScale(0, 0.7f * Settings.AnimationSpeed).SetEase(Ease.OutQuint);
+    }
+
+    public void SetDuationText(float val) {
+        if (float.IsInfinity(val)) {
+            _durationText.text = "";
+            _infinityGO.SetActive(true);
+        } else {
+            _infinityGO.SetActive(false);
+            _durationText.text = $"{val:F1}s";
+        }
     }
 
 
