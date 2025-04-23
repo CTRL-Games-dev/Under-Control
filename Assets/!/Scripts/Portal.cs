@@ -39,12 +39,8 @@ public abstract class Portal : MonoBehaviour
 
     void OnTriggerEnter(Collider other) {
         Debug.Log("Player entered portal to: " + _dimension.ToString());
+        GetComponent<Collider>().enabled = false;
         GameManager.Instance.ChangeDimension(_dimension, Influence);
-    }
-    
-    public void ChangeDimension(Dimension d) {
-        Debug.Log("Changed dimension to: " + d.ToString());
-        _dimension = d;
     }
 
     public void SetDimension(Dimension d) {

@@ -16,6 +16,8 @@ public class HoverTooltip : MonoBehaviour {
     }
 
     void Update() {
+        if(!InputUtility.IsMousePositionAvailable()) return;
+
         transform.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
     }
 
