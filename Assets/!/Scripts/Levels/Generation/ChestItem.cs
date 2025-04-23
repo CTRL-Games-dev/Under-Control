@@ -6,4 +6,6 @@ public class ChestItemData : ScriptableObject
     public float MaxQuantity;
     public float MinInfluence;
     public float MinInfluenceDelta;
+    [Range(0f, 1f)]
+    public float ChanceToSpawn;
 }
