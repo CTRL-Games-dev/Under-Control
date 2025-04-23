@@ -3,11 +3,11 @@ using UnityEngine.Events;
 
 public class MushroomPullComponent : MonoBehaviour {
     public GameObject Puller;
-    public float PullSpeed = 20f;
+    public float PullSpeed = 5f;
     public float StoppingDistance = 1.25f; 
     public UnityEvent OnPulled = new();
 
-    void Update() {
+    void FixedUpdate() {
         if(Puller == null) Destroy(this);
 
         Vector3 pullerPosition = Puller.transform.position;
@@ -19,6 +19,6 @@ public class MushroomPullComponent : MonoBehaviour {
             Destroy(this);
         }
 
-        transform.position = Vector3.MoveTowards(transform.position, pullerPosition, PullSpeed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, pullerPosition, PullSpeed * Time.fixedDeltaTime);
     }
 }

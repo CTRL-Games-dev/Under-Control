@@ -199,6 +199,8 @@ public class LivingEntity : MonoBehaviour {
             Expiration = Time.time + effect.Duration
         });
 
+        effect.Apply(this);
+
         if(effect.Modifiers == null) {
             return;
         }

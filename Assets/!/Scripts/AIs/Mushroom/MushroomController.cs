@@ -1,5 +1,4 @@
 using Unity.Behavior;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -19,14 +18,14 @@ public class MushroomController : MonoBehaviour {
         _behaviorGraphAgent = GetComponent<BehaviorGraphAgent>();
     }
 
-    public void OnAttackAnimationStart() {
+    public void OnPrimaryAttackAnimationStart() {
         WeaponHolder.UpdateWeapon(PrimaryAttackWeapon);
         WeaponHolder.InitializeAttack(AttackType.LIGHT);
         WeaponHolder.BeginAttack();
         WeaponHolder.EnableHitbox();
     }
 
-    public void OnAttackAnimationEnd() {
+    public void OnPrimaryAttackAnimationEnd() {
         WeaponHolder.DisableHitbox();
         WeaponHolder.EndAttack();
     }
@@ -47,7 +46,6 @@ public class MushroomController : MonoBehaviour {
         _pullTarget.Puller = gameObject;
         _pullTarget.OnPulled.AddListener(() => {
             target.ApplyEffect(StunEffect);
-            target.OnStunned.Invoke(StunEffect.Duration);
         });
     }
 
