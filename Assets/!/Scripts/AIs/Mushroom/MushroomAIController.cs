@@ -11,11 +11,21 @@ public class MushroomAIController : MonoBehaviour {
     public WeaponItemData PrimaryAttackWeapon;
     public Effect StunEffect;
 
+    private LivingEntity _livingEntity;
+    private Animator _animator;
     private BehaviorGraphAgent _behaviorGraphAgent;
     private MushroomPullComponent _pullTarget;
 
+    private static readonly int _hurtHash = Animator.StringToHash("hurt");
+
     void Start() {
+        _livingEntity = GetComponent<LivingEntity>();
+        _animator = GetComponent<Animator>();
         _behaviorGraphAgent = GetComponent<BehaviorGraphAgent>();
+
+        _livingEntity.OnDamageTaken.AddListener(_ => {
+            _animator.SetTrigger(_hurtHash);
+        });
  
         WeaponHolder.UpdateWeapon(PrimaryAttackWeapon);
     }
