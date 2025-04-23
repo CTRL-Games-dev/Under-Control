@@ -4,7 +4,7 @@ using UnityEngine.Events;
 public class MushroomPullComponent : MonoBehaviour {
     public GameObject Puller;
     public float PullSpeed = 5f;
-    public float StoppingDistance = 1.25f; 
+    public float StoppingDistance = 2f; 
     public UnityEvent OnPulled = new();
 
     void FixedUpdate() {
