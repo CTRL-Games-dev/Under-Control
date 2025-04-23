@@ -5,12 +5,13 @@ using UnityEngine;
 public class DialogueEntry
 {
     public bool IsPlayer;
+    public bool IsInputField;
     public string Text;
 }
 
 [CreateAssetMenu(fileName = "Dialogue", menuName = "Dialogue/Basic")]
 public class Dialogue : ScriptableObject
 {
+    public List<DialogueEntry> DialogueEntries = new List<DialogueEntry>();
 
-    public List<DialogueEntry> dialogueEntries = new List<DialogueEntry>();
 }

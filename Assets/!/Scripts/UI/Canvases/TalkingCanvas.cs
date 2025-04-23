@@ -13,6 +13,8 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private FaceAnimator _playerFaceAnimator;
     [SerializeField] private TextMeshProUGUI _nameText, _dialogueText;
     [SerializeField] private TextLocalizer _nameTextLocalizer, _dialogueTextLocalizer;
+    [SerializeField] private TMP_InputField _inputField;
+    [SerializeField] private GameObject _confirmButton;
 
     private bool _isTalking = false;
 
@@ -24,6 +26,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     private Dialogue _dialogue;
     private string _otherNameKey = string.Empty;
     private FaceAnimator _otherFaceAnimator;
+    private bool _blockClick = false;
 
     
     private void Awake() {
@@ -35,10 +38,22 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         TextData.OnLanguageChanged?.RemoveListener(OnLanguageChanged);
     }
 
+
     private void OnLanguageChanged() {
         StopAllCoroutines();
         _isTalking = false;
         _dialogueText.text = _goalString;
+    }
+
+
+    public void OnBtnConfirmClick() {
+        FormattedStrings.PlayerName = _inputField.text;
+        _blockClick = false;
+        _inputField.gameObject.SetActive(false);
+        _confirmButton.SetActive(false);
+        _inputField.interactable = false;
+        _inputField.DeactivateInputField();
+        OnClick();
     }
 
 
@@ -47,7 +62,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         _dialogue = dialogue;
         _otherNameKey = nameKey;
         _otherFaceAnimator = faceAnimator;
-        _otherImage.texture = faceImage;
+        _otherImage.texture = faceImage;       
     }
 
 
@@ -87,6 +102,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
 
 
     public void OnClick() {
+        if (_blockClick) return;
         if (_isTalking) {
             StopAllCoroutines();
             _dialogueText.text = _goalString;
@@ -94,13 +110,13 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
             _otherFaceAnimator.EndAnimation();
             _isTalking = false;
         } else {
-            if (_currentDialogueIndex >= _dialogue.dialogueEntries.Count) {
+            if (_currentDialogueIndex >= _dialogue.DialogueEntries.Count) {
                 Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
                 return;
             }
             
             _currentDialogueIndex++;
-            if (_currentDialogueIndex >= _dialogue.dialogueEntries.Count) {
+            if (_currentDialogueIndex >= _dialogue.DialogueEntries.Count) {
                 Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
                 CameraManager.Instance.SwitchCamera(null);
                 return;
@@ -128,7 +144,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
                 _letterInterval = 0.3f;
             }
             else {
-                _letterInterval = Mathf.Clamp(_textSpeed / _goalString.Length, 0.03f, 0.1f);
+                _letterInterval = Mathf.Clamp(_textSpeed / _goalString.Length, 0.02f, 0.07f);
             }
 
             yield return new WaitForSeconds(_letterInterval);
@@ -143,9 +159,9 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
 
 
     private void updateDialogueBox() {
-        _nameTextLocalizer.Key = _dialogue.dialogueEntries[_currentDialogueIndex].IsPlayer ? "%PlayerName%" : _otherNameKey;
+        _nameTextLocalizer.Key = _dialogue.DialogueEntries[_currentDialogueIndex].IsPlayer ? "%PlayerName%" : _otherNameKey;
 
-        _dialogueTextLocalizer.Key = _dialogue.dialogueEntries[_currentDialogueIndex].Text;
+        _dialogueTextLocalizer.Key = _dialogue.DialogueEntries[_currentDialogueIndex].Text;
 
         _goalString = TextLocalizer.GetFormattedString(TextData.LocalizationTable[_dialogueTextLocalizer.Key][TextData.CurrentLanguage]);
 
@@ -154,15 +170,26 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         StopAllCoroutines();
         _dialogueText.text = string.Empty;
 
-        _playerImage.DOColor(_dialogue.dialogueEntries[_currentDialogueIndex].IsPlayer ? Color.white : new Color(0.2f, 0.2f, 0.2f, 1), 0.25f * Settings.AnimationSpeed);
-        _otherImage.DOColor(_dialogue.dialogueEntries[_currentDialogueIndex].IsPlayer ? new Color(0.2f, 0.2f, 0.2f, 1) : Color.white, 0.25f * Settings.AnimationSpeed);
+        _playerImage.DOColor(_dialogue.DialogueEntries[_currentDialogueIndex].IsPlayer ? Color.white : new Color(0.2f, 0.2f, 0.2f, 1), 0.25f * Settings.AnimationSpeed);
+        _otherImage.DOColor(_dialogue.DialogueEntries[_currentDialogueIndex].IsPlayer ? new Color(0.2f, 0.2f, 0.2f, 1) : Color.white, 0.25f * Settings.AnimationSpeed);
 
-        if (_dialogue.dialogueEntries[_currentDialogueIndex].IsPlayer) {
+        if (_dialogue.DialogueEntries[_currentDialogueIndex].IsPlayer) {
             _playerFaceAnimator.StartInfiniteAnimation("TALK");
         } else {
             _otherFaceAnimator.StartInfiniteAnimation("TALK");
         }
         StartCoroutine(animateText());
+
+  
+        if (_dialogue.DialogueEntries[_currentDialogueIndex].IsInputField) {
+            _inputField.gameObject.SetActive(true);
+            _confirmButton.SetActive(true);
+            _inputField.interactable = true;
+            _inputField.Select();
+            _inputField.ActivateInputField();
+            _blockClick = true;
+        }
+            
     }
 }
 
