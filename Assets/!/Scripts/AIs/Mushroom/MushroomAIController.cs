@@ -6,7 +6,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(LivingEntity))]
 [RequireComponent(typeof(BehaviorGraphAgent))]
-public class MushroomController : MonoBehaviour {
+public class MushroomAIController : MonoBehaviour {
     public WeaponHolder WeaponHolder;
     public WeaponItemData PrimaryAttackWeapon;
     public Effect StunEffect;
@@ -16,10 +16,11 @@ public class MushroomController : MonoBehaviour {
 
     void Start() {
         _behaviorGraphAgent = GetComponent<BehaviorGraphAgent>();
+ 
+        WeaponHolder.UpdateWeapon(PrimaryAttackWeapon);
     }
 
     public void OnPrimaryAttackAnimationStart() {
-        WeaponHolder.UpdateWeapon(PrimaryAttackWeapon);
         WeaponHolder.InitializeAttack(AttackType.LIGHT);
         WeaponHolder.BeginAttack();
         WeaponHolder.EnableHitbox();
