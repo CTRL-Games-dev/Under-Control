@@ -5,6 +5,7 @@ public class Testing : MonoBehaviour
 {
     
     public List<Effect> Effects = new List<Effect>();
+    public Seller Seller;
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.F1)) {
@@ -14,7 +15,7 @@ public class Testing : MonoBehaviour
             Player.Instance.FaceAnimator.StartAnimation("EXCITED", 1.5f); 
         }
         if (Input.GetKeyDown(KeyCode.F3)) {
-            Player.LivingEntity.ApplyEffect(Effects[0]);
+            
         }
     }
 }

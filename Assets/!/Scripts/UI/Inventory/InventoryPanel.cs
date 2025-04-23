@@ -12,7 +12,9 @@ public class InventoryPanel : MonoBehaviour
     [Header("Assign if not player inventory")]
     [SerializeField] private bool _isPlayerInventory = false;
     public bool IsSellerInventory = false;
-    public ItemContainer TargetEntityInventory; 
+
+    public EntityInventory TargetEntityInventory; 
+    public Sprite CustomInvTileSprite;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject _itemPrefab;
@@ -58,6 +60,11 @@ public class InventoryPanel : MonoBehaviour
     }
 
     public void Start() {
+        _currentEntityInventory = getCurrentEntityInventory();
+        if (_currentEntityInventory == null) {
+            Debug.LogError("No inventory found!");
+            return;
+        }
         ConnectSignals();
         RegenerateInventory();
     }
@@ -67,9 +74,14 @@ public class InventoryPanel : MonoBehaviour
     #region Grid Methods
 
     public void RegenerateInventory() {
-        if ((_currentEntityInventory = _isPlayerInventory ? Player.Inventory.ItemContainer : TargetEntityInventory) == null) return; 
         setupGrid();
         UpdateItemUIS();
+    }
+
+    private ItemContainer getCurrentEntityInventory() {
+        if (_isPlayerInventory) return Player.Inventory.ItemContainer;
+        if (TargetEntityInventory is SimpleInventory s) return s.ItemContainer;
+        return null; 
     }
 
     private void setupGrid() {
@@ -100,6 +112,8 @@ public class InventoryPanel : MonoBehaviour
                 
                 invTile.InventoryPanel = this;
                 invTile.Pos = new Vector2Int(x, y);
+                
+                if (CustomInvTileSprite != null) invTile.SetCustomImage(CustomInvTileSprite);
             }
         }
     }
@@ -283,9 +297,9 @@ public class InventoryPanel : MonoBehaviour
         EventBus.ItemUIRightClickEvent.AddListener(OnItemUIRightClick);
     }
 
-    public void SetTargetInventory(ItemContainer itemContainer) {
-        TargetEntityInventory = itemContainer;
-        // RegenerateInventory();
+    public void SetTargetInventory(EntityInventory entityInventory) {
+        TargetEntityInventory = entityInventory;
+        Start();
     }
 
     public void SetImagesRaycastTarget(bool val) {

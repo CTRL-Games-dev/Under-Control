@@ -139,12 +139,6 @@ public class UICanvas : MonoBehaviour
         SelectedItemUI.InventoryItem = inventoryItem;
     }
 
-
-    public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab, IInteractableInventory interactable = null, string title = null) {
-        InventoryCanvas.SetOtherInventory(itemContainer, prefab, interactable, title);
-        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Inventory);
-    }
-
     public void DropItem() {
         if (SelectedItemUI.InventoryItem == null) return;
 

@@ -12,19 +12,20 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
         Armor,
         Cards,
         Evo,
-        Quests
+        Seller
     }
 
     private IInteractableInventory _lastInteractableInventory;
-    private ItemContainer _currentOtherInventory;
+    private EntityInventory _currentOtherInventory;
     [SerializeField] private GameObject _otherInventoryHolder;
     [SerializeField] private RectTransform _underlineRect;
-    [SerializeField] private GameObject _armorBtnTabGO, _cardsBtnTabGO, _evoBtnTabGO, _questsBtnTabGO, _otherBtnTabGO;
+    [SerializeField] private GameObject _armorBtnTabGO, _cardsBtnTabGO, _evoBtnTabGO, _sellerBtnTabGO, _otherBtnTabGO;
     [SerializeField] private TextLocalizer _otherTabTextLocalizer;
+    [SerializeField] private Image _bgImage;
 
     [Header("Panel Game Objects")]
     [SerializeField] private GameObject _playerInventoryPanelGO;
-    [SerializeField] private GameObject _armorInventoryPanelGO, _cardsInventoryPanelGO, _evoInventoryPanelGO, _questsInventoryPanelGO, _otherInventoryPanelGO;
+    [SerializeField] private GameObject _armorInventoryPanelGO, _cardsInventoryPanelGO, _evoInventoryPanelGO, _sellerInventoryPanelGO, _otherInventoryPanelGO;
 
     [Header("Armor panel parts")]
     [SerializeField] private GameObject _playerPreviewGO;
@@ -39,22 +40,19 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     [Header("Other panel parts")]
     public CardsPanel CardsPanel;
 
+    [Header("Seller panel parts")]
+    public SellerPanels SellerPanels;
+
 
     private GameObject[] _tabButtonGameObjects;
-    private Button[] _tabButtons;
-    private Image[] _tabImages;
     private TextMeshProUGUI[] _tabTexts;
     private RectTransform[] _tabRectTranforms;
     private Dictionary<InventoryTabs, int> _tabPanelsIndex;
 
     private CanvasGroup _canvasGroup;
-    private GameObject _currentTabPanel;
-    private Button _currentTabButton;
-    private Image _currentTabImage;
-    private TextMeshProUGUI _currentTabText;
     private InventoryTabs _currentTab = InventoryTabs.Armor;
 
-    private Color _defaultColor = Color.white;
+
 
     #region Unity Methods
 
@@ -64,44 +62,32 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
             _armorBtnTabGO,
             _cardsBtnTabGO,
             _evoBtnTabGO,
-            _questsBtnTabGO,
+            _sellerBtnTabGO,
             _otherBtnTabGO
-        };
-        _tabButtons = new Button[] {
-            _armorBtnTabGO.GetComponent<Button>(),
-            _cardsBtnTabGO.GetComponent<Button>(),
-            _evoBtnTabGO.GetComponent<Button>(),
-            _questsBtnTabGO.GetComponent<Button>(),
-            _otherBtnTabGO.GetComponent<Button>()
-        };
-        _tabImages = new Image[] {
-            _armorBtnTabGO.GetComponent<Image>(),
-            _cardsBtnTabGO.GetComponent<Image>(),
-            _evoBtnTabGO.GetComponent<Image>(),
-            _questsBtnTabGO.GetComponent<Image>(),
-            _otherBtnTabGO.GetComponent<Image>(),
-        };
-        _tabTexts = new TextMeshProUGUI[] {
-            _armorBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
-            _cardsBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
-            _evoBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
-            _questsBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
-            _otherBtnTabGO.GetComponentInChildren<TextMeshProUGUI>()
-        };
-        _tabRectTranforms = new RectTransform[] {
-            _armorBtnTabGO.GetComponent<RectTransform>(),
-            _cardsBtnTabGO.GetComponent<RectTransform>(),
-            _evoBtnTabGO.GetComponent<RectTransform>(),
-            _questsBtnTabGO.GetComponent<RectTransform>(),
-            _otherBtnTabGO.GetComponent<RectTransform>(),
         };
 
         _tabPanelsIndex = new Dictionary<InventoryTabs, int> {
             { InventoryTabs.Armor, 0 },
             { InventoryTabs.Cards, 1 },
             { InventoryTabs.Evo, 2 },
-            { InventoryTabs.Quests, 3 },
+            { InventoryTabs.Seller, 3 },
             { InventoryTabs.Other, 4 }
+        };
+
+        _tabTexts = new TextMeshProUGUI[] {
+            _armorBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
+            _cardsBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
+            _evoBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
+            _sellerBtnTabGO.GetComponentInChildren<TextMeshProUGUI>(),
+            _otherBtnTabGO.GetComponentInChildren<TextMeshProUGUI>()
+        };
+
+        _tabRectTranforms = new RectTransform[] {
+            _armorBtnTabGO.GetComponent<RectTransform>(),
+            _cardsBtnTabGO.GetComponent<RectTransform>(),
+            _evoBtnTabGO.GetComponent<RectTransform>(),
+            _sellerBtnTabGO.GetComponent<RectTransform>(),
+            _otherBtnTabGO.GetComponent<RectTransform>()
         };
     }
 
@@ -130,7 +116,8 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     public void ShowUI() {
         gameObject.SetActive(true);
         _canvasGroup.DOComplete();
-        _underlineRect.DOAnchorPosX(_tabRectTranforms[_tabPanelsIndex[_currentTab]].anchoredPosition.x, 0);
+
+        _underlineRect.DOAnchorPos(_tabRectTranforms[_tabPanelsIndex[_currentTab]].anchoredPosition + new Vector2(0, -24), 0);
         SetCurrentTab(_currentTab);
         _canvasGroup.DOFade(1, 0.25f * Settings.AnimationSpeed);
         _canvasGroup.blocksRaycasts = true;
@@ -140,11 +127,8 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     public void SetCurrentTab(InventoryTabs tab) {
         InventoryTabs previousTab = _currentTab;
         _currentTab = tab;
-        _currentTabPanel = _tabButtonGameObjects[_tabPanelsIndex[_currentTab]];
-        _currentTabButton = _tabButtons[_tabPanelsIndex[_currentTab]];
-        _currentTabImage = _tabImages[_tabPanelsIndex[_currentTab]];
-        _currentTabText = _tabTexts[_tabPanelsIndex[_currentTab]];
-        _underlineRect.DOAnchorPosX(_tabRectTranforms[_tabPanelsIndex[_currentTab]].anchoredPosition.x, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+        _bgImage.DOFade(_currentTab == InventoryTabs.Seller ? 175f / 255f : 250f / 255f, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+        _underlineRect.DOAnchorPos(_tabRectTranforms[_tabPanelsIndex[_currentTab]].anchoredPosition + new Vector2(0, -24), 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
 
         foreach (InventoryTabs t in _tabPanelsIndex.Keys) {
             if (t == _currentTab) {
@@ -174,8 +158,8 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
             case InventoryTabs.Evo:
                 evoTabExit().OnComplete(() => openTab(_currentTab));
                 break;
-            case InventoryTabs.Quests:
-                questsTabExit().OnComplete(() => openTab(_currentTab));
+            case InventoryTabs.Seller:
+                sellerTabExit().OnComplete(() => openTab(_currentTab));
                 break;
         }
     }
@@ -196,8 +180,8 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
             case InventoryTabs.Evo:
                 evoTabEnter();
                 break;
-            case InventoryTabs.Quests:
-                questsTabEnter();
+            case InventoryTabs.Seller:
+                sellerTabEnter();
                 break;
         }
     }
@@ -211,7 +195,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
         armorTabExit();
         cardsTabExit();
         evoTabExit();
-        questsTabExit();
+        sellerTabExit();
         otherTabExit();
     }
 
@@ -220,26 +204,27 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
         _armorInventoryPanelGO.GetComponent<RectTransform>().DOKill();
         _cardsInventoryPanelGO.GetComponent<RectTransform>().DOKill();
         _evoInventoryPanelGO.GetComponent<RectTransform>().DOKill();
-        _questsInventoryPanelGO.GetComponent<RectTransform>().DOKill();
+        _sellerInventoryPanelGO.GetComponent<RectTransform>().DOKill();
         _playerInventoryPanelGO.GetComponent<RectTransform>().DOKill();
     }
 
-    public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab, IInteractableInventory interactable = null, string title = null) {
-        if (_currentOtherInventory == itemContainer) return;
-        _currentTab = itemContainer == null ? InventoryTabs.Armor : InventoryTabs.Other;
+    public void SetOtherInventory(EntityInventory entityInventory, GameObject prefab, IInteractableInventory interactable = null, string title = null, bool changeAlpha = false) {
+        if (_currentOtherInventory == entityInventory) return;
+        _currentTab = entityInventory == null ? InventoryTabs.Armor : InventoryTabs.Other;
 
         _lastInteractableInventory?.EndInteract();
         _lastInteractableInventory = interactable;
 
-        _currentOtherInventory = itemContainer;
+        _currentOtherInventory = entityInventory;
+
         SetOtherTabTitle(title);
 
-        if (itemContainer != null) { // animacja zmiany
+        if (entityInventory != null) { // animacja zmiany
             if (_otherInventoryHolder.transform.childCount > 0)
                 Destroy(_otherInventoryHolder.transform.GetChild(0).gameObject);
             
             InventoryPanel inventoryPanel = Instantiate(prefab, _otherInventoryHolder.transform).GetComponentInChildren<InventoryPanel>();
-            inventoryPanel.SetTargetInventory(itemContainer);
+            inventoryPanel.SetTargetInventory(entityInventory);
         } else {
             if (_otherInventoryHolder.transform.childCount > 0)
                 Destroy(_otherInventoryHolder.transform.GetChild(0).gameObject);
@@ -249,6 +234,11 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     public void SetOtherTabTitle(string text) {
         _otherTabTextLocalizer.Key = text ?? "";
         _tabButtonGameObjects[_tabPanelsIndex[InventoryTabs.Other]].GetComponent<Button>().interactable = text != null;
+    }
+
+    public void SetSellerTab(Seller seller) {
+        SellerPanels.SetSeller(seller);
+        _currentTab = InventoryTabs.Seller;
     }
 
     public Tween OtherTabExit() {
@@ -281,7 +271,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
 
     public void OnOpenEvoTab() { SetCurrentTab(InventoryTabs.Evo); }
 
-    public void OnOpenQuestsTab() { SetCurrentTab(InventoryTabs.Quests); }
+    public void OnOpenSellerTab() { SetCurrentTab(InventoryTabs.Seller); }
     
     public void HighlightButton(int index) {
         if (index == _tabPanelsIndex[_currentTab]) return;
@@ -322,6 +312,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     }
 
     private Tween otherTabExit() {
+        _bgImage.DOFade(250f / 255f, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
         return _otherInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DX(-760, 0.5f * Settings.AnimationSpeed).SetEase(Ease.OutExpo);
     }
 
@@ -421,13 +412,15 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
         return c.DOFade(0, 0.25f * Settings.AnimationSpeed).OnComplete(() => _evoInventoryPanelGO.SetActive(false));
     }
 
-    private Tween questsTabEnter() {
-        _questsInventoryPanelGO.SetActive(true);
-        return _questsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(-630, 0.25f * Settings.AnimationSpeed);
+    private Tween sellerTabEnter() {
+        _sellerInventoryPanelGO.SetActive(true);
+        _bgImage.DOFade(175f / 255f, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+        return _sellerInventoryPanelGO.GetComponent<CanvasGroup>().DOFade(1, 0.25f * Settings.AnimationSpeed).SetDelay(2f);
     }
 
-    private Tween questsTabExit() {
-        return _questsInventoryPanelGO.GetComponent<RectTransform>().DOAnchorPos3DY(0, 0.25f * Settings.AnimationSpeed).OnComplete(() => _questsInventoryPanelGO.SetActive(false));
+    private Tween sellerTabExit() {
+        _bgImage.DOFade(250f / 255f, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+        return _sellerInventoryPanelGO.GetComponent<CanvasGroup>().DOFade(0, 0.25f * Settings.AnimationSpeed).OnComplete(() => _sellerInventoryPanelGO.SetActive(false));
     }
 
     #endregion
