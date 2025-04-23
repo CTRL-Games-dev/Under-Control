@@ -1,0 +1,24 @@
+using UnityEngine;
+using UnityEngine.Events;
+
+public class MushroomPullComponent : MonoBehaviour {
+    public GameObject Puller;
+    public float PullSpeed = 20f;
+    public float StoppingDistance = 1.25f; 
+    public UnityEvent OnPulled = new();
+
+    void Update() {
+        if(Puller == null) Destroy(this);
+
+        Vector3 pullerPosition = Puller.transform.position;
+        Vector3 selfPosition = transform.position;
+
+        float distance = Vector3.Distance(pullerPosition, selfPosition);
+        if(distance < StoppingDistance) {
+            OnPulled?.Invoke();
+            Destroy(this);
+        }
+
+        transform.position = Vector3.MoveTowards(transform.position, pullerPosition, PullSpeed * Time.deltaTime);
+    }
+}
