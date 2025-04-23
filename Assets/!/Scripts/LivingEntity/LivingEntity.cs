@@ -189,7 +189,8 @@ public class LivingEntity : MonoBehaviour {
 
     private float getDamageResistance(DamageType damageType) {
         if(Inventory is not HumanoidInventory humanoidInventory) return 0;
-            return humanoidInventory.Armor?.ItemData.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
+
+        return humanoidInventory.Armor?.ItemData?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
     }
 
     #region Effects
