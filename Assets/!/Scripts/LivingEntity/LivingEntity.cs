@@ -88,17 +88,17 @@ public class LivingEntity : MonoBehaviour {
     }
 
     public void DropItem(InventoryItem item) {
-        dropItem(item.ItemData, item.Amount);
+        dropItem(item.ItemData, item.Amount, item.PowerScale);
         Inventory.RemoveInventoryItem(item);
     }
 
     // Spawns item at torso level and throws item on the ground
-    private void dropItem(ItemData itemData, int amount) {
-        ItemEntity.SpawnThrownRelative(itemData, amount, transform.position + new Vector3(0, 1.2f, 0), transform.rotation, Vector3.forward * 2);
+    private void dropItem(ItemData itemData, int amount, float powerScale) {
+        ItemEntity.SpawnThrownRelative(itemData, amount, transform.position + new Vector3(0, 1.2f, 0), powerScale, transform.rotation, Vector3.forward * 2);
     }
 
     private void dropItem(InventoryItem inventoryItem) {
-        dropItem(inventoryItem.ItemData, inventoryItem.Amount);
+        dropItem(inventoryItem.ItemData, inventoryItem.Amount, inventoryItem.PowerScale);
     }
 
     public void Attack(Damage damage, LivingEntity target) {
@@ -158,7 +158,7 @@ public class LivingEntity : MonoBehaviour {
                 // Drop common slots
                 List<InventoryItem> items = new List<InventoryItem>(Inventory.GetItems());
                 foreach(InventoryItem item in items) {
-                    dropItem(item.ItemData, item.Amount);
+                    dropItem(item);
                     Inventory.RemoveInventoryItem(item);
                 }
 

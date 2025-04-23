@@ -16,7 +16,34 @@ public class WeaponHolder : MonoBehaviour
     private bool _isAttacking = false;
 
     public void UpdateWeapon(InventoryItem<WeaponItemData> weaponItem) {
-        UpdateWeapon(weaponItem.ItemData, weaponItem.PowerScale);
+        if (_currentWeaponHitter != null) {
+            Destroy(_currentWeaponHitter.gameObject);
+            _currentWeaponHitter = null;
+            _currentWeaponData = null;
+        }
+
+        if(weaponItem == null) return;
+
+        WeaponItemData weaponData = weaponItem.ItemData;
+        float powerScale = weaponItem.PowerScale;
+
+        if(weaponData == null) return;
+
+        _currentWeaponPowerScale = powerScale;
+
+        if (weaponData.WeaponPrefab != null) {
+            _currentWeaponHitter = InstantiateWeapon(weaponData);
+        } else {
+            _currentWeaponHitter = InstantiateUnknownWeapon();
+        }
+
+        _currentWeaponData = weaponData;
+
+        if (_currentWeaponHitter.gameObject.layer == LayerMask.NameToLayer("Default")) {
+            _currentWeaponHitter.gameObject.layer = gameObject.layer;
+        }
+
+        _currentWeaponHitter.OnHit.AddListener(OnHit);
     }
 
     public void UpdateWeapon(WeaponItemData weaponData, float powerScale = 1) {
