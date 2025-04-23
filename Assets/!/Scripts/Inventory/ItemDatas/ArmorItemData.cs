@@ -11,5 +11,6 @@ public class ArmorItemData : ItemData {
         public float Resistance;
     }
     
+    [SerializeField]
     public DamageResistance[] DamageResistances;
 }
