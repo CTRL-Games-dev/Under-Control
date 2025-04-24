@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour {
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
         {Dimension.HUB, "Hub"},
         {Dimension.FOREST, "Adventure"},
-        {Dimension.FOREST_BOSS, "Adventure"},
+        {Dimension.FOREST_VECTOR, "Adventure"},
     };
 
     [HideInInspector] public GameDifficulty Difficulty { get; private set; }

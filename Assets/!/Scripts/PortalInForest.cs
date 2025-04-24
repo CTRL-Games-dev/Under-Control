@@ -7,6 +7,7 @@ public class PortalInForest : Portal
     public Material PortalInsideLow;
     public Material PortalInsideMedium;
     public Material PortalInsideHigh;
+    public Material PortalVekthar;
     public List<MeshRenderer> Renderers;
     protected override void setInfluence()
     {
@@ -15,24 +16,24 @@ public class PortalInForest : Portal
         float influenceDelta = UnityEngine.Random.Range(minDelta, maxDelta);
         Influence = influenceDelta + GameManager.Instance.TotalInfluence;
 
-        float step = (maxDelta-minDelta) / 3;
         Material currentMaterial;
-        if(influenceDelta < minDelta + step)
-        {
+        float step = (maxDelta-minDelta) / 3;
+
+        if(Influence > 100) {
+            _dimension = Dimension.FOREST_VECTOR;
+            currentMaterial = PortalVekthar;
+        }
+        else if(influenceDelta < minDelta + step) {
             currentMaterial = PortalInsideLow;
         }
-        else if(influenceDelta >= minDelta + step && influenceDelta < minDelta + (step * 2))
-        {
-            Debug.Log("2");
+        else if(influenceDelta >= minDelta + step && influenceDelta < minDelta + (step * 2)) {
             currentMaterial = PortalInsideMedium;
         }
-        else
-        {
+        else {
             currentMaterial = PortalInsideHigh;
         }
 
-        foreach(var r in Renderers)
-        {
+        foreach(var r in Renderers) {
             r.material = currentMaterial;
         }
     }
