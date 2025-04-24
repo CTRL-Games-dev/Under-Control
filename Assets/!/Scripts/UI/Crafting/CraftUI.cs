@@ -54,7 +54,7 @@ public class CraftUI : MonoBehaviour
 
     public void OnPointerClick() {
         if (getCanCraft(_consumableItemData)) {
-            if (Player.Inventory.AddItem(_consumableItemData, 1)) {
+            if (Player.Inventory.AddItem(_consumableItemData, 1, 0f, false)) {
                 for (int i = 0; i < _consumableItemData.Ingredients.Count; i++) {
                     InventoryItem inventoryItem = Player.Inventory.GetFirstInventoryItem(_consumableItemData.Ingredients[i]);
                     inventoryItem.Amount -= 1;
