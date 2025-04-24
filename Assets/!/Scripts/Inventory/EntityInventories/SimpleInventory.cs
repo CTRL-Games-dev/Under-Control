@@ -28,6 +28,10 @@ public class SimpleInventory : EntityInventory
         return ItemContainer.GetInventoryItem(position);
     }
 
+    public override InventoryItem GetFirstInventoryItem(ItemData item) {
+        return ItemContainer.GetFirstInventoryItem(item);
+    }
+
     public override List<InventoryItem> GetItems() {
         return ItemContainer.GetItems();
     }
@@ -59,5 +63,9 @@ public class SimpleInventory : EntityInventory
     public override void Clear() {
         ItemContainer.Clear();
         OnInventoryChanged?.Invoke();
+    }
+    
+    public override bool HasItemData(ItemData itemData, int amount = 1) {
+        return ItemContainer.HasItemData(itemData, amount);
     }
 }

@@ -13,5 +13,7 @@ public abstract class EntityInventory : MonoBehaviour {
     public abstract bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position, float powerScale = 1);
     public abstract bool RemoveInventoryItem(InventoryItem inventoryItem);
     public abstract bool RemoveItemAt(Vector2Int position);
+    public abstract bool HasItemData(ItemData itemData, int amount = 1);
+    public abstract InventoryItem GetFirstInventoryItem(ItemData itemData);    
     public abstract void Clear();
 }

@@ -193,9 +193,19 @@ public class InventoryPanel : MonoBehaviour
 
         InventoryItem[] itemsArray = _inventory.ToArray();
 
+        wipeAllItemUIS();
+        foreach (InvTile tile in _inventoryTileArray) {
+            tile.IsEmpty = true;
+        }
         foreach (InventoryItem i in itemsArray) {
             destroyItemUI(i);
             createItemUI(i);
+        }
+    }
+
+    private void wipeAllItemUIS() {
+        foreach (Transform child in _itemHolder.transform) {
+            Destroy(child.gameObject);
         }
     }
 

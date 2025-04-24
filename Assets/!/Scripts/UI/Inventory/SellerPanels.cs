@@ -20,6 +20,7 @@ public class SellerPanels : MonoBehaviour
     [SerializeField] private RectTransform _buyPanelRect, _sellPanelRect, _craftPanelRect;
     [SerializeField] private CanvasGroup _buyBtnCanvasGroup, _sellBtnCanvasGroup, _craftBtnCanvasGroup;
     [SerializeField] private RectTransform _buyBtnRect, _sellBtnRect, _craftBtnRect;
+    [SerializeField] private CraftPanel _craftPanel;
     
     private Seller _seller;
     private PanelType _currentPanelType = PanelType.None;
@@ -151,6 +152,10 @@ public class SellerPanels : MonoBehaviour
             case PanelType.Craft:
                 _craftBtnRect.DOKill();
                 _craftBtnRect.DOAnchorPosX(0, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+                _craftPanelRect.DOAnchorPosY(-869f, 0.5f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+                _craftCanvasGroup.DOFade(0f, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+                _craftCanvasGroup.interactable = true;
+                _craftCanvasGroup.blocksRaycasts = true;
                 break;
         }
     }
@@ -160,6 +165,7 @@ public class SellerPanels : MonoBehaviour
             case PanelType.Buy:
                 _buyCanvasGroup.DOKill();
                 _buyPanelRect.DOKill();
+                _buyPanelRect.DOAnchorPosY(-564, 0);
                 _buyBtnRect.DOKill();
                 _buyBtnRect.DOAnchorPosX(_selectedX, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
                 float delayBuy = 0;
@@ -190,13 +196,20 @@ public class SellerPanels : MonoBehaviour
                 _sellCanvasGroup.blocksRaycasts = true;
                 break;
             case PanelType.Craft:
+                _craftPanel.UpdateChildren();
                 _craftCanvasGroup.DOKill();
                 _craftPanelRect.DOKill();
                 _craftBtnRect.DOKill();
                 _craftBtnRect.DOAnchorPosX(_selectedX, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+                float delayCraft = 0;
                 if (!CameraManager.IsCameraActive(_seller.CraftCamera)) {
                     CameraManager.SwitchCamera(_seller.CraftCamera);
+                    delayCraft = 2f;
                 }
+                _craftPanelRect.DOAnchorPosY(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.OutCubic).SetDelay(delayCraft);
+                _craftCanvasGroup.DOFade(1f, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic).SetDelay(delayCraft);
+                _craftCanvasGroup.interactable = true;
+                _craftCanvasGroup.blocksRaycasts = true;
                 break;
         }
     }

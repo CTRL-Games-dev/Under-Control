@@ -51,6 +51,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
 
     private CanvasGroup _canvasGroup;
     private InventoryTab _currentTab = InventoryTab.Armor;
+    public InventoryPanel PlayerInventoryPanel;
 
 
 
@@ -424,13 +425,21 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     private Tween sellerTabEnter() {
         _bgImage.DOFade(175f / 255f, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
         SellerPanels.ShowButtons();
-        return _sellerInventoryPanelGO.GetComponent<CanvasGroup>().DOFade(1, 0.25f * Settings.AnimationSpeed);
+        CanvasGroup c = _sellerInventoryPanelGO.GetComponent<CanvasGroup>();
+        c.DOKill();
+        c.interactable = true;
+        c.blocksRaycasts = true;
+        return c.DOFade(1, 0.25f * Settings.AnimationSpeed);
     }
 
     private Tween sellerTabExit() {
         _bgImage.DOFade(250f / 255f, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
         SellerPanels.HideButtons();
-        return _sellerInventoryPanelGO.GetComponent<CanvasGroup>().DOFade(0, 0.5f * Settings.AnimationSpeed);
+        CanvasGroup c = _sellerInventoryPanelGO.GetComponent<CanvasGroup>();
+        c.DOKill();
+        c.interactable = false;
+        c.blocksRaycasts = false;
+        return c.DOFade(0, 0.5f * Settings.AnimationSpeed);
     }
 
     #endregion

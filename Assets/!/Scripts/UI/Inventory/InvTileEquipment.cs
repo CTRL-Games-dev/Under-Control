@@ -221,6 +221,7 @@ public class InvTileEquipment : InvTile {
     }
 
     private void OnConsumablesUpdate() {
+
         InventoryItem consumable = _tileType == TileType.Consumeable1 ? Player.Instance.ConsumableItemOne : Player.Instance.ConsumableItemTwo;
 
         if (consumable == null) {

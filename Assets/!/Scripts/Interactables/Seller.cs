@@ -25,17 +25,6 @@ public class Seller : MonoBehaviour, IInteractableInventory
         _animator = GetComponent<Animator>();
     }
 
-    void Update() {
-        if (Input.GetKeyDown(KeyCode.F3)) {
-            _faceAnimator.StartAnimation("TALK", 5f); 
-        }
-
-        if (Input.GetKeyUp(KeyCode.Alpha7)) {
-            _isTallking = !_isTallking;
-            _animator.SetBool(_isTalkingHash, _isTallking);
-        }
-
-    }
 
     public Tween EnlargePouch() {
         _pouchAnimator.DOKill();
@@ -63,13 +52,14 @@ public class Seller : MonoBehaviour, IInteractableInventory
         _isTallking = true;
         _animator.SetBool(_isTalkingHash, _isTallking);
         _animator.SetTrigger(_sellHash);
-
+        _faceAnimator.StartInfiniteAnimation("TALK"); 
         EventBus.InventoryClosedEvent.AddListener(EndInteract);
     }
 
     public void EndInteract() {
         Player.Instance.UICancelEvent.RemoveListener(EndInteract);
         Player.UICanvas.InventoryCanvas.SetSellerTab(null);
+        _faceAnimator.EndAnimation();
         CameraManager.SwitchCamera(_previousCamera);
     }
 }
