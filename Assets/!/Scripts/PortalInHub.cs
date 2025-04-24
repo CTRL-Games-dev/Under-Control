@@ -5,6 +5,6 @@ public class PortalInHub : Portal
 {
     protected override void setInfluence()
     {
-        Influence = 10;
+        Influence = GameManager.MaxInfluenceDelta;
     }
 }

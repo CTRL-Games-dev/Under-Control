@@ -215,7 +215,7 @@ public class Player : MonoBehaviour {
 
         registerStats();
 
-        if (CurrentWeapon.ItemData != null) {
+        if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
             WeaponHolder.UpdateWeapon(CurrentWeapon);
         }
 
@@ -540,6 +540,7 @@ public class Player : MonoBehaviour {
         bool interacted = tryInteract(interactionType);
         
         if(interacted) return;
+        if(CurrentWeapon == null) return;
         if(CurrentWeapon.ItemData == null) return;
 
         // Default to attacking if no interaction was commited

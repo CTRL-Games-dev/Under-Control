@@ -6,6 +6,7 @@ public abstract class EntityInventory : MonoBehaviour {
     public abstract Vector2Int Size { get; }
     public abstract bool AddItem(ItemData itemData, int amount, Vector2Int position, float powerScale = 1, bool rotated = false);
     public abstract bool AddItem(ItemData itemData, int amount = 1, float powerScale = 1);
+    public abstract bool AddItem(ItemData itemData, int amount = 1, float powerScale = 1, bool rotated = false);
     public abstract InventoryItem GetInventoryItem(Vector2Int position);
     public abstract List<InventoryItem> GetItems();
     public abstract bool IsWithinBounds(Vector2Int position);

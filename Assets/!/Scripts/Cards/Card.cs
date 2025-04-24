@@ -7,4 +7,5 @@ public abstract class Card : ScriptableObject
     public string ShortDesc;
     public string LongDesc;
     public ElementalType ElementalType;
+    public Card[] NextCards;
 }

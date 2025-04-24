@@ -161,7 +161,8 @@ public class WorldGenerator : MonoBehaviour {
         Location forestSpawnPrefab = Resources.Load<Location>("Prefabs/Forest/Locations/ForestSpawn");
         Location[] meadowsPrefabs = Resources.LoadAll<Location>("Prefabs/Forest/Locations/Meadows");
         Location[] rockyFieldsPrefabs = Resources.LoadAll<Location>("Prefabs/Forest/Locations/RockyFields");
-        Location forestWell = Resources.Load<ForestPortalLocation>("Prefabs/Forest/Locations/Well");
+        Location wellPrefab = Resources.Load<Location>("Prefabs/Forest/Locations/Well");
+        Location sellerPrefab = Resources.Load<Location>("Prefabs/Forest/Locations/Seller");
 
         Debug.Log("Loaded location prefabs");
 
@@ -185,6 +186,9 @@ public class WorldGenerator : MonoBehaviour {
         {
             allLocations.Add(Instantiate(forestPortalPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform));
         }
+
+        allLocations.Add(Instantiate(sellerPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform));
+        allLocations.Add(Instantiate(wellPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform));
 
         List<LocationNode> nodes = new()
         {
