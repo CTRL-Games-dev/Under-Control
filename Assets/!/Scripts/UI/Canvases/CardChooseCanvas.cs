@@ -33,7 +33,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
         _currentCards = new CardUI[numberOfCards];
 
         Card[] randomCards = GameManager.Instance.GetRandomCards(numberOfCards);
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < randomCards.Length; i++) {
             _currentCards[i] = AddCard(randomCards[i]);
         }
 
