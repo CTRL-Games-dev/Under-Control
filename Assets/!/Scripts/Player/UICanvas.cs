@@ -94,6 +94,7 @@ public class UICanvas : MonoBehaviour
         if (IsOtherUIOpen) return;
         if (CurrentUIMiddleState == UIMiddleState.NotVisible || CurrentUIMiddleState == UIMiddleState.Inventory) {
             ChangeUIMiddleState(CurrentUIMiddleState == UIMiddleState.Inventory ? UIMiddleState.NotVisible : UIMiddleState.Inventory);
+
         }
     }
 
@@ -137,12 +138,6 @@ public class UICanvas : MonoBehaviour
 
         SelectedItemUI.gameObject.SetActive(inventoryItem != null);
         SelectedItemUI.InventoryItem = inventoryItem;
-    }
-
-
-    public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab, IInteractableInventory interactable = null, string title = null) {
-        InventoryCanvas.SetOtherInventory(itemContainer, prefab, interactable, title);
-        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Inventory);
     }
 
     public void DropItem() {
@@ -214,6 +209,7 @@ public class UICanvas : MonoBehaviour
     private void closeUIMiddleState(UIMiddleState state) {
         switch (state) {
             case UIMiddleState.Inventory:
+                EventBus.InventoryClosedEvent?.Invoke();
                 InventoryCanvas.HideUI();                
                 break;
             case UIMiddleState.MainMenu:

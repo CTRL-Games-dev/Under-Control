@@ -56,7 +56,7 @@ public class Player : MonoBehaviour {
     public Stat DashDistance = new Stat(StatType.DASH_DISTANCE, 5f);
 
     // Coins
-    [SerializeField] private int _coins = 0;
+    [SerializeField] private int _coins = 100;
     public int Coins { 
         get{ return _coins; } 
         set {   
@@ -156,7 +156,7 @@ public class Player : MonoBehaviour {
     // State
     private Vector2 _movementInputVector = Vector2.zero;
     private InteractionType? _queuedInteraction;
-    private Cooldown dashCooldown = new Cooldown(0);
+    private Cooldown _dashCooldown = new Cooldown(0);
 
     private List<Modifier> _currentRingModifiers;
     private List<Modifier> _currentAmuletModifiers;
@@ -337,7 +337,7 @@ public class Player : MonoBehaviour {
     }
 
     private void onStunned(float duration) {
-        CameraManager.Instance.ShakeCamera(2, duration);
+        CameraManager.ShakeCamera(2, duration);
     }
 
     
@@ -464,9 +464,9 @@ public class Player : MonoBehaviour {
     void OnDodge() {
         if (_isAttacking || InputDisabled) return;
 
-        dashCooldown.CooldownTime = DashCooldown;
+        _dashCooldown.CooldownTime = DashCooldown;
         
-        if (!dashCooldown.Execute()) {
+        if (!_dashCooldown.Execute()) {
             return;
         }
 

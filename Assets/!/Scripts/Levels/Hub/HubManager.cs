@@ -11,7 +11,7 @@ public class HubManager : MonoBehaviour
     }
 
     private void Start() {
-        CameraManager.Instance.SwitchCamera(MainMenuCamera);
+        CameraManager.SwitchCamera(MainMenuCamera);
         Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.MainMenu);
         Player.UICanvas.ChangeUITopState(UITopState.NotVisible);

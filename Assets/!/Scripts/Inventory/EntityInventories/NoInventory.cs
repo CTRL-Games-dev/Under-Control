@@ -58,4 +58,15 @@ public class NoInventory : EntityInventory
     }
 
     public override void Clear() {}
+
+
+    public override bool HasItemData(ItemData itemData, int amount = 1)
+    {
+        return false;
+    }
+
+    public override InventoryItem GetFirstInventoryItem(ItemData itemData)
+    {
+        return null;
+    }
 }

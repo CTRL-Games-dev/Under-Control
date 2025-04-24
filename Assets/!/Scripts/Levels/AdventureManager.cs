@@ -29,7 +29,7 @@ public class AdventureManager : MonoBehaviour
 
         Player.Instance.gameObject.SetActive(true);
         
-        CameraManager.Instance.SwitchCamera(Player.Instance.TopDownCamera);
+        CameraManager.SwitchCamera(Player.Instance.TopDownCamera);
 
         _navMeshSurface.BuildNavMesh();
 

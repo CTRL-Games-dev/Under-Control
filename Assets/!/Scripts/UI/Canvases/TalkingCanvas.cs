@@ -118,7 +118,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
             _currentDialogueIndex++;
             if (_currentDialogueIndex >= _dialogue.DialogueEntries.Count) {
                 Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
-                CameraManager.Instance.SwitchCamera(null);
+                CameraManager.SwitchCamera(null);
                 return;
             }
             updateDialogueBox();

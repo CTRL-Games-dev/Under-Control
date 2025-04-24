@@ -85,6 +85,17 @@ public class ItemContainer
         return position.x >= 0 && position.y >= 0 && position.x < _size.x && position.y < _size.y;
     }
 
+    public InventoryItem GetFirstInventoryItem(ItemData itemData) {
+        foreach(var inventoryItem in _items) {
+            if(inventoryItem.ItemData.Equals(itemData)) {
+                return inventoryItem;
+            }
+        }
+
+        return null;
+    }
+
+
     // This will throw an exception if the position is out of bounds
     // Use IsWithinBounds to check if the position is valid
     public InventoryItem GetInventoryItem(Vector2Int position) {
@@ -221,6 +232,20 @@ public class ItemContainer
         return true;
     }
 
+
+
+    private InventoryItem GetFirstItemData(ItemData itemData, int amount) {
+        foreach(var inventoryItem in _items) {
+            if(inventoryItem.ItemData.Equals(itemData)) {
+                if(inventoryItem.Amount >= amount) {
+                    return inventoryItem;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public List<InventoryItem> GetItems() {
         return _items;
     }
@@ -250,5 +275,17 @@ public class ItemContainer
 
     public void Clear() {
         _items.Clear();
+    }
+
+    public bool HasItemData(ItemData itemData, int amount){
+        foreach(var inventoryItem in _items) {
+            if(inventoryItem.ItemData.Equals(itemData)) {
+                if(inventoryItem.Amount >= amount) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

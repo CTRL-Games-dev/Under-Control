@@ -221,9 +221,10 @@ public class InvTileEquipment : InvTile {
     }
 
     private void OnConsumablesUpdate() {
+
         InventoryItem consumable = _tileType == TileType.Consumeable1 ? Player.Instance.ConsumableItemOne : Player.Instance.ConsumableItemTwo;
 
-        if (consumable.ItemData == null) {
+        if (consumable == null) {
             if (_itemUI != null) {
                 Destroy(_itemUI.gameObject);
                 _itemUI = null;

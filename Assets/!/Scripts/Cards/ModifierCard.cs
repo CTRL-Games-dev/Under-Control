@@ -7,8 +7,7 @@ public class ModifierCard : Card
     public float ModifierValue;
     public Modifier Modifier;
 
-    public override string ToString()
-    {
+    public override string ToString() {
         return $"{DisplayName} ({ModifierValue}) [{Modifier}]";
     }
 }
