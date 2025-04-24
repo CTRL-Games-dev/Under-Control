@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using DG.Tweening;
+using Unity.AppUI.UI;
 using UnityEngine;
 
 public class SellerPanels : MonoBehaviour
@@ -17,9 +18,13 @@ public class SellerPanels : MonoBehaviour
     [SerializeField] private InventoryPanel _sellPanel;
     [SerializeField] private CanvasGroup _buyCanvasGroup, _sellCanvasGroup, _craftCanvasGroup;
     [SerializeField] private RectTransform _buyPanelRect, _sellPanelRect, _craftPanelRect;
+    [SerializeField] private CanvasGroup _buyBtnCanvasGroup, _sellBtnCanvasGroup, _craftBtnCanvasGroup;
+    [SerializeField] private RectTransform _buyBtnRect, _sellBtnRect, _craftBtnRect;
     
     private Seller _seller;
     private PanelType _currentPanelType = PanelType.None;
+
+    private float _highlitedX = 25f, _selectedX = 50f;
 
 
     public void SetSeller(Seller seller) {
@@ -32,6 +37,83 @@ public class SellerPanels : MonoBehaviour
         }
         _buyPanel.SetTargetInventory(seller == null ? null : seller.BuyInventory);
         _sellPanel.SetTargetInventory(seller == null ? null : seller.SellInventory);
+    }
+
+    public void ShowButtons() {
+        _buyBtnCanvasGroup.DOKill();
+        _sellBtnCanvasGroup.DOKill();
+        _craftBtnCanvasGroup.DOKill();
+        _buyBtnRect.DOKill();
+        _sellBtnRect.DOKill();
+        _craftBtnRect.DOKill();
+        
+        _buyBtnRect.DOAnchorPosX(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+        _buyBtnCanvasGroup.DOFade(1f, 0.2f * Settings.AnimationSpeed).OnComplete(() => {
+            _buyBtnCanvasGroup.interactable = true;
+            _buyBtnCanvasGroup.blocksRaycasts = true;
+
+            _sellBtnRect.DOAnchorPosX(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+            _sellBtnCanvasGroup.DOFade(1f, 0.2f * Settings.AnimationSpeed).OnComplete(() => {
+                _sellBtnCanvasGroup.interactable = true;
+                _sellBtnCanvasGroup.blocksRaycasts = true;
+
+                _craftBtnRect.DOAnchorPosX(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+                _craftBtnCanvasGroup.DOFade(1f, 0.2f * Settings.AnimationSpeed).OnComplete(() => {
+                    _craftBtnCanvasGroup.interactable = true;
+                    _craftBtnCanvasGroup.blocksRaycasts = true;
+                    
+                    RectTransform rect = getPanelBtnRect(_currentPanelType);
+                    rect.DOKill();
+                    rect.DOAnchorPosX(_selectedX, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+                });
+            });
+        });
+
+        
+    }
+
+    public void HideButtons() {
+        _buyBtnCanvasGroup.DOKill();
+        _sellBtnCanvasGroup.DOKill();
+        _craftBtnCanvasGroup.DOKill();
+        _buyBtnRect.DOKill();
+        _sellBtnRect.DOKill();
+        _craftBtnRect.DOKill();
+        _buyBtnCanvasGroup.interactable = false;
+        _buyBtnCanvasGroup.blocksRaycasts = false;
+        _sellBtnCanvasGroup.interactable = false;
+        _sellBtnCanvasGroup.blocksRaycasts = false;
+        _craftBtnCanvasGroup.interactable = false;
+        _craftBtnCanvasGroup.blocksRaycasts = false;
+        
+        _buyBtnRect.DOAnchorPosX(-300, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+        _buyBtnCanvasGroup.DOFade(0f, 0.1f * Settings.AnimationSpeed).OnComplete(() => {
+            _sellBtnRect.DOAnchorPosX(-300, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+            _sellBtnCanvasGroup.DOFade(0f, 0.1f * Settings.AnimationSpeed).OnComplete(() => {
+                _craftBtnRect.DOAnchorPosX(-300, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+                _craftBtnCanvasGroup.DOFade(0f, 0.1f * Settings.AnimationSpeed);
+            });
+        });
+    }
+
+    public void OnBtnPointerEnter(int index) {
+        PanelType panel = (PanelType)index;
+        if (panel == _currentPanelType) return;
+        
+        RectTransform rect = getPanelBtnRect(panel);
+        rect.DOKill();
+        rect.DOScaleY(1.05f, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+        rect.DOAnchorPosX(_highlitedX, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+    }
+
+    public void OnBtnPointerExit(int index) {
+        PanelType panel = (PanelType)index;
+        if (panel == _currentPanelType) return;
+        
+        RectTransform rect = getPanelBtnRect(panel);
+        rect.DOKill();
+        rect.DOAnchorPosX(0, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+        rect.DOScaleY(1f, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
     }
 
 
@@ -49,6 +131,8 @@ public class SellerPanels : MonoBehaviour
             case PanelType.Buy:
                 _buyCanvasGroup.DOKill();
                 _buyPanelRect.DOKill();
+                _buyBtnRect.DOKill();
+                _buyBtnRect.DOAnchorPosX(0, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
                 _buyCanvasGroup.DOFade(0f, 0.25f * Settings.AnimationSpeed);
                 _buyCanvasGroup.interactable = false;
                 _buyCanvasGroup.blocksRaycasts = false;
@@ -58,10 +142,15 @@ public class SellerPanels : MonoBehaviour
                 _seller.EnsmallPouch();
                 _sellCanvasGroup.DOKill();
                 _sellPanelRect.DOKill();
-                _sellPanelRect.DOScale(Vector3.zero, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+                _sellBtnRect.DOKill();
+                _sellBtnRect.DOAnchorPosX(0, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);_sellPanelRect.DOScale(Vector3.zero, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
                 _sellCanvasGroup.DOFade(0f, 0.25f * Settings.AnimationSpeed);
                 _sellCanvasGroup.interactable = false;
                 _sellCanvasGroup.blocksRaycasts = false;
+                break;
+            case PanelType.Craft:
+                _craftBtnRect.DOKill();
+                _craftBtnRect.DOAnchorPosX(0, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
                 break;
         }
     }
@@ -71,6 +160,8 @@ public class SellerPanels : MonoBehaviour
             case PanelType.Buy:
                 _buyCanvasGroup.DOKill();
                 _buyPanelRect.DOKill();
+                _buyBtnRect.DOKill();
+                _buyBtnRect.DOAnchorPosX(_selectedX, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
                 float delayBuy = 0;
                 if (!CameraManager.IsCameraActive(_seller.BuyCamera)) {
                     CameraManager.SwitchCamera(_seller.BuyCamera);
@@ -84,6 +175,8 @@ public class SellerPanels : MonoBehaviour
             case PanelType.Sell:
                 _sellCanvasGroup.DOKill();
                 _sellPanelRect.DOKill();
+                _sellBtnRect.DOKill();
+                _sellBtnRect.DOAnchorPosX(_selectedX, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
                 float delaySell = 0;
                 if (!CameraManager.IsCameraActive(_seller.SellCamera)) {
                     _seller.EnlargePouch();
@@ -99,6 +192,8 @@ public class SellerPanels : MonoBehaviour
             case PanelType.Craft:
                 _craftCanvasGroup.DOKill();
                 _craftPanelRect.DOKill();
+                _craftBtnRect.DOKill();
+                _craftBtnRect.DOAnchorPosX(_selectedX, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
                 if (!CameraManager.IsCameraActive(_seller.CraftCamera)) {
                     CameraManager.SwitchCamera(_seller.CraftCamera);
                 }
@@ -117,5 +212,18 @@ public class SellerPanels : MonoBehaviour
 
     public void OnCraftButton() {
         SwitchSellerPanel(PanelType.Craft);
+    }
+
+    private RectTransform getPanelBtnRect(PanelType panelType) {
+        switch (panelType) {
+            case PanelType.Buy:
+                return _buyBtnRect;
+            case PanelType.Sell:
+                return _sellBtnRect;
+            case PanelType.Craft:
+                return _craftBtnRect;
+            default:
+                return null;
+        }
     }
 }

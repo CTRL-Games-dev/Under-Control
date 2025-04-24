@@ -43,8 +43,6 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
 
     [Header("Seller panel parts")]
     public SellerPanels SellerPanels;
-    [SerializeField] private CanvasGroup _sellerButtonsCanvasGroup;
-
 
     private GameObject[] _tabButtonGameObjects;
     private TextMeshProUGUI[] _tabTexts;
@@ -425,18 +423,13 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
 
     private Tween sellerTabEnter() {
         _bgImage.DOFade(175f / 255f, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
-        _sellerButtonsCanvasGroup.DOKill();
-        _sellerButtonsCanvasGroup.interactable = true;
-        _sellerButtonsCanvasGroup.blocksRaycasts = true;
-        _sellerButtonsCanvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed);
+        SellerPanels.ShowButtons();
         return _sellerInventoryPanelGO.GetComponent<CanvasGroup>().DOFade(1, 0.25f * Settings.AnimationSpeed);
     }
 
     private Tween sellerTabExit() {
         _bgImage.DOFade(250f / 255f, 0.25f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
-        _sellerButtonsCanvasGroup.DOFade(0, 0.25f * Settings.AnimationSpeed);
-        _sellerButtonsCanvasGroup.interactable = false;
-        _sellerButtonsCanvasGroup.blocksRaycasts = false;
+        SellerPanels.HideButtons();
         return _sellerInventoryPanelGO.GetComponent<CanvasGroup>().DOFade(0, 0.5f * Settings.AnimationSpeed);
     }
 

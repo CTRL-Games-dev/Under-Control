@@ -30,8 +30,7 @@ public class Seller : MonoBehaviour, IInteractableInventory
             _faceAnimator.StartAnimation("TALK", 5f); 
         }
 
-
-                if (Input.GetKeyUp(KeyCode.Alpha7)) {
+        if (Input.GetKeyUp(KeyCode.Alpha7)) {
             _isTallking = !_isTallking;
             _animator.SetBool(_isTalkingHash, _isTallking);
         }
