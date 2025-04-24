@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(MusicPlayer))]
 public class GameManager : MonoBehaviour {
@@ -9,7 +10,6 @@ public class GameManager : MonoBehaviour {
         public Dimension Dimension;
         public AudioClip[] Clips;
     }
-
     public static GameManager Instance;
 
     [Header("References")]
@@ -31,12 +31,14 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f; 
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
+    private MusicPlayer _musicPlayer;
 
     [Header("State")]
-    private MusicPlayer _musicPlayer;
-    
-    private void Awake() 
-    {
+    // public Card[] AllPossibleCards;
+    [SerializeField] private List<Card> _cards = new();
+    // Events
+    public UnityEvent LevelLoaded;
+    private void Awake()  {
         // SceneManager.sceneLoaded += OnLevelChange;
 
         // We need to check if there is already existing manager
@@ -44,7 +46,7 @@ public class GameManager : MonoBehaviour {
         // singleton pattern must be used.
         if(Instance == null) {
             Instance = this;
-        } else{
+        } else {
             Destroy(gameObject);
         }
 
@@ -55,14 +57,12 @@ public class GameManager : MonoBehaviour {
 
         playMusicForDimension(CurrentDimension);
     }
-    private void Start()
-    {
+    private void Start() {
         // For some reason "scene change" is being called, even if it is the first scene?
         // ConnectPortals();
     }
 
-    public void ChangeDimension(Dimension dimension, float newInfluence)
-    {
+    public void ChangeDimension(Dimension dimension, float newInfluence)  {
         Debug.Log($"New influence: {newInfluence}");
         if(newInfluence <= TotalInfluence)
         {
@@ -101,8 +101,43 @@ public class GameManager : MonoBehaviour {
         InfluenceDelta = 0;
     }
 
-    public float GetInfluenceModifier()
-    {
+    public float GetInfluenceModifier() {
         return (InfluenceDelta / MaxInfluenceDelta) + 0.5f;
+    }
+
+    public Card[] GetRandomCards(int numberOfcards = 3) {
+
+        numberOfcards = Math.Min(numberOfcards, _cards.Count);
+        Card[] cards = new Card[numberOfcards];
+
+        List<Card> copiedCards = FluffyUtils.CloneList(_cards);
+        Debug.Log($"Normal {_cards.Count}");
+        Debug.Log($"Copied cards {copiedCards.Count}");
+
+        for(int i = 0; i < 3; i++) {
+            Card card = copiedCards[UnityEngine.Random.Range(0, copiedCards.Count)];
+            copiedCards.Remove(card);
+            cards[i] = card;
+        }
+        return cards;
+    }
+
+    public bool ChooseCard(Card chosenCard) {
+        foreach(var card in _cards) {
+            if(card != chosenCard) continue;
+            _cards.Remove(chosenCard);
+
+            foreach(var c in chosenCard.NextCards) {
+                _cards.Add(c);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    // Each adventure manager calls this function once the level has been loaded
+    public void OnLevelLoaded() {
+        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Choose);
+        LevelLoaded.Invoke();
     }
 }
