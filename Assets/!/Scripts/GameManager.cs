@@ -119,7 +119,7 @@ public class GameManager : MonoBehaviour {
         Debug.Log($"Normal {_cards.Count}");
         Debug.Log($"Copied cards {copiedCards.Count}");
 
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < numberOfcards; i++) {
             Card card = copiedCards[UnityEngine.Random.Range(0, copiedCards.Count)];
             copiedCards.Remove(card);
             cards[i] = card;
