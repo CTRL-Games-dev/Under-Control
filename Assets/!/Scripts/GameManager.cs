@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour {
 
     [Header("State")]
     // public Card[] AllPossibleCards;
+    [HideInInspector] private List<Card> _alreadyAddedCards = new();
     [SerializeField] private List<Card> _cards = new();
     // Events
     public UnityEvent LevelLoaded;
@@ -52,6 +53,10 @@ public class GameManager : MonoBehaviour {
 
         DontDestroyOnLoad(this);
         SetDefault();
+
+        foreach(var c in _cards) {
+            _alreadyAddedCards.Add(c);
+        }
 
         _musicPlayer = GetComponent<MusicPlayer>();
 
@@ -128,7 +133,9 @@ public class GameManager : MonoBehaviour {
             _cards.Remove(chosenCard);
 
             foreach(var c in chosenCard.NextCards) {
+                if(_alreadyAddedCards.Contains(c)) continue;
                 _cards.Add(c);
+                _alreadyAddedCards.Add(c);
             }
             return true;
         }
