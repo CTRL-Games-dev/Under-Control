@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -33,44 +34,52 @@ public class Chunk : MonoBehaviour
         //     }
         // }
 
-        for(int ix = 0; ix < gridWidth; ix++)
+        int parts = 5;
+
+        int gridWidthPart = (int)Math.Ceiling((float)gridWidth / parts);
+        int gridHeightPart = (int)Math.Ceiling((float)gridHeight / parts);
+
+        int quadIndex = 0; // This tracks how many quads we've created
+
+        for (int px = 0; px < parts; px++)
         {
-            for(int iy = 0; iy < gridHeight; iy++) {
-                int index = iy * gridHeight + ix;
+            for (int py = 0; py < parts; py++)
+            {
+                int startX = px * gridWidthPart;
+                int startY = py * gridHeightPart;
 
-                int x = (int)(ix + topLeftCornerPosition.x);
-                int y = (int)(iy + topLeftCornerPosition.y);
+                int partWidth = Math.Min(gridWidthPart, gridWidth - startX);
+                int partHeight = Math.Min(gridHeightPart, gridHeight - startY);
 
-                // Vector3 p0 = new Vector3(x,     th[x,y],  y);
-                // Vector3 p1 = new Vector3(x,     th[x,y+1],  (y+1));
-                // Vector3 p2 = new Vector3((x+1), th[x+1,y+1],  (y+1));
-                // Vector3 p3 = new Vector3((x+1), th[x+1,y], y);
+                int x = (int)(startX + topLeftCornerPosition.x);
+                int y = (int)(startY + topLeftCornerPosition.y);
 
-                Vector3 p0 = new Vector3(x,     0,  y);
-                Vector3 p1 = new Vector3(x,     0,  (y+1));
-                Vector3 p2 = new Vector3((x+1), 0,  (y+1));
-                Vector3 p3 = new Vector3((x+1), 0, y);
+                Vector3 p0 = new Vector3(x, 0, y);
+                Vector3 p1 = new Vector3(x, 0, y + partHeight);
+                Vector3 p2 = new Vector3(x + partWidth, 0, y + partHeight);
+                Vector3 p3 = new Vector3(x + partWidth, 0, y);
 
                 vertices.Add(p0);
                 vertices.Add(p1);
                 vertices.Add(p2);
                 vertices.Add(p3);
 
-                uv.Add(new (0, 0));
-                uv.Add(new (0, 1));
-                uv.Add(new (1, 1));
-                uv.Add(new (1, 0));
+                // Give each quad a full UV range
+                uv.Add(new Vector2(0, 0));
+                uv.Add(new Vector2(0, 1));
+                uv.Add(new Vector2(1, 1));
+                uv.Add(new Vector2(1, 0));
 
-                trianglesFloor.Add(index * 4 + 0);
-                trianglesFloor.Add(index * 4 + 1);
-                trianglesFloor.Add(index * 4 + 2);
-                
-                trianglesFloor.Add(index * 4 + 0);
-                trianglesFloor.Add(index * 4 + 2);
-                trianglesFloor.Add(index * 4 + 3);
+                trianglesFloor.Add(quadIndex * 4 + 0);
+                trianglesFloor.Add(quadIndex * 4 + 1);
+                trianglesFloor.Add(quadIndex * 4 + 2);
+                trianglesFloor.Add(quadIndex * 4 + 0);
+                trianglesFloor.Add(quadIndex * 4 + 2);
+                trianglesFloor.Add(quadIndex * 4 + 3);
+
+                quadIndex++;
             }
         }
-
 
         newMesh.SetVertices(vertices);
         newMesh.SetTriangles(trianglesFloor, 0);
