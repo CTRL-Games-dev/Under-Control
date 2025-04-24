@@ -108,7 +108,7 @@ public class LivingEntity : MonoBehaviour {
     private void takeDamage(Damage damage, LivingEntity source = null) {
         if (source.gameObject.CompareTag("Player")) {
             // StartCoroutine(nameof(slowDown));
-            CameraManager.Instance.ShakeCamera(2, 0.1f);
+            CameraManager.ShakeCamera(2, 0.1f);
         }
 
         if (gameObject.CompareTag("Boar")) {

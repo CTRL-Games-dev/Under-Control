@@ -29,6 +29,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
     public void ShowUI() {
         gameObject.SetActive(true);
         _longDescCanvasGroup.alpha = 0;
+        
         for (int i = 0; i < 3; i++) {
             Card card = _cards[Random.Range(0, _cards.Length)];
             _currentCards.Add(AddCard(card));

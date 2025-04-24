@@ -94,6 +94,7 @@ public class UICanvas : MonoBehaviour
         if (IsOtherUIOpen) return;
         if (CurrentUIMiddleState == UIMiddleState.NotVisible || CurrentUIMiddleState == UIMiddleState.Inventory) {
             ChangeUIMiddleState(CurrentUIMiddleState == UIMiddleState.Inventory ? UIMiddleState.NotVisible : UIMiddleState.Inventory);
+
         }
     }
 
@@ -208,6 +209,7 @@ public class UICanvas : MonoBehaviour
     private void closeUIMiddleState(UIMiddleState state) {
         switch (state) {
             case UIMiddleState.Inventory:
+                EventBus.InventoryClosedEvent?.Invoke();
                 InventoryCanvas.HideUI();                
                 break;
             case UIMiddleState.MainMenu:

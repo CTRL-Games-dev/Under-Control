@@ -63,7 +63,6 @@ public class InvTile : MonoBehaviour {
 
     public void SetCustomImage(Sprite sprite) {
         if (_image != null) {
-            Debug.Log("SetCustomImage: " + sprite.name);
             _image.sprite = sprite;
         }
     }

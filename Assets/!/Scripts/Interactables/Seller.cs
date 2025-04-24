@@ -13,12 +13,12 @@ public class Seller : MonoBehaviour, IInteractableInventory
     [SerializeField] private Transform _pouchTransform;
     [SerializeField] private Animator _pouchAnimator;
     private Animator _animator;
+    private CinemachineCamera _previousCamera;
 
     private readonly int _isTalkingHash = Animator.StringToHash("isTalking");
     private readonly int _sellHash = Animator.StringToHash("sell");
 
     private bool _isTallking = false;
-    private bool _enlarged = false;
 
 
     void Awake() {
@@ -40,39 +40,37 @@ public class Seller : MonoBehaviour, IInteractableInventory
 
     public Tween EnlargePouch() {
         _pouchAnimator.DOKill();
+        _pouchAnimator.SetBool("ensmall", false);
         _pouchAnimator.transform.DORotate(new Vector3(60f, -135f, 0), 2f).OnComplete(() => {
-            if (!_enlarged) {
-                _pouchAnimator.SetTrigger("enlarge");
-                _enlarged = true;
-            }
+            _pouchAnimator.SetTrigger("enlarge");
         });
         return _faceAnimator.transform.DOScale(Vector3.one, 2f);
     }
 
-    public Tween ShrinkPouch() {
+    public Tween EnsmallPouch() {
         _pouchAnimator.DOKill();
-        if (_enlarged) {
-            _pouchAnimator.SetTrigger("enlarge");
-            _enlarged = false;
-        }
-        return _pouchAnimator.transform.DORotate(new Vector3(0, -135f, 0), 0.5f);
+        _pouchAnimator.SetBool("enlarge", false);
+        _pouchAnimator.SetTrigger("ensmall");
+        return _pouchAnimator.transform.DORotate(new Vector3(0, -135f, 0), 0.5f).SetDelay(0.5f);
     }
 
 
     public void Interact() {
         
         // Debug.Log("Interact with seller");
+        _previousCamera = CameraManager.GetCurrentCamera();
         Player.UICanvas.InventoryCanvas.SetSellerTab(this);
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Inventory);
         _isTallking = true;
         _animator.SetBool(_isTalkingHash, _isTallking);
         _animator.SetTrigger(_sellHash);
 
-        Player.Instance.UICancelEvent.AddListener(EndInteract);
+        EventBus.InventoryClosedEvent.AddListener(EndInteract);
     }
 
     public void EndInteract() {
         Player.Instance.UICancelEvent.RemoveListener(EndInteract);
-        CameraManager.Instance.SwitchCamera(null);
+        Player.UICanvas.InventoryCanvas.SetSellerTab(null);
+        CameraManager.SwitchCamera(_previousCamera);
     }
 }

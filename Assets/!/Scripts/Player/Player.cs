@@ -337,7 +337,7 @@ public class Player : MonoBehaviour {
     }
 
     private void onStunned(float duration) {
-        CameraManager.Instance.ShakeCamera(2, duration);
+        CameraManager.ShakeCamera(2, duration);
     }
 
     

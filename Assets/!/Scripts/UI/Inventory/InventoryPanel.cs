@@ -62,10 +62,11 @@ public class InventoryPanel : MonoBehaviour
     public void Start() {
         _currentEntityInventory = getCurrentEntityInventory();
         if (_currentEntityInventory == null) {
-            Debug.LogError("No inventory found!");
+            // Debug.LogError("No inventory found!");
+            disconnectSignals();
             return;
         }
-        ConnectSignals();
+        connectSignals();
         RegenerateInventory();
     }
 
@@ -291,14 +292,26 @@ public class InventoryPanel : MonoBehaviour
     #endregion
 
     #region Misc Methods
-    public void ConnectSignals() {
+    private void connectSignals() {
         EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
         EventBus.ItemUILeftClickEvent.AddListener(OnItemUILeftClick);
         EventBus.ItemUIRightClickEvent.AddListener(OnItemUIRightClick);
     }
 
+    private void disconnectSignals() {
+        EventBus.InventoryItemChangedEvent.RemoveListener(UpdateItemUIS);
+        EventBus.ItemUILeftClickEvent.RemoveListener(OnItemUILeftClick);
+        EventBus.ItemUIRightClickEvent.RemoveListener(OnItemUIRightClick);
+    }
+
     public void SetTargetInventory(EntityInventory entityInventory) {
         TargetEntityInventory = entityInventory;
+        foreach (Transform child in _itemHolder.transform) {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in _gridHolder.transform) {
+            Destroy(child.gameObject);
+        }
         Start();
     }
 
