@@ -94,7 +94,6 @@ public class UICanvas : MonoBehaviour
         if (IsOtherUIOpen) return;
         if (CurrentUIMiddleState == UIMiddleState.NotVisible || CurrentUIMiddleState == UIMiddleState.Inventory) {
             ChangeUIMiddleState(CurrentUIMiddleState == UIMiddleState.Inventory ? UIMiddleState.NotVisible : UIMiddleState.Inventory);
-
         }
     }
 

@@ -116,7 +116,6 @@ public class WeaponHolder : MonoBehaviour
         _isAttacking = true;
 
         _hitEntities.Clear();
-        _currentWeaponHitter.StartMinorTrail();
     }
 
     public void EndAttack() {
@@ -132,7 +131,6 @@ public class WeaponHolder : MonoBehaviour
         _isAttacking = false;
 
         _hitEntities.Clear();
-        _currentWeaponHitter.StopMinorTrail();
         _currentAttackType = null;
     }
 
@@ -145,7 +143,6 @@ public class WeaponHolder : MonoBehaviour
         if(_currentWeaponHitter == null) return;
 
         _currentWeaponHitter.EnableHitbox();
-        _currentWeaponHitter.StartMajorTrail();
     }
 
     public void DisableHitbox() {
@@ -157,7 +154,6 @@ public class WeaponHolder : MonoBehaviour
         if(_currentWeaponHitter == null) return;
 
         _currentWeaponHitter.DisableHitbox();
-        _currentWeaponHitter.StopMajorTrail();
     }
 
     public void OnHit(LivingEntity victim) {
