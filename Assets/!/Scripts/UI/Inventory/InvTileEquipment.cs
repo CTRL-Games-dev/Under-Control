@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using Unity.VisualScripting;
 
 public class InvTileEquipment : InvTile {
     private enum TileType {
@@ -68,8 +69,8 @@ public class InvTileEquipment : InvTile {
             case TileType.Consumeable1:
                 Player.Instance.UpdateConsumablesEvent.AddListener(OnConsumablesUpdate);
                 if (Player.Instance.ConsumableItemOne.ItemData != null) {
-                    InventoryItem inventoryItem = new();
-                    inventoryItem = Player.Instance.ConsumableItemOne;
+                    InventoryItem inventoryItem = ((InventoryItem) Player.Instance.ConsumableItemOne).CloneViaSerialization();
+                    inventoryItem.Rotated = false;
                     createItemUI(inventoryItem);
                     IsEmpty = false;
                 }
@@ -78,8 +79,8 @@ public class InvTileEquipment : InvTile {
             case TileType.Consumeable2:
                 Player.Instance.UpdateConsumablesEvent.AddListener(OnConsumablesUpdate);
                 if (Player.Instance.ConsumableItemTwo.ItemData != null) {
-                    InventoryItem inventoryItem = new();
-                    inventoryItem = Player.Instance.ConsumableItemTwo;
+                    InventoryItem inventoryItem = ((InventoryItem) Player.Instance.ConsumableItemTwo).CloneViaSerialization();
+                    inventoryItem.Rotated = false;
                     createItemUI(inventoryItem);
                     IsEmpty = false;
                 }
@@ -213,25 +214,26 @@ public class InvTileEquipment : InvTile {
 
         createItemUI(SelectedInventoryItem);
 
-        
-
         EventBus.ItemPlacedEvent?.Invoke();
         IsEmpty = false;
         Player.UICanvas.SelectedItemUI.InventoryItem = null;
     }
 
     private void OnConsumablesUpdate() {
+        // Check if we have anything to update
+        if(_itemUI == null) return;
 
         InventoryItem consumable = _tileType == TileType.Consumeable1 ? Player.Instance.ConsumableItemOne : Player.Instance.ConsumableItemTwo;
 
         if (consumable == null) {
-            if (_itemUI != null) {
-                Destroy(_itemUI.gameObject);
-                _itemUI = null;
-                IsEmpty = true;
-            }
+            Destroy(_itemUI.gameObject);
+            _itemUI = null;
+            IsEmpty = true;
         }  else {
+            // Londek: wyglada na niepotrzebne bo item jest ustawiany przy
+            // tworzeniu itemui i taki chyba powinien pozostac, nie?
             _itemUI.InventoryItem = consumable;
+            
             _itemUI.UpdateAmount();
         }
     }
