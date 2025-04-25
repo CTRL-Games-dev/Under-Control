@@ -77,7 +77,7 @@ public class LivingEntity : MonoBehaviour {
         ModifierSystem.RegisterStat(ref Armor);
         ModifierSystem.RegisterStat(ref MovementSpeed);
         ModifierSystem.RegisterStat(ref MaxMana);
-
+ 
         _isPlayer = gameObject.GetComponent<Player>() != null;
         _health = StartingHealth;
         _mana = StartingMana;
@@ -207,6 +207,8 @@ public class LivingEntity : MonoBehaviour {
             Expiration = Time.time + effect.Duration
         });
 
+        effect.OnApply(this);
+
         if(effect.Modifiers == null) {
             return;
         }
@@ -227,6 +229,8 @@ public class LivingEntity : MonoBehaviour {
                 var modifier = effect.Modifiers[j];
                 ModifierSystem.RemoveModifier(modifier);
             }
+
+            effect.OnRemove(this);
 
             ActiveEffects.RemoveAt(i);
         }
@@ -254,7 +258,14 @@ public class LivingEntity : MonoBehaviour {
     // }
 
     private void recheckEffects() {
-        ActiveEffects.RemoveAll(x => x.Expiration < Time.time);
+        ActiveEffects.RemoveAll(x => {
+            if(x.Expiration < Time.time) {
+                x.Effect.OnRemove(this);
+                return true;
+            }
+
+            return false;
+        });
     }
 
     #endregion
