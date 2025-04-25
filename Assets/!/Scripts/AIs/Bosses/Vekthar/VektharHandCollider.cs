@@ -10,7 +10,6 @@ public class VektharHandCollider : MonoBehaviour {
     }
 
     private void OnTriggerEnter(Collider other) {
-
         LivingEntity victim = other.GetComponent<LivingEntity>();
         if(victim == null) return;
 

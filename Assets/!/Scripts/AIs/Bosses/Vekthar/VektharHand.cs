@@ -3,6 +3,8 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using DG.Tweening;
+using NUnit.Framework;
+using System.Collections.Generic;
 
 public class VektharHand : MonoBehaviour
 {
@@ -14,9 +16,7 @@ public class VektharHand : MonoBehaviour
     }
     public bool IsLeft;
     [SerializeField] private GameObject _hand;
-    [SerializeField] private VektharHandCollider _slamCollider;
-    [SerializeField] private VektharHandCollider _fistCollider;
-    [SerializeField] private VektharHandCollider _sandwitchCollider;
+    public VektharHandCollider[] HandDamageColliders;
     [SerializeField] private Transform _handTarget;
     private Animator _animator;
     public HandState State = HandState.Idle;
@@ -25,13 +25,12 @@ public class VektharHand : MonoBehaviour
     public float Damage = 50;
     void Awake() {
         _animator = _hand.GetComponent<Animator>();
+        
+        HandDamageColliders = GetComponentsInChildren<VektharHandCollider>(true);
     }
 
     void Start() {
-        disableAllColliders();
-        _fistCollider.TargetHit.AddListener(onTargetHit);
-        _slamCollider.TargetHit.AddListener(onTargetHit);
-        _sandwitchCollider.TargetHit.AddListener(onTargetHit);
+
     }
     void Update() {
         if(State == HandState.Idle) {
@@ -39,13 +38,13 @@ public class VektharHand : MonoBehaviour
         }
     }
 
-    private void disableAllColliders() {
-        _fistCollider.Collider.enabled = false;
-        _slamCollider.Collider.enabled = false;
-        _sandwitchCollider.Collider.enabled = false;
+    public void EnableColliders(bool enable) {
+        foreach(var c in HandDamageColliders) {
+            c.Collider.enabled = enable;
+        }
     }
 
-    private void onTargetHit(LivingEntity victim) {
+    public void onTargetHit(LivingEntity victim) {
         Debug.Log("Vekthar hit player!");
 
         victim.TakeDamage(new Damage {
@@ -105,19 +104,19 @@ public class VektharHand : MonoBehaviour
 
     private void onIdle() {
         Debug.Log("Hand is now idle");
-        disableAllColliders();
+        EnableColliders(false);
     }
 
     private void onSlam() {
-        _slamCollider.Collider.enabled = true;
+        EnableColliders(true);
     }
 
     private void onFist() {
-        _fistCollider.Collider.enabled = true;
+        EnableColliders(true);
     }
 
     private void onSandwitch() {
-        _sandwitchCollider.Collider.enabled = true;
+        EnableColliders(true);
     }
 
     private IEnumerator returnToNormal(float time) {
@@ -135,7 +134,7 @@ public class VektharHand : MonoBehaviour
     private void moveToPlayer() {
         var target = Player.Instance.transform.position;
         transform.DOMoveX(target.x-1f, 0.5f);
-        transform.DOMoveY(1.8f, 0.5f);
+        transform.DOMoveY(1.4f, 0.5f);
         transform.DOMoveZ(target.z-1f, 0.5f);
     }
     private IEnumerator moveSandwitch() {
@@ -145,7 +144,7 @@ public class VektharHand : MonoBehaviour
         } else {
             yield return transform.DOMove(new(target.x+2f, transform.position.y, target.z-6f), 1.0f).WaitForCompletion();
         }
-        Tween tween = transform.DOMove(new(target.x-1f, 1.8f, target.z-1f), 0.5f);
+        Tween tween = transform.DOMove(new(target.x-1f, 1.4f, target.z-1f), 0.5f);
         yield return tween.WaitForCompletion();
     }
 

@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class VektharBoss : MonoBehaviour, IBoss
+public class VektharBoss : LivingEntity
 {
     enum VektharState {
         WakeUp,
@@ -13,11 +13,6 @@ public class VektharBoss : MonoBehaviour, IBoss
         EndAttack,
     }
     private VektharState _state = VektharState.WakeUp;
-    [SerializeField] private float _maxHP = 1000;
-    [SerializeField] private float _hp = 1000;
-    public float TotalHP => _maxHP;
-    public float CurrentHP => _hp;
-    public event UnityAction OnDeath;
     private Animator _eyeAnimator;
     [SerializeField] private GameObject _eyes;
     [SerializeField] private GameObject _body;
@@ -29,7 +24,22 @@ public class VektharBoss : MonoBehaviour, IBoss
     }
 
     void Start() {
-        
+        foreach(var c in _handLeft.HandDamageColliders) {
+            c.TargetHit.AddListener(hitPlayer);
+        }
+        foreach(var c in _handRight.HandDamageColliders) {
+            c.TargetHit.AddListener(hitPlayer);
+        }
+    }
+
+    private void hitPlayer(LivingEntity entity) {
+        Attack(new Damage {
+            Type = DamageType.PHYSICAL,
+            Value = 50
+        }, entity);
+        Debug.Log("Player was hit!");
+        _handLeft.EnableColliders(false);
+        _handRight.EnableColliders(false);
     }
 
     void Update() {
