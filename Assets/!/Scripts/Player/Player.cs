@@ -143,6 +143,7 @@ public class Player : MonoBehaviour {
     private bool _isAttacking = false;
     public bool LockRotation = false;
     public bool UpdateDisabled = false;
+    public SlashManager SlashManager;
 
     [Header("Events")]
     public UnityEvent InventoryToggleEvent;
@@ -602,6 +603,12 @@ public class Player : MonoBehaviour {
     public void OnInventoryChanged() {
         WeaponHolder.UpdateWeapon(CurrentWeapon);
         Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
+
+        if (CurrentWeapon?.ItemData != null) {
+            Debug.Log(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
+            SlashManager.SetSlashColor(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
+        } 
+        
     }
 
     public Vector3 GetMousePosition() {
@@ -649,6 +656,7 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_Recovery:
+                SlashManager.DisableSlash();
                 _isAttacking = false;
                 LockRotation = false;
                 break;
@@ -660,33 +668,27 @@ public class Player : MonoBehaviour {
         switch (state) {
             case AnimationState.Locomotion:
                 WeaponHolder.DisableHitbox();
-                SlashMaterial.color = Color.white;
                 break;
 
             case AnimationState.Attack_Windup:
-                SlashMaterial.color = Color.white;
                 LockRotation = true;
                 _isAttacking = true;
                 _currentSpeed = 0;
+                SlashManager.EnableSlash();
+                WeaponHolder.EnableHitbox();
                 // SlashGO.SetActive(true);
 
                 break;
 
             case AnimationState.Attack_Contact:
-                SlashMaterial.color = Color.cyan;
-                WeaponHolder.EnableHitbox();
                 break;
 
             case AnimationState.Attack_ComboWindow:
-                SlashMaterial.color = Color.yellow;
                 break;
 
             case AnimationState.Attack_Recovery:
                 WeaponHolder.DisableHitbox();
-                SlashMaterial.color = Color.green;
-                // SlashGO.SetActive(false);
                 LockRotation = false;
-
                 // LockRotation = true;
                 break;
         }
