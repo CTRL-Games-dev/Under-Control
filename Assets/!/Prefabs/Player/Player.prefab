@@ -2316,11 +2316,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 144433619801425869}
+  - component: {fileID: 1065449432897141361}
+  - component: {fileID: 7225692478355850701}
   - component: {fileID: 862517588485659023}
   - component: {fileID: 2932634121617026090}
   - component: {fileID: 6116184372583243191}
-  - component: {fileID: 1065449432897141361}
-  - component: {fileID: 7225692478355850701}
   - component: {fileID: 3092076507248883512}
   - component: {fileID: 4213774698585673196}
   - component: {fileID: 6818052596347534429}
@@ -2356,6 +2356,117 @@ Transform:
   - {fileID: 3092736780626960559}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
+--- !u!114 &1065449432897141361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669612683939749239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9971471b2abbae49bbcb2e0cc409d63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ItemContainer:
+    _size: {x: 5, y: 7}
+    _items:
+    - _itemData: {fileID: 11400000, guid: e238eb001208bff4ab3b431ed6ee2db0, type: 2}
+      Amount: 12
+      Position: {x: 0, y: 0}
+      PowerScale: 1
+      Rotated: 0
+    - _itemData: {fileID: 11400000, guid: 03310c97e7837f149bd40574557472fa, type: 2}
+      Amount: 6
+      Position: {x: 1, y: 0}
+      PowerScale: 1
+      Rotated: 0
+    - _itemData: {fileID: 11400000, guid: 9df73015bdc274a4394a14e34153ecaf, type: 2}
+      Amount: 2
+      Position: {x: 2, y: 0}
+      PowerScale: 1
+      Rotated: 0
+  OnInventoryChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  _amulet:
+    _inventoryItem:
+      _itemData: {fileID: 0}
+      Amount: 0
+      Position: {x: 0, y: 0}
+      PowerScale: 0
+      Rotated: 0
+  _armor:
+    _inventoryItem:
+      _itemData: {fileID: 0}
+      Amount: 0
+      Position: {x: 0, y: 0}
+      PowerScale: 0
+      Rotated: 0
+  _weapon:
+    _inventoryItem:
+      _itemData: {fileID: 0}
+      Amount: 0
+      Position: {x: 0, y: 0}
+      PowerScale: 0
+      Rotated: 0
+--- !u!114 &7225692478355850701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669612683939749239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a23e42751b3623c4a938cdd3448ecea3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DisplayName: Player
+  Guild: {fileID: 11400000, guid: 4fa148434442fd54886d354e664047b1, type: 2}
+  DropItemsOnDeath: 0
+  DestroyOnDeath: 0
+  IsInvisible: 0
+  StartingHealth: 100
+  StartingMana: 100
+  MaxHealth:
+    _raw: 100
+    _adjusted: 100
+    _initValue: 100
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  Armor:
+    _raw: 0
+    _adjusted: 0
+    _initValue: 0
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  MovementSpeed:
+    _raw: 1
+    _adjusted: 1
+    _initValue: 1
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  MaxMana:
+    _raw: 100
+    _adjusted: 100
+    _initValue: 100
+    OnValueChanged:
+      m_PersistentCalls:
+        m_Calls: []
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDamageTaken:
+    m_PersistentCalls:
+      m_Calls: []
+  OnStunned:
+    m_PersistentCalls:
+      m_Calls: []
+  _isPlayer: 0
 --- !u!114 &862517588485659023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2554,117 +2665,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1065449432897141361
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 669612683939749239}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9971471b2abbae49bbcb2e0cc409d63, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ItemContainer:
-    _size: {x: 5, y: 7}
-    _items:
-    - _itemData: {fileID: 11400000, guid: e238eb001208bff4ab3b431ed6ee2db0, type: 2}
-      Amount: 12
-      Position: {x: 0, y: 0}
-      PowerScale: 1
-      Rotated: 0
-    - _itemData: {fileID: 11400000, guid: 03310c97e7837f149bd40574557472fa, type: 2}
-      Amount: 6
-      Position: {x: 1, y: 0}
-      PowerScale: 1
-      Rotated: 0
-    - _itemData: {fileID: 11400000, guid: 9df73015bdc274a4394a14e34153ecaf, type: 2}
-      Amount: 2
-      Position: {x: 2, y: 0}
-      PowerScale: 1
-      Rotated: 0
-  OnInventoryChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  _amulet:
-    _inventoryItem:
-      _itemData: {fileID: 0}
-      Amount: 0
-      Position: {x: 0, y: 0}
-      PowerScale: 0
-      Rotated: 0
-  _armor:
-    _inventoryItem:
-      _itemData: {fileID: 0}
-      Amount: 0
-      Position: {x: 0, y: 0}
-      PowerScale: 0
-      Rotated: 0
-  _weapon:
-    _inventoryItem:
-      _itemData: {fileID: 0}
-      Amount: 0
-      Position: {x: 0, y: 0}
-      PowerScale: 0
-      Rotated: 0
---- !u!114 &7225692478355850701
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 669612683939749239}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a23e42751b3623c4a938cdd3448ecea3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DisplayName: Player
-  Guild: {fileID: 11400000, guid: 4fa148434442fd54886d354e664047b1, type: 2}
-  DropItemsOnDeath: 0
-  DestroyOnDeath: 0
-  IsInvisible: 0
-  StartingHealth: 100
-  StartingMana: 100
-  MaxHealth:
-    _raw: 100
-    _adjusted: 100
-    _initValue: 100
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  Armor:
-    _raw: 0
-    _adjusted: 0
-    _initValue: 0
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  MovementSpeed:
-    _raw: 1
-    _adjusted: 1
-    _initValue: 1
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  MaxMana:
-    _raw: 100
-    _adjusted: 100
-    _initValue: 100
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  OnDeath:
-    m_PersistentCalls:
-      m_Calls: []
-  OnDamageTaken:
-    m_PersistentCalls:
-      m_Calls: []
-  OnStunned:
-    m_PersistentCalls:
-      m_Calls: []
-  _isPlayer: 0
 --- !u!143 &3092076507248883512
 CharacterController:
   m_ObjectHideFlags: 0
