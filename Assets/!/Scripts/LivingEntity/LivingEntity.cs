@@ -7,6 +7,7 @@ using UnityEngine.Events;
 [RequireComponent(typeof(ModifierSystem))]
 [RequireComponent(typeof(EntityInventory))]
 [RequireComponent(typeof(HitFlashAnimator))]
+[RequireComponent(typeof(TintAnimator))]
 public class LivingEntity : MonoBehaviour {
     public struct EffectData {
         public Effect Effect;
@@ -65,6 +66,7 @@ public class LivingEntity : MonoBehaviour {
     public ModifierSystem ModifierSystem { get; private set; }
     public EntityInventory Inventory { get; private set; }
     public HitFlashAnimator HitFlashAnimator { get; private set; }
+    public TintAnimator TintAnimator { get; private set; }
 
     public bool _isPlayer = false;
 
@@ -72,6 +74,7 @@ public class LivingEntity : MonoBehaviour {
         ModifierSystem = GetComponent<ModifierSystem>();
         Inventory = GetComponent<EntityInventory>();
         HitFlashAnimator = GetComponent<HitFlashAnimator>();
+        TintAnimator = GetComponent<TintAnimator>();
 
         ModifierSystem.RegisterStat(ref MaxHealth);
         ModifierSystem.RegisterStat(ref Armor);
@@ -102,13 +105,15 @@ public class LivingEntity : MonoBehaviour {
     }
 
     public void Attack(Damage damage, LivingEntity target) {
-        target.takeDamage(damage, this);
+        target.TakeDamage(damage, this);
     }
 
-    private void takeDamage(Damage damage, LivingEntity source = null) {
-        if (source.gameObject.CompareTag("Player")) {
-            // StartCoroutine(nameof(slowDown));
-            CameraManager.ShakeCamera(2, 0.1f);
+    public void TakeDamage(Damage damage, LivingEntity source = null) {
+        if (source != null) {
+            if (source.gameObject.CompareTag("Player")) {
+                // StartCoroutine(nameof(slowDown));
+                CameraManager.ShakeCamera(2, 0.1f);
+            }
         }
 
         if (gameObject.CompareTag("Boar")) {
@@ -235,6 +240,8 @@ public class LivingEntity : MonoBehaviour {
     public List<EffectData> GetActiveEffects() {
         return ActiveEffects;
     }
+
+    
 
     // public void RemoveAllEffectsLike(Effect effect) {
     //     for(int i = 0; i < activeEffects.Count; i++) {

@@ -12,6 +12,7 @@ public class SlashManager : MonoBehaviour
     public List<SlashColor> SlashColorsList = new List<SlashColor>();
     public List<GameObject> SlashObjects = new List<GameObject>();
     public Material SlashMaterial;
+    public List<Collider> HitEnemies = new List<Collider>();
     
 
     public void SetSlashColor(WeaponTrait weaponTrait) {
@@ -25,10 +26,15 @@ public class SlashManager : MonoBehaviour
     }
 
     public void EnableSlash() {
-        gameObject.SetActive(true);
+        foreach (var slashObject in SlashObjects) {
+            HitEnemies.Clear();
+            slashObject.SetActive(true);
+        }
     }
 
     public void DisableSlash() {
-        gameObject.SetActive(false);
+        foreach (var slashObject in SlashObjects) {
+            slashObject.SetActive(false);
+        }
     }
 }

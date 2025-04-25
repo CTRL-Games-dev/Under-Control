@@ -226,11 +226,11 @@ GameObject:
   - component: {fileID: 5148749227443565395}
   m_Layer: 10
   m_Name: Cube (7)
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3994441279180410755
 Transform:
   m_ObjectHideFlags: 0
@@ -332,6 +332,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _edgeToFollow: {fileID: 2746512902458078169}
+  OnHit:
+    m_PersistentCalls:
+      m_Calls: []
+  HitboxEnabled: 1
 --- !u!1 &80117811894021708
 GameObject:
   m_ObjectHideFlags: 0
@@ -1841,8 +1845,18 @@ MonoBehaviour:
     Color: {r: 0.15304613, g: 0, b: 1, a: 1}
   - Trait: 6
     Color: {r: 0.9061289, g: 1, b: 0, a: 1}
-  SlashObjects: []
+  SlashObjects:
+  - {fileID: 3255161447510759404}
+  - {fileID: 8448887573964603392}
+  - {fileID: 6755216199069254051}
+  - {fileID: 4078468395449597756}
+  - {fileID: 2360266625823096961}
+  - {fileID: 1184532348155260156}
+  - {fileID: 7820580917577485649}
+  - {fileID: 49574759434839813}
+  - {fileID: 2908758041091064709}
   SlashMaterial: {fileID: 2100000, guid: 2f28c55ff4cc0cd45951ea79ce420476, type: 2}
+  HitEnemies: []
 --- !u!1 &455158753642535458
 GameObject:
   m_ObjectHideFlags: 0
@@ -2309,6 +2323,7 @@ GameObject:
   - component: {fileID: 3092076507248883512}
   - component: {fileID: 4213774698585673196}
   - component: {fileID: 6818052596347534429}
+  - component: {fileID: 8652088868657777338}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -2426,7 +2441,7 @@ MonoBehaviour:
   TopDownCamera: {fileID: 1842100701194989401}
   CameraNoise: {fileID: 3582159393707406577}
   MainCamera: {fileID: 469925352793417921}
-  InputDisabled: 1
+  InputDisabled: 0
   DamageDisabled: 0
   SelectedEvolutions: []
   _spellDataOne:
@@ -2766,6 +2781,19 @@ MonoBehaviour:
   _hitFlashMaterial: {fileID: 2100000, guid: a70176b5e5737f04f86db74d184df881, type: 2}
   _flashDuration: 0.1
   _isPlayer: 1
+--- !u!114 &8652088868657777338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669612683939749239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccbfbf48d8b4ca844a0f6084a171adbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _meshRenderer: {fileID: 0}
 --- !u!1 &716846324575732722
 GameObject:
   m_ObjectHideFlags: 0
@@ -5114,11 +5142,11 @@ GameObject:
   - component: {fileID: 3841632217965522577}
   m_Layer: 10
   m_Name: Cube (5)
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4340239592665948571
 Transform:
   m_ObjectHideFlags: 0
@@ -5220,6 +5248,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _edgeToFollow: {fileID: 4580536233722218288}
+  OnHit:
+    m_PersistentCalls:
+      m_Calls: []
+  HitboxEnabled: 1
 --- !u!1 &1189224330872189236
 GameObject:
   m_ObjectHideFlags: 0
@@ -12438,8 +12470,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1577044056733285295}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.4226183, y: 0.00000006697869, z: -0.00000002233356, w: 0.9063078}
-  m_LocalPosition: {x: -0.00000047683716, y: 6.3623114, z: -4.499514}
+  m_LocalRotation: {x: 0.39294195, y: -0.33362672, z: 0.15557271, w: 0.8426666}
+  m_LocalPosition: {x: 3.0800717, y: 6.362311, z: -3.2800584}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15317,7 +15349,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.4749756, y: -0.000038123922}
+  m_AnchoredPosition: {x: 0.4749756, y: -0.000045555422}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6274736155342227322
@@ -16800,11 +16832,11 @@ GameObject:
   - component: {fileID: 5386127632117332332}
   m_Layer: 10
   m_Name: Cube (4)
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5047391237278344273
 Transform:
   m_ObjectHideFlags: 0
@@ -16906,6 +16938,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _edgeToFollow: {fileID: 8180514696813117008}
+  OnHit:
+    m_PersistentCalls:
+      m_Calls: []
+  HitboxEnabled: 1
 --- !u!1 &2367552731233971060
 GameObject:
   m_ObjectHideFlags: 0
@@ -17239,7 +17275,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.00002169609}
+  m_AnchoredPosition: {x: 0, y: -0.000035762787}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &3304424980708954453
@@ -20173,11 +20209,11 @@ GameObject:
   - component: {fileID: 6426514149862217411}
   m_Layer: 10
   m_Name: Cube (8)
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1664432524741190795
 Transform:
   m_ObjectHideFlags: 0
@@ -20279,6 +20315,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _edgeToFollow: {fileID: 1514106453973580022}
+  OnHit:
+    m_PersistentCalls:
+      m_Calls: []
+  HitboxEnabled: 1
 --- !u!1 &2942579809011625722
 GameObject:
   m_ObjectHideFlags: 0
@@ -20308,8 +20348,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2942579809011625722}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.27384555, y: 0.052188475, z: -0.014883451, w: 0.9602414}
-  m_LocalPosition: {x: 0.036803603, y: 4.8064814, z: -3.931305}
+  m_LocalRotation: {x: 0.39294195, y: -0.33362672, z: 0.15557271, w: 0.8426666}
+  m_LocalPosition: {x: 3.0800717, y: 6.362311, z: -3.2800584}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -20415,7 +20455,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 5000
-  field of view: 60
+  field of view: 40
   orthographic: 0
   orthographic size: 10
   m_Depth: 0
@@ -22068,7 +22108,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.4749756, y: -0.000038123922}
+  m_AnchoredPosition: {x: 0.4749756, y: -0.000045555422}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2779757702894924477
@@ -22375,11 +22415,11 @@ GameObject:
   - component: {fileID: 6440165088523913099}
   m_Layer: 10
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8299222434681167687
 Transform:
   m_ObjectHideFlags: 0
@@ -22481,6 +22521,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _edgeToFollow: {fileID: 6866951592863265245}
+  OnHit:
+    m_PersistentCalls:
+      m_Calls: []
+  HitboxEnabled: 1
 --- !u!1 &3301466122611522933
 GameObject:
   m_ObjectHideFlags: 0
@@ -27060,11 +27104,11 @@ GameObject:
   - component: {fileID: 391124076885409777}
   m_Layer: 10
   m_Name: Cube (3)
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7493269799263413148
 Transform:
   m_ObjectHideFlags: 0
@@ -27166,6 +27210,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _edgeToFollow: {fileID: 332583952327316611}
+  OnHit:
+    m_PersistentCalls:
+      m_Calls: []
+  HitboxEnabled: 1
 --- !u!1 &4114122434660160983
 GameObject:
   m_ObjectHideFlags: 0
@@ -30572,7 +30620,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 2.4, y: -0.00003779595}
+  m_AnchoredPosition: {x: 2.4, y: -0.000117253105}
   m_SizeDelta: {x: 1121.5598, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6049122339610106530
@@ -43834,11 +43882,11 @@ GameObject:
   - component: {fileID: 7058429603940583844}
   m_Layer: 10
   m_Name: Cube (2)
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4606330396937973692
 Transform:
   m_ObjectHideFlags: 0
@@ -43940,6 +43988,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _edgeToFollow: {fileID: 1484904505958809907}
+  OnHit:
+    m_PersistentCalls:
+      m_Calls: []
+  HitboxEnabled: 1
 --- !u!1 &6785779280356907884
 GameObject:
   m_ObjectHideFlags: 0
@@ -48851,11 +48903,11 @@ GameObject:
   - component: {fileID: 117786147987392447}
   m_Layer: 10
   m_Name: Cube (6)
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &9061828800277618439
 Transform:
   m_ObjectHideFlags: 0
@@ -48957,6 +49009,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _edgeToFollow: {fileID: 1779613861540606146}
+  OnHit:
+    m_PersistentCalls:
+      m_Calls: []
+  HitboxEnabled: 1
 --- !u!1 &7864792277546512419
 GameObject:
   m_ObjectHideFlags: 0
@@ -56703,15 +56759,14 @@ GameObject:
   - component: {fileID: 3375204159131433174}
   - component: {fileID: 1669048647378045277}
   - component: {fileID: 4093764965480174444}
-  - component: {fileID: 4298130798795815800}
   - component: {fileID: 2533087730983459621}
   m_Layer: 10
   m_Name: Cube (1)
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4167140016959660204
 Transform:
   m_ObjectHideFlags: 0
@@ -56783,23 +56838,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &4298130798795815800
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8448887573964603392}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 252872ec679ad4a68b1746a017de0740, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnHit:
-    m_PersistentCalls:
-      m_Calls: []
-  Hitbox: {fileID: 1669048647378045277}
-  WeaponTrait: 0
 --- !u!114 &2533087730983459621
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56813,6 +56851,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _edgeToFollow: {fileID: 2803399826993615439}
+  OnHit:
+    m_PersistentCalls:
+      m_Calls: []
+  HitboxEnabled: 1
 --- !u!1 &8470819583213827969
 GameObject:
   m_ObjectHideFlags: 0
