@@ -9,7 +9,7 @@ public class TreeRandomizer : MonoBehaviour
     [SerializeField] private Gradient _gradient;
     void Awake() {
         _tree.eulerAngles = new(0,UnityEngine.Random.Range(0f, 359f));
-        _tree.position += new Vector3(UnityEngine.Random.Range(-0.2f, 0.2f), 0, UnityEngine.Random.Range(-0.1f, 0.1f));
+        _tree.position += new Vector3(UnityEngine.Random.Range(-1, 1f), 0, UnityEngine.Random.Range(-1f, 1f));
     }
 
     void Start() {
@@ -19,7 +19,7 @@ public class TreeRandomizer : MonoBehaviour
         float influence = GameManager.Instance.TotalInfluence;
         if(influence <= 15) return;
 
-        influence += Random.Range(-5, 5);
+        influence += Random.Range(-15, 5);
 
         if(influence >= 100) {
             Destroy(_leaves);

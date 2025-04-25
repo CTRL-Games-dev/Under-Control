@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour {
         public AudioClip[] Clips;
     }
     public static GameManager Instance;
+    public bool DebugMode = false;
 
     [Header("References")]
     public Weapon UnknownWeaponPrefab;
@@ -19,7 +20,7 @@ public class GameManager : MonoBehaviour {
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
         {Dimension.HUB, "Hub"},
         {Dimension.FOREST, "Adventure"},
-        {Dimension.FOREST_VECTOR, "Adventure"},
+        {Dimension.FOREST_VECTOR, "VectorBossBattle"},
     };
 
     [HideInInspector] public GameDifficulty Difficulty { get; private set; }
@@ -62,9 +63,13 @@ public class GameManager : MonoBehaviour {
 
         playMusicForDimension(CurrentDimension);
     }
-    private void Start() {
+    void Start() {
         // For some reason "scene change" is being called, even if it is the first scene?
         // ConnectPortals();
+    }
+
+    void Update() {
+        DebugCommands();
     }
 
     public void ChangeDimension(Dimension dimension, float newInfluence)  {
@@ -146,5 +151,32 @@ public class GameManager : MonoBehaviour {
     public void OnLevelLoaded() {
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Choose);
         LevelLoaded.Invoke();
+    }
+
+    public void DebugCommands() {
+        if(Input.GetKeyDown(KeyCode.F1)) {
+            Debug.Log("<color=red>Debug Tools - Moving to the hub");
+            ChangeDimension(Dimension.FOREST, TotalInfluence + 10);
+        }
+
+        if(Input.GetKeyDown(KeyCode.F2)) {
+            Debug.Log("<color=red>Debug Tools - Moving to the new forest");
+            ChangeDimension(Dimension.FOREST, TotalInfluence + 10);
+        }
+
+        if(Input.GetKeyDown(KeyCode.F3)) {
+            Debug.Log("<color=red>Debug Tools - Moving to Vek'thar's arena");
+            ChangeDimension(Dimension.FOREST_VECTOR, TotalInfluence);
+        }
+
+        if(Input.GetKeyDown(KeyCode.F7)) {
+            TotalInfluence += 5;
+            Debug.Log($"<color=red>Debug Tools - Adding 5 influence. New influence: {TotalInfluence}");
+        }
+
+        if(Input.GetKeyDown(KeyCode.F8)) {
+            TotalInfluence -= 5;
+            Debug.Log($"<color=red>Debug Tools - Subtracting 5 influence. New influence: {TotalInfluence}");
+        }
     }
 }

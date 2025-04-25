@@ -1,0 +1,100 @@
+using System;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.Events;
+
+public class VektharBoss : MonoBehaviour, IBoss
+{
+    enum VektharState {
+        WakeUp,
+        Follow,
+        StartAttack,
+        DuringAttack,
+        EndAttack,
+    }
+    private VektharState _state = VektharState.WakeUp;
+    [SerializeField] private float _maxHP = 1000;
+    [SerializeField] private float _hp = 1000;
+    public float TotalHP => _maxHP;
+    public float CurrentHP => _hp;
+    public event UnityAction OnDeath;
+    private Animator _eyeAnimator;
+    [SerializeField] private GameObject _eyes;
+    [SerializeField] private GameObject _body;
+    [SerializeField] private VektharHand _handLeft;
+    [SerializeField] private VektharHand _handRight;
+
+    void Awake() {
+        _eyeAnimator = GetComponent<Animator>();   
+    }
+
+    void Start() {
+        
+    }
+
+    void Update() {
+        switch (_state)
+        {
+            case VektharState.WakeUp: {
+                Debug.Log("Vek'thar is now following player");
+                _state = VektharState.Follow;
+
+                StartCoroutine(scheduleAttack(5));
+            } break;
+            case VektharState.Follow:
+                follow();
+                break;
+            case VektharState.StartAttack:
+                startAttack();
+                break;
+            case VektharState.DuringAttack: {
+                if(_handLeft.State == VektharHand.HandState.Idle && _handRight.State == VektharHand.HandState.Idle) {
+                    _state = VektharState.EndAttack;
+                }
+            } break;
+            case VektharState.EndAttack: {
+                StartCoroutine(scheduleAttack(3));
+                _state = VektharState.Follow;
+            } break;
+        }
+    }
+
+    private void follow() {
+
+        Vector3 target = Player.Instance.transform.position;
+        target.x += 5;
+        target.z += 5;
+        target.y = 3;
+
+        var step = 10 * Time.deltaTime; // calculate distance to move
+        var fastStep = 10 * Time.deltaTime * (Vector3.Distance(_body.transform.position, target) / 4);
+        step = Math.Max(step, fastStep);      
+
+        _body.transform.position = Vector3.MoveTowards(_body.transform.position, target, step);
+    }
+    private void startAttack() {
+        Debug.Log("Starting an attack.");
+
+        int attackNumber = UnityEngine.Random.Range(0, 3);
+        switch(attackNumber) {
+            case 0: {
+                _handRight.Attack(VektharHand.HandState.Fist);
+            } break;
+            case 1: {
+                _handLeft.Attack(VektharHand.HandState.Sandwitch);
+                _handRight.Attack(VektharHand.HandState.Sandwitch);
+            } break;
+            case 2: {
+                _handLeft.Attack(VektharHand.HandState.Slam);
+            } break;
+        }
+
+        _state = VektharState.DuringAttack;
+    }
+
+    private IEnumerator scheduleAttack(float secs) {
+        yield return new WaitForSeconds(secs);
+        Debug.Log("Scheduled attack's timer expired.");
+        _state = VektharState.StartAttack;
+    }
+}
