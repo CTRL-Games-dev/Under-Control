@@ -149,13 +149,17 @@ public class InventoryPanel : MonoBehaviour
 
     private void highlightNeighbours(Vector2Int pos, InventoryItem inventoryItem) {
         Vector2Int size = inventoryItem.Rotated ? new Vector2Int(inventoryItem.Size.y, inventoryItem.Size.x) : inventoryItem.Size;
+        pos += inventoryItem.Rotated ?
+          new Vector2Int(Player.UICanvas.SelectedItemUI.SelectedOffsetInv.y, -Player.UICanvas.SelectedItemUI.SelectedOffsetInv.x - 1) :
+          Player.UICanvas.SelectedItemUI.SelectedOffsetInv;
+            
         int startingY = pos.y;
         int endingY = startingY + size.y;
 
-        if (inventoryItem.Size.x > 1 && inventoryItem.Rotated) {
-            startingY = pos.y - inventoryItem.Size.x + 1;
-            endingY = startingY + inventoryItem.Size.x;
-        }
+        // if (inventoryItem.Size.x > 1 && inventoryItem.Rotated) {
+        //     startingY = pos.y - inventoryItem.Size.x + 1;
+        //     endingY = startingY + inventoryItem.Size.x;
+        // }
 
         for(int y = startingY; y < endingY; y++) {
             for(int x = pos.x; x < pos.x + size.x; x++) {
@@ -255,8 +259,10 @@ public class InventoryPanel : MonoBehaviour
         }
 
         Vector2Int selectedTilePos = SelectedTile.Pos;
-        if (_selectedInventoryItem.Size.x > 1 && _selectedInventoryItem.Rotated) {
-            selectedTilePos = new Vector2Int(SelectedTile.Pos.x, SelectedTile.Pos.y - _selectedInventoryItem.Size.x + 1);
+        if(_selectedInventoryItem != null) {
+            selectedTilePos += _selectedInventoryItem.Rotated ?
+                new Vector2Int(Player.UICanvas.SelectedItemUI.SelectedOffsetInv.y, -Player.UICanvas.SelectedItemUI.SelectedOffsetInv.x - 1) :
+                Player.UICanvas.SelectedItemUI.SelectedOffsetInv;
         }
 
         Vector2Int size = _selectedInventoryItem.Rotated ? new Vector2Int(_selectedInventoryItem.Size.y, _selectedInventoryItem.Size.x) : _selectedInventoryItem.Size;
