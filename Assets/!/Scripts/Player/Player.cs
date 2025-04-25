@@ -216,15 +216,20 @@ public class Player : MonoBehaviour {
 
         registerStats();
 
-        if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
-            WeaponHolder.UpdateWeapon(CurrentWeapon);
-        }
-
         OnEvolutionSelected.AddListener((evoUI) => {
             foreach (Modifier modifier in evoUI.GetModifiers()) {
                 LivingEntity.ApplyIndefiniteModifier(modifier);
             }
         });
+
+        // ResetRun();
+        // LoadKeybinds();
+    }
+
+    void Start() {
+        if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
+            WeaponHolder.UpdateWeapon(CurrentWeapon);
+        }
 
         // Amulet modifiers
         Inventory.OnInventoryChanged.AddListener(() => {
@@ -243,11 +248,7 @@ public class Player : MonoBehaviour {
             }
         });
 
-        // ResetRun();
-        // LoadKeybinds();
     }
-
-
 
     void Update() {
         if (UpdateDisabled) return;

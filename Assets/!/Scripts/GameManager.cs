@@ -40,6 +40,7 @@ public class GameManager : MonoBehaviour {
     // Events
     public UnityEvent LevelLoaded;
     private void Awake()  {
+        _musicPlayer = GetComponent<MusicPlayer>();
         // SceneManager.sceneLoaded += OnLevelChange;
 
         // We need to check if there is already existing manager
@@ -57,12 +58,10 @@ public class GameManager : MonoBehaviour {
         foreach(var c in _cards) {
             _alreadyAddedCards.Add(c);
         }
-
-        _musicPlayer = GetComponent<MusicPlayer>();
-
-        playMusicForDimension(CurrentDimension);
     }
     private void Start() {
+        playMusicForDimension(CurrentDimension);
+
         // For some reason "scene change" is being called, even if it is the first scene?
         // ConnectPortals();
     }

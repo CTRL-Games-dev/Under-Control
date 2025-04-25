@@ -32,13 +32,16 @@ public class SelectedItemUI : MonoBehaviour
                 transform.rotation = Quaternion.identity;
                 gameObject.SetActive(false);
             } else {
-                Vector3 itemUiOffset = _inventoryItem.ItemUI.transform.position - Input.mousePosition;
-                if (_inventoryItem.Rotated) {
-                    itemUiOffset = new Vector3(
-                        itemUiOffset.y - InventoryPanel.TileSize * value.Size.x,
-                        -itemUiOffset.x,
-                        0
-                    );
+                Vector3 itemUiOffset = Vector3.zero;
+                if(_inventoryItem.ItemUI != null) {
+                    itemUiOffset = _inventoryItem.ItemUI.transform.position - Input.mousePosition;
+                    if (_inventoryItem.Rotated) {
+                        itemUiOffset = new Vector3(
+                            itemUiOffset.y - InventoryPanel.TileSize * value.Size.x,
+                            -itemUiOffset.x,
+                            0
+                        );
+                    }
                 }
              
                 Holder.transform.localPosition = itemUiOffset;
