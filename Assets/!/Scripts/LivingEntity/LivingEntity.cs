@@ -46,6 +46,11 @@ public class LivingEntity : MonoBehaviour {
     public Stat Armor = new Stat(StatType.ARMOR, 0);
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
     public Stat MaxMana = new Stat(StatType.MAX_MANA, 100f);
+    [Header("Sounds")]
+    public AudioClip OnDeathSound;
+    public AudioClip OnDamageSound;
+    public AudioClip OnAttack;
+    public AudioClip[] IdleSounds;
 
     [Header("Events")]
     public UnityEvent OnDeath;
@@ -181,10 +186,13 @@ public class LivingEntity : MonoBehaviour {
                 }
             }
 
+            if(OnDeathSound!=null) SoundFXManager.Instance.PlaySoundFXClip(OnDeathSound, transform, 0.7f);
+
             OnDeath.Invoke();
 
             if (DestroyOnDeath) Destroy(gameObject);
         }
+        else if(OnDamageSound!=null) SoundFXManager.Instance.PlaySoundFXClip(OnDamageSound, transform, 1f);
     }
 
     private float getDamageResistance(DamageType damageType) {

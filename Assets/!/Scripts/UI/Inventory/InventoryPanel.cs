@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -68,6 +69,9 @@ public class InventoryPanel : MonoBehaviour
         }
         connectSignals();
         RegenerateInventory();
+        EventBus.ItemPlacedEvent.AddListener(playInventorySound);
+        EventBus.ItemUILeftClickEvent.AddListener(playInventorySound);
+        EventBus.ItemUIRightClickEvent.AddListener(playInventorySound);
     }
 
     #endregion
@@ -342,6 +346,14 @@ public class InventoryPanel : MonoBehaviour
         yield return new WaitForSeconds(0.2f * Settings.AnimationSpeed);
         _redPanel.gameObject.SetActive(false);
     }
+    
+    private void playInventorySound(ItemUI arg){
+        playInventorySound();
+    }
+    private void playInventorySound(){
+        AudioClip InvClickClip = Resources.Load("SFX/click") as AudioClip;
+        SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform);
+    }
 
     #endregion
 
@@ -404,7 +416,6 @@ public class InventoryPanel : MonoBehaviour
 
     public void OnItemUIRightClick(ItemUI itemUI) {
         if (itemUI == null) return;
-
         if (_inventory.Contains(itemUI.InventoryItem)) {
             if (Player.UICanvas.SelectedItemUI.InventoryItem == null) {
                 if (itemUI.InventoryItem.Amount > 1) {

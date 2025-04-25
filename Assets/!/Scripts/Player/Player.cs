@@ -64,7 +64,8 @@ public class Player : MonoBehaviour {
             _coins = value; 
         }
     }
-
+    [Header("Sound effects")]
+    AudioClip OnDashSound;
     [Header("Properties")]
     [SerializeField] private float _acceleration = 8f;
     [SerializeField] private float _deceleration = 4f;
@@ -246,7 +247,7 @@ public class Player : MonoBehaviour {
                 }
             }
         });
-
+        OnDashSound =  Resources.Load("SFX/bohater/dash") as AudioClip;
     }
 
     void Update() {
@@ -489,7 +490,7 @@ public class Player : MonoBehaviour {
 
         UpdateDisabled = true;
         Animator.animatePhysics = false;
-
+        SoundFXManager.Instance.PlaySoundFXClip(OnDashSound, transform,1.2f);
         Instance.transform.DOMove(transform.position + transform.forward * Instance.DashDistance, Instance.DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
             // Animator.applyRootMotion = true;
             Animator.animatePhysics = true;

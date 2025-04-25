@@ -76,10 +76,10 @@ MonoBehaviour:
   DisplayName: enemy_name_boar_key
   Guild: {fileID: 11400000, guid: 734b0a650a008d14ab9d8696640c3a05, type: 2}
   DropItemsOnDeath: 1
-  TimeToRegenAfterDamage: 3
   DestroyOnDeath: 1
-  Health: 100
-  Mana: 100
+  IsInvisible: 0
+  StartingHealth: 100
+  StartingMana: 100
   MaxHealth:
     _raw: 15
     _adjusted: 100
@@ -88,13 +88,6 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   Armor:
-    _raw: 0
-    _adjusted: 0
-    _initValue: 0
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  ElementalArmor:
     _raw: 0
     _adjusted: 0
     _initValue: 0
@@ -115,12 +108,20 @@ MonoBehaviour:
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
+  OnDeathSound: {fileID: 8300000, guid: 3db75ef688639274b8980666bddc21f6, type: 3}
+  OnDamageSound: {fileID: 8300000, guid: e9445dc903129944e81c91924c912541, type: 3}
+  OnAttack: {fileID: 0}
+  IdleSounds: []
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
   OnDamageTaken:
     m_PersistentCalls:
       m_Calls: []
+  OnStunned:
+    m_PersistentCalls:
+      m_Calls: []
+  _isPlayer: 0
 --- !u!114 &1993330704382467551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,17 +162,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DropOnDeath: 1
   PossibleLoot:
-  - Item: {fileID: 11400000, guid: b125bd877215e4418ba08244717254e4, type: 2}
+  - Item: {fileID: 11400000, guid: 03310c97e7837f149bd40574557472fa, type: 2}
     MinAmount: 1
     MaxAmount: 4
+    MinPowerScale: 0
+    MaxPowerScale: 0
     Chance: 1
   - Item: {fileID: 11400000, guid: 9df73015bdc274a4394a14e34153ecaf, type: 2}
     MinAmount: 0
     MaxAmount: 2
+    MinPowerScale: 0
+    MaxPowerScale: 0
     Chance: 1
   - Item: {fileID: 11400000, guid: e238eb001208bff4ab3b431ed6ee2db0, type: 2}
     MinAmount: 0
     MaxAmount: 2
+    MinPowerScale: 0
+    MaxPowerScale: 0
     Chance: 1
 --- !u!195 &8974613204039339173
 NavMeshAgent:
@@ -387,6 +394,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _hitFlashMaterial: {fileID: 2100000, guid: a70176b5e5737f04f86db74d184df881, type: 2}
   _flashDuration: 0.1
+  _isPlayer: 0
 --- !u!1 &4528148705983052239
 GameObject:
   m_ObjectHideFlags: 0
