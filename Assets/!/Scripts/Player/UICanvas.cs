@@ -155,11 +155,11 @@ public class UICanvas : MonoBehaviour
     #endregion
     #region Misc Methods
 
-    public void StartTalking(Dialogue dialogue, Texture faceImage, FaceAnimator faceAnimator, string nameKey) {
+    public void StartTalking(Dialogue dialogue, Texture faceImage, FaceAnimator faceAnimator, string nameKey, Talkable talkable) {
         TalkingCanvas.gameObject.SetActive(true);
         if (dialogue == null) return;
 
-        TalkingCanvas.SetupDialogue(dialogue, faceImage, faceAnimator, nameKey);
+        TalkingCanvas.SetupDialogue(dialogue, faceImage, faceAnimator, nameKey, talkable);
         ChangeUIBottomState(UIBottomState.Talking);
     }
 
