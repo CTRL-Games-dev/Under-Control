@@ -186,13 +186,16 @@ public class LivingEntity : MonoBehaviour {
                 }
             }
 
-            if(OnDeathSound!=null) SoundFXManager.Instance.PlaySoundFXClip(OnDeathSound, transform, 0.7f);
+            if(OnDeathSound!=null) SoundFXManager.Instance.PlaySoundFXClip(OnDeathSound, transform, 0.4f);
 
             OnDeath.Invoke();
 
             if (DestroyOnDeath) Destroy(gameObject);
         }
-        else if(OnDamageSound!=null) SoundFXManager.Instance.PlaySoundFXClip(OnDamageSound, transform, 1f);
+        else {
+            AudioClip hitSound = Resources.Load("SFX/uderzenienowe") as AudioClip;
+            SoundFXManager.Instance.PlaySoundFXClip(hitSound, transform, 1f);
+        }
     }
 
     private float getDamageResistance(DamageType damageType) {
