@@ -10,6 +10,9 @@ public class Testing : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F1)) {
             Instantiate(BoarPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         }
+        if (Input.GetKeyUp(KeyCode.F2)) {
+            Player.LivingEntity.OnDeath.Invoke();
+        }
        
         
     }

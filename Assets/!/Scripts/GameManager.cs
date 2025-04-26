@@ -39,6 +39,8 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private List<Card> _cards = new();
     // Events
     public UnityEvent LevelLoaded;
+    public bool IsStarterDialogueOver = false;
+
     private void Awake()  {
         _musicPlayer = GetComponent<MusicPlayer>();
         // SceneManager.sceneLoaded += OnLevelChange;
