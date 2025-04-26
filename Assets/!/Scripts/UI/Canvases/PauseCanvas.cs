@@ -161,7 +161,7 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
 
     public void OnExitBtnClick() {
         hideUI().OnComplete(() => {
-            Player.UICanvas.ChangeUIMiddleState(UIMiddleState.MainMenu);
+            Player.LivingEntity.OnDeath.Invoke();
         });
     }
 
