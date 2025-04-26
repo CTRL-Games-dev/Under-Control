@@ -8,9 +8,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
 {
     [Header("Portal things")]
     [SerializeField] private Portal _portal;
-    [SerializeField] private Renderer[] _ballRenderers;
     [SerializeField] private CinemachineCamera _ballCamera;
-    [SerializeField] private Material _portalMaterial;
 
     [Header("UI things")]
     [SerializeField] private GameObject _ui;
@@ -44,10 +42,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
     }
 
     void FixedUpdate() {
-        float xOffset = Mathf.Sin(Time.time) * 0.2f;
-        float yOffset = Mathf.Cos(Time.time) * 0.2f;
-        foreach (Renderer _ballRenderer in _ballRenderers)
-            _ballRenderer.material.mainTextureOffset = new Vector2(xOffset, yOffset);
+
         _spaceBGRect.rotation = Quaternion.Euler(0, 0, Mathf.PingPong(Time.time, 10));
     }
 
@@ -60,7 +55,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
     public void OpenUI()
     {
         Player.UICanvas.IsOtherUIOpen = true;
-        CameraManager.Instance.SwitchCamera(_ballCamera);
+        CameraManager.SwitchCamera(_ballCamera);
         _ui.SetActive(true);
         _canvasGroup.DOFade(1, 1 * Settings.AnimationSpeed).SetDelay(1 * Settings.AnimationSpeed);
         _opened = true;
@@ -69,7 +64,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
     public void CloseUI()
     {
         Player.Instance.UICancelEvent.RemoveListener(CloseUI);
-        CameraManager.Instance.SwitchCamera(null); 
+        CameraManager.SwitchCamera(null); 
         _canvasGroup.DOFade(0, 1 * Settings.AnimationSpeed).OnComplete(() => {
             Player.UICanvas.IsOtherUIOpen = false;
             _ui.SetActive(false);
@@ -77,8 +72,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
         _opened = false;
     }
 
-    public void SetPortal()
-    {
+    public void SetPortal() {
         Invoke(nameof(CloseUI), 1f);
     }
 
@@ -93,7 +87,7 @@ public class ChangePortal : MonoBehaviour, IInteractable
         // if (_currentDimension == dimension) return;
         _currentDimension = dimension;
         _portal.SetDimensionAndActivate(_currentDimension.WhatDimension);
-        _portalMaterial.DOColor(_currentDimension.Color, 0.3f * Settings.AnimationSpeed);
+        _portal.FadePortalColor(_currentDimension.Color, 0.3f * Settings.AnimationSpeed);
 
         _whitePanelGO.SetActive(false);
         setupRightPanel(_currentDimension);

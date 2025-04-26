@@ -7,31 +7,26 @@ public class NoInventory : EntityInventory
 {
     public override Vector2Int Size => Vector2Int.zero;
 
-    public override bool AddItem(ItemData itemData, int amount, Vector2Int position, bool rotated = false)
+    public override bool AddItem(ItemData itemData, int amount, Vector2Int position, float powerScale = 1, bool rotated = false)
     {
         return false;
     }
 
-    public override bool AddItem(ItemData itemData, int amount, Vector2Int position)
+    public override bool AddItem(ItemData itemData, int amount = 1, float powerScale = 1)
     {
         return false;
     }
 
-    public override bool AddItem(ItemData itemData, int amount)
+    public override bool AddItem(ItemData itemData, int amount = 1, float powerScale = 1, bool rotated = false)
     {
         return false;
     }
 
-    public override bool AddItem(ItemData itemData)
+    public override bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position, float powerScale = 1)
     {
         return false;
     }
-
-    public override bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position)
-    {
-        return false;
-    }
-
+    
     public override bool FitsWithinBounds(Vector2Int position, Vector2Int size)
     {
         return false;
@@ -63,4 +58,15 @@ public class NoInventory : EntityInventory
     }
 
     public override void Clear() {}
+
+
+    public override bool HasItemData(ItemData itemData, int amount = 1)
+    {
+        return false;
+    }
+
+    public override InventoryItem GetFirstInventoryItem(ItemData itemData)
+    {
+        return null;
+    }
 }

@@ -1,4 +1,3 @@
-using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +8,12 @@ public class SelectedItemUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _amountText;
     [SerializeField] private RectTransform _amountRectTransform;
 
+    public GameObject Holder;
+
+    // private Vector3 _pivotPosition = new Vector3(0, 0, 0);
+
+    public Vector2Int SelectedOffsetInv;
+
     private InventoryItem _inventoryItem = null;
     public InventoryItem InventoryItem { 
         get { return _inventoryItem; } 
@@ -18,6 +23,8 @@ public class SelectedItemUI : MonoBehaviour
                 return;
             }
 
+            SelectedOffsetInv = Vector2Int.zero;
+
             _inventoryItem = value;
             gameObject.SetActive(_inventoryItem != null);
             if (_inventoryItem == null) {
@@ -25,6 +32,23 @@ public class SelectedItemUI : MonoBehaviour
                 transform.rotation = Quaternion.identity;
                 gameObject.SetActive(false);
             } else {
+                Vector3 itemUiOffset = Vector3.zero;
+                if(_inventoryItem.ItemUI != null) {
+                    itemUiOffset = _inventoryItem.ItemUI.transform.position - Input.mousePosition;
+                    if (_inventoryItem.Rotated) {
+                        itemUiOffset = new Vector3(
+                            itemUiOffset.y - InventoryPanel.TileSize * value.Size.x,
+                            -itemUiOffset.x,
+                            0
+                        );
+                    }
+                }
+             
+                Holder.transform.localPosition = itemUiOffset;
+
+                SelectedOffsetInv.x = (int)(itemUiOffset.x / InventoryPanel.TileSize);
+                SelectedOffsetInv.y = -(int)(itemUiOffset.y / InventoryPanel.TileSize); // negative = up
+                
                 Player.UICanvas.ItemInfoPanel.ShowItemInfo(null);
 
                 transform.rotation = _inventoryItem.Rotated ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;

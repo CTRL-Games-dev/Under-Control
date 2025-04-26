@@ -32,8 +32,6 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         _exitBtnStartingX = _exitRect.anchoredPosition.x;
     }
 
-    public void PlayGame() {
-    }
 
     public void QuitGame() {
         Application.Quit();
@@ -41,7 +39,7 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
 
     public void ShowUI() {
         killTweens();
-        if (HubManager.MainMenuCamera != null) CameraManager.Instance.SwitchCamera(HubManager.MainMenuCamera);
+        if (HubManager.MainMenuCamera != null) CameraManager.SwitchCamera(HubManager.MainMenuCamera);
 
         gameObject.SetActive(true);
 
@@ -53,7 +51,7 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
 
     public void HideUI() {
         killTweens();
-        // CameraManager.Instance.SwitchCamera(Player.Instance.TopDownCamera);
+        // CameraManager.SwitchCamera(Player.Instance.TopDownCamera);
 
         _canvasGroup.DOFade(0, 1f * Settings.AnimationSpeed).OnComplete(() => {
             _bgImage.DOFade(0, 0);

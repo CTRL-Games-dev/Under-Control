@@ -7,8 +7,9 @@ using UnityEngine.Events;
 [RequireComponent(typeof(ModifierSystem))]
 [RequireComponent(typeof(EntityInventory))]
 [RequireComponent(typeof(HitFlashAnimator))]
+[RequireComponent(typeof(TintAnimator))]
 public class LivingEntity : MonoBehaviour {
-    private struct EffectData {
+    public struct EffectData {
         public Effect Effect;
         public float Expiration;
     }
@@ -17,36 +18,47 @@ public class LivingEntity : MonoBehaviour {
     public string DisplayName;
     public Guild Guild;
     public bool DropItemsOnDeath = true;
-    public float TimeToRegenAfterDamage = 2;
+    public bool DestroyOnDeath = true;
+    public bool IsInvisible = false;
+
     public string DebugName => $"{DisplayName} ({Guild.Name} {gameObject.name})";
 
-    public int Exp = 0;
-    public float Level { get => 1 + Exp / 100f; }
-
-    [Range(0, 2)]
-    public int DroppedExpMultiplier = 1;
-
-    public bool DestroyOnDeath = true;
-
     [Header("Stats")]
-    public float Health = 100;
-    public float Mana = 100f;
+    public float StartingHealth = 100;
+    public float StartingMana = 100f;
+    private float _health = 0;
+    public float Health {
+        get => _health;
+        set {
+            _health = value;
+            if (_isPlayer) Player.UICanvas.HUDCanvas.UpdateHealthBar();
+        }
+    }
+    private float _mana = 100f;
+    public float Mana {
+        get => _mana;
+        set {
+            _mana = value;
+            if (_isPlayer) Player.UICanvas.HUDCanvas.UpdateManaBar();
+        }
+    }
    
     public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
-    public Stat HealthRegenRate = new Stat(StatType.HEALTH_REGEN_RATE, 1);
-    public Stat ManaRegenRate = new Stat(StatType.MANA_REGEN_RATE, 1);
     public Stat Armor = new Stat(StatType.ARMOR, 0);
-    public Stat ElementalArmor = new Stat(StatType.ELEMENTAL_ARMOR, 0);
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
     public Stat MaxMana = new Stat(StatType.MAX_MANA, 100f);
 
     [Header("Events")]
     public UnityEvent OnDeath;
     public UnityEvent<DamageTakenEventData> OnDamageTaken;
+    public UnityEvent<float> OnStunned; // float - stun duration
 
     // State
-    private float _lastDamageTime = 0;
     private List<EffectData> _activeEffects = new List<EffectData>();
+    public List<EffectData> ActiveEffects {
+        get { return _activeEffects; }
+        private set { _activeEffects = value; }
+    }
 
     private readonly int _hurtHash = Animator.StringToHash("hurt");
 
@@ -54,73 +66,60 @@ public class LivingEntity : MonoBehaviour {
     public ModifierSystem ModifierSystem { get; private set; }
     public EntityInventory Inventory { get; private set; }
     public HitFlashAnimator HitFlashAnimator { get; private set; }
+    public TintAnimator TintAnimator { get; private set; }
+
+    public bool _isPlayer = false;
 
     void Awake() {
         ModifierSystem = GetComponent<ModifierSystem>();
         Inventory = GetComponent<EntityInventory>();
         HitFlashAnimator = GetComponent<HitFlashAnimator>();
+        TintAnimator = GetComponent<TintAnimator>();
 
         ModifierSystem.RegisterStat(ref MaxHealth);
-        ModifierSystem.RegisterStat(ref HealthRegenRate);
         ModifierSystem.RegisterStat(ref Armor);
-        ModifierSystem.RegisterStat(ref ElementalArmor);
         ModifierSystem.RegisterStat(ref MovementSpeed);
         ModifierSystem.RegisterStat(ref MaxMana);
+ 
+        _isPlayer = gameObject.GetComponent<Player>() != null;
+        _health = StartingHealth;
+        _mana = StartingMana;
     }
 
     void Update() {
         recheckEffects();
-   
-        // Health regen
-        if(Time.time - _lastDamageTime > TimeToRegenAfterDamage) {
-            Health += HealthRegenRate * Time.deltaTime;
-            if(Health > MaxHealth) {
-                Health = MaxHealth;
-            }
-        }
-
-        // Mana regen
-        Mana += ManaRegenRate * Time.deltaTime;
-        if(Mana > MaxMana) {
-            Mana = MaxMana;
-        }
     }
 
     public void DropItem(InventoryItem item) {
-        dropItem(item.ItemData, item.Amount);
+        dropItem(item.ItemData, item.Amount, item.PowerScale);
         Inventory.RemoveInventoryItem(item);
     }
 
     // Spawns item at torso level and throws item on the ground
-    private void dropItem(ItemData itemData, int amount) {
-        ItemEntity.SpawnThrownRelative(itemData, amount, transform.position + new Vector3(0, 1.2f, 0), transform.rotation, Vector3.forward * 2);
+    private void dropItem(ItemData itemData, int amount, float powerScale) {
+        ItemEntity.SpawnThrownRelative(itemData, amount, transform.position + new Vector3(0, 1.2f, 0), powerScale, transform.rotation, Vector3.forward * 2);
+    }
+
+    private void dropItem(InventoryItem inventoryItem) {
+        dropItem(inventoryItem.ItemData, inventoryItem.Amount, inventoryItem.PowerScale);
     }
 
     public void Attack(Damage damage, LivingEntity target) {
-        target.takeDamage(damage, this);
+        target.TakeDamage(damage, this);
     }
 
-    private IEnumerator slowDown() {
-        Time.timeScale = 0f;
-        Debug.Log("Slowing down time for 0.1 seconds");
-        yield return new WaitForSecondsRealtime(0.04f);
-        Debug.Log("Resuming time");
-        Time.timeScale = 1f;
-    }
-
-    private void takeDamage(Damage damage, LivingEntity source = null) {
-        
-        if (source.gameObject.CompareTag("Player")) {
-            StartCoroutine(nameof(slowDown));
-            CameraShake.Instance.Shake(2, 0.1f);
+    public void TakeDamage(Damage damage, LivingEntity source = null) {
+        if (source != null) {
+            if (source.gameObject.CompareTag("Player")) {
+                // StartCoroutine(nameof(slowDown));
+                CameraManager.ShakeCamera(2, 0.1f);
+            }
         }
 
         if (gameObject.CompareTag("Boar")) {
             gameObject.GetComponent<Animator>()?.SetTrigger(_hurtHash);
         }
 
-
-        _lastDamageTime = Time.time;
 
         // Check if entity is dead
         if(Health == 0) {
@@ -159,33 +158,29 @@ public class LivingEntity : MonoBehaviour {
         HitFlashAnimator.Flash();
 
         if (Health == 0) {
-            if(source != null) {
-                source.Exp += Exp * DroppedExpMultiplier;
-            }
-
             // Drop items
             if(DropItemsOnDeath) {
                 // Drop common slots
                 List<InventoryItem> items = new List<InventoryItem>(Inventory.GetItems());
                 foreach(InventoryItem item in items) {
-                    dropItem(item.ItemData, item.Amount);
+                    dropItem(item);
                     Inventory.RemoveInventoryItem(item);
                 }
 
                 // Drop equipment
                 if(Inventory is HumanoidInventory humanoidInventory) {
                     if(humanoidInventory.Armor != null) {
-                        dropItem(humanoidInventory.Armor, 1);
+                        dropItem(humanoidInventory.Armor);
                         humanoidInventory.Armor = null;
                     }
 
                     if(humanoidInventory.Amulet != null) {
-                        dropItem(humanoidInventory.Amulet, 1);
+                        dropItem(humanoidInventory.Amulet);
                         humanoidInventory.Amulet = null;
                     }
 
                     if(humanoidInventory.Weapon != null) {
-                        dropItem(humanoidInventory.Weapon, 1);
+                        dropItem(humanoidInventory.Weapon);
                         humanoidInventory.Weapon = null;
                     }
                 }
@@ -199,17 +194,25 @@ public class LivingEntity : MonoBehaviour {
 
     private float getDamageResistance(DamageType damageType) {
         if(Inventory is not HumanoidInventory humanoidInventory) return 0;
+        var armor = humanoidInventory.Armor;
+        if(armor == null) return 0;
 
-        return humanoidInventory.Armor?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance) ?? 0;
+        float resistanceValue = armor.ItemData?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance * armor.PowerScale) ?? 0;
+        
+        resistanceValue = resistanceValue < 0 ? 0 : resistanceValue;
+        resistanceValue = resistanceValue > 90 ? 90 : resistanceValue;
+        return resistanceValue;
     }
 
     #region Effects
 
     public void ApplyEffect(Effect effect) {
-        _activeEffects.Add(new EffectData {
+        ActiveEffects.Add(new EffectData {
             Effect = effect,
             Expiration = Time.time + effect.Duration
         });
+
+        effect.OnApply(this);
 
         if(effect.Modifiers == null) {
             return;
@@ -222,8 +225,8 @@ public class LivingEntity : MonoBehaviour {
     }
 
     public void RemoveEffect(Effect effect) {
-        for(int i = 0; i < _activeEffects.Count; i++) {
-            if(!_activeEffects[i].Effect.Equals(effect)) {
+        for(int i = 0; i < ActiveEffects.Count; i++) {
+            if(!ActiveEffects[i].Effect.Equals(effect)) {
                 continue;
             }
 
@@ -232,9 +235,17 @@ public class LivingEntity : MonoBehaviour {
                 ModifierSystem.RemoveModifier(modifier);
             }
 
-            _activeEffects.RemoveAt(i);
+            effect.OnRemove(this);
+
+            ActiveEffects.RemoveAt(i);
         }
     }
+
+    public List<EffectData> GetActiveEffects() {
+        return ActiveEffects;
+    }
+
+    
 
     // public void RemoveAllEffectsLike(Effect effect) {
     //     for(int i = 0; i < activeEffects.Count; i++) {
@@ -254,7 +265,14 @@ public class LivingEntity : MonoBehaviour {
     // }
 
     private void recheckEffects() {
-        _activeEffects.RemoveAll(x => x.Expiration < Time.time);
+        ActiveEffects.RemoveAll(x => {
+            if(x.Expiration < Time.time) {
+                x.Effect.OnRemove(this);
+                return true;
+            }
+
+            return false;
+        });
     }
 
     #endregion

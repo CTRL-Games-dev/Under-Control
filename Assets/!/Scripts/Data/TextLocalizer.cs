@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -27,11 +26,14 @@ public class TextLocalizer : MonoBehaviour
             TextData.OnLanguageChanged?.RemoveListener(UpdateText);
             TextData.OnLanguageChanged?.AddListener(UpdateText);
         }
-        
     }
 
 
-    public void UpdateText() {        
+    public void UpdateText() {
+        if (string.IsNullOrEmpty(Key)) {
+            _textMeshPro.text = string.Empty;
+            return;
+        }
         try {
             _ = TextData.LocalizationTable[Key][TextData.CurrentLanguage];
         } catch (KeyNotFoundException) {

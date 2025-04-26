@@ -10,18 +10,26 @@ public class WeaponHolder : MonoBehaviour
 
     private Weapon _currentWeaponHitter;
     private WeaponItemData _currentWeaponData;
+    private float _currentWeaponPowerScale;
     private List<LivingEntity> _hitEntities = new List<LivingEntity>();
     private AttackType? _currentAttackType;
     private bool _isAttacking = false;
 
-    public void UpdateWeapon(WeaponItemData weaponData) {
+    public void UpdateWeapon(InventoryItem<WeaponItemData> weaponItem) {
         if (_currentWeaponHitter != null) {
             Destroy(_currentWeaponHitter.gameObject);
             _currentWeaponHitter = null;
             _currentWeaponData = null;
         }
 
+        if(weaponItem == null) return;
+
+        WeaponItemData weaponData = weaponItem.ItemData;
+        float powerScale = weaponItem.PowerScale;
+
         if(weaponData == null) return;
+
+        _currentWeaponPowerScale = powerScale;
 
         if (weaponData.WeaponPrefab != null) {
             _currentWeaponHitter = InstantiateWeapon(weaponData);
@@ -31,7 +39,36 @@ public class WeaponHolder : MonoBehaviour
 
         _currentWeaponData = weaponData;
 
-        _currentWeaponHitter.gameObject.layer = gameObject.layer;
+        if (_currentWeaponHitter.gameObject.layer == LayerMask.NameToLayer("Default")) {
+            _currentWeaponHitter.gameObject.layer = gameObject.layer;
+        }
+
+        _currentWeaponHitter.OnHit.AddListener(OnHit);
+    }
+
+    public void UpdateWeapon(WeaponItemData weaponData, float powerScale = 1) {
+        if (_currentWeaponHitter != null) {
+            Destroy(_currentWeaponHitter.gameObject);
+            _currentWeaponHitter = null;
+            _currentWeaponData = null;
+        }
+
+        if(weaponData == null) return;
+
+        _currentWeaponPowerScale = powerScale;
+
+        if (weaponData.WeaponPrefab != null) {
+            _currentWeaponHitter = InstantiateWeapon(weaponData);
+        } else {
+            _currentWeaponHitter = InstantiateUnknownWeapon();
+        }
+
+        _currentWeaponData = weaponData;
+
+        if (_currentWeaponHitter.gameObject.layer == LayerMask.NameToLayer("Default")) {
+            _currentWeaponHitter.gameObject.layer = gameObject.layer;
+        }
+
         _currentWeaponHitter.OnHit.AddListener(OnHit);
     }
 
@@ -79,7 +116,6 @@ public class WeaponHolder : MonoBehaviour
         _isAttacking = true;
 
         _hitEntities.Clear();
-        _currentWeaponHitter.StartMinorTrail();
     }
 
     public void EndAttack() {
@@ -95,7 +131,6 @@ public class WeaponHolder : MonoBehaviour
         _isAttacking = false;
 
         _hitEntities.Clear();
-        _currentWeaponHitter.StopMinorTrail();
         _currentAttackType = null;
     }
 
@@ -108,7 +143,6 @@ public class WeaponHolder : MonoBehaviour
         if(_currentWeaponHitter == null) return;
 
         _currentWeaponHitter.EnableHitbox();
-        _currentWeaponHitter.StartMajorTrail();
     }
 
     public void DisableHitbox() {
@@ -120,7 +154,6 @@ public class WeaponHolder : MonoBehaviour
         if(_currentWeaponHitter == null) return;
 
         _currentWeaponHitter.DisableHitbox();
-        _currentWeaponHitter.StopMajorTrail();
     }
 
     public void OnHit(LivingEntity victim) {
@@ -135,6 +168,9 @@ public class WeaponHolder : MonoBehaviour
 
         float damageMin = _currentAttackType.Value == AttackType.LIGHT ? _currentWeaponData.LightDamageMin : _currentWeaponData.HeavyDamageMin;
         float damageMax = _currentAttackType.Value == AttackType.LIGHT ? _currentWeaponData.LightDamageMax : _currentWeaponData.HeavyDamageMax;
+
+        damageMin *= _currentWeaponPowerScale;
+        damageMax *= _currentWeaponPowerScale;
 
         if(damageMax <= 0) {
             Debug.LogWarning($"{Self.DebugName}: DamageMax is zero or negative. Current weapon is {_currentWeaponData.DisplayName}. Attack type is {_currentAttackType}");

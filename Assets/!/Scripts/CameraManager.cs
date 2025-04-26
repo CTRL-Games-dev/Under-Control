@@ -1,25 +1,55 @@
 using System;
 using System.Collections.Generic;
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    private CinemachineCamera _currentCamera;
-    private CinemachineCamera _previousCamera = null;
+    private static CinemachineCamera _currentCamera;
+    private static CinemachineCamera _previousCamera = null;
 
     public static CameraManager Instance;
 
+
+    private static CinemachineBasicMultiChannelPerlin _noise;
+
+    private static float _startingIntensity;
+    private static float _shakeTimer;
+    private static float _shakeTimerTotal;
+
+
     private void Awake() {
-        if (Instance != null) {
-            Destroy(this);
+        DontDestroyOnLoad(this);
+        if (Instance == null) {
+            Instance = this;
+        } else if (Instance != this) {
+            Destroy(gameObject);
             return;
         }
-        Instance = this;
+    }
+
+    private void Start() {
+        _noise = Player.Instance.CameraNoise;
+    }
+
+    void Update() {
+    if (_shakeTimer > 0) {
+        _shakeTimer -= Time.deltaTime;
+        _noise.AmplitudeGain = Mathf.Lerp(_startingIntensity, 0f, 1 - _shakeTimer / _shakeTimerTotal);
+        }
+    }
+
+    private static void shake(float intensity, float time) {
+        _noise.AmplitudeGain = intensity;
+        _startingIntensity = intensity;
+        _shakeTimerTotal = time;
+        _shakeTimer = time;
     }
 
 
-    public void SwitchCamera(CinemachineCamera camera) {
+    public static void SwitchCamera(CinemachineCamera camera) {
+
         if (camera == _currentCamera) {
             return;
         }
@@ -39,7 +69,22 @@ public class CameraManager : MonoBehaviour
         setCamerasPriority();
     }
 
-    private void setCamerasPriority() {
+    public static bool IsCameraActive(CinemachineCamera camera) {
+        return _currentCamera == camera;
+    }
+
+    public static void ShakeCamera(float strength, float time) {
+        if (_currentCamera != null) {
+            shake(strength, time);
+        }
+    }
+
+    public static CinemachineCamera GetCurrentCamera() {
+        return _currentCamera;
+    }
+
+
+    private static void setCamerasPriority() {
         List<CinemachineCamera> cameras = new List<CinemachineCamera>(FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None));
 
         for (int i = 0; i < cameras.Count; i++) {

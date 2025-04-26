@@ -24,34 +24,35 @@ public class ItemInfoPanel : MonoBehaviour
 
     public void ShowItemInfo(ItemUI itemUI) {
         gameObject.SetActive(itemUI != null);
-
+        
         if (itemUI == null) return;
 
-        InventoryItem item = itemUI.InventoryItem;
-
-        
+        Vector2 scale = new(Screen.width / 1920f, Screen.height / 1080f);
 
         transform.position = new Vector2(
-            Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width), 
-            Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height, Screen.height)
+            Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width * scale.x), 
+            Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height * scale.y, Screen.height)
         );
+
+        InventoryItem item = itemUI.InventoryItem;
 
         _nameTextLocalizer.Key = item.ItemData.DisplayName;
         _descriptionTextLocalizer.Key = item.ItemData.Description;
 
-        if (itemUI.InventoryItem.ItemData.GetType() == typeof(WeaponItemData)) {
-            WeaponItemData weaponItemData = (WeaponItemData)item.ItemData;
+        if (itemUI.InventoryItem.ItemData is WeaponItemData weaponItemData) {
             _lightAttackHolder.SetActive(true);
             _heavyAttackHolder.SetActive(true);
-            _itemLightDamage.text = $"{weaponItemData.LightDamageMin} - {weaponItemData.LightDamageMax}";
-            _itemHeavyDamage.text = $"{weaponItemData.HeavyDamageMin} - {weaponItemData.HeavyDamageMax}";
+            _itemLightDamage.text = $"{weaponItemData.LightDamageMin * item.PowerScale} - {weaponItemData.LightDamageMax * item.PowerScale}";
+            _itemHeavyDamage.text = $"{weaponItemData.HeavyDamageMin * item.PowerScale} - {weaponItemData.HeavyDamageMax * item.PowerScale}";
         } else {
             _lightAttackHolder.SetActive(false);
             _heavyAttackHolder.SetActive(false);
         }
 
-        int value = item.ItemData.Value / 2;
-        if (itemUI.CurrentInventoryPanel != null && itemUI.CurrentInventoryPanel.IsSellerInventory) value *= 2;
+        int value = item.ScaledValue / 2;
+        if (itemUI.CurrentInventoryPanel != null && itemUI.CurrentInventoryPanel.IsSellerInventory) {
+            value *= 2;
+        }
 
         _itemValue.text = value + $" ({value * item.Amount})";
         _itemAmount.text = '×' + item.Amount.ToString();

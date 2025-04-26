@@ -37,7 +37,6 @@ public class UICanvas : MonoBehaviour
     [Header("References for children")]
     [HideInInspector] public InventoryPanel ActiveInventoryPanel;
     public ItemInfoPanel ItemInfoPanel;
-    public EvoInfo EvoInfo;
     public SelectedItemUI SelectedItemUI;
 
 
@@ -140,12 +139,6 @@ public class UICanvas : MonoBehaviour
         SelectedItemUI.InventoryItem = inventoryItem;
     }
 
-
-    public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab, IInteractableInventory interactable = null, string title = null) {
-        InventoryCanvas.SetOtherInventory(itemContainer, prefab, interactable, title);
-        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Inventory);
-    }
-
     public void DropItem() {
         if (SelectedItemUI.InventoryItem == null) return;
 
@@ -162,11 +155,11 @@ public class UICanvas : MonoBehaviour
     #endregion
     #region Misc Methods
 
-    public void StartTalking(Dialogue dialogue, Texture faceImage, FaceAnimator faceAnimator, string nameKey) {
+    public void StartTalking(Dialogue dialogue, Texture faceImage, FaceAnimator faceAnimator, string nameKey, Talkable talkable) {
         TalkingCanvas.gameObject.SetActive(true);
         if (dialogue == null) return;
 
-        TalkingCanvas.SetupDialogue(dialogue, faceImage, faceAnimator, nameKey);
+        TalkingCanvas.SetupDialogue(dialogue, faceImage, faceAnimator, nameKey, talkable);
         ChangeUIBottomState(UIBottomState.Talking);
     }
 
@@ -215,10 +208,13 @@ public class UICanvas : MonoBehaviour
     private void closeUIMiddleState(UIMiddleState state) {
         switch (state) {
             case UIMiddleState.Inventory:
+                EventBus.InventoryClosedEvent?.Invoke();
                 InventoryCanvas.HideUI();                
                 break;
             case UIMiddleState.MainMenu:
                 Player.Instance.InputDisabled = false;
+                Player.Instance.LockRotation = false;
+                Player.Instance.UpdateDisabled = false;
                 MainMenuCanvas.HideUI();
                 break;
             case UIMiddleState.Pause:
@@ -238,6 +234,7 @@ public class UICanvas : MonoBehaviour
             case UIMiddleState.MainMenu:
                 closeUIBottomState(CurrentUIBottomState);
                 Player.Instance.InputDisabled = true;
+                Player.Instance.LockRotation = true;
                 MainMenuCanvas.ShowUI();
                 break;
             case UIMiddleState.Pause:
@@ -245,6 +242,7 @@ public class UICanvas : MonoBehaviour
                 break;
             case UIMiddleState.NotVisible:
                 Player.Instance.InputDisabled = false;
+                Player.Instance.LockRotation = false;
                 InventoryPanel.IsItemJustBought = false;
                 DropItem();
                 InventoryCanvas.SetOtherInventory(null, null);

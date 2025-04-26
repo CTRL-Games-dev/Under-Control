@@ -15,7 +15,15 @@ public class HoverTooltip : MonoBehaviour {
         _camera = Player.Instance.MainCamera;
     }
 
+    void Update() {
+        if(!InputUtility.IsMousePositionAvailable()) return;
+
+        transform.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+    }
+
     void FixedUpdate() {
+        if(!InputUtility.IsMousePositionAvailable()) return;
+       
         if (EventSystem.current.IsPointerOverGameObject()) {
             if (_lastHoveredGameObject != null) {
                 _lastHoveredGameObject = null;
@@ -27,8 +35,6 @@ public class HoverTooltip : MonoBehaviour {
             return;
         }
 
-        transform.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
         if (!Physics.Raycast(ray, out RaycastHit hit, 100)) {
             return;
@@ -38,8 +44,6 @@ public class HoverTooltip : MonoBehaviour {
             return;
         }
 
-        _lastHoveredGameObject = hit.transform.gameObject;
-
         ItemEntityTooltip.Disable();
         LivingEntityTooltip.Disable();
         GenericInteractableTooltip.Disable();
@@ -47,8 +51,12 @@ public class HoverTooltip : MonoBehaviour {
 
         if(hit.transform.gameObject.TryGetComponent(out ItemEntity itemEntity)) {
             ItemEntityTooltip.Enable(itemEntity);
-        } else if(hit.transform.gameObject.TryGetComponent(out LivingEntity livingEntity)) {
+        } else if(hit.transform.gameObject.TryGetComponentInParent(out LivingEntity livingEntity)) {
             if(livingEntity == Player.LivingEntity) {
+                return;
+            }
+
+            if(livingEntity.IsInvisible) {
                 return;
             }
 
@@ -57,6 +65,8 @@ public class HoverTooltip : MonoBehaviour {
             TalkableTooltip.Enable(null);
         } else if(hit.transform.gameObject.TryGetComponent(out IInteractable _)) {
             GenericInteractableTooltip.Enable(null);
-        } 
+        }
+
+        _lastHoveredGameObject = hit.transform.gameObject;
     }
 }

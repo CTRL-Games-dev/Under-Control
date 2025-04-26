@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using Unity.Cinemachine;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -26,6 +25,7 @@ public class Player : MonoBehaviour {
 
             caster.Mana -= Spell.Mana; 
             Spell.Cast();
+            Animator.SetTrigger(Instance._spellHash);
 
             return true;
         }
@@ -36,7 +36,6 @@ public class Player : MonoBehaviour {
     [Header("Stats")]
     public float Health => LivingEntity.Health;
     public Stat MaxHealth => LivingEntity.MaxHealth;
-    public Stat RegenRate => LivingEntity.HealthRegenRate;
     public Stat MaxMana => LivingEntity.MaxMana;
     public float Mana => LivingEntity.Mana;
     public Stat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
@@ -52,12 +51,12 @@ public class Player : MonoBehaviour {
 
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 10f);
 
-    public Stat DashSpeed = new Stat(StatType.DASH_SPEED, 10f);
+    public Stat DashSpeed = new Stat(StatType.DASH_SPEED, 0.2f);
     public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 5f);
     public Stat DashDistance = new Stat(StatType.DASH_DISTANCE, 5f);
 
     // Coins
-    [SerializeField] private int _coins = 0;
+    [SerializeField] private int _coins = 100;
     public int Coins { 
         get{ return _coins; } 
         set {   
@@ -73,8 +72,6 @@ public class Player : MonoBehaviour {
     [SerializeField] private float _currentSpeed = 0f;
     [SerializeField] private float _turnSpeed = 260f;
 
-    public float MaxMovementSpeed = 10;
-    
     public float MinCameraDistance = 10f;
     public float MaxCameraDistance = 30f;
     public float CameraDistanceSpeed = 1f;
@@ -84,11 +81,12 @@ public class Player : MonoBehaviour {
     public GameObject CinemachineObject;
     public GameObject CameraTargetObject;
     public CinemachineCamera TopDownCamera;
+    public CinemachineBasicMultiChannelPerlin CameraNoise;
     public Camera MainCamera;
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
 
-    private int _evolutionPoints = 4;
+    private int _evolutionPoints = 9;
     public int EvolutionPoints {
         get{ return _evolutionPoints; }
         set {
@@ -101,12 +99,13 @@ public class Player : MonoBehaviour {
 
     [Header("Spells")]
     [SerializeField]
-    private SpellData _spellDataOne;
+    private SpellData _spellDataOne; 
     public Spell SpellSlotOne {
         get => _spellDataOne.Spell;
         set {
             _spellDataOne.Spell = value;
-            _spellDataOne.Cooldown = new Cooldown(value.CooldownTime);
+            // _spellDataOne.Cooldown = new Cooldown(value.CooldownTime); 
+            UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
 
@@ -116,7 +115,8 @@ public class Player : MonoBehaviour {
         get => _spellDataTwo.Spell;
         set {
             _spellDataTwo.Spell = value;
-            _spellDataTwo.Cooldown = new Cooldown(value.CooldownTime);
+            // _spellDataTwo.Cooldown = new Cooldown(value.CooldownTime);
+            UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
 
@@ -126,16 +126,24 @@ public class Player : MonoBehaviour {
         get => _spellDataThree.Spell;
         set {
             _spellDataThree.Spell = value;
-            _spellDataThree.Cooldown = new Cooldown(value.CooldownTime);
+            // _spellDataThree.Cooldown = new Cooldown(value.CooldownTime);
+            UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
 
+    [Header("Consumable")]
+    public InventoryItem<ConsumableItemData> ConsumableItemOne = null;
+    public InventoryItem<ConsumableItemData> ConsumableItemTwo = null;
+    public Cooldown ConsumableCooldown = new Cooldown(0.5f);
+
     [Header("Weapon")]
     public WeaponHolder WeaponHolder;
-    public WeaponItemData CurrentWeapon { get => Inventory.Weapon; }
+    public InventoryItem<WeaponItemData> CurrentWeapon { get => Inventory.Weapon; }
 
     private bool _isAttacking = false;
-    private bool _lockRotation = false;
+    public bool LockRotation = false;
+    public bool UpdateDisabled = false;
+    public SlashManager SlashManager;
 
     [Header("Events")]
     public UnityEvent InventoryToggleEvent;
@@ -143,12 +151,13 @@ public class Player : MonoBehaviour {
     public UnityEvent ItemRotateEvent;
     public UnityEvent<EvoUI> OnEvolutionSelected = new();
     public UnityEvent<int> CoinsChangeEvent;
+    public UnityEvent UpdateConsumablesEvent;
+    public float CameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
-    private float _cameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
     private InteractionType? _queuedInteraction;
-    private Cooldown dashCooldown = new Cooldown(0);
+    private Cooldown _dashCooldown = new Cooldown(0);
 
     private List<Modifier> _currentRingModifiers;
     private List<Modifier> _currentAmuletModifiers;
@@ -160,7 +169,7 @@ public class Player : MonoBehaviour {
     private readonly int _weaponTypeHash = Animator.StringToHash("weapon_type");
     private readonly int _lightAttackSpeedHash = Animator.StringToHash("attack_light_speed");
     private readonly int _heavyAttackSpeedHash = Animator.StringToHash("attack_heavy_speed");
-    private readonly int _movementSpeedHash = Animator.StringToHash("movement_speed");
+    private readonly int _spellHash = Animator.StringToHash("spell");
 
     [Header("References")]
     [SerializeField] private UICanvas _uiCanvas;
@@ -176,51 +185,51 @@ public class Player : MonoBehaviour {
     public static HumanoidInventory Inventory => LivingEntity.Inventory as HumanoidInventory;
 
     [SerializeField] private LayerMask _groundLayerMask;
+    public FaceAnimator FaceAnimator;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
 
-
-    private Vector3 _queuedRotation;
-    
+    public GameObject SlashGO;
+    public Material SlashMaterial;
+    private Vector3 _queuedRotation = Vector3.zero;
 
     #region Unity Methods
     void Awake() {
-
-        #if UNITY_EDITOR // zeby mi nie szumial laptop
-            QualitySettings.vSyncCount = 0;  // VSync must be disabled
-            Application.targetFrameRate = 30;
-        #endif
-
+        DontDestroyOnLoad(gameObject);
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject);
+            return;
+        }
+        
         LivingEntity = GetComponent<LivingEntity>();
         ModifierSystem = GetComponent<ModifierSystem>();
         CharacterController = GetComponent<CharacterController>();
         Animator = GetComponent<Animator>();
         CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
 
-        DontDestroyOnLoad(gameObject);
-        if (Instance != null && Instance != this) {
-            Destroy(gameObject);
-            return;
-        }
-
         Instance = this;
 
         LivingEntity.OnDeath.AddListener(onDeath);
-        MovementSpeed.OnValueChanged.AddListener(onMovementSpeedChanged);
+        LivingEntity.OnStunned.AddListener(onStunned);
         
-        _cameraDistance = MinCameraDistance;
+        CameraDistance = MinCameraDistance;
 
         registerStats();
-
-        if (CurrentWeapon != null) {
-            WeaponHolder.UpdateWeapon(CurrentWeapon);
-        }
 
         OnEvolutionSelected.AddListener((evoUI) => {
             foreach (Modifier modifier in evoUI.GetModifiers()) {
                 LivingEntity.ApplyIndefiniteModifier(modifier);
             }
         });
+
+        // ResetRun();
+        // LoadKeybinds();
+    }
+
+    void Start() {
+        if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
+            WeaponHolder.UpdateWeapon(CurrentWeapon);
+        }
 
         // Amulet modifiers
         Inventory.OnInventoryChanged.AddListener(() => {
@@ -230,7 +239,7 @@ public class Player : MonoBehaviour {
                 }
             }
 
-            _currentAmuletModifiers = Inventory.Amulet?.Modifiers;
+            _currentAmuletModifiers = Inventory.Amulet?.ItemData?.Modifiers;
 
             if (_currentAmuletModifiers != null) {
                 foreach(var modifier in _currentAmuletModifiers) {
@@ -239,11 +248,11 @@ public class Player : MonoBehaviour {
             }
         });
 
-        // ResetRun();
-        // LoadKeybinds();
     }
 
     void Update() {
+        if (UpdateDisabled) return;
+
         handleInteraction();
         handleRotation();
 
@@ -252,9 +261,12 @@ public class Player : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        Animator.SetFloat(_speedHash, _currentSpeed / MaxMovementSpeed);
+        // Magiczna liczba to predkosc animacji biegu
+        Animator.SetFloat(_speedHash, _currentSpeed / Instance.MovementSpeed);
         Animator.SetFloat(_lightAttackSpeedHash, Instance.LightAttackSpeed);
         Animator.SetFloat(_heavyAttackSpeedHash, Instance.HeavyAttackSpeed);
+
+        ModifierSystem.GetActiveModifiers();
     }
 
     #endregion
@@ -280,9 +292,13 @@ public class Player : MonoBehaviour {
     private Vector3 getGoalDirection() {
         switch (CurrentAnimationState) {
             case AnimationState.Attack_Windup:
+                if (_queuedRotation == Vector3.zero) return transform.forward;
+                Vector3 dir = _queuedRotation;
+                _queuedRotation = Vector3.zero;
+                return dir.normalized;
             case AnimationState.Attack_Contact:
             case AnimationState.Attack_ComboWindow:
-                return _queuedRotation.normalized;
+                return transform.forward;
 
             case AnimationState.Locomotion:
             case AnimationState.Attack_Recovery:
@@ -291,51 +307,94 @@ public class Player : MonoBehaviour {
         }
     }
 
-
     private float getGoalSpeed() {
         if (InputDisabled) return 0;
 
         switch (CurrentAnimationState) {
             case AnimationState.Locomotion:
-                return _movementInputVector.magnitude > 0.1f ? MaxMovementSpeed : 0;
+                return _movementInputVector.magnitude > 0.1f ? MovementSpeed : 0;
 
             case AnimationState.Attack_Windup:
             case AnimationState.Attack_Contact:
             case AnimationState.Attack_ComboWindow:
             case AnimationState.Attack_Recovery:
-                return 0;
+                return _movementInputVector.magnitude > 0.1f ? MovementSpeed * 0.3f : 0;
         }
 
         return 0;
     }
 
-
     private void handleRotation() {
-        if (_lockRotation) return;
+        if (LockRotation) return;
         if (_movementInputVector.magnitude > 0.1f) {
             var targetRotation = Quaternion.Euler(0, 45, 0) * Quaternion.LookRotation(new Vector3(_movementInputVector.x, 0, _movementInputVector.y));
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
         }
     }
 
-
     private void onDeath() {
         UICanvas.ChangeUITopState(UITopState.Death);
+        Animator.SetTrigger("die");
+        UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
+    }
+
+    private void onStunned(float duration) {
+        CameraManager.ShakeCamera(2, duration);
     }
 
     
     #region Input Events
 
     void OnCastSpellOne(InputValue value) {
-        _spellDataOne.TryCast(LivingEntity);
+        if (SpellSlotOne != null) UICanvas.HUDCanvas.UseSpell1();
+        // _spellDataOne.TryCast(LivingEntity);
     }
 
     void OnCastSpellTwo(InputValue value) {
-        _spellDataTwo.TryCast(LivingEntity);
+        if (SpellSlotTwo != null) UICanvas.HUDCanvas.UseSpell2();
+        // _spellDataTwo.TryCast(LivingEntity);
     }
 
     void OnCastSpellThree(InputValue value) {
-        _spellDataThree.TryCast(LivingEntity);
+        if (SpellSlotThree != null) UICanvas.HUDCanvas.UseSpell3();
+        // _spellDataThree.TryCast(LivingEntity);
+    }
+
+    void OnUseConsumableOne(InputValue value) {
+        if(ConsumableItemOne == null) return;
+        if(!ConsumableCooldown.Execute()) return;
+        if(ConsumableItemOne.Amount <= 0) return;
+
+        ConsumableItemData c =  ConsumableItemOne.ItemData as ConsumableItemData;
+
+        if(c == null) return;
+        c.Consume(LivingEntity);
+        ConsumableItemOne.Amount--;
+
+        if (ConsumableItemOne.Amount <= 0) {
+            ConsumableItemOne = null;
+        }
+
+        UICanvas.HUDCanvas.UseConsumable1();
+        UpdateConsumablesEvent?.Invoke();
+    }
+
+    void OnUseConsumableTwo(InputValue value) {
+        if(ConsumableItemTwo == null) return;
+        if(!ConsumableCooldown.Execute()) return;
+        if(ConsumableItemTwo.Amount <= 0) return;
+
+        ConsumableItemData c =  ConsumableItemTwo.ItemData as ConsumableItemData;
+        
+        if(c == null) return;
+        c.Consume(LivingEntity);
+        ConsumableItemTwo.Amount--;
+        if (ConsumableItemTwo.Amount <= 0) {
+            ConsumableItemTwo = null;
+        }
+
+        UICanvas.HUDCanvas.UseConsumable2();
+        UpdateConsumablesEvent?.Invoke();
     }
 
     void OnMove(InputValue value) {
@@ -383,12 +442,12 @@ public class Player : MonoBehaviour {
 
     void OnScrollWheel(InputValue value) {
         var delta = value.Get<Vector2>();
-        _cameraDistance -= delta.y * CameraDistanceSpeed;
-        if (_cameraDistance < MinCameraDistance) {
-            _cameraDistance = MinCameraDistance;
+        CameraDistance -= delta.y * CameraDistanceSpeed;
+        if (CameraDistance < MinCameraDistance) {
+            CameraDistance = MinCameraDistance;
         }
-        if (_cameraDistance > MaxCameraDistance) {
-            _cameraDistance = MaxCameraDistance;
+        if (CameraDistance > MaxCameraDistance) {
+            CameraDistance = MaxCameraDistance;
         }
     }
 
@@ -407,13 +466,15 @@ public class Player : MonoBehaviour {
     void OnDodge() {
         if (_isAttacking || InputDisabled) return;
 
-        dashCooldown.CooldownTime = DashCooldown;
+        _dashCooldown.CooldownTime = DashCooldown;
         
-        if (!dashCooldown.Execute()) {
+        if (!_dashCooldown.Execute()) {
             return;
         }
 
-        _lockRotation = true;
+        UICanvas.HUDCanvas.ShowDashCooldown();
+
+        LockRotation = true;
         DamageDisabled = true;
 
         if (_movementInputVector.magnitude > 0.1f) {
@@ -427,11 +488,16 @@ public class Player : MonoBehaviour {
 
         foreach (ParticleSystem trail in _trailParticles) { trail.Play(); }
 
-        transform.DOMove(transform.position + transform.forward * Instance.DashDistance, Instance.DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
+        UpdateDisabled = true;
+        Animator.animatePhysics = false;
+
+        Instance.transform.DOMove(transform.position + transform.forward * Instance.DashDistance, Instance.DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
             // Animator.applyRootMotion = true;
+            Animator.animatePhysics = true;
+            UpdateDisabled = false;
             Animator.speed = 1;
             DamageDisabled = false;
-            _lockRotation = false;
+            LockRotation = false;
             foreach (ParticleSystem trail in _trailParticles) {
                 trail.Clear();
                 trail.Stop();
@@ -477,19 +543,21 @@ public class Player : MonoBehaviour {
         
         if(interacted) return;
         if(CurrentWeapon == null) return;
+        if(CurrentWeapon.ItemData == null) return;
 
         // Default to attacking if no interaction was commited
-        _queuedRotation = GetMousePosition() - transform.position;
-        if(_isAttacking) {
-            
+        if (CurrentAnimationState == AnimationState.Attack_ComboWindow) {
+            _queuedRotation = GetMousePosition() - transform.position;
+            LockRotation = false;
+        } else if(_isAttacking) {
             return;
-        };
+        }
         
-        if (!_lockRotation) {
-            transform.LookAt(GetMousePosition());
+        if (!LockRotation) {
+            transform.LookAt(GetMousePosition());   
         }
 
-        _lockRotation = true;
+        LockRotation = true;
         switch(interactionType) {
             case InteractionType.Primary:
                 performLightAttack();
@@ -497,7 +565,7 @@ public class Player : MonoBehaviour {
             case InteractionType.Secondary:
                 performHeavyAttack();
                 break;
-        };
+        }
     }
 
     private bool tryInteract(InteractionType interactionType) {
@@ -523,22 +591,25 @@ public class Player : MonoBehaviour {
     }
 
     private void performLightAttack() {
-        WeaponHolder.InitializeAttack(AttackType.LIGHT);
         Animator.SetBool(_heavyAttackHash, false);
         Animator.SetTrigger(_lightAttackHash);
     }
 
     private void performHeavyAttack() {
-        WeaponHolder.InitializeAttack(AttackType.HEAVY);
         Animator.SetBool(_lightAttackHash, false);
         Animator.SetTrigger(_heavyAttackHash);
     }
 
     public void OnInventoryChanged() {
         WeaponHolder.UpdateWeapon(CurrentWeapon);
-        Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.WeaponType ?? WeaponType.None));
-    }
+        Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
 
+        if (CurrentWeapon?.ItemData != null) {
+            Debug.Log(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
+            SlashManager.SetSlashColor(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
+        } 
+        
+    }
 
     public Vector3 GetMousePosition() {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
@@ -575,19 +646,19 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_Windup:
-                break;
+                break; 
 
             case AnimationState.Attack_Contact:
-                WeaponHolder.DisableHitbox();
-                _isAttacking = false;
                 break;
 
             case AnimationState.Attack_ComboWindow:
+                _isAttacking = false;
                 break;
 
             case AnimationState.Attack_Recovery:
-                _lockRotation = false;
-                WeaponHolder.EndAttack();
+                SlashManager.DisableSlash();
+                _isAttacking = false;
+                LockRotation = false;
                 break;
         }
     }
@@ -596,29 +667,40 @@ public class Player : MonoBehaviour {
         CurrentAnimationState = state;
         switch (state) {
             case AnimationState.Locomotion:
-                _lockRotation = false;
+                WeaponHolder.DisableHitbox();
                 break;
 
             case AnimationState.Attack_Windup:
-                _lockRotation = true;
+                LockRotation = true;
                 _isAttacking = true;
                 _currentSpeed = 0;
-                WeaponHolder.BeginAttack();
+                SlashManager.EnableSlash();
+                WeaponHolder.EnableHitbox();
+                // SlashGO.SetActive(true);
+
                 break;
 
             case AnimationState.Attack_Contact:
-                WeaponHolder.EnableHitbox();
                 break;
 
             case AnimationState.Attack_ComboWindow:
-                _lockRotation = false;
-                transform.LookAt(GetMousePosition());
                 break;
 
             case AnimationState.Attack_Recovery:
-                _lockRotation = true;
+                WeaponHolder.DisableHitbox();
+                LockRotation = false;
+                // LockRotation = true;
                 break;
         }
+    }
+
+    public void OnAttackAnimationStart(AttackType attackType) {
+        WeaponHolder.InitializeAttack(attackType);
+        WeaponHolder.BeginAttack();
+    }
+
+    public void OnAttackAnimationEnd(AttackType _) {
+        WeaponHolder.EndAttack();
     }
 
     #endregion
@@ -665,23 +747,13 @@ public class Player : MonoBehaviour {
         ModifierSystem.RegisterStat(ref DashDistance);
     }
 
-    private void onMovementSpeedChanged() {
-        // Calculates movement speed multiplier
-        Animator.SetFloat(_movementSpeedHash, MovementSpeed / MaxMovementSpeed);
-    }
-
     public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
-        // Animator.applyRootMotion = false;
-        Animator.speed = 0;
-        gameObject.transform.position = position;
-        gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time).SetEase(Ease.OutSine).OnComplete(() => {
-            applyRootMotion();
-        });
-    }
-
-    private void applyRootMotion() {
-        // Animator.applyRootMotion = true;
-        Animator.speed = 1;
+        UpdateDisabled = true;
+        Animator.animatePhysics = false;
+        Instance.gameObject.transform.position = position;
+        Animator.animatePhysics = true;
+        UpdateDisabled = false;
+        Instance.gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
 
     #endregion
