@@ -1,6 +1,7 @@
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.VFX;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Animator))]
@@ -10,6 +11,7 @@ public class MushroomAIController : MonoBehaviour {
     public WeaponHolder WeaponHolder;
     public WeaponItemData PrimaryAttackWeapon;
     public Effect StunEffect;
+    public VisualEffect PullVFX;
 
     private LivingEntity _livingEntity;
     private Animator _animator;
@@ -53,6 +55,8 @@ public class MushroomAIController : MonoBehaviour {
             return;
         }
 
+        PullVFX.Play();
+
         _pullTarget = target.gameObject.AddComponent<MushroomPullComponent>();
         _pullTarget.Puller = gameObject;
         _pullTarget.OnPulled.AddListener(() => {
@@ -61,8 +65,10 @@ public class MushroomAIController : MonoBehaviour {
     }
 
     public void OnSecondaryAttackAnimationEnd() {
+        PullVFX.Stop();
+                
         if(_pullTarget == null) return;
-
+       
         Destroy(_pullTarget);
     }
 }
