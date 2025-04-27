@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -26,6 +25,8 @@ public class LivingEntity : MonoBehaviour {
     [Header("Stats")]
     public float StartingHealth = 100;
     public float StartingMana = 100f;
+
+    [SerializeField]
     private float _health = 0;
     public float Health {
         get => _health;
@@ -34,6 +35,8 @@ public class LivingEntity : MonoBehaviour {
             if (_isPlayer) Player.UICanvas.HUDCanvas.UpdateHealthBar();
         }
     }
+   
+    [SerializeField]
     private float _mana = 100f;
     public float Mana {
         get => _mana;
@@ -88,6 +91,10 @@ public class LivingEntity : MonoBehaviour {
 
     void Update() {
         recheckEffects();
+
+        if (Health <= 0) {
+            Die();
+        }
     }
 
     public void DropItem(InventoryItem item) {
@@ -158,38 +165,42 @@ public class LivingEntity : MonoBehaviour {
         HitFlashAnimator.Flash();
 
         if (Health == 0) {
-            // Drop items
-            if(DropItemsOnDeath) {
-                // Drop common slots
-                List<InventoryItem> items = new List<InventoryItem>(Inventory.GetItems());
-                foreach(InventoryItem item in items) {
-                    dropItem(item);
-                    Inventory.RemoveInventoryItem(item);
-                }
-
-                // Drop equipment
-                if(Inventory is HumanoidInventory humanoidInventory) {
-                    if(humanoidInventory.Armor != null) {
-                        dropItem(humanoidInventory.Armor);
-                        humanoidInventory.Armor = null;
-                    }
-
-                    if(humanoidInventory.Amulet != null) {
-                        dropItem(humanoidInventory.Amulet);
-                        humanoidInventory.Amulet = null;
-                    }
-
-                    if(humanoidInventory.Weapon != null) {
-                        dropItem(humanoidInventory.Weapon);
-                        humanoidInventory.Weapon = null;
-                    }
-                }
+            Die();
+        }
+    }
+    
+    public void Die() {
+        // Drop items
+        if(DropItemsOnDeath) {
+            // Drop common slots
+            List<InventoryItem> items = new List<InventoryItem>(Inventory.GetItems());
+            foreach(InventoryItem item in items) {
+                dropItem(item);
+                Inventory.RemoveInventoryItem(item);
             }
 
-            OnDeath.Invoke();
+            // Drop equipment
+            if(Inventory is HumanoidInventory humanoidInventory) {
+                if(humanoidInventory.Armor != null) {
+                    dropItem(humanoidInventory.Armor);
+                    humanoidInventory.Armor = null;
+                }
 
-            if (DestroyOnDeath) Destroy(gameObject);
+                if(humanoidInventory.Amulet != null) {
+                    dropItem(humanoidInventory.Amulet);
+                    humanoidInventory.Amulet = null;
+                }
+
+                if(humanoidInventory.Weapon != null) {
+                    dropItem(humanoidInventory.Weapon);
+                    humanoidInventory.Weapon = null;
+                }
+            }
         }
+
+        OnDeath.Invoke();
+
+        if (DestroyOnDeath) Destroy(gameObject);
     }
 
     private float getDamageResistance(DamageType damageType) {

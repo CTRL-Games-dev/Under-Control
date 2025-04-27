@@ -23,9 +23,9 @@ public class Player : MonoBehaviour {
             if(caster.Mana < Spell.Mana) return false;
             if(!Cooldown.Execute()) return false;
 
+            Instance.CastSpell(Spell);
+
             caster.Mana -= Spell.Mana; 
-            Spell.Cast();
-            Animator.SetTrigger(Instance._spellHash);
 
             return true;
         }
@@ -131,6 +131,8 @@ public class Player : MonoBehaviour {
         }
     }
 
+    private Spell _queuedSpell = null;
+
     [Header("Consumable")]
     public InventoryItem<ConsumableItemData> ConsumableItemOne = null;
     public InventoryItem<ConsumableItemData> ConsumableItemTwo = null;
@@ -183,6 +185,7 @@ public class Player : MonoBehaviour {
     public static CharacterController CharacterController { get; private set; }
     public static Animator Animator { get; private set; }
     public static CinemachinePositionComposer CinemachinePositionComposer { get; private set; }
+    public static SpellSpawner SpellSpawner { get; private set; }
     public static HumanoidInventory Inventory => LivingEntity.Inventory as HumanoidInventory;
 
     [SerializeField] private LayerMask _groundLayerMask;
@@ -204,6 +207,7 @@ public class Player : MonoBehaviour {
         CharacterController = GetComponent<CharacterController>();
         Animator = GetComponent<Animator>();
         CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
+        SpellSpawner = GetComponentInChildren<SpellSpawner>();
 
         Instance = this;
 
@@ -317,6 +321,9 @@ public class Player : MonoBehaviour {
             case AnimationState.Attack_ComboWindow:
             case AnimationState.Attack_Recovery:
                 return _movementInputVector.magnitude > 0.1f ? MovementSpeed * 0.3f : 0;
+
+            case AnimationState.Spell_Cast:
+                return 0;
         }
 
         return 0;
@@ -344,18 +351,24 @@ public class Player : MonoBehaviour {
     #region Input Events
 
     void OnCastSpellOne(InputValue value) {
-        if (SpellSlotOne != null) UICanvas.HUDCanvas.UseSpell1();
-        // _spellDataOne.TryCast(LivingEntity);
+        if (SpellSlotOne == null) return;
+        if(!_spellDataOne.TryCast(LivingEntity)) return;
+
+         UICanvas.HUDCanvas.UseSpell1();
     }
 
     void OnCastSpellTwo(InputValue value) {
-        if (SpellSlotTwo != null) UICanvas.HUDCanvas.UseSpell2();
-        // _spellDataTwo.TryCast(LivingEntity);
+        if (SpellSlotTwo == null) return;
+        if(!_spellDataTwo.TryCast(LivingEntity)) return;
+
+        UICanvas.HUDCanvas.UseSpell2();
     }
 
     void OnCastSpellThree(InputValue value) {
-        if (SpellSlotThree != null) UICanvas.HUDCanvas.UseSpell3();
-        // _spellDataThree.TryCast(LivingEntity);
+        if (SpellSlotThree == null) return;
+        if(!_spellDataThree.TryCast(LivingEntity)) return;
+
+        UICanvas.HUDCanvas.UseSpell3();
     }
 
     void OnUseConsumableOne(InputValue value) {
@@ -363,7 +376,7 @@ public class Player : MonoBehaviour {
         if(!ConsumableCooldown.Execute()) return;
         if(ConsumableItemOne.Amount <= 0) return;
 
-        ConsumableItemData c =  ConsumableItemOne.ItemData as ConsumableItemData;
+        ConsumableItemData c =  ConsumableItemOne.ItemData;
 
         if(c == null) return;
         c.Consume(LivingEntity);
@@ -606,7 +619,6 @@ public class Player : MonoBehaviour {
             Debug.Log(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
             SlashManager.SetSlashColor(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
         } 
-        
     }
 
     public Vector3 GetMousePosition() {
@@ -616,9 +628,9 @@ public class Player : MonoBehaviour {
             point.y = transform.position.y;
             return point;
         } else {
+            Debug.LogWarning("GetMousePosition: Raycast didnt hit ground");
             return Vector3.zero;
         }
-
     }
 
     #endregion
@@ -630,7 +642,8 @@ public class Player : MonoBehaviour {
         Attack_Windup,
         Attack_Contact,
         Attack_ComboWindow,
-        Attack_Recovery
+        Attack_Recovery,
+        Spell_Cast,
     }
 
     public void SetAnimationState(AnimationState state) {
@@ -656,6 +669,11 @@ public class Player : MonoBehaviour {
             case AnimationState.Attack_Recovery:
                 SlashManager.DisableSlash();
                 _isAttacking = false;
+                LockRotation = false;
+                break;
+
+            case AnimationState.Spell_Cast:
+                UpdateDisabled = false;
                 LockRotation = false;
                 break;
         }
@@ -689,6 +707,11 @@ public class Player : MonoBehaviour {
                 LockRotation = false;
                 // LockRotation = true;
                 break;
+
+            case AnimationState.Spell_Cast:
+                UpdateDisabled = true;
+                LockRotation = true;
+                break;
         }
     }
 
@@ -700,6 +723,36 @@ public class Player : MonoBehaviour {
     public void OnAttackAnimationEnd(AttackType _) {
         WeaponHolder.EndAttack();
     }
+
+    #endregion
+
+    #region Spell Methods
+
+    void CastSpell(Spell spell) {
+        if (spell == null) return;
+        if (_queuedSpell != null) return;
+
+        _queuedSpell = spell;
+
+        spell.Cast();
+        Animator.SetTrigger(_spellHash);
+
+        if (!LockRotation) {
+            transform.LookAt(GetMousePosition());   
+        }
+    }
+
+    public void OnSpellCastReady() {
+        Spell spell = _queuedSpell;
+
+        _queuedSpell = null;
+
+        if (!LockRotation) {
+            transform.LookAt(GetMousePosition());   
+        }
+
+        spell.OnCastReady();
+}
 
     #endregion
 
