@@ -127,6 +127,16 @@ public class EnemySpawner : MonoBehaviour
         Debug.Log($"Number of all enemies enemies: {newNumberOfEnemies}");
         Debug.Log($"=== Wave {WaveNumber} ===");
 
+        var currentEnemies = currentWave.EnemyInfo
+            .Where(x => x.minInfluence <= GameManager.Instance.TotalInfluence)
+            .Where(x => x.maxInfluence >= GameManager.Instance.TotalInfluence)
+            .ToList();
+
+        if(currentEnemies.Count == 0) {
+            Debug.LogWarning("No Enemies in wave");
+            return;
+        }
+
         NumberOfEnemies = newNumberOfEnemies;
 
         for(int i = 0; i < NumberOfEnemies; i++)
@@ -139,8 +149,8 @@ public class EnemySpawner : MonoBehaviour
             int batch = i / randomSpawnPoints.Count;
             Transform spawnPoint = randomSpawnPoints[i%randomSpawnPoints.Count];
 
-            int randomIndex = UnityEngine.Random.Range(0, currentWave.EnemyInfo.Count);
-            EnemySpawnInfo enemy = currentWave.EnemyInfo[randomIndex];
+            int randomIndex = UnityEngine.Random.Range(0, currentEnemies.Count);
+            EnemySpawnInfo enemy = currentEnemies[randomIndex];
 
             float firstBatchDelay = 3f;
             float delayBetweenEach = 1f;
