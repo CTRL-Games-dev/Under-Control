@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour {
         public AudioClip[] Clips;
     }
     public static GameManager Instance;
+    public bool DebugMode = false;
 
     [Header("References")]
     public Weapon UnknownWeaponPrefab;
@@ -19,16 +20,17 @@ public class GameManager : MonoBehaviour {
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
         {Dimension.HUB, "NewHub"},
         {Dimension.FOREST, "Adventure"},
-        {Dimension.FOREST_BOSS, "Adventure"},
+        {Dimension.FOREST_VECTOR, "VectorBossBattle"},
     };
 
     [HideInInspector] public GameDifficulty Difficulty { get; private set; }
-    [HideInInspector]  public Dimension CurrentDimension { get; private set; }
+    [HideInInspector] public Dimension CurrentDimension { get; private set; }
     [Range(0, 1)]
     public float TotalInfluence {get; private set; }
     public float InfluenceDelta {get; private set; }
     [HideInInspector] public static readonly float MinInfluenceDelta = 5.0f; 
-    [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f; 
+    [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f;
+
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
     private MusicPlayer _musicPlayer;
@@ -37,6 +39,7 @@ public class GameManager : MonoBehaviour {
     // public Card[] AllPossibleCards;
     [HideInInspector] private List<Card> _alreadyAddedCards = new();
     [SerializeField] private List<Card> _cards = new();
+
     // Events
     public UnityEvent LevelLoaded;
     public bool IsStarterDialogueOver = false;
@@ -61,9 +64,9 @@ public class GameManager : MonoBehaviour {
             _alreadyAddedCards.Add(c);
         }
     }
+
     private void Start() {
         playMusicForDimension(CurrentDimension);
-
         // For some reason "scene change" is being called, even if it is the first scene?
         // ConnectPortals();
     }

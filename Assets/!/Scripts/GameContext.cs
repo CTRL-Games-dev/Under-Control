@@ -11,7 +11,7 @@ public enum Dimension
 {
     HUB,
     FOREST,
-    FOREST_BOSS,
+    FOREST_VECTOR,
 }
 
 // [CreateAssetMenu(fileName = "SO_GameContext", menuName = "GameContext")]

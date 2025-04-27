@@ -153,7 +153,7 @@ public class LivingEntity : MonoBehaviour {
         }
 
         Health -= actualDamageAmount; 
-
+ 
         OnDamageTaken.Invoke(new DamageTakenEventData {
             Damage = damage,
             DesiredDamageAmount = desiredDamageAmount,
