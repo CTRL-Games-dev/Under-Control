@@ -231,7 +231,6 @@ public class Player : MonoBehaviour {
             CameraManager.ShakeCamera(2, 0.1f);
         });
 
-        // ResetRun();
         // LoadKeybinds();
     }
 
@@ -259,6 +258,7 @@ public class Player : MonoBehaviour {
         OnDashSound =  Resources.Load("SFX/bohater/dash") as AudioClip;
 
         ResetRun();
+        // ResetRun();
     }
 
     void Update() {
@@ -833,8 +833,8 @@ public class Player : MonoBehaviour {
             }
         }
 
-        Player.Inventory.Clear();
-        Player.Inventory.OnInventoryChanged?.Invoke();
+        Player.Instance.GetComponent<HumanoidInventory>().Clear();
+        Player.Instance.GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         Player.Instance.ConsumableItemOne = null;
         Player.Instance.ConsumableItemTwo = null;
         Player.Instance.SpellSlotOne = null;
@@ -848,7 +848,7 @@ public class Player : MonoBehaviour {
         Player.UICanvas.HUDCanvas.UpdateManaBar();
         Player.UICanvas.HUDCanvas.OnUpdateConsumables();
         EventBus.InventoryItemChangedEvent?.Invoke();
-        Player.Inventory.AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 0);
+        Player.Instance.GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         EventBus.InventoryItemChangedEvent?.Invoke();
 
     }

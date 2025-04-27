@@ -68,7 +68,7 @@ public class InvTileEquipment : InvTile {
             
             case TileType.Consumeable1:
                 Player.Instance.UpdateConsumablesEvent.AddListener(OnConsumablesUpdate);
-                if (Player.Instance.ConsumableItemOne.ItemData != null) {
+                if (Player.Instance.ConsumableItemOne != null) {
                     InventoryItem inventoryItem = ((InventoryItem) Player.Instance.ConsumableItemOne).CloneViaSerialization();
                     inventoryItem.Rotated = false;
                     createItemUI(inventoryItem);
@@ -78,7 +78,7 @@ public class InvTileEquipment : InvTile {
             
             case TileType.Consumeable2:
                 Player.Instance.UpdateConsumablesEvent.AddListener(OnConsumablesUpdate);
-                if (Player.Instance.ConsumableItemTwo.ItemData != null) {
+                if (Player.Instance.ConsumableItemTwo != null) {
                     InventoryItem inventoryItem = ((InventoryItem) Player.Instance.ConsumableItemTwo).CloneViaSerialization();
                     inventoryItem.Rotated = false;
                     createItemUI(inventoryItem);
@@ -241,6 +241,7 @@ public class InvTileEquipment : InvTile {
     }
 
     private GameObject createItemUI(InventoryItem inventoryItem){
+        if (inventoryItem.ItemData == null) return null;
         GameObject itemGameObject = Instantiate(_itemPrefab, _rectTransform);
         itemGameObject.name = inventoryItem.ItemData.DisplayName;
 
