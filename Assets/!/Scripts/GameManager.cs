@@ -148,4 +148,32 @@ public class GameManager : MonoBehaviour {
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Choose);
         LevelLoaded.Invoke();
     }
+
+
+    public void DebugCommands() {
+        if(Input.GetKeyDown(KeyCode.F1)) {
+            Debug.Log("<color=red>Debug Tools - Moving to the hub");
+            ChangeDimension(Dimension.FOREST, TotalInfluence + 10);
+        }
+
+        if(Input.GetKeyDown(KeyCode.F2)) {
+            Debug.Log("<color=red>Debug Tools - Moving to the new forest");
+            ChangeDimension(Dimension.FOREST, TotalInfluence + 10);
+        }
+
+        if(Input.GetKeyDown(KeyCode.F3)) {
+            Debug.Log("<color=red>Debug Tools - Moving to Vek'thar's arena");
+            // ChangeDimension(Dimension.FOREST_VECTOR, TotalInfluence);
+        }
+
+        if(Input.GetKeyDown(KeyCode.F7)) {
+            TotalInfluence += 5;
+            Debug.Log($"<color=red>Debug Tools - Adding 5 influence. New influence: {TotalInfluence}");
+        }
+
+        if(Input.GetKeyDown(KeyCode.F8)) {
+            TotalInfluence -= 5;
+            Debug.Log($"<color=red>Debug Tools - Subtracting 5 influence. New influence: {TotalInfluence}");
+        }
+    }
 }
