@@ -64,7 +64,8 @@ public class Player : MonoBehaviour {
             _coins = value; 
         }
     }
-
+    [Header("Sound effects")]
+    AudioClip OnDashSound;
     [Header("Properties")]
     [SerializeField] private float _acceleration = 8f;
     [SerializeField] private float _deceleration = 4f;
@@ -255,6 +256,7 @@ public class Player : MonoBehaviour {
                 }
             }
         });
+        OnDashSound =  Resources.Load("SFX/bohater/dash") as AudioClip;
 
         ResetRun();
     }
@@ -518,6 +520,7 @@ public class Player : MonoBehaviour {
         foreach (ParticleSystem trail in _trailParticles) { trail.Play(); }
 
         CurrentAnimationState = AnimationState.Dash;
+        SoundFXManager.Instance.PlaySoundFXClip(OnDashSound, transform,1.2f);
         
 
         // UpdateDisabled = true;
@@ -592,6 +595,7 @@ public class Player : MonoBehaviour {
         if(CurrentWeapon.ItemData == null) return;
 
         // Default to attacking if no interaction was commited
+        
         if (CurrentAnimationState == AnimationState.Attack_ComboWindow) {
             _queuedRotation = GetMousePosition() - transform.position;
             LockRotation = false;
@@ -613,6 +617,8 @@ public class Player : MonoBehaviour {
                 break;
         }
     }
+
+    
 
     private bool tryInteract(InteractionType interactionType) {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
@@ -640,11 +646,15 @@ public class Player : MonoBehaviour {
     private void performLightAttack() {
         Animator.SetBool(_heavyAttackHash, false);
         Animator.SetTrigger(_lightAttackHash);
+        AudioClip attackSound = Resources.Load("SFX/bron/atak4") as AudioClip;
+        SoundFXManager.Instance.PlaySoundFXClip(attackSound, transform, 0.35f);
     }
 
     private void performHeavyAttack() {
         Animator.SetBool(_lightAttackHash, false);
         Animator.SetTrigger(_heavyAttackHash);
+        AudioClip attackSound = Resources.Load("SFX/bron/atak2") as AudioClip;
+        SoundFXManager.Instance.PlaySoundFXClip(attackSound, transform, 0.35f);
     }
 
     public void OnInventoryChanged() {

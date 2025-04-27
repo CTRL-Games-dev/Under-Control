@@ -104,6 +104,7 @@ public class InvTileEquipment : InvTile {
         // Debug.Log("ItemUIClickEvent");
         // if (itemUI == _itemUI) 
         //     Destroy(_itemUI.gameObject);
+        
         if (itemUI == null || Player.UICanvas.SelectedItemUI.InventoryItem != null) return;
         
         if (itemUI == _itemUI) {
@@ -126,7 +127,7 @@ public class InvTileEquipment : InvTile {
                     Player.UICanvas.HUDCanvas.OnUpdateConsumables();
                     break;
             }
-
+            
             IsEmpty = true;
             _hintImage.SetActive(true);
 
@@ -166,7 +167,8 @@ public class InvTileEquipment : InvTile {
                 if(!SelectedInventoryItem.TryAs(out InventoryItem<WeaponItemData> weaponItem)) {
                     return;
                 }
-
+                AudioClip EquipWeaponClip = Resources.Load("SFX/bron/wyjmowaniebroni") as AudioClip;
+                SoundFXManager.Instance.PlaySoundFXClip(EquipWeaponClip,transform);
                 Player.Inventory.Weapon = weaponItem;
             } else if (_tileType == TileType.Consumeable1) {
                 if(!SelectedInventoryItem.TryAs(out InventoryItem<ConsumableItemData> consumableItem)) {

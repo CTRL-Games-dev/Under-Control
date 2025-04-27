@@ -105,14 +105,20 @@ public class VektharBoss : MonoBehaviour {
         switch (attackNumber) {
             case 0:
                 _handRight.Attack(VektharHand.HandState.Fist);
-                break;
+                AudioClip fistAttack = Resources.Load("SFX/vekthar/fist") as AudioClip;
+                SoundFXManager.Instance.PlaySoundFXClip(fistAttack, transform,1f);
+            break;
             case 1:
                 _handLeft.Attack(VektharHand.HandState.Sandwitch);
                 _handRight.Attack(VektharHand.HandState.Sandwitch);
-                break;
-            case 2:
+                AudioClip sandwitchAttack = Resources.Load("SFX/vekthar/klasniecie") as AudioClip;
+                SoundFXManager.Instance.PlaySoundFXClip(sandwitchAttack, transform,1f);
+            break;
+            case 2: 
                 _handLeft.Attack(VektharHand.HandState.Slam);
-                break;
+                AudioClip slamAttack = Resources.Load("SFX/vekthar/slap") as AudioClip;
+                SoundFXManager.Instance.PlaySoundFXClip(slamAttack, transform,1f);
+            break;
         }
 
         _state = VektharState.DuringAttack;
