@@ -24,12 +24,8 @@ public class VektharBoss : LivingEntity
     }
 
     void Start() {
-        foreach(var c in _handLeft.HandDamageColliders) {
-            c.TargetHit.AddListener(hitPlayer);
-        }
-        foreach(var c in _handRight.HandDamageColliders) {
-            c.TargetHit.AddListener(hitPlayer);
-        }
+        _handLeft.TargetHit.AddListener(hitPlayer);
+        _handRight.TargetHit.AddListener(hitPlayer);
     }
 
     private void hitPlayer(LivingEntity entity) {
@@ -37,6 +33,7 @@ public class VektharBoss : LivingEntity
             Type = DamageType.PHYSICAL,
             Value = 50
         }, entity);
+        
         Debug.Log("Player was hit!");
         _handLeft.EnableColliders(false);
         _handRight.EnableColliders(false);

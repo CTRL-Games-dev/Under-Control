@@ -24,12 +24,13 @@ public class GameManager : MonoBehaviour {
     };
 
     [HideInInspector] public GameDifficulty Difficulty { get; private set; }
-    [HideInInspector]  public Dimension CurrentDimension { get; private set; }
+    [HideInInspector] public Dimension CurrentDimension { get; private set; }
     [Range(0, 1)]
     public float TotalInfluence {get; private set; }
     public float InfluenceDelta {get; private set; }
     [HideInInspector] public static readonly float MinInfluenceDelta = 5.0f; 
-    [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f; 
+    [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f;
+
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
     private MusicPlayer _musicPlayer;
@@ -38,6 +39,7 @@ public class GameManager : MonoBehaviour {
     // public Card[] AllPossibleCards;
     [HideInInspector] private List<Card> _alreadyAddedCards = new();
     [SerializeField] private List<Card> _cards = new();
+
     // Events
     public UnityEvent LevelLoaded;
     public bool IsStarterDialogueOver = false;
@@ -67,10 +69,6 @@ public class GameManager : MonoBehaviour {
         playMusicForDimension(CurrentDimension);
         // For some reason "scene change" is being called, even if it is the first scene?
         // ConnectPortals();
-    }
-
-    void Update() {
-        DebugCommands();
     }
 
     public void ChangeDimension(Dimension dimension, float newInfluence)  {

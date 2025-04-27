@@ -17,6 +17,7 @@ public class VektharHandBehaviour : StateMachineBehaviour {
                 methodName = "ChangeStateSandwitch";
                 break;
         }
+        
         animator.SendMessageUpwards(methodName);
     }
 }

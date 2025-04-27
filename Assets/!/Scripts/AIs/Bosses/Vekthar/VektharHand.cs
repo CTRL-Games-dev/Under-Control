@@ -3,35 +3,33 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using DG.Tweening;
-using NUnit.Framework;
-using System.Collections.Generic;
 
-public class VektharHand : MonoBehaviour
-{
+public class VektharHand : MonoBehaviour {
     public enum HandState {
         Slam,
         Fist,
         Sandwitch,
         Idle,
     }
+
+    [HideInInspector] public UnityEvent<LivingEntity> TargetHit;
+
     public bool IsLeft;
     [SerializeField] private GameObject _hand;
-    public VektharHandCollider[] HandDamageColliders;
     [SerializeField] private Transform _handTarget;
-    private Animator _animator;
     public HandState State = HandState.Idle;
     public UnityEvent AttackStarted;
     public UnityEvent AttackEnded;
     public float Damage = 50;
+
+    private Animator _animator;
+    private Rigidbody _rigidbody;
+
     void Awake() {
         _animator = _hand.GetComponent<Animator>();
-        
-        HandDamageColliders = GetComponentsInChildren<VektharHandCollider>(true);
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
-    void Start() {
-
-    }
     void Update() {
         if(State == HandState.Idle) {
             followTarget();
@@ -39,9 +37,7 @@ public class VektharHand : MonoBehaviour
     }
 
     public void EnableColliders(bool enable) {
-        foreach(var c in HandDamageColliders) {
-            c.Collider.enabled = enable;
-        }
+        _rigidbody.detectCollisions = enable;
     }
 
     public void onTargetHit(LivingEntity victim) {
@@ -52,6 +48,7 @@ public class VektharHand : MonoBehaviour
             Value = Damage
         });
     }
+
     public void Attack(HandState attack) {
         string attackName;
         switch (attack)
@@ -152,13 +149,23 @@ public class VektharHand : MonoBehaviour
     public void ChangeStateIdle() {
         ChangeState(HandState.Idle);
     }
+
     public void ChangeStateFist() {
         ChangeState(HandState.Fist);
     }
+
     public void ChangeStateSlam() {
         ChangeState(HandState.Slam);
     }
+
     public void ChangeStateSandwitch() {
         ChangeState(HandState.Sandwitch);
+    }
+
+    private void OnTriggerEnter(Collider other) {
+        LivingEntity victim = other.GetComponent<LivingEntity>();
+        if(victim == null) return;
+
+        TargetHit.Invoke(victim);
     }
 }
