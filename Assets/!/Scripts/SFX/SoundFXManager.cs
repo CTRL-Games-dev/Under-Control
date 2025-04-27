@@ -9,12 +9,16 @@ public class SoundFXManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Awake()
     {
+        DontDestroyOnLoad(gameObject);
         if(Instance==null){
             Instance = this;
         }
     }
-    public void PlaySoundFXClip(AudioClip audioClip, Transform transform, float volume = 1f, float speed = 1f){
-        AudioSource audioSource = Instantiate(soundFXObject, transform.position , Quaternion.identity);
+    public void PlaySoundFXClip(AudioClip audioClip, Transform _transform, float volume = 1f, float speed = 1f){
+        if(_transform ==null){
+            _transform = transform;
+        }
+        AudioSource audioSource = Instantiate(soundFXObject, _transform.position , Quaternion.identity);
         audioSource.clip = audioClip;
         audioSource.volume = volume;
         audioSource.pitch = UnityEngine.Random.Range(0.95f,1.05f);
