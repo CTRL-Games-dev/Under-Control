@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeaponHolder : MonoBehaviour
-{
+public class WeaponHolder : MonoBehaviour {
     public static Weapon UnknownWeaponPrefab => GameManager.Instance.UnknownWeaponPrefab;
 
     public LivingEntity Self;

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour
@@ -9,7 +8,6 @@ public class CameraManager : MonoBehaviour
     private static CinemachineCamera _previousCamera = null;
 
     public static CameraManager Instance;
-
 
     private static CinemachineBasicMultiChannelPerlin _noise;
 
@@ -35,7 +33,7 @@ public class CameraManager : MonoBehaviour
     void Update() {
     if (_shakeTimer > 0) {
         _shakeTimer -= Time.deltaTime;
-        _noise.AmplitudeGain = Mathf.Lerp(_startingIntensity, 0f, 1 - _shakeTimer / _shakeTimerTotal);
+            _noise.AmplitudeGain = Mathf.Lerp(_startingIntensity, 0f, 1 - _shakeTimer / _shakeTimerTotal);
         }
     }
 
@@ -48,10 +46,10 @@ public class CameraManager : MonoBehaviour
 
 
     public static void SwitchCamera(CinemachineCamera camera) {
-
         if (camera == _currentCamera) {
             return;
         }
+
         if(camera == null) {
             if (_previousCamera != null) {
                 SwitchCamera(_previousCamera);
