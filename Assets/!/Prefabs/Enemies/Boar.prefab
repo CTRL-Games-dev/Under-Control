@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 944497780338279808}
   - component: {fileID: 8495430180178546008}
   - component: {fileID: 1303237322038029711}
+  - component: {fileID: 2426849268657618550}
   m_Layer: 0
   m_Name: Boar
   m_TagString: Untagged
@@ -78,10 +79,10 @@ MonoBehaviour:
   DropItemsOnDeath: 1
   DestroyOnDeath: 1
   IsInvisible: 0
-  StartingHealth: 100
-  StartingMana: 100
+  StartingHealth: 50
+  StartingMana: 10
   MaxHealth:
-    _raw: 15
+    _raw: 10
     _adjusted: 100
     _initValue: 100
     OnValueChanged:
@@ -394,7 +395,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _hitFlashMaterial: {fileID: 2100000, guid: a70176b5e5737f04f86db74d184df881, type: 2}
   _flashDuration: 0.1
-  _isPlayer: 0
 --- !u!1 &4528148705983052239
 GameObject:
   m_ObjectHideFlags: 0
@@ -636,6 +636,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -3314160729480047072, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -3314160729480047072, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: acc3b20724406744cb8b49bdf4e3e028, type: 2}
+    - target: {fileID: -3314160729480047072, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: -7674537378844400586, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
     - target: {fileID: 919132149155446097, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
       propertyPath: m_Name
       value: boar
@@ -653,6 +665,11 @@ PrefabInstance:
       addedObject: {fileID: 6791158440615136571}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
+--- !u!137 &1048271120803497581 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -3314160729480047072, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
+  m_PrefabInstance: {fileID: 6669137702589419597}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1708187124427179226 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -3802944345525381993, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}

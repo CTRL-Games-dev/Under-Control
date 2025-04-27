@@ -1,10 +1,13 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using DG.Tweening;
 
 public class HubManager : MonoBehaviour
 {
     [SerializeField] private Vector3 _spawnPosition = new();
     public static CinemachineCamera MainMenuCamera;
+    [SerializeField] private Material _dissolveMaterial;
+    [SerializeField] private Transform _eyeTransform, _cylinderTransform;
 
     private void Awake() {
         MainMenuCamera = GetComponentInChildren<CinemachineCamera>();
@@ -15,12 +18,49 @@ public class HubManager : MonoBehaviour
         Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.MainMenu);
         Player.UICanvas.ChangeUITopState(UITopState.NotVisible);
-        Player.Instance.SetPlayerPosition(new Vector3(-0.7f, 0, -1.7f));
         Player.Instance.MaxCameraDistance = 7f;
-        Player.Instance.SetPlayerPosition(_spawnPosition);
+        Player.Instance.UpdateDisabled = true;
+        Player.Instance.gameObject.transform.position = _spawnPosition;
         Player.LivingEntity.Health = Player.LivingEntity.StartingHealth;
         Player.LivingEntity.Mana = Player.LivingEntity.StartingMana;
-        Player.Animator.SetTrigger("live");
-        Player.Instance.InputDisabled = true;
+        Player.Instance.HasPlayerDied = false;
+        PlayRespawnAnimation();
+
+        GameManager.Instance.ResetInfluence();
+        // Player.Animator.SetTrigger("live");
+    }
+
+    private void Update() {
+        if (Input.GetKeyUp(KeyCode.F4)) {
+            PlayRespawnAnimation();
+        }
+    }
+
+    public void PlayRespawnAnimation() {
+
+        float dissolve = 1f;
+        DOTween.To(() => dissolve, x => dissolve = x, 0f, 2f).SetDelay(1f).OnUpdate(() => {
+            _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
+        }).OnComplete(() => {
+            Player.Animator.animatePhysics = false;
+            Player.Instance.UpdateDisabled = true;
+            Player.Instance.gameObject.transform.DOMoveY(-2, 0);
+            Player.Animator.SetTrigger("rise");
+            Player.Instance.gameObject.transform.DOComplete();
+
+            Player.Instance.gameObject.transform.DOKill();
+
+            dissolve = 0f;
+            DOTween.To(() => dissolve, x => dissolve = x, 1f, 4f).SetDelay(1f).OnUpdate(() => {
+                _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
+            });
+            Player.Instance.gameObject.transform.DOMoveY(1, 2f).SetEase(Ease.OutQuint).OnComplete(() => {
+                Player.Animator.SetTrigger("live");
+                Player.Instance.UpdateDisabled = false;
+                Player.Animator.animatePhysics = true;
+                
+            });
+        });
+   
     }
 }

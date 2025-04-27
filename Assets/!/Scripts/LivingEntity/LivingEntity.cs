@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,6 +6,7 @@ using UnityEngine.Events;
 [RequireComponent(typeof(ModifierSystem))]
 [RequireComponent(typeof(EntityInventory))]
 [RequireComponent(typeof(HitFlashAnimator))]
+[RequireComponent(typeof(TintAnimator))]
 public class LivingEntity : MonoBehaviour {
     public struct EffectData {
         public Effect Effect;
@@ -25,6 +25,8 @@ public class LivingEntity : MonoBehaviour {
     [Header("Stats")]
     public float StartingHealth = 100;
     public float StartingMana = 100f;
+
+    [SerializeField]
     private float _health = 0;
     public float Health {
         get => _health;
@@ -33,6 +35,8 @@ public class LivingEntity : MonoBehaviour {
             if (_isPlayer) Player.UICanvas.HUDCanvas.UpdateHealthBar();
         }
     }
+   
+    [SerializeField]
     private float _mana = 100f;
     public float Mana {
         get => _mana;
@@ -70,6 +74,7 @@ public class LivingEntity : MonoBehaviour {
     public ModifierSystem ModifierSystem { get; private set; }
     public EntityInventory Inventory { get; private set; }
     public HitFlashAnimator HitFlashAnimator { get; private set; }
+    public TintAnimator TintAnimator { get; private set; }
 
     public bool _isPlayer = false;
 
@@ -77,6 +82,7 @@ public class LivingEntity : MonoBehaviour {
         ModifierSystem = GetComponent<ModifierSystem>();
         Inventory = GetComponent<EntityInventory>();
         HitFlashAnimator = GetComponent<HitFlashAnimator>();
+        TintAnimator = GetComponent<TintAnimator>();
 
         ModifierSystem.RegisterStat(ref MaxHealth);
         ModifierSystem.RegisterStat(ref Armor);
@@ -86,10 +92,19 @@ public class LivingEntity : MonoBehaviour {
         _isPlayer = gameObject.GetComponent<Player>() != null;
         _health = StartingHealth;
         _mana = StartingMana;
+
+        if (_isPlayer) {
+            MaxHealth.OnValueChanged.AddListener(() => Player.UICanvas.HUDCanvas.UpdateHealthBar());
+            MaxMana.OnValueChanged.AddListener(() => Player.UICanvas.HUDCanvas.UpdateManaBar());
+        }
     }
 
     void Update() {
         recheckEffects();
+
+        if (Health <= 0) {
+            Die();
+        }
     }
 
     public void DropItem(InventoryItem item) {
@@ -107,13 +122,15 @@ public class LivingEntity : MonoBehaviour {
     }
 
     public void Attack(Damage damage, LivingEntity target) {
-        target.takeDamage(damage, this);
+        target.TakeDamage(damage, this);
     }
 
-    private void takeDamage(Damage damage, LivingEntity source = null) {
-        if (source.gameObject.CompareTag("Player")) {
-            // StartCoroutine(nameof(slowDown));
-            CameraManager.ShakeCamera(2, 0.1f);
+    public void TakeDamage(Damage damage, LivingEntity source = null) {
+
+        if (_isPlayer) {
+            if (Player.Instance.DamageDisabled) {
+                return;
+            }
         }
 
         if (gameObject.CompareTag("Boar")) {
@@ -146,7 +163,7 @@ public class LivingEntity : MonoBehaviour {
         }
 
         Health -= actualDamageAmount; 
-
+ 
         OnDamageTaken.Invoke(new DamageTakenEventData {
             Damage = damage,
             DesiredDamageAmount = desiredDamageAmount,
@@ -158,37 +175,42 @@ public class LivingEntity : MonoBehaviour {
         HitFlashAnimator.Flash();
 
         if (Health == 0) {
-            // Drop items
-            if(DropItemsOnDeath) {
-                // Drop common slots
-                List<InventoryItem> items = new List<InventoryItem>(Inventory.GetItems());
-                foreach(InventoryItem item in items) {
-                    dropItem(item);
-                    Inventory.RemoveInventoryItem(item);
+            Die();
+        }
+    }
+    
+    public void Die() {
+        // Drop items
+        if(DropItemsOnDeath) {
+            // Drop common slots
+            List<InventoryItem> items = new List<InventoryItem>(Inventory.GetItems());
+            foreach(InventoryItem item in items) {
+                dropItem(item);
+                Inventory.RemoveInventoryItem(item);
+            }
+
+            // Drop equipment
+            if(Inventory is HumanoidInventory humanoidInventory) {
+                if(humanoidInventory.Armor != null) {
+                    dropItem(humanoidInventory.Armor);
+                    humanoidInventory.Armor = null;
                 }
 
-                // Drop equipment
-                if(Inventory is HumanoidInventory humanoidInventory) {
-                    if(humanoidInventory.Armor != null) {
-                        dropItem(humanoidInventory.Armor);
-                        humanoidInventory.Armor = null;
-                    }
-
-                    if(humanoidInventory.Amulet != null) {
-                        dropItem(humanoidInventory.Amulet);
-                        humanoidInventory.Amulet = null;
-                    }
+                if(humanoidInventory.Amulet != null) {
+                    dropItem(humanoidInventory.Amulet);
+                    humanoidInventory.Amulet = null;
+                }
 
                     if(humanoidInventory.Weapon != null) {
                         dropItem(humanoidInventory.Weapon);
                         humanoidInventory.Weapon = null;
                     }
                 }
-            }
+            
 
             if(OnDeathSound!=null) SoundFXManager.Instance.PlaySoundFXClip(OnDeathSound, transform, 0.4f);
 
-            OnDeath.Invoke();
+            OnDeath?.Invoke();
 
             if (DestroyOnDeath) Destroy(gameObject);
         }
@@ -250,6 +272,8 @@ public class LivingEntity : MonoBehaviour {
     public List<EffectData> GetActiveEffects() {
         return ActiveEffects;
     }
+
+    
 
     // public void RemoveAllEffectsLike(Effect effect) {
     //     for(int i = 0; i < activeEffects.Count; i++) {

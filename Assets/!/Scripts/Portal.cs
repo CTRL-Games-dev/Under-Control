@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 public abstract class Portal : MonoBehaviour
 {
-    [SerializeField] private Dimension _dimension = Dimension.HUB;
+    [SerializeField] protected Dimension _dimension = Dimension.HUB;
     [SerializeField] private GameObject _portalInside;
     [SerializeField] private BoxCollider _collider;
     public UnityEvent<Dimension> PlayerEnteredPortal;
