@@ -16,7 +16,11 @@ public class HubManager : MonoBehaviour
     private void Start() {
         CameraManager.SwitchCamera(MainMenuCamera);
         Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
-        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.MainMenu);
+        if (GameManager.Instance.ShowMainMenu) {
+            Player.UICanvas.ChangeUIMiddleState(UIMiddleState.MainMenu);
+        } else {
+            Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
+        }
         Player.UICanvas.ChangeUITopState(UITopState.NotVisible);
         Player.Instance.MaxCameraDistance = 7f;
         Player.Instance.UpdateDisabled = true;
@@ -24,6 +28,7 @@ public class HubManager : MonoBehaviour
         Player.LivingEntity.Health = Player.LivingEntity.StartingHealth;
         Player.LivingEntity.Mana = Player.LivingEntity.StartingMana;
         Player.Instance.HasPlayerDied = false;
+        Player.Instance.EvolutionPoints++;
         PlayRespawnAnimation();
 
         GameManager.Instance.ResetInfluence();

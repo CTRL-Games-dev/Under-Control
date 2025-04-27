@@ -23,6 +23,7 @@ public class EntAIController : MonoBehaviour {
     private Animator _animator;
     private NavMeshAgent _navMeshAgent;
     private LivingEntity _livingEntity;
+    private BehaviorGraphAgent _behaviorGraphAgent;
 
     private static readonly int _isRealHash = Animator.StringToHash("isReal");
     private static readonly int _speedHash = Animator.StringToHash("speed");
@@ -31,6 +32,7 @@ public class EntAIController : MonoBehaviour {
         _animator = GetComponent<Animator>();
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _livingEntity = GetComponent<LivingEntity>();
+        _behaviorGraphAgent = GetComponent<BehaviorGraphAgent>();
 
         RealEnt.SetActive(false);
         FakeEnt.SetActive(true);
@@ -39,6 +41,16 @@ public class EntAIController : MonoBehaviour {
         RightWeaponHolder.UpdateWeapon(PrimaryWeapon);
 
         _livingEntity.IsInvisible = true;
+    }
+
+    public void TriggerEndgame() {
+        _behaviorGraphAgent.GetVariable<EntAIStatus>("Status", out var endgameVariable);
+
+        if(FakeEnt.activeInHierarchy) {
+            MorphToReal();
+        }
+
+        endgameVariable.Value = EntAIStatus.Endgame;
     }
 
     public void MorphToReal() {

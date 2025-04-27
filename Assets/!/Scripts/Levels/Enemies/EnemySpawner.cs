@@ -87,7 +87,7 @@ public class EnemySpawner : MonoBehaviour
                 {   
                     List<EntAIController> ents = GetEnts();
                     Debug.Log("Last wave has been defeated, triggering ents.");
-                    ents.ForEach(e => e.MorphToReal());
+                    ents.ForEach(e => e.TriggerEndgame());
                     _state = SpawnerState.DuringFightWithEnts;
                 }
                 else

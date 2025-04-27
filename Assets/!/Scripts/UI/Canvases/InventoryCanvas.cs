@@ -411,6 +411,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
         c.DOKill();
         c.interactable = true;
         c.blocksRaycasts = true;
+        ChangeEvoPoints();
         return c.DOFade(1, 0.25f * Settings.AnimationSpeed);
     }
 

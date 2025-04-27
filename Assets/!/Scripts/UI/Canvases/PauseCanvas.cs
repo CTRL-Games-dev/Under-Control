@@ -163,6 +163,7 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
         hideUI().OnComplete(() => {
             Player.LivingEntity.OnDeath.Invoke();
         });
+        GameManager.Instance.ShowMainMenu = true;
     }
 
     public void OnPointerEnter(GameObject button) {

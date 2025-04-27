@@ -4,4 +4,5 @@ using Unity.Behavior;
 public enum EntAIStatus {
     Hidden,
     Chasing,
+    Endgame,
 }

@@ -87,7 +87,7 @@ public class Player : MonoBehaviour {
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
 
-    private int _evolutionPoints = 9;
+    private int _evolutionPoints = 0;
     public int EvolutionPoints {
         get{ return _evolutionPoints; }
         set {
@@ -195,6 +195,7 @@ public class Player : MonoBehaviour {
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
     private Vector3 _queuedRotation = Vector3.zero;
+    public List<WeaponItemData> StarterWeapons = new List<WeaponItemData>();
 
     #region Unity Methods
     void Awake() {
@@ -256,6 +257,8 @@ public class Player : MonoBehaviour {
             }
         });
         OnDashSound =  Resources.Load("SFX/bohater/dash") as AudioClip;
+
+        ResetRun();
     }
 
     void Update() {
@@ -350,7 +353,11 @@ public class Player : MonoBehaviour {
 
     private void onDeath() {
         if (HasPlayerDied) return;
+        GameManager.Instance.ShowMainMenu = false;
         HasPlayerDied = true;
+        SlashManager.DisableSlash();
+        _isAttacking = false;
+        LockRotation = false;
         UICanvas.ChangeUITopState(UITopState.Death);
         Animator.SetTrigger("die");
         UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
@@ -615,7 +622,8 @@ public class Player : MonoBehaviour {
 
     private bool tryInteract(InteractionType interactionType) {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray, out RaycastHit hit)) {
+        int layerMask = ~LayerMask.GetMask("Player");
+        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask)) {
             return false;
         }
 
@@ -824,6 +832,25 @@ public class Player : MonoBehaviour {
                 LivingEntity.ApplyIndefiniteModifier(modifier);
             }
         }
+
+        Player.Inventory.Clear();
+        Player.Inventory.OnInventoryChanged?.Invoke();
+        Player.Instance.ConsumableItemOne = null;
+        Player.Instance.ConsumableItemTwo = null;
+        Player.Instance.SpellSlotOne = null;
+        Player.Instance.SpellSlotTwo = null;
+        Player.Instance.SpellSlotThree = null;
+        Player.Instance.WeaponHolder.UpdateWeapon(null);
+        Player.Instance.WeaponHolder.DisableHitbox();
+        Player.Instance.WeaponHolder.EndAttack();
+        Player.UICanvas.HUDCanvas.UpdateSpellSlots();
+        Player.UICanvas.HUDCanvas.UpdateHealthBar();
+        Player.UICanvas.HUDCanvas.UpdateManaBar();
+        Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+        EventBus.InventoryItemChangedEvent?.Invoke();
+        Player.Inventory.AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 0);
+        EventBus.InventoryItemChangedEvent?.Invoke();
+
     }
 
     private void registerStats() {

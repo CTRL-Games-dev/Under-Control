@@ -1,26 +1,38 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 
-public class VektharBoss : LivingEntity
-{
+[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(LivingEntity))]
+public class VektharBoss : MonoBehaviour {
     enum VektharState {
         WakeUp,
         Follow,
         StartAttack,
         DuringAttack,
         EndAttack,
+        
+        StartHurt,
+        DuringHurt,
+        EndHurt,
     }
+
+    public float Damage = 40;
+
     private VektharState _state = VektharState.WakeUp;
-    private Animator _eyeAnimator;
+
     [SerializeField] private GameObject _eyes;
     [SerializeField] private GameObject _body;
     [SerializeField] private VektharHand _handLeft;
     [SerializeField] private VektharHand _handRight;
+    
+    public bool attacking = false;
+    private bool _wasPlayerHit = false;
+
+    public LivingEntity LivingEntity { get; private set; }
 
     void Awake() {
-        _eyeAnimator = GetComponent<Animator>();   
+        LivingEntity = GetComponent<LivingEntity>();
     }
 
     void Start() {
@@ -29,25 +41,25 @@ public class VektharBoss : LivingEntity
     }
 
     private void hitPlayer(LivingEntity entity) {
-        Attack(new Damage {
+        if(entity == LivingEntity) return;
+        if(!attacking) return;
+        if(_wasPlayerHit) return;
+
+        LivingEntity.Attack(new Damage {
             Type = DamageType.PHYSICAL,
-            Value = 50
+            Value = Damage
         }, entity);
-        
-        Debug.Log("Player was hit!");
-        _handLeft.EnableColliders(false);
-        _handRight.EnableColliders(false);
+
+        _wasPlayerHit = true;
     }
 
     void Update() {
-        switch (_state)
-        {
+        switch (_state) {
             case VektharState.WakeUp: {
-                Debug.Log("Vek'thar is now following player");
                 _state = VektharState.Follow;
-
                 StartCoroutine(scheduleAttack(5));
-            } break;
+                break;
+            }
             case VektharState.Follow:
                 follow();
                 break;
@@ -58,16 +70,21 @@ public class VektharBoss : LivingEntity
                 if(_handLeft.State == VektharHand.HandState.Idle && _handRight.State == VektharHand.HandState.Idle) {
                     _state = VektharState.EndAttack;
                 }
-            } break;
+                break;
+            }
             case VektharState.EndAttack: {
                 StartCoroutine(scheduleAttack(3));
                 _state = VektharState.Follow;
-            } break;
+                break;
+            }
+            case VektharState.StartHurt: {
+                _state = VektharState.DuringHurt;
+                break;
+            }
         }
     }
 
     private void follow() {
-
         Vector3 target = Player.Instance.transform.position;
         target.x += 5;
         target.z += 5;
@@ -82,24 +99,26 @@ public class VektharBoss : LivingEntity
     private void startAttack() {
         Debug.Log("Starting an attack.");
 
+        _wasPlayerHit = false;
+
         int attackNumber = UnityEngine.Random.Range(0, 3);
-        switch(attackNumber) {
-            case 0: {
+        switch (attackNumber) {
+            case 0:
                 _handRight.Attack(VektharHand.HandState.Fist);
                 AudioClip fistAttack = Resources.Load("SFX/vekthar/fist") as AudioClip;
                 SoundFXManager.Instance.PlaySoundFXClip(fistAttack, transform,1f);
-            } break;
-            case 1: {
+            break;
+            case 1:
                 _handLeft.Attack(VektharHand.HandState.Sandwitch);
                 _handRight.Attack(VektharHand.HandState.Sandwitch);
                 AudioClip sandwitchAttack = Resources.Load("SFX/vekthar/klasniecie") as AudioClip;
                 SoundFXManager.Instance.PlaySoundFXClip(sandwitchAttack, transform,1f);
-            } break;
-            case 2: {
+            break;
+            case 2: 
                 _handLeft.Attack(VektharHand.HandState.Slam);
                 AudioClip slamAttack = Resources.Load("SFX/vekthar/slap") as AudioClip;
                 SoundFXManager.Instance.PlaySoundFXClip(slamAttack, transform,1f);
-            } break;
+            break;
         }
 
         _state = VektharState.DuringAttack;

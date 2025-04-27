@@ -42,6 +42,13 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         if (HubManager.MainMenuCamera != null) CameraManager.SwitchCamera(HubManager.MainMenuCamera);
 
         gameObject.SetActive(true);
+        if (GameManager.Instance.ShowNewGame) {
+            _continueButton.SetActive(false);
+            _newGameButton.SetActive(true);
+        } else {
+            _continueButton.SetActive(true);
+            _newGameButton.SetActive(false);
+        }
 
         _canvasGroup.alpha = 1;
         _bgImage.DOFade(230.0f / 255.0f, 1f * Settings.AnimationSpeed).OnComplete(() => {
@@ -121,12 +128,14 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
     }
 
     public void OnContinueGameBtnClick() {
-        
+        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
     }
 
     public void OnNewGameBtnClick() {
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
+        GameManager.Instance.ShowNewGame = false;
     }
 
     public void OnSettingsBtnClick() {
