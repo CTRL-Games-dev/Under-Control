@@ -8,4 +8,6 @@ public abstract class Spell : ScriptableObject {
     public float CooldownTime;
 
     public abstract void Cast();
+
+    public abstract void OnCastReady();
 }

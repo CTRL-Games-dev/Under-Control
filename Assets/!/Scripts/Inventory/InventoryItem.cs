@@ -75,6 +75,9 @@ public class InventoryItem<T> where T : ItemData {
     }
 
     public static implicit operator InventoryItem(InventoryItem<T> inventoryItem) {
+        // If InventoryItem window is null, casting behavior should return null
+        if(inventoryItem == null) return null;
+
         return inventoryItem._inventoryItem;
     }
 }

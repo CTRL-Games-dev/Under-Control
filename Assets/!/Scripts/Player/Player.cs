@@ -23,9 +23,9 @@ public class Player : MonoBehaviour {
             if(caster.Mana < Spell.Mana) return false;
             if(!Cooldown.Execute()) return false;
 
+            Instance.CastSpell(Spell);
+
             caster.Mana -= Spell.Mana; 
-            Spell.Cast();
-            Animator.SetTrigger(Instance._spellHash);
 
             return true;
         }
@@ -56,7 +56,7 @@ public class Player : MonoBehaviour {
     public Stat DashDistance = new Stat(StatType.DASH_DISTANCE, 5f);
 
     // Coins
-    [SerializeField] private int _coins = 0;
+    [SerializeField] private int _coins = 100;
     public int Coins { 
         get{ return _coins; } 
         set {   
@@ -131,6 +131,8 @@ public class Player : MonoBehaviour {
         }
     }
 
+    private Spell _queuedSpell = null;
+
     [Header("Consumable")]
     public InventoryItem<ConsumableItemData> ConsumableItemOne = null;
     public InventoryItem<ConsumableItemData> ConsumableItemTwo = null;
@@ -143,6 +145,7 @@ public class Player : MonoBehaviour {
     private bool _isAttacking = false;
     public bool LockRotation = false;
     public bool UpdateDisabled = false;
+    public SlashManager SlashManager;
 
     [Header("Events")]
     public UnityEvent InventoryToggleEvent;
@@ -156,7 +159,7 @@ public class Player : MonoBehaviour {
     // State
     private Vector2 _movementInputVector = Vector2.zero;
     private InteractionType? _queuedInteraction;
-    private Cooldown dashCooldown = new Cooldown(0);
+    private Cooldown _dashCooldown = new Cooldown(0);
 
     private List<Modifier> _currentRingModifiers;
     private List<Modifier> _currentAmuletModifiers;
@@ -173,6 +176,7 @@ public class Player : MonoBehaviour {
     [Header("References")]
     [SerializeField] private UICanvas _uiCanvas;
     [SerializeField] private ParticleSystem[] _trailParticles;
+    public GameObject FBXModel;
 
     // Static reference getters
     public static LivingEntity LivingEntity { get; private set; }
@@ -181,15 +185,13 @@ public class Player : MonoBehaviour {
     public static CharacterController CharacterController { get; private set; }
     public static Animator Animator { get; private set; }
     public static CinemachinePositionComposer CinemachinePositionComposer { get; private set; }
+    public static SpellSpawner SpellSpawner { get; private set; }
     public static HumanoidInventory Inventory => LivingEntity.Inventory as HumanoidInventory;
 
     [SerializeField] private LayerMask _groundLayerMask;
     public FaceAnimator FaceAnimator;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
-
-    public GameObject SlashGO;
-    public Material SlashMaterial;
     private Vector3 _queuedRotation = Vector3.zero;
 
     #region Unity Methods
@@ -205,6 +207,7 @@ public class Player : MonoBehaviour {
         CharacterController = GetComponent<CharacterController>();
         Animator = GetComponent<Animator>();
         CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
+        SpellSpawner = GetComponentInChildren<SpellSpawner>();
 
         Instance = this;
 
@@ -215,15 +218,20 @@ public class Player : MonoBehaviour {
 
         registerStats();
 
-        if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
-            WeaponHolder.UpdateWeapon(CurrentWeapon);
-        }
-
         OnEvolutionSelected.AddListener((evoUI) => {
             foreach (Modifier modifier in evoUI.GetModifiers()) {
                 LivingEntity.ApplyIndefiniteModifier(modifier);
             }
         });
+
+        // ResetRun();
+        // LoadKeybinds();
+    }
+
+    void Start() {
+        if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
+            WeaponHolder.UpdateWeapon(CurrentWeapon);
+        }
 
         // Amulet modifiers
         Inventory.OnInventoryChanged.AddListener(() => {
@@ -242,11 +250,7 @@ public class Player : MonoBehaviour {
             }
         });
 
-        // ResetRun();
-        // LoadKeybinds();
     }
-
-
 
     void Update() {
         if (UpdateDisabled) return;
@@ -317,6 +321,9 @@ public class Player : MonoBehaviour {
             case AnimationState.Attack_ComboWindow:
             case AnimationState.Attack_Recovery:
                 return _movementInputVector.magnitude > 0.1f ? MovementSpeed * 0.3f : 0;
+
+            case AnimationState.Spell_Cast:
+                return 0;
         }
 
         return 0;
@@ -337,25 +344,31 @@ public class Player : MonoBehaviour {
     }
 
     private void onStunned(float duration) {
-        CameraManager.Instance.ShakeCamera(2, duration);
+        CameraManager.ShakeCamera(2, duration);
     }
 
     
     #region Input Events
 
     void OnCastSpellOne(InputValue value) {
-        if (SpellSlotOne != null) UICanvas.HUDCanvas.UseSpell1();
-        // _spellDataOne.TryCast(LivingEntity);
+        if (SpellSlotOne == null) return;
+        if(!_spellDataOne.TryCast(LivingEntity)) return;
+
+         UICanvas.HUDCanvas.UseSpell1();
     }
 
     void OnCastSpellTwo(InputValue value) {
-        if (SpellSlotTwo != null) UICanvas.HUDCanvas.UseSpell2();
-        // _spellDataTwo.TryCast(LivingEntity);
+        if (SpellSlotTwo == null) return;
+        if(!_spellDataTwo.TryCast(LivingEntity)) return;
+
+        UICanvas.HUDCanvas.UseSpell2();
     }
 
     void OnCastSpellThree(InputValue value) {
-        if (SpellSlotThree != null) UICanvas.HUDCanvas.UseSpell3();
-        // _spellDataThree.TryCast(LivingEntity);
+        if (SpellSlotThree == null) return;
+        if(!_spellDataThree.TryCast(LivingEntity)) return;
+
+        UICanvas.HUDCanvas.UseSpell3();
     }
 
     void OnUseConsumableOne(InputValue value) {
@@ -363,7 +376,7 @@ public class Player : MonoBehaviour {
         if(!ConsumableCooldown.Execute()) return;
         if(ConsumableItemOne.Amount <= 0) return;
 
-        ConsumableItemData c =  ConsumableItemOne.ItemData as ConsumableItemData;
+        ConsumableItemData c =  ConsumableItemOne.ItemData;
 
         if(c == null) return;
         c.Consume(LivingEntity);
@@ -464,9 +477,9 @@ public class Player : MonoBehaviour {
     void OnDodge() {
         if (_isAttacking || InputDisabled) return;
 
-        dashCooldown.CooldownTime = DashCooldown;
+        _dashCooldown.CooldownTime = DashCooldown;
         
-        if (!dashCooldown.Execute()) {
+        if (!_dashCooldown.Execute()) {
             return;
         }
 
@@ -601,6 +614,11 @@ public class Player : MonoBehaviour {
     public void OnInventoryChanged() {
         WeaponHolder.UpdateWeapon(CurrentWeapon);
         Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
+
+        if (CurrentWeapon?.ItemData != null) {
+            Debug.Log(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
+            SlashManager.SetSlashColor(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
+        } 
     }
 
     public Vector3 GetMousePosition() {
@@ -610,9 +628,9 @@ public class Player : MonoBehaviour {
             point.y = transform.position.y;
             return point;
         } else {
+            Debug.LogWarning("GetMousePosition: Raycast didnt hit ground");
             return Vector3.zero;
         }
-
     }
 
     #endregion
@@ -624,7 +642,8 @@ public class Player : MonoBehaviour {
         Attack_Windup,
         Attack_Contact,
         Attack_ComboWindow,
-        Attack_Recovery
+        Attack_Recovery,
+        Spell_Cast,
     }
 
     public void SetAnimationState(AnimationState state) {
@@ -648,7 +667,13 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_Recovery:
+                SlashManager.DisableSlash();
                 _isAttacking = false;
+                LockRotation = false;
+                break;
+
+            case AnimationState.Spell_Cast:
+                UpdateDisabled = false;
                 LockRotation = false;
                 break;
         }
@@ -659,34 +684,33 @@ public class Player : MonoBehaviour {
         switch (state) {
             case AnimationState.Locomotion:
                 WeaponHolder.DisableHitbox();
-                SlashMaterial.color = Color.white;
                 break;
 
             case AnimationState.Attack_Windup:
-                SlashMaterial.color = Color.white;
                 LockRotation = true;
                 _isAttacking = true;
                 _currentSpeed = 0;
+                SlashManager.EnableSlash();
+                WeaponHolder.EnableHitbox();
                 // SlashGO.SetActive(true);
 
                 break;
 
             case AnimationState.Attack_Contact:
-                SlashMaterial.color = Color.cyan;
-                WeaponHolder.EnableHitbox();
                 break;
 
             case AnimationState.Attack_ComboWindow:
-                SlashMaterial.color = Color.yellow;
                 break;
 
             case AnimationState.Attack_Recovery:
                 WeaponHolder.DisableHitbox();
-                SlashMaterial.color = Color.green;
-                // SlashGO.SetActive(false);
                 LockRotation = false;
-
                 // LockRotation = true;
+                break;
+
+            case AnimationState.Spell_Cast:
+                UpdateDisabled = true;
+                LockRotation = true;
                 break;
         }
     }
@@ -699,6 +723,36 @@ public class Player : MonoBehaviour {
     public void OnAttackAnimationEnd(AttackType _) {
         WeaponHolder.EndAttack();
     }
+
+    #endregion
+
+    #region Spell Methods
+
+    void CastSpell(Spell spell) {
+        if (spell == null) return;
+        if (_queuedSpell != null) return;
+
+        _queuedSpell = spell;
+
+        spell.Cast();
+        Animator.SetTrigger(_spellHash);
+
+        if (!LockRotation) {
+            transform.LookAt(GetMousePosition());   
+        }
+    }
+
+    public void OnSpellCastReady() {
+        Spell spell = _queuedSpell;
+
+        _queuedSpell = null;
+
+        if (!LockRotation) {
+            transform.LookAt(GetMousePosition());   
+        }
+
+        spell.OnCastReady();
+}
 
     #endregion
 

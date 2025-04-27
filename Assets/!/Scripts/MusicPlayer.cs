@@ -24,7 +24,7 @@ public class MusicPlayer : MonoBehaviour {
     public void Play() {
         _shouldPlay = true;
     }
-
+ 
     private IEnumerator runAudioLooper() {
         while(true) {
             yield return new WaitUntil(() => _shouldPlay);

@@ -139,12 +139,6 @@ public class UICanvas : MonoBehaviour
         SelectedItemUI.InventoryItem = inventoryItem;
     }
 
-
-    public void SetOtherInventory(ItemContainer itemContainer, GameObject prefab, IInteractableInventory interactable = null, string title = null) {
-        InventoryCanvas.SetOtherInventory(itemContainer, prefab, interactable, title);
-        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Inventory);
-    }
-
     public void DropItem() {
         if (SelectedItemUI.InventoryItem == null) return;
 
@@ -161,11 +155,11 @@ public class UICanvas : MonoBehaviour
     #endregion
     #region Misc Methods
 
-    public void StartTalking(Dialogue dialogue, Texture faceImage, FaceAnimator faceAnimator, string nameKey) {
+    public void StartTalking(Dialogue dialogue, Texture faceImage, FaceAnimator faceAnimator, string nameKey, Talkable talkable) {
         TalkingCanvas.gameObject.SetActive(true);
         if (dialogue == null) return;
 
-        TalkingCanvas.SetupDialogue(dialogue, faceImage, faceAnimator, nameKey);
+        TalkingCanvas.SetupDialogue(dialogue, faceImage, faceAnimator, nameKey, talkable);
         ChangeUIBottomState(UIBottomState.Talking);
     }
 
@@ -214,6 +208,7 @@ public class UICanvas : MonoBehaviour
     private void closeUIMiddleState(UIMiddleState state) {
         switch (state) {
             case UIMiddleState.Inventory:
+                EventBus.InventoryClosedEvent?.Invoke();
                 InventoryCanvas.HideUI();                
                 break;
             case UIMiddleState.MainMenu:
