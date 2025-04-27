@@ -51,9 +51,9 @@ public class Player : MonoBehaviour {
 
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 10f);
 
-    public Stat DashSpeed = new Stat(StatType.DASH_SPEED, 0.2f);
-    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 5f);
-    public Stat DashDistance = new Stat(StatType.DASH_DISTANCE, 5f);
+    public Stat DashSpeedMultiplier = new Stat(StatType.DASH_SPEED_MULTIPLIER, 2f);
+    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 3f);
+    public Stat DashDuration = new Stat(StatType.DASH_COOLDOWN, 0.3f);
 
     // Coins
     [SerializeField] private int _coins = 100;
@@ -86,7 +86,7 @@ public class Player : MonoBehaviour {
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
 
-    private int _evolutionPoints = 9;
+    private int _evolutionPoints = 0;
     public int EvolutionPoints {
         get{ return _evolutionPoints; }
         set {
@@ -145,6 +145,7 @@ public class Player : MonoBehaviour {
     private bool _isAttacking = false;
     public bool LockRotation = false;
     public bool UpdateDisabled = false;
+    public bool HasPlayerDied = false;
     public SlashManager SlashManager;
 
     [Header("Events")]
@@ -224,6 +225,10 @@ public class Player : MonoBehaviour {
             }
         });
 
+        LivingEntity.OnDamageTaken.AddListener((data) => {
+            CameraManager.ShakeCamera(2, 0.1f);
+        });
+
         // ResetRun();
         // LoadKeybinds();
     }
@@ -277,6 +282,8 @@ public class Player : MonoBehaviour {
         if (InputDisabled) return _deceleration;
 
         switch (CurrentAnimationState) {
+            case AnimationState.Dash:
+                return _acceleration * 100;
             case AnimationState.Locomotion:
                 return _movementInputVector.magnitude > 0.1f ? _acceleration : _deceleration;
                 
@@ -293,6 +300,7 @@ public class Player : MonoBehaviour {
 
     private Vector3 getGoalDirection() {
         switch (CurrentAnimationState) {
+            case AnimationState.Dash:
             case AnimationState.Attack_Windup:
                 if (_queuedRotation == Vector3.zero) return transform.forward;
                 Vector3 dir = _queuedRotation;
@@ -313,6 +321,8 @@ public class Player : MonoBehaviour {
         if (InputDisabled) return 0;
 
         switch (CurrentAnimationState) {
+            case AnimationState.Dash:
+                return MovementSpeed * DashSpeedMultiplier;
             case AnimationState.Locomotion:
                 return _movementInputVector.magnitude > 0.1f ? MovementSpeed : 0;
 
@@ -338,6 +348,11 @@ public class Player : MonoBehaviour {
     }
 
     private void onDeath() {
+        if (HasPlayerDied) return;
+        HasPlayerDied = true;
+        SlashManager.DisableSlash();
+        _isAttacking = false;
+        LockRotation = false;
         UICanvas.ChangeUITopState(UITopState.Death);
         Animator.SetTrigger("die");
         UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
@@ -499,21 +514,38 @@ public class Player : MonoBehaviour {
 
         foreach (ParticleSystem trail in _trailParticles) { trail.Play(); }
 
-        UpdateDisabled = true;
-        Animator.animatePhysics = false;
+        CurrentAnimationState = AnimationState.Dash;
+        
 
-        Instance.transform.DOMove(transform.position + transform.forward * Instance.DashDistance, Instance.DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
-            // Animator.applyRootMotion = true;
-            Animator.animatePhysics = true;
-            UpdateDisabled = false;
-            Animator.speed = 1;
-            DamageDisabled = false;
-            LockRotation = false;
-            foreach (ParticleSystem trail in _trailParticles) {
-                trail.Clear();
-                trail.Stop();
-            }
-        });
+        // UpdateDisabled = true;
+        // Animator.animatePhysics = false;
+
+        // Instance.transform.DOMove(transform.position + transform.forward * Instance.DashDistance, Instance.DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
+        //     // Animator.applyRootMotion = true;
+        //     Animator.animatePhysics = true;
+        //     UpdateDisabled = false;
+        //     Animator.speed = 1;
+        //     DamageDisabled = false;
+        //     LockRotation = false;
+        //     foreach (ParticleSystem trail in _trailParticles) {
+        //         trail.Clear();
+        //         trail.Stop();
+        //     }
+        // }
+        Invoke(nameof(endDash), DashDuration);
+    }
+
+    private void endDash() {
+        SetAnimationState(AnimationState.Locomotion);
+        // CharacterController.SimpleMove(getGoalDirection() * MovementSpeed);
+
+        Animator.speed = 1;
+        DamageDisabled = false;
+        LockRotation = false;
+        foreach (ParticleSystem trail in _trailParticles) {
+            trail.Clear();
+            trail.Stop();
+        }
     }
 
     // przeniesc do save systemu 
@@ -581,7 +613,8 @@ public class Player : MonoBehaviour {
 
     private bool tryInteract(InteractionType interactionType) {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray, out RaycastHit hit)) {
+        int layerMask = ~LayerMask.GetMask("Player");
+        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask)) {
             return false;
         }
 
@@ -644,6 +677,7 @@ public class Player : MonoBehaviour {
         Attack_ComboWindow,
         Attack_Recovery,
         Spell_Cast,
+        Dash
     }
 
     public void SetAnimationState(AnimationState state) {
@@ -653,6 +687,10 @@ public class Player : MonoBehaviour {
 
     private void exitAnimationState(AnimationState state) {
         switch (state) {
+            case AnimationState.Dash:
+                _currentSpeed = MovementSpeed;
+                break;
+
             case AnimationState.Locomotion:
                 break;
 
@@ -793,9 +831,9 @@ public class Player : MonoBehaviour {
         ModifierSystem.RegisterStat(ref HeavyAttackSpeed);
         // ModifierSystem.RegisterStat(ref HeavyAttackRange);
         ModifierSystem.RegisterStat(ref MovementSpeed);
-        ModifierSystem.RegisterStat(ref DashSpeed);
+        ModifierSystem.RegisterStat(ref DashSpeedMultiplier);
         ModifierSystem.RegisterStat(ref DashCooldown);
-        ModifierSystem.RegisterStat(ref DashDistance);
+        ModifierSystem.RegisterStat(ref DashDuration);
     }
 
     public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {

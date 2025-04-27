@@ -23,6 +23,8 @@ public class HubManager : MonoBehaviour
         Player.Instance.gameObject.transform.position = _spawnPosition;
         Player.LivingEntity.Health = Player.LivingEntity.StartingHealth;
         Player.LivingEntity.Mana = Player.LivingEntity.StartingMana;
+        Player.Instance.HasPlayerDied = false;
+        Player.Instance.EvolutionPoints++;
         PlayRespawnAnimation();
 
         GameManager.Instance.ResetInfluence();

@@ -87,6 +87,11 @@ public class LivingEntity : MonoBehaviour {
         _isPlayer = gameObject.GetComponent<Player>() != null;
         _health = StartingHealth;
         _mana = StartingMana;
+
+        if (_isPlayer) {
+            MaxHealth.OnValueChanged.AddListener(() => Player.UICanvas.HUDCanvas.UpdateHealthBar());
+            MaxMana.OnValueChanged.AddListener(() => Player.UICanvas.HUDCanvas.UpdateManaBar());
+        }
     }
 
     void Update() {
@@ -116,10 +121,10 @@ public class LivingEntity : MonoBehaviour {
     }
 
     public void TakeDamage(Damage damage, LivingEntity source = null) {
-        if (source != null) {
-            if (source.gameObject.CompareTag("Player")) {
-                // StartCoroutine(nameof(slowDown));
-                CameraManager.ShakeCamera(2, 0.1f);
+
+        if (_isPlayer) {
+            if (Player.Instance.DamageDisabled) {
+                return;
             }
         }
 
@@ -198,7 +203,7 @@ public class LivingEntity : MonoBehaviour {
             }
         }
 
-        OnDeath.Invoke();
+        OnDeath?.Invoke();
 
         if (DestroyOnDeath) Destroy(gameObject);
     }

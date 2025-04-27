@@ -14,6 +14,7 @@ public class LoadingScreen : MonoBehaviour
     [SerializeField] private List<Sprite> _sprites;
     private CanvasGroup _canvasGroup;
     public static bool IsLoading = false;
+    private static string _currentSceneName = string.Empty;
 
     private void Awake()
     {
@@ -35,6 +36,10 @@ public class LoadingScreen : MonoBehaviour
 
 
     public static void LoadScene(string sceneName) {
+        if (IsLoading) return;
+        if (sceneName == _currentSceneName) return;
+        _currentSceneName = sceneName;
+        
         Instance._canvasGroup.alpha = 0;
         Instance._imageGO.SetActive(true);
         IsLoading = true;
