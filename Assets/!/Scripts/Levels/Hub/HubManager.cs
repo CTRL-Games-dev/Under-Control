@@ -32,6 +32,7 @@ public class HubManager : MonoBehaviour
         PlayRespawnAnimation();
 
         GameManager.Instance.ResetInfluence();
+        GameManager.Instance.ResetCards();
         // Player.Animator.SetTrigger("live");
     }
 

@@ -30,6 +30,8 @@ public class GameManager : MonoBehaviour {
     public float InfluenceDelta {get; private set; }
     [HideInInspector] public static readonly float MinInfluenceDelta = 5.0f; 
     [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f;
+    public bool ShowMainMenu = true;
+    public bool ShowNewGame = true;
 
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
@@ -38,13 +40,12 @@ public class GameManager : MonoBehaviour {
     [Header("State")]
     // public Card[] AllPossibleCards;
     [HideInInspector] private List<Card> _alreadyAddedCards = new();
+    [HideInInspector] private List<Card> _availableCards = new();
     [SerializeField] private List<Card> _cards = new();
 
     // Events
     public UnityEvent LevelLoaded;
     public bool IsStarterDialogueOver = false;
-    public bool ShowMainMenu = true;
-    public bool ShowNewGame = true;
 
     private void Awake()  {
         _musicPlayer = GetComponent<MusicPlayer>();
@@ -65,6 +66,8 @@ public class GameManager : MonoBehaviour {
         foreach(var c in _cards) {
             _alreadyAddedCards.Add(c);
         }
+
+        ResetCards();
     }
 
     private void Start() {
@@ -121,17 +124,22 @@ public class GameManager : MonoBehaviour {
         InfluenceDelta = 0;
     }
 
+    public void ResetCards() {
+        _alreadyAddedCards.Clear();
+        _cards.ForEach(x => _availableCards.Add(x));
+    }
+
     public float GetInfluenceModifier() {
         return (InfluenceDelta / MaxInfluenceDelta) + 0.5f;
     }
 
     public Card[] GetRandomCards(int numberOfcards = 3) {
 
-        numberOfcards = Math.Min(numberOfcards, _cards.Count);
+        numberOfcards = Math.Min(numberOfcards, _availableCards.Count);
         Card[] cards = new Card[numberOfcards];
 
         List<Card> copiedCards = FluffyUtils.CloneList(_cards);
-        Debug.Log($"Normal {_cards.Count}");
+        Debug.Log($"Normal {_availableCards.Count}");
         Debug.Log($"Copied cards {copiedCards.Count}");
 
         for(int i = 0; i < numberOfcards; i++) {
@@ -145,11 +153,11 @@ public class GameManager : MonoBehaviour {
     public bool ChooseCard(Card chosenCard) {
         foreach(var card in _cards) {
             if(card != chosenCard) continue;
-            _cards.Remove(chosenCard);
+            _availableCards.Remove(chosenCard);
 
             foreach(var c in chosenCard.NextCards) {
                 if(_alreadyAddedCards.Contains(c)) continue;
-                _cards.Add(c);
+                _availableCards.Add(c);
                 _alreadyAddedCards.Add(c);
             }
             return true;
