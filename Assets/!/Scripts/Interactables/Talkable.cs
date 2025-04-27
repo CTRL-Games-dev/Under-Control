@@ -36,6 +36,8 @@ public class Talkable : MonoBehaviour, IInteractable
         Player.UICanvas.StartTalking(_dialogue, _faceImage, _faceAnimator, _nameKey, this);
         Player.Instance.LockRotation = true;
         _interacted = true;
+        _exclamationMark.DOComplete();
+        _exclamationMark.DOKill();
         _exclamationMark.gameObject.SetActive(false);
 
     }
@@ -63,6 +65,11 @@ public class Talkable : MonoBehaviour, IInteractable
                     _exclamationMark.DOMoveY(1.9f, 0.8f).SetDelay(0.5f).SetEase(Ease.OutBack);
                     _exclamationMark.DOScale(0.3f, 0.8f).SetDelay(0.5f).SetEase(Ease.OutBack).OnComplete(() => {
                         if (!_interacted) AnimateMark();
+                        else {
+                            _exclamationMark.DOComplete();
+                            _exclamationMark.DOKill();
+                            _exclamationMark.gameObject.SetActive(false);
+                        }
                     });
                 });
             });

@@ -145,6 +145,7 @@ public class Player : MonoBehaviour {
     private bool _isAttacking = false;
     public bool LockRotation = false;
     public bool UpdateDisabled = false;
+    public bool HasPlayerDied = false;
     public SlashManager SlashManager;
 
     [Header("Events")]
@@ -222,6 +223,10 @@ public class Player : MonoBehaviour {
             foreach (Modifier modifier in evoUI.GetModifiers()) {
                 LivingEntity.ApplyIndefiniteModifier(modifier);
             }
+        });
+
+        LivingEntity.OnDamageTaken.AddListener((data) => {
+            CameraManager.ShakeCamera(2, 0.1f);
         });
 
         // ResetRun();
@@ -343,6 +348,8 @@ public class Player : MonoBehaviour {
     }
 
     private void onDeath() {
+        if (HasPlayerDied) return;
+        HasPlayerDied = true;
         UICanvas.ChangeUITopState(UITopState.Death);
         Animator.SetTrigger("die");
         UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
