@@ -14,39 +14,25 @@ public class VektharHand : MonoBehaviour {
 
     [HideInInspector] public UnityEvent<LivingEntity> TargetHit;
 
+    public VektharBoss Vekthar;
+
     public bool IsLeft;
     [SerializeField] private GameObject _hand;
     [SerializeField] private Transform _handTarget;
     public HandState State = HandState.Idle;
     public UnityEvent AttackStarted;
     public UnityEvent AttackEnded;
-    public float Damage = 50;
 
     private Animator _animator;
-    private Rigidbody _rigidbody;
 
     void Awake() {
-        _animator = _hand.GetComponent<Animator>();
-        _rigidbody = GetComponent<Rigidbody>();
+        _animator = GetComponent<Animator>();
     }
 
     void Update() {
         if(State == HandState.Idle) {
             followTarget();
         }
-    }
-
-    public void EnableColliders(bool enable) {
-        _rigidbody.detectCollisions = enable;
-    }
-
-    public void onTargetHit(LivingEntity victim) {
-        Debug.Log("Vekthar hit player!");
-
-        victim.TakeDamage(new Damage {
-            Type = DamageType.PHYSICAL,
-            Value = Damage
-        });
     }
 
     public void Attack(HandState attack) {
@@ -99,22 +85,28 @@ public class VektharHand : MonoBehaviour {
         State = newState;
     }
 
+    public void OnEnableAttack() {
+        if(!Vekthar.attacking) Vekthar.attacking = true;
+    }
+
+    public void OnDisableAttack() {
+        if(Vekthar.attacking) Vekthar.attacking = false;
+    }
+
     private void onIdle() {
         Debug.Log("Hand is now idle");
-        EnableColliders(false);
     }
 
     private void onSlam() {
-        EnableColliders(true);
     }
 
     private void onFist() {
-        EnableColliders(true);
     }
 
     private void onSandwitch() {
-        EnableColliders(true);
     }
+
+
 
     private IEnumerator returnToNormal(float time) {
         yield return new WaitForSeconds(time);
@@ -163,7 +155,8 @@ public class VektharHand : MonoBehaviour {
     }
 
     private void OnTriggerEnter(Collider other) {
-        LivingEntity victim = other.GetComponent<LivingEntity>();
+        LivingEntity victim = other.GetComponentInParent<LivingEntity>(includeInactive: true);
+
         if(victim == null) return;
 
         TargetHit.Invoke(victim);

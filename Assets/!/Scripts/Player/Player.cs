@@ -87,7 +87,7 @@ public class Player : MonoBehaviour {
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
 
-    private int _evolutionPoints = 9;
+    private int _evolutionPoints = 0;
     public int EvolutionPoints {
         get{ return _evolutionPoints; }
         set {
@@ -351,6 +351,9 @@ public class Player : MonoBehaviour {
     private void onDeath() {
         if (HasPlayerDied) return;
         HasPlayerDied = true;
+        SlashManager.DisableSlash();
+        _isAttacking = false;
+        LockRotation = false;
         UICanvas.ChangeUITopState(UITopState.Death);
         Animator.SetTrigger("die");
         UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
@@ -615,7 +618,8 @@ public class Player : MonoBehaviour {
 
     private bool tryInteract(InteractionType interactionType) {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray, out RaycastHit hit)) {
+        int layerMask = ~LayerMask.GetMask("Player");
+        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask)) {
             return false;
         }
 
