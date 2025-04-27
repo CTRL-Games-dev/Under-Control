@@ -10,7 +10,9 @@ public class IceShardSpell : Spell {
             Player.Instance.transform.position + Vector3.up,
             Player.Instance.transform.rotation
         );
-        
+
         shard.Initialize(Player.LivingEntity, Player.Instance.GetMousePosition() - Player.Instance.transform.position);
     }
+
+    public override void OnCastReady() {}
 }
