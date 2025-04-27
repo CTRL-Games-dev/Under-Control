@@ -99,6 +99,11 @@ public class SlimeAIController : MonoBehaviour {
 
         _animator.SetTrigger(_jumpAnimationHash);
 
+        AudioClip jumpSound = Resources.Load("SFX/slime/skok") as AudioClip; //hitsound
+        SoundFXManager.Instance.PlaySoundFXClip(jumpSound, transform, 0.7f);
+
+
+
         // Debug.Log($"Jumping to {destination} from {transform.position} | Distance: {Vector3.Distance(transform.position, destination)}");
     }
 

@@ -68,6 +68,8 @@ public class EntAIController : MonoBehaviour {
     }
 
     public void OnRightHandAttackStart() {
+        AudioClip attackSound = Resources.Load("SFX/drzewo/atak") as AudioClip; //hitsound
+        SoundFXManager.Instance.PlaySoundFXClip(attackSound, transform, 1f);
         RightWeaponHolder.InitializeAttack(AttackType.LIGHT);
         RightWeaponHolder.BeginAttack();
         RightWeaponHolder.EnableHitbox();
@@ -79,6 +81,8 @@ public class EntAIController : MonoBehaviour {
     }
 
     public void OnLeftHandAttackStart() {
+        AudioClip attackSound = Resources.Load("SFX/drzewo/atak") as AudioClip; //hitsound
+        SoundFXManager.Instance.PlaySoundFXClip(attackSound, transform, 1f);
         LeftWeaponHolder.InitializeAttack(AttackType.LIGHT);
         LeftWeaponHolder.BeginAttack();
         LeftWeaponHolder.EnableHitbox();

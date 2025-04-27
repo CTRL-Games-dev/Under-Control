@@ -193,8 +193,8 @@ public class LivingEntity : MonoBehaviour {
             if (DestroyOnDeath) Destroy(gameObject);
         }
         else {
-            AudioClip hitSound = Resources.Load("SFX/uderzenienowe") as AudioClip;
-            SoundFXManager.Instance.PlaySoundFXClip(hitSound, transform, 1f);
+            AudioClip hitSound = Resources.Load("SFX/uderzenie") as AudioClip; //hitsound
+            SoundFXManager.Instance.PlaySoundFXClip(hitSound, transform, 0.7f);
         }
     }
 
