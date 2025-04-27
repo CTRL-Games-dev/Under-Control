@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour {
     public GameObject UnknownModelPrefab;
     public ItemEntity ItemEntityPrefab;
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
-        {Dimension.HUB, "Hub"},
+        {Dimension.HUB, "NewHub"},
         {Dimension.FOREST, "Adventure"},
         {Dimension.FOREST_BOSS, "Adventure"},
     };
@@ -111,6 +111,11 @@ public class GameManager : MonoBehaviour {
         InfluenceDelta = 0;
     }
 
+    public void ResetInfluence() {
+        TotalInfluence = 0;
+        InfluenceDelta = 0;
+    }
+
     public float GetInfluenceModifier() {
         return (InfluenceDelta / MaxInfluenceDelta) + 0.5f;
     }
@@ -155,17 +160,17 @@ public class GameManager : MonoBehaviour {
 
 
     public void DebugCommands() {
-        if(Input.GetKeyDown(KeyCode.F1)) {
+        if(Input.GetKeyDown(KeyCode.F4)) {
             Debug.Log("<color=red>Debug Tools - Moving to the hub");
-            ChangeDimension(Dimension.FOREST, TotalInfluence + 10);
+            ChangeDimension(Dimension.HUB, TotalInfluence + 10);
         }
 
-        if(Input.GetKeyDown(KeyCode.F2)) {
+        if(Input.GetKeyDown(KeyCode.F5)) {
             Debug.Log("<color=red>Debug Tools - Moving to the new forest");
             ChangeDimension(Dimension.FOREST, TotalInfluence + 10);
         }
 
-        if(Input.GetKeyDown(KeyCode.F3)) {
+        if(Input.GetKeyDown(KeyCode.F6)) {
             Debug.Log("<color=red>Debug Tools - Moving to Vek'thar's arena");
             // ChangeDimension(Dimension.FOREST_VECTOR, TotalInfluence);
         }
