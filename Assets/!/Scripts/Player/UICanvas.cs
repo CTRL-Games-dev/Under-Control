@@ -98,7 +98,7 @@ public class UICanvas : MonoBehaviour
     }
 
     private void OnUICancel() {
-        if (IsOtherUIOpen) {
+        if (IsOtherUIOpen || CurrentUIMiddleState == UIMiddleState.Choose || CurrentUITopState == UITopState.Death) {
             Debug.Log("Other UI is open");
             return;
         }
