@@ -43,6 +43,8 @@ public class GameManager : MonoBehaviour {
     // Events
     public UnityEvent LevelLoaded;
     public bool IsStarterDialogueOver = false;
+    public bool ShowMainMenu = true;
+    public bool ShowNewGame = true;
 
     private void Awake()  {
         _musicPlayer = GetComponent<MusicPlayer>();

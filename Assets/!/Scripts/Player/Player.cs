@@ -194,6 +194,7 @@ public class Player : MonoBehaviour {
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
     private Vector3 _queuedRotation = Vector3.zero;
+    public List<WeaponItemData> StarterWeapons = new List<WeaponItemData>();
 
     #region Unity Methods
     void Awake() {
@@ -255,6 +256,7 @@ public class Player : MonoBehaviour {
             }
         });
 
+        ResetRun();
     }
 
     void Update() {
@@ -349,6 +351,7 @@ public class Player : MonoBehaviour {
 
     private void onDeath() {
         if (HasPlayerDied) return;
+        GameManager.Instance.ShowMainMenu = false;
         HasPlayerDied = true;
         SlashManager.DisableSlash();
         _isAttacking = false;
@@ -819,6 +822,25 @@ public class Player : MonoBehaviour {
                 LivingEntity.ApplyIndefiniteModifier(modifier);
             }
         }
+
+        Player.Inventory.Clear();
+        Player.Inventory.OnInventoryChanged?.Invoke();
+        Player.Instance.ConsumableItemOne = null;
+        Player.Instance.ConsumableItemTwo = null;
+        Player.Instance.SpellSlotOne = null;
+        Player.Instance.SpellSlotTwo = null;
+        Player.Instance.SpellSlotThree = null;
+        Player.Instance.WeaponHolder.UpdateWeapon(null);
+        Player.Instance.WeaponHolder.DisableHitbox();
+        Player.Instance.WeaponHolder.EndAttack();
+        Player.UICanvas.HUDCanvas.UpdateSpellSlots();
+        Player.UICanvas.HUDCanvas.UpdateHealthBar();
+        Player.UICanvas.HUDCanvas.UpdateManaBar();
+        Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+        EventBus.InventoryItemChangedEvent?.Invoke();
+        Player.Inventory.AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 0);
+        EventBus.InventoryItemChangedEvent?.Invoke();
+
     }
 
     private void registerStats() {
