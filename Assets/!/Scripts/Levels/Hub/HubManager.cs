@@ -24,6 +24,8 @@ public class HubManager : MonoBehaviour
         Player.LivingEntity.Health = Player.LivingEntity.StartingHealth;
         Player.LivingEntity.Mana = Player.LivingEntity.StartingMana;
         PlayRespawnAnimation();
+
+        GameManager.Instance.ResetInfluence();
         // Player.Animator.SetTrigger("live");
     }
 

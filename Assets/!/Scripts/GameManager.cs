@@ -11,24 +11,26 @@ public class GameManager : MonoBehaviour {
         public AudioClip[] Clips;
     }
     public static GameManager Instance;
+    public bool DebugMode = false;
 
     [Header("References")]
     public Weapon UnknownWeaponPrefab;
     public GameObject UnknownModelPrefab;
     public ItemEntity ItemEntityPrefab;
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
-        {Dimension.HUB, "Hub"},
+        {Dimension.HUB, "NewHub"},
         {Dimension.FOREST, "Adventure"},
-        {Dimension.FOREST_BOSS, "Adventure"},
+        {Dimension.FOREST_VECTOR, "VectorBossBattle"},
     };
 
     [HideInInspector] public GameDifficulty Difficulty { get; private set; }
-    [HideInInspector]  public Dimension CurrentDimension { get; private set; }
+    [HideInInspector] public Dimension CurrentDimension { get; private set; }
     [Range(0, 1)]
     public float TotalInfluence {get; private set; }
     public float InfluenceDelta {get; private set; }
     [HideInInspector] public static readonly float MinInfluenceDelta = 5.0f; 
-    [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f; 
+    [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f;
+
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
     private MusicPlayer _musicPlayer;
@@ -37,6 +39,7 @@ public class GameManager : MonoBehaviour {
     // public Card[] AllPossibleCards;
     [HideInInspector] private List<Card> _alreadyAddedCards = new();
     [SerializeField] private List<Card> _cards = new();
+
     // Events
     public UnityEvent LevelLoaded;
     public bool IsStarterDialogueOver = false;
@@ -61,11 +64,15 @@ public class GameManager : MonoBehaviour {
             _alreadyAddedCards.Add(c);
         }
     }
+
     private void Start() {
         playMusicForDimension(CurrentDimension);
-
         // For some reason "scene change" is being called, even if it is the first scene?
         // ConnectPortals();
+    }
+
+    void Update() {
+        DebugCommands();
     }
 
     public void ChangeDimension(Dimension dimension, float newInfluence)  {
@@ -103,6 +110,11 @@ public class GameManager : MonoBehaviour {
     public void SetDefault() {
         Difficulty = GameDifficulty.NORMAL;
         CurrentDimension = Dimension.HUB;
+        TotalInfluence = 0;
+        InfluenceDelta = 0;
+    }
+
+    public void ResetInfluence() {
         TotalInfluence = 0;
         InfluenceDelta = 0;
     }
@@ -147,5 +159,33 @@ public class GameManager : MonoBehaviour {
     public void OnLevelLoaded() {
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Choose);
         LevelLoaded.Invoke();
+    }
+
+
+    public void DebugCommands() {
+        if(Input.GetKeyDown(KeyCode.F4)) {
+            Debug.Log("<color=red>Debug Tools - Moving to the hub");
+            ChangeDimension(Dimension.HUB, TotalInfluence + 10);
+        }
+
+        if(Input.GetKeyDown(KeyCode.F5)) {
+            Debug.Log("<color=red>Debug Tools - Moving to the new forest");
+            ChangeDimension(Dimension.FOREST, TotalInfluence + 10);
+        }
+
+        if(Input.GetKeyDown(KeyCode.F6)) {
+            Debug.Log("<color=red>Debug Tools - Moving to Vek'thar's arena");
+            // ChangeDimension(Dimension.FOREST_VECTOR, TotalInfluence);
+        }
+
+        if(Input.GetKeyDown(KeyCode.F7)) {
+            TotalInfluence += 5;
+            Debug.Log($"<color=red>Debug Tools - Adding 5 influence. New influence: {TotalInfluence}");
+        }
+
+        if(Input.GetKeyDown(KeyCode.F8)) {
+            TotalInfluence -= 5;
+            Debug.Log($"<color=red>Debug Tools - Subtracting 5 influence. New influence: {TotalInfluence}");
+        }
     }
 }
