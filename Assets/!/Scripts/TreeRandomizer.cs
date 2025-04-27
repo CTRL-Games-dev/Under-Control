@@ -19,7 +19,7 @@ public class TreeRandomizer : MonoBehaviour
         float influence = GameManager.Instance.TotalInfluence;
         if(influence <= 15) return;
 
-        influence += Random.Range(-5, 5);
+        influence += Random.Range(-15, 10);
 
         if(influence >= 100) {
             Destroy(_leaves);
