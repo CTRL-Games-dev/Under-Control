@@ -7,8 +7,9 @@ public class Effect : ScriptableObject {
     public float Duration;
     public Modifier[] Modifiers;
 
-    // Side effects
-    public virtual void Apply(LivingEntity entity) {}
+    public virtual void OnApply(LivingEntity entity) {}
+
+    public virtual void OnRemove(LivingEntity entity) {}
 
     public override string ToString() {
         if (Modifiers == null || Modifiers.Length == 0) {

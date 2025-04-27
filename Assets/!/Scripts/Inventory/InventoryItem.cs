@@ -15,7 +15,7 @@ public class InventoryItem {
     public int Amount;
     public Vector2Int Position;
 
-    [Range(0, 2)]
+    [Range(0.75f, 1.25f)]
     public float PowerScale = 1;
     public bool Rotated;
 
@@ -54,7 +54,7 @@ public class InventoryItem<T> where T : ItemData {
     public int Amount { get => _inventoryItem.Amount; set => _inventoryItem.Amount = value; }
     public Vector2Int Position { get => _inventoryItem.Position; set => _inventoryItem.Position = value; }
 
-    [Range(0, 2)]
+    [Range(0.75f, 1.25f)]
     public float PowerScale { get => _inventoryItem.PowerScale; set => _inventoryItem.PowerScale = value; }
     public bool Rotated { get => _inventoryItem.Rotated; set => _inventoryItem.Rotated = value; }
 
@@ -75,6 +75,9 @@ public class InventoryItem<T> where T : ItemData {
     }
 
     public static implicit operator InventoryItem(InventoryItem<T> inventoryItem) {
+        // If InventoryItem window is null, casting behavior should return null
+        if(inventoryItem == null) return null;
+
         return inventoryItem._inventoryItem;
     }
 }

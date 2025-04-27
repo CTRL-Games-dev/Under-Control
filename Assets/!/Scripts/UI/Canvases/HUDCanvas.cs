@@ -225,6 +225,11 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
 
 
     public void OnUpdateConsumables() {
+        updateConsumableOne();
+        updateConsumableTwo();
+    }
+
+    private void updateConsumableOne() {
         if (Player.Instance.ConsumableItemOne != null) {
             if (Player.Instance.ConsumableItemOne.ItemData == null) {
                 _consumable1Img.gameObject.SetActive(false);
@@ -250,7 +255,9 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
             _consumable1Img.gameObject.SetActive(false);
             _consumable1CooldownImg.gameObject.SetActive(false);
         }
+    }
 
+    private void updateConsumableTwo() {
         if (Player.Instance.ConsumableItemTwo != null) {
             if (Player.Instance.ConsumableItemTwo.ItemData == null) {
                 _consumable2Img.gameObject.SetActive(false);

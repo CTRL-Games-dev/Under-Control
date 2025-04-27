@@ -17,7 +17,8 @@ public class InvTile : MonoBehaviour {
             if (_isEmpty && _image != null) {
                 _image.color = Color.white;
             } else {
-                _image.color = Color.yellow;
+                float c = 190f / 255f;
+                _image.color = new Color(c, c, c, 1f);
             }
         }
     }
@@ -58,5 +59,11 @@ public class InvTile : MonoBehaviour {
 
     public void SetHighlight(bool value) {
         _highlightImage.SetActive(value);
+    }
+
+    public void SetCustomImage(Sprite sprite) {
+        if (_image != null) {
+            _image.sprite = sprite;
+        }
     }
 }

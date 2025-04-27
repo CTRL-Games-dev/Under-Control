@@ -17,6 +17,11 @@ public class NoInventory : EntityInventory
         return false;
     }
 
+    public override bool AddItem(ItemData itemData, int amount = 1, float powerScale = 1, bool rotated = false)
+    {
+        return false;
+    }
+
     public override bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position, float powerScale = 1)
     {
         return false;
@@ -53,4 +58,15 @@ public class NoInventory : EntityInventory
     }
 
     public override void Clear() {}
+
+
+    public override bool HasItemData(ItemData itemData, int amount = 1)
+    {
+        return false;
+    }
+
+    public override InventoryItem GetFirstInventoryItem(ItemData itemData)
+    {
+        return null;
+    }
 }

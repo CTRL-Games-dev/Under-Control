@@ -24,8 +24,18 @@ public class SimpleInventory : EntityInventory
         return wasAdded;
     }
 
+    public override bool AddItem(ItemData itemData, int amount = 1, float powerScale = 1, bool rotated = false) {
+        bool wasAdded = ItemContainer.AddItem(itemData, amount, powerScale, rotated);
+        if (wasAdded) OnInventoryChanged?.Invoke();
+        return wasAdded;
+    }
+
     public override InventoryItem GetInventoryItem(Vector2Int position) {
         return ItemContainer.GetInventoryItem(position);
+    }
+
+    public override InventoryItem GetFirstInventoryItem(ItemData item) {
+        return ItemContainer.GetFirstInventoryItem(item);
     }
 
     public override List<InventoryItem> GetItems() {
@@ -59,5 +69,9 @@ public class SimpleInventory : EntityInventory
     public override void Clear() {
         ItemContainer.Clear();
         OnInventoryChanged?.Invoke();
+    }
+    
+    public override bool HasItemData(ItemData itemData, int amount = 1) {
+        return ItemContainer.HasItemData(itemData, amount);
     }
 }

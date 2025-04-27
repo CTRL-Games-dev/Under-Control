@@ -427,8 +427,6 @@ MonoBehaviour:
   WeaponHolder: {fileID: 1406075851802362218}
   PrimaryAttackWeapon: {fileID: 11400000, guid: bbb94b7d82c394445bb5e3a013460e61, type: 2}
   ChargeAttackWeapon: {fileID: 11400000, guid: bef4f3215ce2b454b9d4f84aae6cdee8, type: 2}
-  PrimaryAttackCooldown:
-    CooldownTime: 3
 --- !u!114 &7806520074396417047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -444,10 +442,10 @@ MonoBehaviour:
   DisplayName: Boar
   Guild: {fileID: 11400000, guid: 734b0a650a008d14ab9d8696640c3a05, type: 2}
   DropItemsOnDeath: 1
-  TimeToRegenAfterDamage: 2
   DestroyOnDeath: 1
-  Health: 100
-  Mana: 100
+  IsInvisible: 0
+  StartingHealth: 100
+  StartingMana: 100
   MaxHealth:
     _raw: 200
     _adjusted: 100
@@ -455,28 +453,7 @@ MonoBehaviour:
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
-  HealthRegenRate:
-    _raw: 1
-    _adjusted: 1
-    _initValue: 1
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  ManaRegenRate:
-    _raw: 1
-    _adjusted: 1
-    _initValue: 1
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
   Armor:
-    _raw: 0
-    _adjusted: 0
-    _initValue: 0
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  ElementalArmor:
     _raw: 0
     _adjusted: 0
     _initValue: 0
@@ -503,6 +480,10 @@ MonoBehaviour:
   OnDamageTaken:
     m_PersistentCalls:
       m_Calls: []
+  OnStunned:
+    m_PersistentCalls:
+      m_Calls: []
+  _isPlayer: 0
 --- !u!114 &5971722301657437975
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -546,14 +527,20 @@ MonoBehaviour:
   - Item: {fileID: 11400000, guid: 76cc4ac11506f5949ad88e652d5100fb, type: 2}
     MinAmount: 1
     MaxAmount: 4
+    MinPowerScale: 0
+    MaxPowerScale: 0
     Chance: 1
   - Item: {fileID: 11400000, guid: 9df73015bdc274a4394a14e34153ecaf, type: 2}
     MinAmount: 0
     MaxAmount: 2
+    MinPowerScale: 0
+    MaxPowerScale: 0
     Chance: 1
   - Item: {fileID: 11400000, guid: 7f3a1b5152c312642aa6e38b9609647c, type: 2}
     MinAmount: 1
     MaxAmount: 2
+    MinPowerScale: 0
+    MaxPowerScale: 0
     Chance: 1
 --- !u!195 &4352187923124067570
 NavMeshAgent:
@@ -751,6 +738,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _hitFlashMaterial: {fileID: 2100000, guid: a70176b5e5737f04f86db74d184df881, type: 2}
   _flashDuration: 0.1
+  _isPlayer: 0
 --- !u!114 &801651726614500412
 MonoBehaviour:
   m_ObjectHideFlags: 0

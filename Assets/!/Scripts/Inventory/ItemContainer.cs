@@ -55,10 +55,15 @@ public class ItemContainer
         return true;
     }
 
-    public bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position, float powerScale) {
+    public bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position, float powerScale, bool rotated = false) {
         var inventoryItem = GetInventoryItem(position);
         if(inventoryItem == null) {
-            return DoesFitWithin(position, itemData.Size);
+            Vector2Int size = itemData.Size;
+            if(rotated) {
+                size = new Vector2Int(size.y, size.x);
+            }
+
+            return DoesFitWithin(position, size);
         }
 
         if(!inventoryItem.ItemData.Equals(itemData)) {
@@ -79,6 +84,17 @@ public class ItemContainer
     public bool IsWithinBounds(Vector2Int position) {
         return position.x >= 0 && position.y >= 0 && position.x < _size.x && position.y < _size.y;
     }
+
+    public InventoryItem GetFirstInventoryItem(ItemData itemData) {
+        foreach(var inventoryItem in _items) {
+            if(inventoryItem.ItemData.Equals(itemData)) {
+                return inventoryItem;
+            }
+        }
+
+        return null;
+    }
+
 
     // This will throw an exception if the position is out of bounds
     // Use IsWithinBounds to check if the position is valid
@@ -119,7 +135,7 @@ public class ItemContainer
             throw new Exception("Position is out of bounds");
         }
 
-        if(!CanBeAdded(itemData, amount, position, powerScale)) {
+        if(!CanBeAdded(itemData, amount, position, powerScale, rotated)) {
             return false;
         }
 
@@ -131,8 +147,29 @@ public class ItemContainer
     public bool AddItem(ItemData itemData, int amount = 1, float powerScale = 1) {
         for(int y = 0; y < _size.y; y++) {
             for(int x = 0; x < _size.x; x++) {
-                if(CanBeAdded(itemData, amount, new Vector2Int(x, y), powerScale)) {
-                    return addItem(itemData, amount, new Vector2Int(x, y));
+                if(CanBeAdded(itemData, amount, new Vector2Int(x, y), powerScale, false)) {
+                    return addItem(itemData, amount, new Vector2Int(x, y), powerScale, false);
+                }
+            }
+        }
+
+        // Try rotated
+        for(int y = 0; y < _size.y; y++) {
+            for(int x = 0; x < _size.x; x++) {
+                if(CanBeAdded(itemData, amount, new Vector2Int(x, y), powerScale, true)) {
+                    return addItem(itemData, amount, new Vector2Int(x, y), powerScale, true);
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public bool AddItem(ItemData itemData, int amount = 1, float powerScale = 1, bool rotated = false) {
+        for(int y = 0; y < _size.y; y++) {
+            for(int x = 0; x < _size.x; x++) {
+                if(CanBeAdded(itemData, amount, new Vector2Int(x, y), powerScale, rotated)) {
+                    return addItem(itemData, amount, new Vector2Int(x, y), powerScale, rotated);
                 }
             }
         }
@@ -195,6 +232,20 @@ public class ItemContainer
         return true;
     }
 
+
+
+    private InventoryItem GetFirstItemData(ItemData itemData, int amount) {
+        foreach(var inventoryItem in _items) {
+            if(inventoryItem.ItemData.Equals(itemData)) {
+                if(inventoryItem.Amount >= amount) {
+                    return inventoryItem;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public List<InventoryItem> GetItems() {
         return _items;
     }
@@ -224,5 +275,17 @@ public class ItemContainer
 
     public void Clear() {
         _items.Clear();
+    }
+
+    public bool HasItemData(ItemData itemData, int amount){
+        foreach(var inventoryItem in _items) {
+            if(inventoryItem.ItemData.Equals(itemData)) {
+                if(inventoryItem.Amount >= amount) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

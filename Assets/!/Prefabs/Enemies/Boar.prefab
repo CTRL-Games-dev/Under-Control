@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 944497780338279808}
   - component: {fileID: 8495430180178546008}
   - component: {fileID: 1303237322038029711}
+  - component: {fileID: 2426849268657618550}
   m_Layer: 0
   m_Name: Boar
   m_TagString: Untagged
@@ -76,25 +77,18 @@ MonoBehaviour:
   DisplayName: enemy_name_boar_key
   Guild: {fileID: 11400000, guid: 734b0a650a008d14ab9d8696640c3a05, type: 2}
   DropItemsOnDeath: 1
-  TimeToRegenAfterDamage: 3
   DestroyOnDeath: 1
-  Health: 100
-  Mana: 100
+  IsInvisible: 0
+  StartingHealth: 50
+  StartingMana: 10
   MaxHealth:
-    _raw: 15
+    _raw: 10
     _adjusted: 100
     _initValue: 100
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
   Armor:
-    _raw: 0
-    _adjusted: 0
-    _initValue: 0
-    OnValueChanged:
-      m_PersistentCalls:
-        m_Calls: []
-  ElementalArmor:
     _raw: 0
     _adjusted: 0
     _initValue: 0
@@ -121,6 +115,10 @@ MonoBehaviour:
   OnDamageTaken:
     m_PersistentCalls:
       m_Calls: []
+  OnStunned:
+    m_PersistentCalls:
+      m_Calls: []
+  _isPlayer: 0
 --- !u!114 &1993330704382467551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,17 +159,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DropOnDeath: 1
   PossibleLoot:
-  - Item: {fileID: 11400000, guid: b125bd877215e4418ba08244717254e4, type: 2}
+  - Item: {fileID: 11400000, guid: 03310c97e7837f149bd40574557472fa, type: 2}
     MinAmount: 1
     MaxAmount: 4
+    MinPowerScale: 0
+    MaxPowerScale: 0
     Chance: 1
   - Item: {fileID: 11400000, guid: 9df73015bdc274a4394a14e34153ecaf, type: 2}
     MinAmount: 0
     MaxAmount: 2
+    MinPowerScale: 0
+    MaxPowerScale: 0
     Chance: 1
   - Item: {fileID: 11400000, guid: e238eb001208bff4ab3b431ed6ee2db0, type: 2}
     MinAmount: 0
     MaxAmount: 2
+    MinPowerScale: 0
+    MaxPowerScale: 0
     Chance: 1
 --- !u!195 &8974613204039339173
 NavMeshAgent:
@@ -387,6 +391,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _hitFlashMaterial: {fileID: 2100000, guid: a70176b5e5737f04f86db74d184df881, type: 2}
   _flashDuration: 0.1
+  _isPlayer: 0
+--- !u!114 &2426849268657618550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3366227734027736264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccbfbf48d8b4ca844a0f6084a171adbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _meshRenderers:
+  - {fileID: 1048271120803497581}
 --- !u!1 &4528148705983052239
 GameObject:
   m_ObjectHideFlags: 0
@@ -628,6 +647,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -3314160729480047072, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -3314160729480047072, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: acc3b20724406744cb8b49bdf4e3e028, type: 2}
+    - target: {fileID: -3314160729480047072, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: -7674537378844400586, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
     - target: {fileID: 919132149155446097, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
       propertyPath: m_Name
       value: boar
@@ -645,6 +676,11 @@ PrefabInstance:
       addedObject: {fileID: 6791158440615136571}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
+--- !u!137 &1048271120803497581 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -3314160729480047072, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
+  m_PrefabInstance: {fileID: 6669137702589419597}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1708187124427179226 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -3802944345525381993, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}

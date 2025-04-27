@@ -16,7 +16,34 @@ public class WeaponHolder : MonoBehaviour
     private bool _isAttacking = false;
 
     public void UpdateWeapon(InventoryItem<WeaponItemData> weaponItem) {
-        UpdateWeapon(weaponItem.ItemData, weaponItem.PowerScale);
+        if (_currentWeaponHitter != null) {
+            Destroy(_currentWeaponHitter.gameObject);
+            _currentWeaponHitter = null;
+            _currentWeaponData = null;
+        }
+
+        if(weaponItem == null) return;
+
+        WeaponItemData weaponData = weaponItem.ItemData;
+        float powerScale = weaponItem.PowerScale;
+
+        if(weaponData == null) return;
+
+        _currentWeaponPowerScale = powerScale;
+
+        if (weaponData.WeaponPrefab != null) {
+            _currentWeaponHitter = InstantiateWeapon(weaponData);
+        } else {
+            _currentWeaponHitter = InstantiateUnknownWeapon();
+        }
+
+        _currentWeaponData = weaponData;
+
+        if (_currentWeaponHitter.gameObject.layer == LayerMask.NameToLayer("Default")) {
+            _currentWeaponHitter.gameObject.layer = gameObject.layer;
+        }
+
+        _currentWeaponHitter.OnHit.AddListener(OnHit);
     }
 
     public void UpdateWeapon(WeaponItemData weaponData, float powerScale = 1) {
@@ -89,7 +116,6 @@ public class WeaponHolder : MonoBehaviour
         _isAttacking = true;
 
         _hitEntities.Clear();
-        _currentWeaponHitter.StartMinorTrail();
     }
 
     public void EndAttack() {
@@ -105,7 +131,6 @@ public class WeaponHolder : MonoBehaviour
         _isAttacking = false;
 
         _hitEntities.Clear();
-        _currentWeaponHitter.StopMinorTrail();
         _currentAttackType = null;
     }
 
@@ -118,7 +143,6 @@ public class WeaponHolder : MonoBehaviour
         if(_currentWeaponHitter == null) return;
 
         _currentWeaponHitter.EnableHitbox();
-        _currentWeaponHitter.StartMajorTrail();
     }
 
     public void DisableHitbox() {
@@ -130,7 +154,6 @@ public class WeaponHolder : MonoBehaviour
         if(_currentWeaponHitter == null) return;
 
         _currentWeaponHitter.DisableHitbox();
-        _currentWeaponHitter.StopMajorTrail();
     }
 
     public void OnHit(LivingEntity victim) {

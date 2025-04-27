@@ -27,6 +27,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     private string _otherNameKey = string.Empty;
     private FaceAnimator _otherFaceAnimator;
     private bool _blockClick = false;
+    private Talkable _talkable = null;
 
     
     private void Awake() {
@@ -57,12 +58,13 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     }
 
 
-    public void SetupDialogue(Dialogue dialogue, Texture faceImage, FaceAnimator faceAnimator, string nameKey) {
+    public void SetupDialogue(Dialogue dialogue, Texture faceImage, FaceAnimator faceAnimator, string nameKey, Talkable talkable) {
         gameObject.SetActive(true);
         _dialogue = dialogue;
         _otherNameKey = nameKey;
         _otherFaceAnimator = faceAnimator;
         _otherImage.texture = faceImage;       
+        _talkable = talkable;
     }
 
 
@@ -88,7 +90,6 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
 
 
     public void HideUI() {
-
         _canvasGroup.DOFade(0, 0.7f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnComplete(() => {
             gameObject.SetActive(false);
         });
@@ -117,8 +118,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
             
             _currentDialogueIndex++;
             if (_currentDialogueIndex >= _dialogue.DialogueEntries.Count) {
-                Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
-                CameraManager.Instance.SwitchCamera(null);
+                _talkable.EndInteract();
                 return;
             }
             updateDialogueBox();

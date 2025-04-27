@@ -12,7 +12,9 @@ public class InventoryPanel : MonoBehaviour
     [Header("Assign if not player inventory")]
     [SerializeField] private bool _isPlayerInventory = false;
     public bool IsSellerInventory = false;
-    public ItemContainer TargetEntityInventory; 
+
+    public EntityInventory TargetEntityInventory; 
+    public Sprite CustomInvTileSprite;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject _itemPrefab;
@@ -58,7 +60,13 @@ public class InventoryPanel : MonoBehaviour
     }
 
     public void Start() {
-        ConnectSignals();
+        _currentEntityInventory = getCurrentEntityInventory();
+        if (_currentEntityInventory == null) {
+            // Debug.LogError("No inventory found!");
+            disconnectSignals();
+            return;
+        }
+        connectSignals();
         RegenerateInventory();
     }
 
@@ -67,9 +75,14 @@ public class InventoryPanel : MonoBehaviour
     #region Grid Methods
 
     public void RegenerateInventory() {
-        if ((_currentEntityInventory = _isPlayerInventory ? Player.Inventory.ItemContainer : TargetEntityInventory) == null) return; 
         setupGrid();
         UpdateItemUIS();
+    }
+
+    private ItemContainer getCurrentEntityInventory() {
+        if (_isPlayerInventory) return Player.Inventory.ItemContainer;
+        if (TargetEntityInventory is SimpleInventory s) return s.ItemContainer;
+        return null; 
     }
 
     private void setupGrid() {
@@ -100,6 +113,8 @@ public class InventoryPanel : MonoBehaviour
                 
                 invTile.InventoryPanel = this;
                 invTile.Pos = new Vector2Int(x, y);
+                
+                if (CustomInvTileSprite != null) invTile.SetCustomImage(CustomInvTileSprite);
             }
         }
     }
@@ -134,13 +149,17 @@ public class InventoryPanel : MonoBehaviour
 
     private void highlightNeighbours(Vector2Int pos, InventoryItem inventoryItem) {
         Vector2Int size = inventoryItem.Rotated ? new Vector2Int(inventoryItem.Size.y, inventoryItem.Size.x) : inventoryItem.Size;
+        pos += inventoryItem.Rotated ?
+          new Vector2Int(Player.UICanvas.SelectedItemUI.SelectedOffsetInv.y, -Player.UICanvas.SelectedItemUI.SelectedOffsetInv.x - 1) :
+          Player.UICanvas.SelectedItemUI.SelectedOffsetInv;
+            
         int startingY = pos.y;
         int endingY = startingY + size.y;
 
-        if (inventoryItem.Size.x > 1 && inventoryItem.Rotated) {
-            startingY = pos.y - inventoryItem.Size.x + 1;
-            endingY = startingY + inventoryItem.Size.x;
-        }
+        // if (inventoryItem.Size.x > 1 && inventoryItem.Rotated) {
+        //     startingY = pos.y - inventoryItem.Size.x + 1;
+        //     endingY = startingY + inventoryItem.Size.x;
+        // }
 
         for(int y = startingY; y < endingY; y++) {
             for(int x = pos.x; x < pos.x + size.x; x++) {
@@ -178,9 +197,19 @@ public class InventoryPanel : MonoBehaviour
 
         InventoryItem[] itemsArray = _inventory.ToArray();
 
+        wipeAllItemUIS();
+        foreach (InvTile tile in _inventoryTileArray) {
+            tile.IsEmpty = true;
+        }
         foreach (InventoryItem i in itemsArray) {
             destroyItemUI(i);
             createItemUI(i);
+        }
+    }
+
+    private void wipeAllItemUIS() {
+        foreach (Transform child in _itemHolder.transform) {
+            Destroy(child.gameObject);
         }
     }
 
@@ -230,8 +259,10 @@ public class InventoryPanel : MonoBehaviour
         }
 
         Vector2Int selectedTilePos = SelectedTile.Pos;
-        if (_selectedInventoryItem.Size.x > 1 && _selectedInventoryItem.Rotated) {
-            selectedTilePos = new Vector2Int(SelectedTile.Pos.x, SelectedTile.Pos.y - _selectedInventoryItem.Size.x + 1);
+        if(_selectedInventoryItem != null) {
+            selectedTilePos += _selectedInventoryItem.Rotated ?
+                new Vector2Int(Player.UICanvas.SelectedItemUI.SelectedOffsetInv.y, -Player.UICanvas.SelectedItemUI.SelectedOffsetInv.x - 1) :
+                Player.UICanvas.SelectedItemUI.SelectedOffsetInv;
         }
 
         Vector2Int size = _selectedInventoryItem.Rotated ? new Vector2Int(_selectedInventoryItem.Size.y, _selectedInventoryItem.Size.x) : _selectedInventoryItem.Size;
@@ -277,15 +308,27 @@ public class InventoryPanel : MonoBehaviour
     #endregion
 
     #region Misc Methods
-    public void ConnectSignals() {
+    private void connectSignals() {
         EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
         EventBus.ItemUILeftClickEvent.AddListener(OnItemUILeftClick);
         EventBus.ItemUIRightClickEvent.AddListener(OnItemUIRightClick);
     }
 
-    public void SetTargetInventory(ItemContainer itemContainer) {
-        TargetEntityInventory = itemContainer;
-        // RegenerateInventory();
+    private void disconnectSignals() {
+        EventBus.InventoryItemChangedEvent.RemoveListener(UpdateItemUIS);
+        EventBus.ItemUILeftClickEvent.RemoveListener(OnItemUILeftClick);
+        EventBus.ItemUIRightClickEvent.RemoveListener(OnItemUIRightClick);
+    }
+
+    public void SetTargetInventory(EntityInventory entityInventory) {
+        TargetEntityInventory = entityInventory;
+        foreach (Transform child in _itemHolder.transform) {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in _gridHolder.transform) {
+            Destroy(child.gameObject);
+        }
+        Start();
     }
 
     public void SetImagesRaycastTarget(bool val) {

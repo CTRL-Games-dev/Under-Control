@@ -7,13 +7,12 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
 {
     [SerializeField] private GameObject _cardsHolder;
     [SerializeField] private GameObject _cardPrefab;
-    [SerializeField] private Card[] _cards;
     [SerializeField] private CanvasGroup _longDescCanvasGroup;
     [SerializeField] private TextLocalizer _longDescTextLocalizer;
     [SerializeField] private ContentSizeFitter  _contentSizeFitter;
 
     private CanvasGroup _canvasGroup;
-    private List<CardUI> _currentCards = new();
+    private CardUI[] _currentCards;
 
     private void Awake() {
         _canvasGroup = GetComponent<CanvasGroup>();
@@ -29,9 +28,13 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
     public void ShowUI() {
         gameObject.SetActive(true);
         _longDescCanvasGroup.alpha = 0;
-        for (int i = 0; i < 3; i++) {
-            Card card = _cards[Random.Range(0, _cards.Length)];
-            _currentCards.Add(AddCard(card));
+
+        int numberOfCards = 3;
+        _currentCards = new CardUI[numberOfCards];
+
+        Card[] randomCards = GameManager.Instance.GetRandomCards(numberOfCards);
+        for(int i = 0; i < randomCards.Length; i++) {
+            _currentCards[i] = AddCard(randomCards[i]);
         }
 
         _canvasGroup.DOComplete();
@@ -76,8 +79,10 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
             }
         }
 
+        GameManager.Instance.ChooseCard(card);
+
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
-        _currentCards.Clear();
+        _currentCards = null;
     }
 
     public CardUI AddCard(Card runCard) {
