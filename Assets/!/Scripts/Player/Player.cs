@@ -176,6 +176,7 @@ public class Player : MonoBehaviour {
     [Header("References")]
     [SerializeField] private UICanvas _uiCanvas;
     [SerializeField] private ParticleSystem[] _trailParticles;
+    public GameObject FBXModel;
 
     // Static reference getters
     public static LivingEntity LivingEntity { get; private set; }
@@ -191,9 +192,6 @@ public class Player : MonoBehaviour {
     public FaceAnimator FaceAnimator;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
-
-    public GameObject SlashGO;
-    public Material SlashMaterial;
     private Vector3 _queuedRotation = Vector3.zero;
 
     #region Unity Methods
