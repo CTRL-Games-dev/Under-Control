@@ -68,6 +68,10 @@ public class GameManager : MonoBehaviour {
         // ConnectPortals();
     }
 
+    void Update() {
+        DebugCommands();
+    }
+
     public void ChangeDimension(Dimension dimension, float newInfluence)  {
         Debug.Log($"New influence: {newInfluence}");
         if(newInfluence <= TotalInfluence)
