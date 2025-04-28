@@ -878,4 +878,22 @@ public class Player : MonoBehaviour {
     }
 
     #endregion
+    #region Saving System
+    public void Save(ref PlayerSaveData data){
+        data.EvolutionPoints = EvolutionPoints;
+        data.SelectedEvolutions = SelectedEvolutions;
+    }
+    public void Load(PlayerSaveData data){
+        EvolutionPoints = data.EvolutionPoints;
+        foreach(EvoUI evolution in data.SelectedEvolutions){
+            evolution.AddEvolution();
+        }
+    }
+    [Serializable]
+    public struct PlayerSaveData{
+        public List<EvoUI> SelectedEvolutions;
+        public int EvolutionPoints;
+
+    }
+    #endregion
 }

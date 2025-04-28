@@ -17,6 +17,13 @@ public class GameManager : MonoBehaviour {
     public Weapon UnknownWeaponPrefab;
     public GameObject UnknownModelPrefab;
     public ItemEntity ItemEntityPrefab;
+    public InventoryPanel InventoryPanel;
+    public InvTileEquipment ArmorTile;
+    public InvTileEquipment WeaponTile;
+    public InvTileEquipment AmuletTile;
+    public InvTileEquipment Consumable1Tile;
+    public InvTileEquipment Consumable2Tile;
+
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
         {Dimension.HUB, "NewHub"},
         {Dimension.FOREST, "Adventure"},
@@ -196,6 +203,14 @@ public class GameManager : MonoBehaviour {
         if(Input.GetKeyDown(KeyCode.F8)) {
             TotalInfluence -= 5;
             Debug.Log($"<color=red>Debug Tools - Subtracting 5 influence. New influence: {TotalInfluence}");
+        }
+        if(Input.GetKeyDown(KeyCode.F9)) {
+            Debug.Log("<color=red>Debug Tools - Saved game via hotkey");
+            SaveSystem.Save();
+        }
+        if(Input.GetKeyDown(KeyCode.F10)) {
+            Debug.Log("<color=red>Debug Tools - Loaded game via hotkey");
+            SaveSystem.Load();
         }
     }
 }

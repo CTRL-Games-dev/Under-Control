@@ -3,7 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.EventSystems;
+using System;
 
+[Serializable]
 public class EvoUI : MonoBehaviour
 {
     
@@ -25,6 +27,8 @@ public class EvoUI : MonoBehaviour
     private void Awake() {
         _rectTransform = GetComponent<RectTransform>();
         _eventTrigger = GetComponent<EventTrigger>();
+        _isAvailable = false;
+        _isSelected = false;
 
         _rectTransform.localScale = _isAvailable ? Vector3.one : Vector3.one * 0.95f;
         _bgImage.color = _isAvailable ? Color.white : Color.gray;
@@ -56,18 +60,27 @@ public class EvoUI : MonoBehaviour
     public void OnPointerClick() {
         if (!_isAvailable || _isSelected || Player.Instance.EvolutionPoints <= 0) return;
         Player.Instance.EvolutionPoints--;
-        Player.Instance.SelectedEvolutions.Add(this);
-        Player.Instance.OnEvolutionSelected.Invoke(this);
+        AddEvolution();
         float fillAmount = 0;
         DOTween.To(() => fillAmount, x => fillAmount = x, 1, 0.8f * Settings.AnimationSpeed).SetEase(Ease.OutSine).OnUpdate(() => {
             _lineImage.fillAmount = fillAmount;
         }).OnComplete(() => {
             _rectTransform.DOScale(1.05f, 0.2f * Settings.AnimationSpeed);
         });
-        _isSelected = true;
         _rectTransform.DOKill();
+    }
+    public void AddEvolution(){
+        
+        Player.Instance.SelectedEvolutions.Add(this);
+        Player.Instance.OnEvolutionSelected.Invoke(this);
+        _isSelected = true;
         if (_nextEvoUI != null) _nextEvoUI.SetAvailable();
     }
+    // public void RemoveEvolution(){
+    //     Player.Instance.SelectedEvolutions.Remove(this);
+    //     _isSelected = false;
+    //     if (_nextEvoUI != null) _nextEvoUI.SetAvailable();
+    // }
 
     public List<Modifier> GetModifiers() {
         return new List<Modifier>(_modifiers);
