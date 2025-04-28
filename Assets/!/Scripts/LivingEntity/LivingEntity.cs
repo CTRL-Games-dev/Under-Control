@@ -50,6 +50,7 @@ public class LivingEntity : MonoBehaviour {
     public Stat Armor = new Stat(StatType.ARMOR, 0);
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
     public Stat MaxMana = new Stat(StatType.MAX_MANA, 100f);
+
     [Header("Sounds")]
     public AudioClip OnDeathSound;
     public AudioClip OnDamageSound;
@@ -67,6 +68,8 @@ public class LivingEntity : MonoBehaviour {
         get { return _activeEffects; }
         private set { _activeEffects = value; }
     }
+
+    public bool HasDied = false;
 
     private readonly int _hurtHash = Animator.StringToHash("hurt");
 
@@ -126,7 +129,6 @@ public class LivingEntity : MonoBehaviour {
     }
 
     public void TakeDamage(Damage damage, LivingEntity source = null) {
-
         if (_isPlayer) {
             if (Player.Instance.DamageDisabled) {
                 return;
@@ -136,7 +138,6 @@ public class LivingEntity : MonoBehaviour {
         if (gameObject.CompareTag("Boar")) {
             gameObject.GetComponent<Animator>()?.SetTrigger(_hurtHash);
         }
-
 
         // Check if entity is dead
         if(Health == 0) {
@@ -180,6 +181,11 @@ public class LivingEntity : MonoBehaviour {
     }
     
     public void Die() {
+        if (HasDied) return;
+        HasDied = true;
+
+        Debug.Log(gameObject.name + " died");
+
         // Drop items
         if(DropItemsOnDeath) {
             // Drop common slots
@@ -201,23 +207,21 @@ public class LivingEntity : MonoBehaviour {
                     humanoidInventory.Amulet = null;
                 }
 
-                    if(humanoidInventory.Weapon != null) {
-                        dropItem(humanoidInventory.Weapon);
-                        humanoidInventory.Weapon = null;
-                    }
+                if(humanoidInventory.Weapon != null) {
+                    dropItem(humanoidInventory.Weapon);
+                    humanoidInventory.Weapon = null;
                 }
-            
-
-            if(OnDeathSound!=null) SoundFXManager.Instance.PlaySoundFXClip(OnDeathSound, transform, 0.4f);
-
-            OnDeath?.Invoke();
-
-            if (DestroyOnDeath) Destroy(gameObject);
-        }
-        else {
+            }
+        } else {
             AudioClip hitSound = Resources.Load("SFX/uderzenie") as AudioClip; //hitsound
             SoundFXManager.Instance.PlaySoundFXClip(hitSound, transform, 0.7f);
         }
+
+        if(OnDeathSound!=null) SoundFXManager.Instance.PlaySoundFXClip(OnDeathSound, transform, 0.4f);
+
+        OnDeath?.Invoke();
+
+        if (DestroyOnDeath) Destroy(gameObject);
     }
 
     private float getDamageResistance(DamageType damageType) {
@@ -272,8 +276,6 @@ public class LivingEntity : MonoBehaviour {
     public List<EffectData> GetActiveEffects() {
         return ActiveEffects;
     }
-
-    
 
     // public void RemoveAllEffectsLike(Effect effect) {
     //     for(int i = 0; i < activeEffects.Count; i++) {
