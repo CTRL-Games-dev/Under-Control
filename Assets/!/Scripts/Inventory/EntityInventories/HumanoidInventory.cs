@@ -1,82 +1,42 @@
 using System;
+using UnityEngine;
 
 [Serializable]
 public class HumanoidInventory : SimpleInventory
 {
-    public HelmetItemData Helmet
+    [SerializeField]
+    private InventoryItem<AmuletItemData> _amulet;
+    public InventoryItem<AmuletItemData> Amulet
     {
-        get => helmet;
+        get => _amulet;
         set
         {
-            helmet = value;
+            _amulet = value;
             OnInventoryChanged.Invoke();
         }
     }
-    private HelmetItemData helmet;
-    
-    public ChestplateItemData Chestplate
-    {
-        get => chestplate;
-        set
-        {
-            chestplate = value;
-            OnInventoryChanged.Invoke();
-        }
-    }
-    private ChestplateItemData chestplate;
 
-    public LeggingsItemData Leggings
+    [SerializeField]
+    private InventoryItem<ArmorItemData> _armor;
+    public InventoryItem<ArmorItemData> Armor
     {
-        get => leggings;
+        get => _armor;
         set
         {
-            leggings = value;
+            _armor = value;
             OnInventoryChanged.Invoke();
         }
     }
-    private LeggingsItemData leggings;
 
-    public BootsItemData Boots
+    [SerializeField]
+    private InventoryItem<WeaponItemData> _weapon;
+    public InventoryItem<WeaponItemData> Weapon
     {
-        get => boots;
+        get => _weapon;
         set
         {
-            boots = value;
+            _weapon = value;
             OnInventoryChanged.Invoke();
         }
     }
-    private BootsItemData boots;
-
-    public AmuletItemData Amulet
-    {
-        get => amulet;
-        set
-        {
-            amulet = value;
-            OnInventoryChanged.Invoke();
-        }
-    }
-    private AmuletItemData amulet;
-
-    public RingItemData Ring
-    {
-        get => ring;
-        set
-        {
-            ring = value;
-            OnInventoryChanged.Invoke();
-        }
-    }
-    private RingItemData ring;
-
-    public WeaponItemData Weapon
-    {
-        get => weapon;
-        set
-        {
-            weapon = value;
-            OnInventoryChanged.Invoke();
-        }
-    }
-    private WeaponItemData weapon;
 }

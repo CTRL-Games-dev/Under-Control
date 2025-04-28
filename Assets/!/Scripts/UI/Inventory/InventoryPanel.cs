@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -12,7 +13,9 @@ public class InventoryPanel : MonoBehaviour
     [Header("Assign if not player inventory")]
     [SerializeField] private bool _isPlayerInventory = false;
     public bool IsSellerInventory = false;
-    public ItemContainer TargetEntityInventory; 
+
+    public EntityInventory TargetEntityInventory; 
+    public Sprite CustomInvTileSprite;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject _itemPrefab;
@@ -28,7 +31,6 @@ public class InventoryPanel : MonoBehaviour
 
     // References set in Awake or Start
     private RectTransform _rectTransform;
-    private UICanvas _uiCanvas;
     private ItemContainer _currentEntityInventory;
     private GridLayoutGroup _gridLayoutGroup;
     private Image _layoutImage;
@@ -41,7 +43,7 @@ public class InventoryPanel : MonoBehaviour
     private int _inventoryWidth, _inventoryHeight;
 
     public List<InventoryItem> _inventory => _currentEntityInventory.GetItems();
-    private InventoryItem _selectedInventoryItem => _uiCanvas.SelectedItemUI.InventoryItem;
+    private InventoryItem _selectedInventoryItem => Player.UICanvas.SelectedItemUI.InventoryItem;
     [HideInInspector] public static bool IsItemJustBought = false;
 
     // Grid variables
@@ -59,9 +61,17 @@ public class InventoryPanel : MonoBehaviour
     }
 
     public void Start() {
-        ConnectSignals();
-        _uiCanvas = UICanvas.Instance;
+        _currentEntityInventory = getCurrentEntityInventory();
+        if (_currentEntityInventory == null) {
+            // Debug.LogError("No inventory found!");
+            disconnectSignals();
+            return;
+        }
+        connectSignals();
         RegenerateInventory();
+        EventBus.ItemPlacedEvent.AddListener(playInventorySound);
+        EventBus.ItemUILeftClickEvent.AddListener(playInventorySound);
+        EventBus.ItemUIRightClickEvent.AddListener(playInventorySound);
     }
 
     #endregion
@@ -69,9 +79,14 @@ public class InventoryPanel : MonoBehaviour
     #region Grid Methods
 
     public void RegenerateInventory() {
-        if ((_currentEntityInventory = _isPlayerInventory ? _uiCanvas.PlayerInventory.ItemContainer : TargetEntityInventory) == null) return; 
         setupGrid();
         UpdateItemUIS();
+    }
+
+    private ItemContainer getCurrentEntityInventory() {
+        if (_isPlayerInventory) return Player.Inventory.ItemContainer;
+        if (TargetEntityInventory is SimpleInventory s) return s.ItemContainer;
+        return null; 
     }
 
     private void setupGrid() {
@@ -102,6 +117,8 @@ public class InventoryPanel : MonoBehaviour
                 
                 invTile.InventoryPanel = this;
                 invTile.Pos = new Vector2Int(x, y);
+                
+                if (CustomInvTileSprite != null) invTile.SetCustomImage(CustomInvTileSprite);
             }
         }
     }
@@ -136,13 +153,17 @@ public class InventoryPanel : MonoBehaviour
 
     private void highlightNeighbours(Vector2Int pos, InventoryItem inventoryItem) {
         Vector2Int size = inventoryItem.Rotated ? new Vector2Int(inventoryItem.Size.y, inventoryItem.Size.x) : inventoryItem.Size;
+        pos += inventoryItem.Rotated ?
+          new Vector2Int(Player.UICanvas.SelectedItemUI.SelectedOffsetInv.y, -Player.UICanvas.SelectedItemUI.SelectedOffsetInv.x - 1) :
+          Player.UICanvas.SelectedItemUI.SelectedOffsetInv;
+            
         int startingY = pos.y;
         int endingY = startingY + size.y;
 
-        if (inventoryItem.Size.x > 1 && inventoryItem.Rotated) {
-            startingY = pos.y - inventoryItem.Size.x + 1;
-            endingY = startingY + inventoryItem.Size.x;
-        }
+        // if (inventoryItem.Size.x > 1 && inventoryItem.Rotated) {
+        //     startingY = pos.y - inventoryItem.Size.x + 1;
+        //     endingY = startingY + inventoryItem.Size.x;
+        // }
 
         for(int y = startingY; y < endingY; y++) {
             for(int x = pos.x; x < pos.x + size.x; x++) {
@@ -156,7 +177,7 @@ public class InventoryPanel : MonoBehaviour
 
     public void OnInvTileEnter(InvTile invTile) {
         SelectedTile = invTile;
-        if (_uiCanvas.SelectedItemUI.InventoryItem != null && invTile != null) {
+        if (Player.UICanvas.SelectedItemUI.InventoryItem != null && invTile != null) {
             clearHighlights();
             highlightNeighbours(invTile.Pos, _selectedInventoryItem);
         } else {
@@ -176,13 +197,23 @@ public class InventoryPanel : MonoBehaviour
     #region ItemUI Methods
 
     public void UpdateItemUIS() {
-        // _currentEntityInventory = _isPlayerInventory ? _uiCanvas.PlayerInventory.ItemContainer : TargetEntityInventory;
+        // _currentEntityInventory = _isPlayerInventory ? Player.UICanvas.PlayerInventory.ItemContainer : TargetEntityInventory;
 
         InventoryItem[] itemsArray = _inventory.ToArray();
 
+        wipeAllItemUIS();
+        foreach (InvTile tile in _inventoryTileArray) {
+            tile.IsEmpty = true;
+        }
         foreach (InventoryItem i in itemsArray) {
             destroyItemUI(i);
             createItemUI(i);
+        }
+    }
+
+    private void wipeAllItemUIS() {
+        foreach (Transform child in _itemHolder.transform) {
+            Destroy(child.gameObject);
         }
     }
 
@@ -232,8 +263,10 @@ public class InventoryPanel : MonoBehaviour
         }
 
         Vector2Int selectedTilePos = SelectedTile.Pos;
-        if (_selectedInventoryItem.Size.x > 1 && _selectedInventoryItem.Rotated) {
-            selectedTilePos = new Vector2Int(SelectedTile.Pos.x, SelectedTile.Pos.y - _selectedInventoryItem.Size.x + 1);
+        if(_selectedInventoryItem != null) {
+            selectedTilePos += _selectedInventoryItem.Rotated ?
+                new Vector2Int(Player.UICanvas.SelectedItemUI.SelectedOffsetInv.y, -Player.UICanvas.SelectedItemUI.SelectedOffsetInv.x - 1) :
+                Player.UICanvas.SelectedItemUI.SelectedOffsetInv;
         }
 
         Vector2Int size = _selectedInventoryItem.Rotated ? new Vector2Int(_selectedInventoryItem.Size.y, _selectedInventoryItem.Size.x) : _selectedInventoryItem.Size;
@@ -248,15 +281,15 @@ public class InventoryPanel : MonoBehaviour
             return;
         }
 
-        _currentEntityInventory.AddItem(_selectedInventoryItem.ItemData, _selectedInventoryItem.Amount, selectedTilePos, _selectedInventoryItem.Rotated);
+        _currentEntityInventory.AddItem(_selectedInventoryItem.ItemData, _selectedInventoryItem.Amount, selectedTilePos, _selectedInventoryItem.PowerScale, _selectedInventoryItem.Rotated);
         GameObject item = createItemUI(_currentEntityInventory.GetInventoryItem(selectedTilePos));
         
         if (item.GetComponent<ItemUI>().CurrentInventoryPanel.IsSellerInventory) {
-            _uiCanvas.PlayerController.Coins += (IsItemJustBought ? _selectedInventoryItem.ItemData.Value : _selectedInventoryItem.ItemData.Value / 2) * _selectedInventoryItem.Amount;
+            Player.Instance.Coins += (IsItemJustBought ? _selectedInventoryItem.ScaledValue : _selectedInventoryItem.ScaledValue / 2) * _selectedInventoryItem.Amount;
         }
         IsItemJustBought = false;
 
-        _uiCanvas.SelectedItemUI.InventoryItem = null;
+        Player.UICanvas.SelectedItemUI.InventoryItem = null;
         EventBus.ItemPlacedEvent?.Invoke();
 
         SelectedTile.SetHighlight(false);
@@ -279,15 +312,27 @@ public class InventoryPanel : MonoBehaviour
     #endregion
 
     #region Misc Methods
-    public void ConnectSignals() {
+    private void connectSignals() {
         EventBus.InventoryItemChangedEvent.AddListener(UpdateItemUIS);
         EventBus.ItemUILeftClickEvent.AddListener(OnItemUILeftClick);
         EventBus.ItemUIRightClickEvent.AddListener(OnItemUIRightClick);
     }
 
-    public void SetTargetInventory(ItemContainer itemContainer) {
-        TargetEntityInventory = itemContainer;
-        // RegenerateInventory();
+    private void disconnectSignals() {
+        EventBus.InventoryItemChangedEvent.RemoveListener(UpdateItemUIS);
+        EventBus.ItemUILeftClickEvent.RemoveListener(OnItemUILeftClick);
+        EventBus.ItemUIRightClickEvent.RemoveListener(OnItemUIRightClick);
+    }
+
+    public void SetTargetInventory(EntityInventory entityInventory) {
+        TargetEntityInventory = entityInventory;
+        foreach (Transform child in _itemHolder.transform) {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in _gridHolder.transform) {
+            Destroy(child.gameObject);
+        }
+        Start();
     }
 
     public void SetImagesRaycastTarget(bool val) {
@@ -298,8 +343,16 @@ public class InventoryPanel : MonoBehaviour
 
     private IEnumerator redPanelShow() {
         _redPanel.gameObject.SetActive(true);
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.2f * Settings.AnimationSpeed);
         _redPanel.gameObject.SetActive(false);
+    }
+    
+    private void playInventorySound(ItemUI arg){
+        playInventorySound();
+    }
+    private void playInventorySound(){
+        AudioClip InvClickClip = Resources.Load("SFX/click") as AudioClip;
+        SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform);
     }
 
     #endregion
@@ -307,13 +360,13 @@ public class InventoryPanel : MonoBehaviour
     #region Callbacks
 
     public void OnItemUIClick(ItemUI itemUI) {
-        // if (UICanvas.Instance.SelectedItemUI.InventoryItem != null) return; 
+        // if (Player.UICanvas.SelectedItemUI.InventoryItem != null) return; 
         if (_inventory.Contains(itemUI.InventoryItem)) {
-            if (UICanvas.Instance.SelectedItemUI.InventoryItem != null) return; 
-            if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
-            UICanvas.Instance.SetSelectedItemUI(itemUI);
+            if (Player.UICanvas.SelectedItemUI.InventoryItem != null) return; 
+            if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
+            Player.UICanvas.SetSelectedItemUI(itemUI);
             if (IsSellerInventory) {
-                _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
+                Player.Instance.Coins -= itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount;
                 IsItemJustBought = true;
             }
             destroyAndRemoveItemUI(itemUI.InventoryItem);
@@ -325,34 +378,34 @@ public class InventoryPanel : MonoBehaviour
         if (itemUI == null) return;
 
         if (_inventory.Contains(itemUI.InventoryItem)) {
-            if (UICanvas.Instance.SelectedItemUI.InventoryItem == null) {
-                if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
-                UICanvas.Instance.SetSelectedItemUI(itemUI);
+            if (Player.UICanvas.SelectedItemUI.InventoryItem == null) {
+                if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
+                Player.UICanvas.SetSelectedItemUI(itemUI);
                 if (IsSellerInventory) {
-                    if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0) return;
-                    _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
+                    if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount < 0) return;
+                    Player.Instance.Coins -= itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount;
                     IsItemJustBought = true;
                 }
                 destroyAndRemoveItemUI(itemUI.InventoryItem);
             } else {
-                if (UICanvas.Instance.SelectedItemUI.InventoryItem.ItemData == itemUI.InventoryItem.ItemData) {
-                    if (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount >= UICanvas.Instance.SelectedItemUI.InventoryItem.Amount) {
-                        if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
-                        itemUI.InventoryItem.Amount += UICanvas.Instance.SelectedItemUI.InventoryItem.Amount;
+                if (Player.UICanvas.SelectedItemUI.InventoryItem.ItemData == itemUI.InventoryItem.ItemData) {
+                    if (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount >= Player.UICanvas.SelectedItemUI.InventoryItem.Amount) {
+                        if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
+                        itemUI.InventoryItem.Amount += Player.UICanvas.SelectedItemUI.InventoryItem.Amount;
                         if (IsSellerInventory) {
-                            _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * UICanvas.Instance.SelectedItemUI.InventoryItem.Amount;
+                            Player.Instance.Coins -= itemUI.InventoryItem.ScaledValue * Player.UICanvas.SelectedItemUI.InventoryItem.Amount;
                             IsItemJustBought = true;
                         }
                         itemUI.UpdateAmount();
-                        UICanvas.Instance.SelectedItemUI.InventoryItem = null;
+                        Player.UICanvas.SelectedItemUI.InventoryItem = null;
                     } else {
-                        if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
-                        UICanvas.Instance.SelectedItemUI.InventoryItem.Amount = UICanvas.Instance.SelectedItemUI.InventoryItem.Amount - (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount);
+                        if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
+                        Player.UICanvas.SelectedItemUI.InventoryItem.Amount = Player.UICanvas.SelectedItemUI.InventoryItem.Amount - (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount);
                         itemUI.InventoryItem.Amount = itemUI.InventoryItem.ItemData.MaxQuantity;
                         itemUI.UpdateAmount();
-                        UICanvas.Instance.SelectedItemUI.UpdateAmount();
+                        Player.UICanvas.SelectedItemUI.UpdateAmount();
                         if (IsSellerInventory) {
-                            _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount);
+                            Player.Instance.Coins -= itemUI.InventoryItem.ScaledValue * (itemUI.InventoryItem.ItemData.MaxQuantity - itemUI.InventoryItem.Amount);
                             IsItemJustBought = true;
                         }
                     }
@@ -363,12 +416,11 @@ public class InventoryPanel : MonoBehaviour
 
     public void OnItemUIRightClick(ItemUI itemUI) {
         if (itemUI == null) return;
-
         if (_inventory.Contains(itemUI.InventoryItem)) {
-            if (UICanvas.Instance.SelectedItemUI.InventoryItem == null) {
+            if (Player.UICanvas.SelectedItemUI.InventoryItem == null) {
                 if (itemUI.InventoryItem.Amount > 1) {
                     int half = itemUI.InventoryItem.Amount / 2;
-                    if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * (half + itemUI.InventoryItem.Amount % 2) < 0 && IsSellerInventory) return;
+                    if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * (half + itemUI.InventoryItem.Amount % 2) < 0 && IsSellerInventory) return;
                     
                     InventoryItem inventoryItem = new(){
                         ItemData = itemUI.InventoryItem.ItemData,
@@ -376,33 +428,33 @@ public class InventoryPanel : MonoBehaviour
                         Position = itemUI.InventoryItem.Position,
                         Rotated = itemUI.InventoryItem.Rotated
                     };
-                    UICanvas.Instance.SetSelectedInventoryItem(inventoryItem);
-                    UICanvas.Instance.SelectedItemUI.UpdateAmount();
+                    Player.UICanvas.SetSelectedInventoryItem(inventoryItem);
+                    Player.UICanvas.SelectedItemUI.UpdateAmount();
 
                     itemUI.InventoryItem.Amount = half;
                     itemUI.UpdateAmount();
                     if (IsSellerInventory) {
-                        _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * (half + itemUI.InventoryItem.Amount % 2);
+                        Player.Instance.Coins -= itemUI.InventoryItem.ScaledValue * (half + itemUI.InventoryItem.Amount % 2);
                         IsItemJustBought = true;
                     }
                 } else {
-                    if (_uiCanvas.PlayerController.Coins - itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
-                    UICanvas.Instance.SetSelectedItemUI(itemUI);
+                    if (Player.Instance.Coins - itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount < 0 && IsSellerInventory) return;
+                    Player.UICanvas.SetSelectedItemUI(itemUI);
                     if (IsSellerInventory) {
-                        _uiCanvas.PlayerController.Coins -= itemUI.InventoryItem.ItemData.Value * itemUI.InventoryItem.Amount;
+                        Player.Instance.Coins -= itemUI.InventoryItem.ScaledValue * itemUI.InventoryItem.Amount;
                         IsItemJustBought = true;
                     }
                     destroyAndRemoveItemUI(itemUI.InventoryItem);
                 }
             } else {
-                if (UICanvas.Instance.SelectedItemUI.InventoryItem.ItemData == itemUI.InventoryItem.ItemData) {
-                    if (itemUI.InventoryItem.Amount + 1 <= itemUI.InventoryItem.ItemData.MaxQuantity && UICanvas.Instance.SelectedItemUI.InventoryItem.Amount - 1 >= 0) {
+                if (Player.UICanvas.SelectedItemUI.InventoryItem.ItemData == itemUI.InventoryItem.ItemData) {
+                    if (itemUI.InventoryItem.Amount + 1 <= itemUI.InventoryItem.ItemData.MaxQuantity && Player.UICanvas.SelectedItemUI.InventoryItem.Amount - 1 >= 0) {
                         itemUI.InventoryItem.Amount = itemUI.InventoryItem.Amount + 1;
                         itemUI.UpdateAmount();
-                        UICanvas.Instance.SelectedItemUI.InventoryItem.Amount = UICanvas.Instance.SelectedItemUI.InventoryItem.Amount - 1;
-                        UICanvas.Instance.SelectedItemUI.UpdateAmount();
+                        Player.UICanvas.SelectedItemUI.InventoryItem.Amount = Player.UICanvas.SelectedItemUI.InventoryItem.Amount - 1;
+                        Player.UICanvas.SelectedItemUI.UpdateAmount();
                         if (IsSellerInventory) {
-                            _uiCanvas.PlayerController.Coins += itemUI.InventoryItem.ItemData.Value;
+                            Player.Instance.Coins += itemUI.InventoryItem.ScaledValue;
                             IsItemJustBought = true;
                         }
                     }
@@ -413,11 +465,11 @@ public class InventoryPanel : MonoBehaviour
 
 
     public void OnPointerEnter() {
-        _uiCanvas.ActiveInventoryPanel = this;
+        Player.UICanvas.ActiveInventoryPanel = this;
     }
 
     public void OnPointerExit() {
-        _uiCanvas.ActiveInventoryPanel = null;
+        Player.UICanvas.ActiveInventoryPanel = null;
     }
 
     #endregion

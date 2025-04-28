@@ -11,10 +11,10 @@ public class LoadingScreen : MonoBehaviour
     public static LoadingScreen Instance;
     [SerializeField] private GameObject _imageGO;
     [SerializeField] private Image _image;
-    [SerializeField] private Image _fillImage;
     [SerializeField] private List<Sprite> _sprites;
     private CanvasGroup _canvasGroup;
     public static bool IsLoading = false;
+    // private static string _currentSceneName = string.Empty;
 
     private void Awake()
     {
@@ -36,26 +36,29 @@ public class LoadingScreen : MonoBehaviour
 
 
     public static void LoadScene(string sceneName) {
+        if (IsLoading) return;
+        // if (sceneName == _currentSceneName) return;
+        // _currentSceneName = sceneName;
+        
         Instance._canvasGroup.alpha = 0;
         Instance._imageGO.SetActive(true);
         IsLoading = true;
-        Instance._canvasGroup.DOFade(1, 0.5f).SetUpdate(true).OnComplete(() => Instance.StartCoroutine(Instance.loadSceneAsync(sceneName))); 
-        UICanvas.Instance.HideUI();
         Instance.StartCoroutine(Instance.animateImages());
+        Instance._canvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => Instance.StartCoroutine(Instance.loadSceneAsync(sceneName))); 
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
     }
 
 
-    private IEnumerator loadSceneAsync(string sceneName) {        
+    private IEnumerator loadSceneAsync(string sceneName) {
         AsyncOperation operation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName);
 
         while (!operation.isDone) {
-            _fillImage.fillAmount = Mathf.Clamp01(operation.progress / 0.9f);
 
             if (operation.progress >= 0.9f) {
                 yield return new WaitForSeconds(0.5f);
                 operation.allowSceneActivation = true;
-                UICanvas.Instance.HideUI();
-                _canvasGroup.DOFade(0, 0.5f).SetUpdate(true).OnComplete(() => {
+                Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
+                _canvasGroup.DOFade(0, 0.5f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
                     _imageGO.SetActive(false);
                     StopCoroutine(animateImages());
                 });
@@ -65,8 +68,7 @@ public class LoadingScreen : MonoBehaviour
         }
 
         IsLoading = false;
-        UICanvas.Instance.ShowUI();
-        UICanvas.Instance.OpenUIState(UIState.NotVisible);
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
     }
 
 

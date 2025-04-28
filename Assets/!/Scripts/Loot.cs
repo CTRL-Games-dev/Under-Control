@@ -9,6 +9,9 @@ public class Loot : MonoBehaviour {
         public int MinAmount;
         public int MaxAmount;
 
+        public float MinPowerScale;
+        public float MaxPowerScale;
+
         [Range(0, 1)]
         public float Chance;
     }
@@ -40,7 +43,9 @@ public class Loot : MonoBehaviour {
                 continue;
             }
 
-            ItemEntity.Spawn(lootData.Item, amount, transform.position);
+            float powerScale = UnityEngine.Random.Range(lootData.MinPowerScale, lootData.MaxPowerScale);
+
+            ItemEntity.Spawn(lootData.Item, amount, transform.position, powerScale);
         }
     }
 }

@@ -98,7 +98,7 @@ namespace DG.Tweening
             // Returns FALSE if the DOTween's Physics2D Module is disabled, or if there's no Rigidbody2D attached
             public static bool HasRigidbody2D(Component target)
             {
-#if false // PHYSICS2D_MARKER
+#if true // PHYSICS2D_MARKER
                 return target.GetComponent<Rigidbody2D>() != null;
 #else
                 return false;
@@ -142,7 +142,7 @@ namespace DG.Tweening
                     }
                 }
 #endif
-#if false // PHYSICS2D_MARKER
+#if true // PHYSICS2D_MARKER
                 if (!rBodyFoundAndTweened && tweenRigidbody) {
                     Rigidbody2D rBody2D = target.GetComponent<Rigidbody2D>();
                     if (rBody2D != null) {

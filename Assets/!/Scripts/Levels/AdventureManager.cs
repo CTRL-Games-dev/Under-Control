@@ -1,68 +1,38 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Unity.AI.Navigation;
-using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(MeshCollider))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(BetterGenerator))]
-public class AdventureManager : MonoBehaviour, ILevelManager
+[RequireComponent(typeof(WorldGenerator))]
+public class AdventureManager : MonoBehaviour
 {
-    private GameManager _gameManager;
-    [SerializeField] private CameraManager _cameraManager;
     [SerializeField] private GameObject _player;
     [SerializeField] private NavMeshSurface _navMeshSurface;
     private void Start()
     {
-        _gameManager = GameManager.Instance;
+        Player.Instance.gameObject.SetActive(false);
+
+        var generator = GetComponent<WorldGenerator>();
+        generator.GenerateMap(GameManager.Instance.CurrentDimension);
         
-        var generator = GetComponent<BetterGenerator>();
-        generator.GenerateMap(GameManager.Instance.GetCurrentDimension());
+        ForestPortalLocation portal = generator.Getlocation<ForestPortalLocation>();
+
+        Vector2 spawn = portal.LocationCenterInWorld;
+
+        Player.Instance.MaxCameraDistance = 30f;
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
+        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
+        Player.UICanvas.ChangeUITopState(UITopState.NotVisible);
+        Player.Instance.SetPlayerPosition(new Vector3(spawn.x, 1, spawn.y));
+
+        Player.Instance.gameObject.SetActive(true);
         
-        ForestPortal portal = generator.Getlocation<ForestPortal>();
-
-        Vector2 spawn = portal.GetAbsoluteCenter(generator.wd.Offset, generator.wd.Scale);
-
-        Instantiate(_player, new(spawn.x, 0.2f, spawn.y - 3f), Quaternion.identity);
-
-        _cameraManager.SwitchCamera(UICanvas.Instance.PlayerController.PlayerTopDownCamera);
+        CameraManager.SwitchCamera(Player.Instance.TopDownCamera);
 
         _navMeshSurface.BuildNavMesh();
+
+        GameManager.Instance.OnLevelLoaded();
     }
-
-    // public void SpawnPlayer()
-    // {
-        // GameObject player = Instantiate(_player, _map.SpawnLocation, Quaternion.identity);
-        // GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
-        // player.GetComponent<PlayerController>().CameraObject = camera;
-        // camera.GetComponent<CinemachineCamera>().Follow = player.transform;
-    // }
-    // private void SpawnEnemies(WorldMap map)
-    // {
-    //     int groupCount = _gm.GetInfluence() > 0.5 ? 2 : 3;
-
-    //     var floors = map.GetMapAsList().Where(x => x.Type == TileType.FLOOR);
-    //     var floorCount = floors.Count();
-
-    //     Debug.Log(floorCount);
-
-    //     for(int i = 0; i < groupCount; i++)
-    //     {
-    //         int floorIndex = UnityEngine.Random.Range(0, floorCount);
-    //         var tile = floors.ElementAt(floorIndex);
-
-
-    //         var center = tile.GetCenter(_map.TileWidth);
-    //         var enemyCount = UnityEngine.Random.Range(3, 6);
-    //         for(int e = 0; e < enemyCount; e++)
-    //         {
-    //             float left = e%3*1.5f - 1.5f;
-    //             float bottom = e/3*1.5f - 1.5f;
-    //             Instantiate(_enemyPrefab, new Vector3(center.x + left, 1, center.y + bottom), Quaternion.identity);
-    //         }
-    //     }
-    // }
 }

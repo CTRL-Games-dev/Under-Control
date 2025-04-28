@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
+
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -8,7 +10,7 @@ using UnityEngine.UIElements;
 
 [Serializable]
 public class Stat {
-    [HideInInspector, NonSerialized]
+    [HideInInspector, SerializeField]
     public readonly StatType StatType;
 
     [SerializeField]
@@ -19,14 +21,34 @@ public class Stat {
     private float _adjusted;
     public float Adjusted { get => _adjusted; protected set => _adjusted = value; }
 
+    [SerializeField]
+    private float _initValue;
+
+    public UnityEvent OnValueChanged;
+
     public Stat(StatType statType, float initValue) {
         StatType = statType;
         Raw = initValue;
         Adjusted = initValue;
+        _initValue = initValue;
     }
 
-    public virtual float Recalculate(ModifierSystem modifierSystem) {
+    public void Reset() {
+        Raw = _initValue;
+        Adjusted = _initValue;
+
+        OnValueChanged?.Invoke();
+    }
+
+    public float Recalculate(ModifierSystem modifierSystem) {
+        float oldAdjusted = Adjusted;
+
         Adjusted = modifierSystem.CalculateForStatType(StatType, Raw);
+
+        if (oldAdjusted != Adjusted) {
+            OnValueChanged?.Invoke();
+        }
+
         return Adjusted;
     }
 

@@ -3,11 +3,9 @@ using UnityEngine;
 
 public class ItemInfoPanel : MonoBehaviour
 {
-    [Header("Item Info Panel")]
-    [SerializeField] private TextMeshProUGUI _itemName;
-    [SerializeField] private TextMeshProUGUI _itemDescription;
-    [SerializeField] private TextMeshProUGUI _itemValue;
-    [SerializeField] private TextMeshProUGUI _itemAmount;
+    [SerializeField] private GameObject _lightAttackHolder, _heavyAttackHolder;
+    [SerializeField] private TextMeshProUGUI _itemLightDamage, _itemHeavyDamage, _itemValue, _itemAmount;
+    [SerializeField] private TextLocalizer _nameTextLocalizer, _rarityTextLocalizer, _descriptionTextLocalizer;
 
     private RectTransform _rectTransform;
 
@@ -26,21 +24,35 @@ public class ItemInfoPanel : MonoBehaviour
 
     public void ShowItemInfo(ItemUI itemUI) {
         gameObject.SetActive(itemUI != null);
-
+        
         if (itemUI == null) return;
+
+        Vector2 scale = new(Screen.width / 1920f, Screen.height / 1080f);
+
+        transform.position = new Vector2(
+            Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width * scale.x), 
+            Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height * scale.y, Screen.height)
+        );
 
         InventoryItem item = itemUI.InventoryItem;
 
-        transform.position = new Vector2(
-            Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width), 
-            Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height, Screen.height)
-        );
+        _nameTextLocalizer.Key = item.ItemData.DisplayName;
+        _descriptionTextLocalizer.Key = item.ItemData.Description;
 
-        _itemName.text = item.ItemData.DisplayName;
-        _itemDescription.text = item.ItemData.Description;
+        if (itemUI.InventoryItem.ItemData is WeaponItemData weaponItemData) {
+            _lightAttackHolder.SetActive(true);
+            _heavyAttackHolder.SetActive(true);
+            _itemLightDamage.text = $"{weaponItemData.LightDamageMin * item.PowerScale} - {weaponItemData.LightDamageMax * item.PowerScale}";
+            _itemHeavyDamage.text = $"{weaponItemData.HeavyDamageMin * item.PowerScale} - {weaponItemData.HeavyDamageMax * item.PowerScale}";
+        } else {
+            _lightAttackHolder.SetActive(false);
+            _heavyAttackHolder.SetActive(false);
+        }
 
-        int value = item.ItemData.Value / 2;
-        if (itemUI.CurrentInventoryPanel != null && itemUI.CurrentInventoryPanel.IsSellerInventory) value *= 2;
+        int value = item.ScaledValue / 2;
+        if (itemUI.CurrentInventoryPanel != null && itemUI.CurrentInventoryPanel.IsSellerInventory) {
+            value *= 2;
+        }
 
         _itemValue.text = value + $" ({value * item.Amount})";
         _itemAmount.text = '×' + item.Amount.ToString();

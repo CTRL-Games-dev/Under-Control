@@ -1,99 +1,109 @@
-using System.Collections;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class FaceAnimator : MonoBehaviour
 {
-    public enum FaceState {
-        Neutral,
-        Excited,
-        Talk
+    [Serializable]
+    public struct FaceAnimation {
+        public string AnimationName;
+        public List<Vector2Int> Positions;
+        public float Speed;
+        public bool IsRandomized;
+        public bool CanBlink;
     }
 
-    [Header("Blinking")]
-    [SerializeField] private Material _blinkMaterial;
-    [SerializeField] private float _blinkDuration = 0.1f;
-    [SerializeField] private float _blinkDelay = 3f;
+    [Header("References")]
+    [SerializeField] private Renderer _faceRenderer;
+    [SerializeField] private int _sheetSize = 5;
 
-    // [Header("Neutral")]
-    // [SerializeField] private Material[] _neutralMaterials;
-    // [SerializeField] private float _neutralSpeed = 0.2f;
-    // private int _neutralIndex = 0;
+    [Space(1)]
+    [SerializeField] private FaceAnimation _defaultAnimation;
+    [Space(1)]
+    [SerializeField] private Vector2Int _blinkPosition;
+    [SerializeField] private float _blinkInterval = 0.5f, _blinkSpeed = 0.1f;
 
-    [Header("Excited")]
-    [SerializeField] private Material[] _excitedMaterials;
-    [SerializeField] private float _excitedSpeed = 0.1f;
-    
-    [Header("Talk")]
-    [SerializeField] private Material[] _talkMaterials;
-    [SerializeField] private float _talkSpeed = 0.1f;
+    [Header("Custom Animations")]
+    [SerializeField] private List<FaceAnimation> _customAnimations = new List<FaceAnimation>();
 
-    private Material _originalMaterial;
-    private SkinnedMeshRenderer _skinnedMeshRenderer;
+    private float _textureOffset;
 
-    public static FaceAnimator Instance;
+    private float _animationTimer = 0;
+    private float _blinkTimer = 0;
+    private float _customDurationTimer = 0;
+    private float _customGoalDuration = 0;
 
-    public FaceState CurrentFaceState = FaceState.Neutral;
+    private FaceAnimation _currentFaceAnimation;
+    private int _animationIndex = 0;
 
 
     private void Awake() {
-        if (Instance == null) {
-            Instance = this;
+        _currentFaceAnimation = _defaultAnimation;
+        _textureOffset = 1f / _sheetSize;
+    }
+
+    public void FixedUpdate() {
+        _animationTimer += Time.deltaTime;
+        _customDurationTimer += Time.deltaTime;
+        _blinkTimer += Time.deltaTime;
+
+
+        if (_blinkTimer >= _blinkInterval && _currentFaceAnimation.CanBlink) {
+            if (_blinkTimer <= _blinkInterval + _blinkSpeed) {
+                _faceRenderer.material.mainTextureOffset = getRealOffset(_blinkPosition);
+                return;
+            } else {
+                _blinkTimer = 0;
+            }
         }
 
-        _skinnedMeshRenderer = GetComponent<SkinnedMeshRenderer>();
-        _originalMaterial = _skinnedMeshRenderer.materials[0];
-        InvokeRepeating(nameof(Blink), _blinkDelay, _blinkDelay);
-    }
-
-    private void Start() {
-        Talk(5);
-    }
-
-    public void Blink() {;
-        StartCoroutine(blinkCoroutine());
-    }
-
-    public void Talk(float duration) {
-        StopAllCoroutines();
-        CurrentFaceState = FaceState.Talk;
-        StartCoroutine(talkCoroutine(duration));
-    }
-
-    public void Excited(float duration) {
-        StopAllCoroutines();
-        CurrentFaceState = FaceState.Excited;
-        StartCoroutine(excitedCoroutine(duration));
-    }
-
-    private IEnumerator blinkCoroutine() {
-        _skinnedMeshRenderer.materials = new Material[] { _blinkMaterial };
-        yield return new WaitForSeconds(_blinkDuration);
-        _skinnedMeshRenderer.materials = new Material[] {_originalMaterial};   
-    }
-
-    private IEnumerator talkCoroutine(float duration) {
-        float time = 0;
-        int index = 0;
-        while (time < duration) {
-            _skinnedMeshRenderer.materials = new Material[] { _talkMaterials[index] };
-            yield return new WaitForSeconds(_talkSpeed);
-            time += _talkSpeed;
-            index = (index + 1) % _talkMaterials.Length;
+        if (_animationTimer >= _currentFaceAnimation.Speed) {
+            _animationTimer = 0;
+            _faceRenderer.material.mainTextureOffset = getRealOffset(_currentFaceAnimation.Positions[_animationIndex]);
+            if (_currentFaceAnimation.IsRandomized) {
+                _animationIndex = UnityEngine.Random.Range(0, _currentFaceAnimation.Positions.Count);
+            } else {
+                _animationIndex = (_animationIndex + 1) % _currentFaceAnimation.Positions.Count;
+            }
         }
-        _skinnedMeshRenderer.materials = new Material[] {_originalMaterial};
-        CurrentFaceState = FaceState.Neutral;
+
+        if (_customGoalDuration <= 0) return;
+        if (_customDurationTimer >= _customGoalDuration) {
+            _currentFaceAnimation = _defaultAnimation;
+            _animationIndex = 0;
+            _customGoalDuration = 0;
+        }
     }
 
-    private IEnumerator excitedCoroutine(float duration) {
-        float time = 0;
-        int index = 0;
-        while (time < duration) {
-            _skinnedMeshRenderer.materials = new Material[] { _excitedMaterials[index] };
-            yield return new WaitForSeconds(_excitedSpeed);
-            time += _excitedSpeed;
-            index = (index + 1) % _excitedMaterials.Length;
+    // Infinite by default
+    public void StartInfiniteAnimation(string animationName) {
+        StartAnimation(animationName, -1);
+    }
+
+    public void StartAnimation(string animationName, float duration) {
+        foreach (var animation in _customAnimations) {
+            if (animation.AnimationName == animationName) {
+                _currentFaceAnimation = animation;
+                _animationIndex = 0;
+                _customGoalDuration = duration;
+                _customDurationTimer = 0;
+                _blinkTimer = 0;
+                return;
+            }
         }
-        _skinnedMeshRenderer.materials = new Material[] {_originalMaterial};
-        CurrentFaceState = FaceState.Neutral;
+
+        Debug.LogWarning($"Animation {animationName} not found!");
+    }
+
+    public void EndAnimation() {
+        _currentFaceAnimation = _defaultAnimation;
+        _animationIndex = 0;
+        _customGoalDuration = 0;
+        _customDurationTimer = 0;
+        _blinkTimer = 0;
+    }
+
+    private Vector2 getRealOffset(Vector2Int offset) {
+        return new Vector2(offset.x * _textureOffset, -offset.y * _textureOffset - _textureOffset);
     }
 }

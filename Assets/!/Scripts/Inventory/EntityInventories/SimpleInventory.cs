@@ -12,32 +12,30 @@ public class SimpleInventory : EntityInventory
     // Does not guarantee that inventory WAS indeed changed
     public UnityEvent OnInventoryChanged;
 
-    public override bool AddItem(ItemData itemData, int amount, Vector2Int position, bool rotated = false) {
-        bool wasAdded = ItemContainer.AddItem(itemData, amount, position, rotated);
+    public override bool AddItem(ItemData itemData, int amount, Vector2Int position, float powerScale = 1, bool rotated = false) {
+        bool wasAdded = ItemContainer.AddItem(itemData, amount, position, powerScale, rotated);
         if (wasAdded) OnInventoryChanged?.Invoke();
         return wasAdded;
     }
 
-    public override bool AddItem(ItemData itemData, int amount, Vector2Int position) {
-        bool wasAdded = ItemContainer.AddItem(itemData, amount, position);
+    public override bool AddItem(ItemData itemData, int amount = 1, float powerScale = 1) {
+        bool wasAdded = ItemContainer.AddItem(itemData, amount, powerScale);
         if (wasAdded) OnInventoryChanged?.Invoke();
         return wasAdded;
     }
 
-    public override bool AddItem(ItemData itemData, int amount) {
-        bool wasAdded = ItemContainer.AddItem(itemData, amount);
-        if (wasAdded) OnInventoryChanged?.Invoke();
-        return wasAdded;
-    }
-
-    public override bool AddItem(ItemData itemData) {
-        bool wasAdded = ItemContainer.AddItem(itemData);
+    public override bool AddItem(ItemData itemData, int amount = 1, float powerScale = 1, bool rotated = false) {
+        bool wasAdded = ItemContainer.AddItem(itemData, amount, powerScale, rotated);
         if (wasAdded) OnInventoryChanged?.Invoke();
         return wasAdded;
     }
 
     public override InventoryItem GetInventoryItem(Vector2Int position) {
         return ItemContainer.GetInventoryItem(position);
+    }
+
+    public override InventoryItem GetFirstInventoryItem(ItemData item) {
+        return ItemContainer.GetFirstInventoryItem(item);
     }
 
     public override List<InventoryItem> GetItems() {
@@ -52,8 +50,8 @@ public class SimpleInventory : EntityInventory
         return ItemContainer.FitsWithinBounds(position, size);
     }
 
-    public override bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position) {
-        return ItemContainer.CanBeAdded(itemData, quantity, position);
+    public override bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position, float powerScale) {
+        return ItemContainer.CanBeAdded(itemData, quantity, position, powerScale);
     }
 
     public override bool RemoveInventoryItem(InventoryItem inventoryItem) {
@@ -71,5 +69,9 @@ public class SimpleInventory : EntityInventory
     public override void Clear() {
         ItemContainer.Clear();
         OnInventoryChanged?.Invoke();
+    }
+    
+    public override bool HasItemData(ItemData itemData, int amount = 1) {
+        return ItemContainer.HasItemData(itemData, amount);
     }
 }

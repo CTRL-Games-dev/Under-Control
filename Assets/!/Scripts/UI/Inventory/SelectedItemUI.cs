@@ -1,4 +1,3 @@
-using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,6 +8,12 @@ public class SelectedItemUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _amountText;
     [SerializeField] private RectTransform _amountRectTransform;
 
+    public GameObject Holder;
+
+    // private Vector3 _pivotPosition = new Vector3(0, 0, 0);
+
+    public Vector2Int SelectedOffsetInv;
+
     private InventoryItem _inventoryItem = null;
     public InventoryItem InventoryItem { 
         get { return _inventoryItem; } 
@@ -18,6 +23,8 @@ public class SelectedItemUI : MonoBehaviour
                 return;
             }
 
+            SelectedOffsetInv = Vector2Int.zero;
+
             _inventoryItem = value;
             gameObject.SetActive(_inventoryItem != null);
             if (_inventoryItem == null) {
@@ -25,9 +32,24 @@ public class SelectedItemUI : MonoBehaviour
                 transform.rotation = Quaternion.identity;
                 gameObject.SetActive(false);
             } else {
-                if (_uiCanvas == null) _uiCanvas = UICanvas.Instance;
+                Vector3 itemUiOffset = Vector3.zero;
+                if(_inventoryItem.ItemUI != null) {
+                    itemUiOffset = _inventoryItem.ItemUI.transform.position - Input.mousePosition;
+                    if (_inventoryItem.Rotated) {
+                        itemUiOffset = new Vector3(
+                            itemUiOffset.y - InventoryPanel.TileSize * value.Size.x,
+                            -itemUiOffset.x,
+                            0
+                        );
+                    }
+                }
+             
+                Holder.transform.localPosition = itemUiOffset;
 
-                _uiCanvas.ItemInfoPanel.ShowItemInfo(null);
+                SelectedOffsetInv.x = (int)(itemUiOffset.x / InventoryPanel.TileSize);
+                SelectedOffsetInv.y = -(int)(itemUiOffset.y / InventoryPanel.TileSize); // negative = up
+                
+                Player.UICanvas.ItemInfoPanel.ShowItemInfo(null);
 
                 transform.rotation = _inventoryItem.Rotated ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
                 _goalRotation = transform.rotation; 
@@ -51,7 +73,6 @@ public class SelectedItemUI : MonoBehaviour
 
     private RectTransform _rectTransform;
     private Image _image;
-    private UICanvas _uiCanvas;
 
     private Quaternion _goalRotation;
     [SerializeField] private float _rotationSpeed = 10f;
@@ -63,8 +84,7 @@ public class SelectedItemUI : MonoBehaviour
     }
 
     private void Start() {
-        _uiCanvas = UICanvas.Instance;
-        _uiCanvas.PlayerController.ItemRotateEvent.AddListener(OnRotate);
+        Player.Instance.ItemRotateEvent.AddListener(OnRotate);
     }
 
     private void Update()  {
@@ -75,11 +95,11 @@ public class SelectedItemUI : MonoBehaviour
         transform.position = Input.mousePosition;
 
         if (transform.rotation != _goalRotation) {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, _goalRotation, _rotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, _goalRotation, _rotationSpeed * Settings.AnimationSpeed * Time.deltaTime);
         }
 
-        if (Input.GetMouseButtonUp(0) && _uiCanvas.ActiveInventoryPanel != null) {
-            _uiCanvas.ActiveInventoryPanel.TryMoveSelectedItem();
+        if (Input.GetMouseButtonUp(0) && Player.UICanvas.ActiveInventoryPanel != null) {
+            Player.UICanvas.ActiveInventoryPanel.TryMoveSelectedItem();
         }
     }
 
@@ -91,8 +111,8 @@ public class SelectedItemUI : MonoBehaviour
         InventoryItem.Rotated = !InventoryItem.Rotated;
         _goalRotation = InventoryItem.Rotated ? Quaternion.Euler(0, 0, 90) : Quaternion.identity;
 
-        if (_uiCanvas.ActiveInventoryPanel != null)  
-            _uiCanvas.ActiveInventoryPanel.OnInvTileEnter(_uiCanvas.ActiveInventoryPanel.SelectedTile);
+        if (Player.UICanvas.ActiveInventoryPanel != null)  
+            Player.UICanvas.ActiveInventoryPanel.OnInvTileEnter(Player.UICanvas.ActiveInventoryPanel.SelectedTile);
     }
 
     public void UpdateAmount() {

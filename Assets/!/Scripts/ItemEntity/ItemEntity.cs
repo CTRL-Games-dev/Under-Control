@@ -7,10 +7,11 @@ public class ItemEntity : MonoBehaviour, IInteractable
 {
     public int Amount;
     public ItemData ItemData;
+    public float PowerScale;
 
     public Rigidbody Rigidbody { get; private set; }
 
-    public static ItemEntity[] Spawn(ItemData itemData, int amount, Vector3 position, Quaternion quaternion) {
+    public static ItemEntity[] Spawn(ItemData itemData, int amount, Vector3 position, float powerScale, Quaternion quaternion) {
         if(amount <= 0) return new ItemEntity[0];
 
         int itemEntitiesCount = amount / itemData.MaxQuantity;
@@ -26,7 +27,7 @@ public class ItemEntity : MonoBehaviour, IInteractable
                 itemEntityAmount = amount % itemData.MaxQuantity;
             }
 
-            ItemEntity itemEntity = spawn(itemData, itemEntityAmount, position, quaternion);
+            ItemEntity itemEntity = spawn(itemData, itemEntityAmount, position, powerScale, quaternion);
 
             itemEntities[i] = itemEntity;
         }
@@ -34,14 +35,15 @@ public class ItemEntity : MonoBehaviour, IInteractable
         return itemEntities;
     }
 
-    public static ItemEntity[] Spawn(ItemData itemData, int amount, Vector3 position) {
-        return Spawn(itemData, amount, position, Quaternion.identity);
+    public static ItemEntity[] Spawn(ItemData itemData, int amount, Vector3 position, float powerScale) {
+        return Spawn(itemData, amount, position, powerScale, Quaternion.identity);
     }
 
-    private static ItemEntity spawn(ItemData itemData, int amount, Vector3 position, Quaternion quaternion) {
+    private static ItemEntity spawn(ItemData itemData, int amount, Vector3 position, float powerScale, Quaternion quaternion) {
         ItemEntity itemEntity = Instantiate(GameManager.Instance.ItemEntityPrefab, position, quaternion);
         itemEntity.Amount = amount;
         itemEntity.ItemData = itemData;
+        itemEntity.PowerScale = powerScale;
 
         if(itemData.Model != null) {
             Instantiate(itemData.Model, itemEntity.transform);
@@ -52,8 +54,8 @@ public class ItemEntity : MonoBehaviour, IInteractable
         return itemEntity;
     }
 
-    public static ItemEntity[] SpawnThrownRelative(ItemData itemData, int amount, Vector3 position, Quaternion quaternion, Vector3 force) {
-        ItemEntity[] itemEntities = Spawn(itemData, amount, position, quaternion);
+    public static ItemEntity[] SpawnThrownRelative(ItemData itemData, int amount, Vector3 position, float powerScale, Quaternion quaternion, Vector3 force) {
+        ItemEntity[] itemEntities = Spawn(itemData, amount, position, powerScale, quaternion);
         
         for(int i = 0; i < itemEntities.Length; i++) {
             itemEntities[i].Rigidbody.AddRelativeForce(force, ForceMode.Impulse);
@@ -66,12 +68,12 @@ public class ItemEntity : MonoBehaviour, IInteractable
         Rigidbody = GetComponent<Rigidbody>();
     }
 
-    public void Interact(PlayerController player) {
-        if(!player.LivingEntity.Inventory.AddItem(ItemData, Amount)) {
+    public void Interact() {
+        if(!Player.LivingEntity.Inventory.AddItem(ItemData, Amount, 1)) {
             return;
         }
 
-        UICanvas.Instance.PickupItemNotify(ItemData, Amount);
+        Player.UICanvas.PickupItemNotify(ItemData, Amount);
         EventBus.InventoryItemChangedEvent?.Invoke();
         Destroy(gameObject);
     }

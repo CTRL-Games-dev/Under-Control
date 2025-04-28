@@ -1,14 +1,11 @@
-using TMPro;
 using UnityEngine.UI;
 
 public class LivingEntityTooltip : HoverTooltipImpl<LivingEntity> {
-    public TextMeshProUGUI DisplayNameText;
-    public TextMeshProUGUI LevelText;
+    public TextLocalizer DisplayNameTextLocalizer;
     public Slider HealthBarSider;
 
     protected override void UpdateTooltip(LivingEntity livingEntity) {
-        DisplayNameText.text = livingEntity.DisplayName;
-        LevelText.text = livingEntity.Level.ToString();
+        DisplayNameTextLocalizer.Key = livingEntity.DisplayName;
         HealthBarSider.value = livingEntity.Health / livingEntity.MaxHealth; 
     }
 }

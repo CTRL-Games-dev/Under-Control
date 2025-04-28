@@ -4,27 +4,24 @@ using UnityEngine;
 public class ActionNotifierManager : MonoBehaviour
 {
     [SerializeField] private GameObject _actionNotifierPrefab;
-    private ActionNotifier _lastActionNotifier;
-
+    private List<ActionNotifier> _actionNotifiers = new List<ActionNotifier>();
 
 
     public void SpawnActionNotifier(Sprite icon, string text, Color color, int amount) {
-        GameObject actionNotifier = Instantiate(_actionNotifierPrefab, transform);
-        _lastActionNotifier = actionNotifier.GetComponent<ActionNotifier>();
-        _lastActionNotifier.Setup(icon, text, color, amount, this);
-    }
-
-    public void ClearChildren() {
-        ActionNotifier[] children = GetComponentsInChildren<ActionNotifier>(true);
-
-        for (int i = 0; i < children.Length; i++) {
-            children[i].Destroy();
+        ActionNotifier actionNotifier = Instantiate(_actionNotifierPrefab, transform).GetComponent<ActionNotifier>();
+        ActionNotifier[] actionNotifiers = _actionNotifiers.ToArray();
+        foreach (ActionNotifier notifier in actionNotifiers) {
+            notifier.MoveUp();
         }
+        actionNotifier.Setup(icon, text, color, amount, this);
+        _actionNotifiers.Add(actionNotifier);
     }
+
 
     public void TryClearChildren(ActionNotifier actionNotifier) {
-        if (_lastActionNotifier != actionNotifier) return;
-
-        ClearChildren();
+        if (_actionNotifiers.Contains(actionNotifier)) {
+            _actionNotifiers.Remove(actionNotifier);
+            actionNotifier.Destroy();
+        }
     }
 }

@@ -18,21 +18,29 @@ public class DynamicStat : Stat {
     public void Add(float value) {
         Raw += value;
         Adjusted += value;
+
+        OnValueChanged?.Invoke();
     }
 
     public void Subtract(float value) {
         Raw -= value;
         Adjusted -= value;
+
+        OnValueChanged?.Invoke();
     }
 
     public void Multiply(float value) {
         Raw *= value;
         Adjusted *= value;
+
+        OnValueChanged?.Invoke();
     }
 
     public void Divide(float value) {
         Raw /= value;
         Adjusted /= value;
+
+        OnValueChanged?.Invoke();
     }
 
     // Beware! Potential magic behavior.
@@ -42,11 +50,6 @@ public class DynamicStat : Stat {
         var difference = value - Raw;
         Raw = value;
         Adjusted += difference;
-    }
-
-    public override float Recalculate(ModifierSystem modifierSystem) {
-        Adjusted = modifierSystem.CalculateForStatType(StatType, Raw);
-        return Adjusted;
     }
 }
 
