@@ -353,6 +353,7 @@ public class Player : MonoBehaviour {
 
     private void onDeath() {
         if (HasPlayerDied) return;
+        Debug.Log("Player died");
         GameManager.Instance.ShowMainMenu = false;
         HasPlayerDied = true;
         SlashManager.DisableSlash();
