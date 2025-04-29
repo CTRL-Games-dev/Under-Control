@@ -255,6 +255,7 @@ public class Player : MonoBehaviour {
                 }
             }
         });
+        
         OnDashSound =  Resources.Load("SFX/bohater/dash") as AudioClip;
 
         ResetRun();
