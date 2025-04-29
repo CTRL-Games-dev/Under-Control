@@ -93,7 +93,6 @@ public class InventoryPanel : MonoBehaviour
         
         _inventoryWidth = _currentEntityInventory.Size.x;
         _inventoryHeight = _currentEntityInventory.Size.y;
-        Debug.Log(_inventoryWidth.ToString() +"     "+ _inventoryHeight.ToString());
         _gridLayoutGroup.constraintCount = _inventoryWidth;
 
         _gridLayoutGroup.cellSize = new Vector2(TileSize, TileSize);

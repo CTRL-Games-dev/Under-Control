@@ -884,10 +884,9 @@ public class Player : MonoBehaviour {
         data.SelectedEvolutions = SelectedEvolutions;
     }
     public void Load(PlayerSaveData data){
-        Debug.Log("player data loaded");
         EvolutionPoints = data.EvolutionPoints;
         foreach(EvoUI evolution in data.SelectedEvolutions){
-            evolution.AddEvolution();
+            evolution.AddEvolution();   
         }
     }
     [Serializable]

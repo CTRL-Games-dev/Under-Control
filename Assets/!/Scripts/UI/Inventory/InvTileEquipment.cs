@@ -109,7 +109,6 @@ public class InvTileEquipment : InvTile {
         
         if (itemUI != _itemUI) return;
         PickUpItem();
-        
     }
     public void PickUpItem(){
         switch (_tileType) {
