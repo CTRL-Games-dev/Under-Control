@@ -87,7 +87,7 @@ public class Player : MonoBehaviour {
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
 
-    private int _evolutionPoints = 0;
+    public int _evolutionPoints = 0;
     public int EvolutionPoints {
         get{ return _evolutionPoints; }
         set {
@@ -884,6 +884,7 @@ public class Player : MonoBehaviour {
         data.SelectedEvolutions = SelectedEvolutions;
     }
     public void Load(PlayerSaveData data){
+        Debug.Log("player data loaded");
         EvolutionPoints = data.EvolutionPoints;
         foreach(EvoUI evolution in data.SelectedEvolutions){
             evolution.AddEvolution();

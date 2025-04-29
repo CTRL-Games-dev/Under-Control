@@ -54,7 +54,7 @@ public class SaveSystem
     }
     private static void LoadEquipmentItem(InventoryItem item, InvTileEquipment tile){
         tile.PickUpItem();
-        Player.UICanvas.SelectedItemUI.InventoryItem = null;
+        if(Player.UICanvas.SelectedItemUI.InventoryItem != null) Player.UICanvas.SelectedItemUI.InventoryItem = null;
         tile.UpdateInvTile();
         tile.PlaceItem(item);
         tile.UpdateInvTile();
