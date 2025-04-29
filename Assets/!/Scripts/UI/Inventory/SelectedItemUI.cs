@@ -10,8 +10,6 @@ public class SelectedItemUI : MonoBehaviour
 
     public GameObject Holder;
 
-    // private Vector3 _pivotPosition = new Vector3(0, 0, 0);
-
     public Vector2Int SelectedOffsetInv;
 
     private InventoryItem _inventoryItem = null;
@@ -43,7 +41,9 @@ public class SelectedItemUI : MonoBehaviour
                         );
                     }
                 }
-             
+
+                itemUiOffset = UICanvas.ScaleToCanvas(itemUiOffset);
+
                 Holder.transform.localPosition = itemUiOffset;
 
                 SelectedOffsetInv.x = (int)(itemUiOffset.x / InventoryPanel.TileSize);

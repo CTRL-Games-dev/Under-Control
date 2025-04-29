@@ -1,9 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class InventoryPanel : MonoBehaviour
@@ -154,7 +151,7 @@ public class InventoryPanel : MonoBehaviour
     private void highlightNeighbours(Vector2Int pos, InventoryItem inventoryItem) {
         Vector2Int size = inventoryItem.Rotated ? new Vector2Int(inventoryItem.Size.y, inventoryItem.Size.x) : inventoryItem.Size;
         pos += inventoryItem.Rotated ?
-          new Vector2Int(Player.UICanvas.SelectedItemUI.SelectedOffsetInv.y, -Player.UICanvas.SelectedItemUI.SelectedOffsetInv.x - 1) :
+          new Vector2Int(Player.UICanvas.SelectedItemUI.SelectedOffsetInv.y, -Player.UICanvas.SelectedItemUI.SelectedOffsetInv.x) :
           Player.UICanvas.SelectedItemUI.SelectedOffsetInv;
             
         int startingY = pos.y;
@@ -265,7 +262,7 @@ public class InventoryPanel : MonoBehaviour
         Vector2Int selectedTilePos = SelectedTile.Pos;
         if(_selectedInventoryItem != null) {
             selectedTilePos += _selectedInventoryItem.Rotated ?
-                new Vector2Int(Player.UICanvas.SelectedItemUI.SelectedOffsetInv.y, -Player.UICanvas.SelectedItemUI.SelectedOffsetInv.x - 1) :
+                new Vector2Int(Player.UICanvas.SelectedItemUI.SelectedOffsetInv.y, -Player.UICanvas.SelectedItemUI.SelectedOffsetInv.x) :
                 Player.UICanvas.SelectedItemUI.SelectedOffsetInv;
         }
 
