@@ -32,7 +32,14 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f;
     public bool ShowMainMenu = true;
     public bool ShowNewGame = true;
-
+    [Header("Android UI")]
+    public GameObject Hud;
+    public GameObject AndroidUI;
+    public GameObject Joystick;
+    public GameObject LightAttackButton;
+    public GameObject HeavyAttackButton;
+    public GameObject DashButton;
+    public GameObject InventoryButton;
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
     private MusicPlayer _musicPlayer;
@@ -48,6 +55,13 @@ public class GameManager : MonoBehaviour {
     public bool IsStarterDialogueOver = false;
 
     private void Awake()  {
+        if(CheckIfAndroid()){
+            RectTransform HudRectTransform = Hud.GetComponent<RectTransform>();
+            HudRectTransform.anchorMin = new Vector2(0.5f,1);
+            HudRectTransform.anchorMax = new Vector2(0.5f,1);
+            HudRectTransform.anchoredPosition = new Vector2(-270,-200);
+            AndroidUI.SetActive(true);
+        }
         _musicPlayer = GetComponent<MusicPlayer>();
         // SceneManager.sceneLoaded += OnLevelChange;
 
@@ -169,6 +183,7 @@ public class GameManager : MonoBehaviour {
     public void OnLevelLoaded() {
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Choose);
         LevelLoaded.Invoke();
+        AndroidUI.SetActive(false);
     }
 
 
@@ -176,5 +191,25 @@ public class GameManager : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.F1)) {
             Player.Instance.DamageDisabled = true;
         }
+    }
+    public bool CheckIfAndroid(){
+        if(Application.platform != RuntimePlatform.WindowsPlayer
+        && Application.platform != RuntimePlatform.WindowsEditor){
+            return true;
+        }
+        return false;
+
+    }
+    public void DisableAndroidMovementUI(){
+        Joystick.SetActive(false);
+        LightAttackButton.SetActive(false);
+        HeavyAttackButton.SetActive(false);
+        DashButton.SetActive(false);
+    }
+    public void EnableAndroidMovementUI(){
+        Joystick.SetActive(true);
+        LightAttackButton.SetActive(true);
+        HeavyAttackButton.SetActive(true);
+        DashButton.SetActive(true);
     }
 }

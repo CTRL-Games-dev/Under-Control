@@ -159,7 +159,7 @@ public class Player : MonoBehaviour {
     public float CameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
 
     // State
-    private Vector2 _movementInputVector = Vector2.zero;
+    public Vector2 _movementInputVector = Vector2.zero;
     private InteractionType? _queuedInteraction;
     private Cooldown _dashCooldown = new Cooldown(0);
 
@@ -318,7 +318,8 @@ public class Player : MonoBehaviour {
             case AnimationState.Locomotion:
             case AnimationState.Attack_Recovery:
             default:
-                return Quaternion.Euler(0, 45, 0) * new Vector3(_movementInputVector.x, 0, _movementInputVector.y).normalized;
+                Vector3 Direction = new Vector3(_movementInputVector.x, 0, _movementInputVector.y);
+                return Quaternion.Euler(0, 45, 0) * Direction.normalized;
         }
     }
 
@@ -485,6 +486,8 @@ public class Player : MonoBehaviour {
     }
 
     void OnToggleInventory(InputValue value) {
+        if(UICanvas.CurrentUIMiddleState == UIMiddleState.NotVisible) GameManager.Instance.DisableAndroidMovementUI();
+        else GameManager.Instance.EnableAndroidMovementUI();
         InventoryToggleEvent?.Invoke();
     }
 
