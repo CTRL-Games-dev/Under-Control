@@ -179,12 +179,14 @@ public class Player : MonoBehaviour {
     [SerializeField] private UICanvas _uiCanvas;
     [SerializeField] private ParticleSystem[] _trailParticles;
     public GameObject FBXModel;
+    
 
     // Static reference getters
     public static LivingEntity LivingEntity { get; private set; }
     public static ModifierSystem ModifierSystem { get; private set; }
     public static UICanvas UICanvas { get => Instance._uiCanvas; }
     public static CharacterController CharacterController { get; private set; }
+    public static PlayerInput PlayerInput { get; private set; }
     public static Animator Animator { get; private set; }
     public static CinemachinePositionComposer CinemachinePositionComposer { get; private set; }
     public static SpellSpawner SpellSpawner { get; private set; }
@@ -208,6 +210,7 @@ public class Player : MonoBehaviour {
         LivingEntity = GetComponent<LivingEntity>();
         ModifierSystem = GetComponent<ModifierSystem>();
         CharacterController = GetComponent<CharacterController>();
+        PlayerInput = GetComponent<PlayerInput>();
         Animator = GetComponent<Animator>();
         CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
         SpellSpawner = GetComponentInChildren<SpellSpawner>();
@@ -346,7 +349,7 @@ public class Player : MonoBehaviour {
     }
 
     private void handleRotation() {
-        if (LockRotation) return;
+        if (LockRotation && !GameManager.Instance.CheckIfAndroid()) return;
         if (_movementInputVector.magnitude > 0.1f) {
             var targetRotation = Quaternion.Euler(0, 45, 0) * Quaternion.LookRotation(new Vector3(_movementInputVector.x, 0, _movementInputVector.y));
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _turnSpeed * Time.deltaTime);
@@ -467,10 +470,12 @@ public class Player : MonoBehaviour {
     }
 
     void OnPrimaryInteraction(InputValue value) {
+        Debug.Log("primary interaction");
         _queuedInteraction = InteractionType.Primary;
     }
 
     void OnSecondaryInteraction(InputValue value) {
+        Debug.Log("secondary interaction");
         _queuedInteraction = InteractionType.Secondary;
     }
 
@@ -587,7 +592,7 @@ public class Player : MonoBehaviour {
 
 
     private void interact(InteractionType interactionType) {
-        if(EventSystem.current.IsPointerOverGameObject()) {
+        if(EventSystem.current.IsPointerOverGameObject() && !GameManager.Instance.CheckIfAndroid()) {
             return;
         }
 
@@ -608,7 +613,7 @@ public class Player : MonoBehaviour {
             return;
         }
         
-        if (!LockRotation) {
+        if (!LockRotation && !GameManager.Instance.CheckIfAndroid()) {
             transform.LookAt(GetMousePosition());   
         }
 

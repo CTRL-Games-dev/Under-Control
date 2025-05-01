@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(MusicPlayer))]
 public class GameManager : MonoBehaviour {
@@ -40,6 +41,7 @@ public class GameManager : MonoBehaviour {
     public GameObject HeavyAttackButton;
     public GameObject DashButton;
     public GameObject InventoryButton;
+    public bool AndroidTesting = false;
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
     private MusicPlayer _musicPlayer;
@@ -55,14 +57,14 @@ public class GameManager : MonoBehaviour {
     public bool IsStarterDialogueOver = false;
 
     private void Awake()  {
+        _musicPlayer = GetComponent<MusicPlayer>();
         if(CheckIfAndroid()){
             RectTransform HudRectTransform = Hud.GetComponent<RectTransform>();
-            HudRectTransform.anchorMin = new Vector2(0.5f,1);
-            HudRectTransform.anchorMax = new Vector2(0.5f,1);
-            HudRectTransform.anchoredPosition = new Vector2(-270,-200);
+            HudRectTransform.anchorMin = new Vector2(0,1);
+            HudRectTransform.anchorMax = new Vector2(0,1);
+            HudRectTransform.anchoredPosition = new Vector2(150,-100);
             AndroidUI.SetActive(true);
         }
-        _musicPlayer = GetComponent<MusicPlayer>();
         // SceneManager.sceneLoaded += OnLevelChange;
 
         // We need to check if there is already existing manager
@@ -86,6 +88,7 @@ public class GameManager : MonoBehaviour {
 
     private void Start() {
         playMusicForDimension(CurrentDimension);
+        if(CheckIfAndroid()) Player.PlayerInput.SwitchCurrentControlScheme("Touch");
         // For some reason "scene change" is being called, even if it is the first scene?
         // ConnectPortals();
     }
@@ -193,6 +196,7 @@ public class GameManager : MonoBehaviour {
         }
     }
     public bool CheckIfAndroid(){
+        if(AndroidTesting) return true;
         if(Application.platform != RuntimePlatform.WindowsPlayer
         && Application.platform != RuntimePlatform.WindowsEditor){
             return true;

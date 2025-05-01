@@ -83,6 +83,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
 
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         _currentCards = null;
+        if(GameManager.Instance.CheckIfAndroid()) GameManager.Instance.AndroidUI.SetActive(true);
     }
 
     public CardUI AddCard(Card runCard) {
