@@ -181,28 +181,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 89.896, z: 0}
---- !u!1 &26220682 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5753857576870180428, guid: ed9be1bac93899b05ae2cf8583efc5a4, type: 3}
-  m_PrefabInstance: {fileID: 1287731410}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &26220687
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 26220682}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0d2b3bd6c1946742878aac1e93633f2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  applicationID: 1367576019762155591
-  details: Game for T3G Competition
-  state: Made by CTRL games with love <3
-  largeImage: game_logo
-  largeText: Under Control
 --- !u!1001 &285869481
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -791,6 +769,55 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8f1ec000c56f1ea4fbb451f32e948566, type: 3}
+--- !u!1 &1287493376
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1287493378}
+  - component: {fileID: 1287493377}
+  m_Layer: 0
+  m_Name: DiscordManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1287493377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1287493376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0d2b3bd6c1946742878aac1e93633f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applicationID: 1367576019762155591
+  details: Game for T3G Competition
+  state: Made by CTRL games with love <3
+  largeImage: game_logo
+  largeText: Under Control
+--- !u!4 &1287493378
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1287493376}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1287731410
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -799,6 +826,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 11844003812944097, guid: ed9be1bac93899b05ae2cf8583efc5a4, type: 3}
+      propertyPath: UnknownModelPrefab
+      value: 
+      objectReference: {fileID: 509276410893099372, guid: 224cea61933114240bad861366d75fc4, type: 3}
     - target: {fileID: 3865485680309899944, guid: ed9be1bac93899b05ae2cf8583efc5a4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -843,13 +874,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
+    - target: {fileID: 8719684399960456901, guid: ed9be1bac93899b05ae2cf8583efc5a4, type: 3}
+      propertyPath: MusicClips.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8719684399960456901, guid: ed9be1bac93899b05ae2cf8583efc5a4, type: 3}
+      propertyPath: 'MusicClips.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 3daca99caacc0ae409f166fab6838b6a, type: 3}
+    - target: {fileID: 8719684399960456901, guid: ed9be1bac93899b05ae2cf8583efc5a4, type: 3}
+      propertyPath: 'MusicClips.Array.data[1]'
+      value: 
+      objectReference: {fileID: 8300000, guid: dc17612fd3c99e641a562151fde79e2a, type: 3}
+    - target: {fileID: 8719684399960456901, guid: ed9be1bac93899b05ae2cf8583efc5a4, type: 3}
+      propertyPath: 'MusicClips.Array.data[2]'
+      value: 
+      objectReference: {fileID: 8300000, guid: bf0ea8d8ac1e94a47a60ed9491dc479b, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5753857576870180428, guid: ed9be1bac93899b05ae2cf8583efc5a4, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 26220687}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ed9be1bac93899b05ae2cf8583efc5a4, type: 3}
 --- !u!1 &1358490362
 GameObject:
@@ -1998,3 +2042,4 @@ SceneRoots:
   - {fileID: 1358490365}
   - {fileID: 1896954434}
   - {fileID: 1668228965}
+  - {fileID: 1287493378}
