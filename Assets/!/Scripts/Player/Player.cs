@@ -87,7 +87,7 @@ public class Player : MonoBehaviour {
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
 
-    private int _evolutionPoints = 0;
+    public int _evolutionPoints = 0;
     public int EvolutionPoints {
         get{ return _evolutionPoints; }
         set {
@@ -216,6 +216,7 @@ public class Player : MonoBehaviour {
 
         LivingEntity.OnDeath.AddListener(onDeath);
         LivingEntity.OnStunned.AddListener(onStunned);
+        EventBus.ItemPlacedEvent.AddListener(UpdateEquipment);
         
         CameraDistance = MinCameraDistance;
 
@@ -660,6 +661,9 @@ public class Player : MonoBehaviour {
     }
 
     public void OnInventoryChanged() {
+        UpdateEquipment();
+    }
+    public void UpdateEquipment(){
         WeaponHolder.UpdateWeapon(CurrentWeapon);
         Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
 
@@ -879,5 +883,23 @@ public class Player : MonoBehaviour {
         Instance.gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
 
+    #endregion
+    #region Saving System
+    public void Save(ref PlayerSaveData data){
+        data.EvolutionPoints = EvolutionPoints;
+        data.SelectedEvolutions = SelectedEvolutions;
+    }
+    public void Load(PlayerSaveData data){
+        EvolutionPoints = data.EvolutionPoints;
+        foreach(EvoUI evolution in data.SelectedEvolutions){
+            evolution.AddEvolution();   
+        }
+    }
+    [Serializable]
+    public struct PlayerSaveData{
+        public List<EvoUI> SelectedEvolutions;
+        public int EvolutionPoints;
+
+    }
     #endregion
 }

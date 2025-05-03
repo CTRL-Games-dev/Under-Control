@@ -87,9 +87,9 @@ public class InventoryPanel : MonoBehaviour
     }
 
     private void setupGrid() {
+        
         _inventoryWidth = _currentEntityInventory.Size.x;
         _inventoryHeight = _currentEntityInventory.Size.y;
-
         _gridLayoutGroup.constraintCount = _inventoryWidth;
 
         _gridLayoutGroup.cellSize = new Vector2(TileSize, TileSize);
@@ -117,6 +117,11 @@ public class InventoryPanel : MonoBehaviour
                 
                 if (CustomInvTileSprite != null) invTile.SetCustomImage(CustomInvTileSprite);
             }
+        }
+    }
+    private void clearGrid(){
+        foreach (RectTransform child in _gridHolder.GetComponentInChildren<RectTransform>()) {
+            Destroy(child.gameObject);
         }
     }
 
@@ -350,6 +355,11 @@ public class InventoryPanel : MonoBehaviour
     private void playInventorySound(){
         AudioClip InvClickClip = Resources.Load("SFX/click") as AudioClip;
         SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform);
+    }
+    public void ChangeCurrentInventory(ItemContainer newInventory){
+        _currentEntityInventory = newInventory;
+        clearGrid();
+        RegenerateInventory();
     }
 
     #endregion

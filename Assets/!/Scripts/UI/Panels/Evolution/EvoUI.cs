@@ -3,7 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.EventSystems;
+using System;
 
+[Serializable]
 public class EvoUI : MonoBehaviour
 {
     
@@ -54,19 +56,25 @@ public class EvoUI : MonoBehaviour
     }
 
     public void OnPointerClick() {
+        Debug.Log("agugu");
         if (!_isAvailable || _isSelected || Player.Instance.EvolutionPoints <= 0) return;
         Player.Instance.EvolutionPoints--;
+        AddEvolution();
+    }
+    public void AddEvolution(){
+        
         Player.Instance.SelectedEvolutions.Add(this);
         Player.Instance.OnEvolutionSelected.Invoke(this);
-        float fillAmount = 0;
+        _isSelected = true;
+        if (_nextEvoUI != null) _nextEvoUI.SetAvailable();
+
+         float fillAmount = 0;
         DOTween.To(() => fillAmount, x => fillAmount = x, 1, 0.8f * Settings.AnimationSpeed).SetEase(Ease.OutSine).OnUpdate(() => {
             _lineImage.fillAmount = fillAmount;
         }).OnComplete(() => {
             _rectTransform.DOScale(1.05f, 0.2f * Settings.AnimationSpeed);
         });
-        _isSelected = true;
         _rectTransform.DOKill();
-        if (_nextEvoUI != null) _nextEvoUI.SetAvailable();
     }
 
     public List<Modifier> GetModifiers() {

@@ -39,4 +39,20 @@ public class HumanoidInventory : SimpleInventory
             OnInventoryChanged.Invoke();
         }
     }
+    public void Save(ref HumanoidInventorySaveData data){
+        data.inventory = ItemContainer;
+        data.Amulet = Amulet;
+        data.Armor = Armor;
+        data.Weapon = Weapon;
+    }
+    public void Load(HumanoidInventorySaveData data){
+        ItemContainer = data.inventory;
+    }
+    [Serializable]
+    public struct HumanoidInventorySaveData{
+        public ItemContainer inventory;
+        public InventoryItem<AmuletItemData> Amulet;
+        public InventoryItem<ArmorItemData> Armor;
+        public InventoryItem<WeaponItemData> Weapon;
+    }
 }

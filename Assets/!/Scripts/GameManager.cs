@@ -17,6 +17,13 @@ public class GameManager : MonoBehaviour {
     public Weapon UnknownWeaponPrefab;
     public GameObject UnknownModelPrefab;
     public ItemEntity ItemEntityPrefab;
+    public InventoryPanel InventoryPanel;
+    public InvTileEquipment ArmorTile;
+    public InvTileEquipment WeaponTile;
+    public InvTileEquipment AmuletTile;
+    public InvTileEquipment Consumable1Tile;
+    public InvTileEquipment Consumable2Tile;
+
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
         {Dimension.HUB, "NewHub"},
         {Dimension.FOREST, "Adventure"},
@@ -42,6 +49,8 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] private List<Card> _alreadyAddedCards = new();
     [HideInInspector] private List<Card> _availableCards = new();
     [SerializeField] private List<Card> _cards = new();
+    [Space]
+    public float SaveCooldown = 15f;
 
     // Events
     public UnityEvent LevelLoaded;
@@ -175,6 +184,14 @@ public class GameManager : MonoBehaviour {
     public void DebugCommands() {
         if (Input.GetKeyDown(KeyCode.F1)) {
             Player.Instance.DamageDisabled = true;
+        }
+        if(Input.GetKeyDown(KeyCode.F9)) {
+            Debug.Log("<color=red>Debug Tools - Saved game via hotkey");
+            SaveSystem.Save();
+        }
+        if(Input.GetKeyDown(KeyCode.F10)) {
+            Debug.Log("<color=red>Debug Tools - Loaded game via hotkey");
+            SaveSystem.Load();
         }
     }
 }

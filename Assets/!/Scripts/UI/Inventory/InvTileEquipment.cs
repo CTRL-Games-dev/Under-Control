@@ -93,7 +93,7 @@ public class InvTileEquipment : InvTile {
     }
 
     public void UpdateInvTile() {
-        if (_itemUI.InventoryItem.Amount <= 0) {
+        if (_itemUI?.InventoryItem.Amount <= 0) {
             Destroy(_itemUI.gameObject);
             _itemUI = null;
             IsEmpty = true;
@@ -107,90 +107,96 @@ public class InvTileEquipment : InvTile {
         
         if (itemUI == null || Player.UICanvas.SelectedItemUI.InventoryItem != null) return;
         
-        if (itemUI == _itemUI) {
-            switch (_tileType) {
-                case TileType.Armor:
-                    Player.Inventory.Armor = null;
-                    break;
-                case TileType.Amulet:
-                    Player.Inventory.Amulet = null;
-                    break;
-                case TileType.Weapon:
-                    Player.Inventory.Weapon = null;
-                    break;
-                case TileType.Consumeable1:
-                    Player.Instance.ConsumableItemOne = null;
-                    Player.UICanvas.HUDCanvas.OnUpdateConsumables();
-                    break;
-                case TileType.Consumeable2:
-                    Player.Instance.ConsumableItemTwo = null;
-                    Player.UICanvas.HUDCanvas.OnUpdateConsumables();
-                    break;
-            }
-            
-            IsEmpty = true;
-            _hintImage.SetActive(true);
+        if (itemUI != _itemUI) return;
+        PickUpItem();
+    }
+    public void PickUpItem(){
+        switch (_tileType) {
+            case TileType.Armor:
+                Player.Inventory.Armor = null;
+                break;
+            case TileType.Amulet:
+                Player.Inventory.Amulet = null;
+                break;
+            case TileType.Weapon:
+                Player.Inventory.Weapon = null;
+                break;
+            case TileType.Consumeable1:
+                Player.Instance.ConsumableItemOne = null;
+                Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+                break;
+            case TileType.Consumeable2:
+                Player.Instance.ConsumableItemTwo = null;
+                Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+                break;
+        }
+        
+        IsEmpty = true;
+        _hintImage.SetActive(true);
 
-            if (_tileType == TileType.Weapon) {
-                _rectTransform.DOKill();
-                _rectTransform.DOSizeDelta(new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize * 3), 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutBack).OnComplete(() => {
-                    _bgImage.sprite = _tripleBg;
-                    _highlightImg.sprite = _tripleHighlight;
-                });
-            }
+        if (_tileType == TileType.Weapon) {
+            _rectTransform.DOKill();
+            _rectTransform.DOSizeDelta(new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize * 3), 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutBack).OnComplete(() => {
+                _bgImage.sprite = _tripleBg;
+                _highlightImg.sprite = _tripleHighlight;
+            });
+        }
 
-            if (_itemUI != null) {
-                Player.UICanvas.SetSelectedItemUI(_itemUI);
-                Destroy(_itemUI.gameObject);
-                _itemUI = null;
-            }
+        if (_itemUI != null) {
+            Player.UICanvas.SetSelectedItemUI(_itemUI);
+            Destroy(_itemUI.gameObject);
+            _itemUI = null;
         }
     }
 
     public void OnPointerClickEquipment() {
-        if (SelectedInventoryItem == null && _itemUI == null) return;        
-        if (SelectedInventoryItem != null && _itemUI != null) return;
+        InventoryItem item = SelectedInventoryItem;
+        if (item == null && _itemUI == null) return;        
+        if (item != null && _itemUI != null) return;
         if(!IsEmpty) return;
-            if (_tileType == TileType.Armor) {
-                if(!SelectedInventoryItem.TryAs(out InventoryItem<ArmorItemData> armorItem)) {
-                    return;
-                }
-
-                Player.Inventory.Armor = armorItem;
-            } else if (_tileType == TileType.Amulet) {
-                if(!SelectedInventoryItem.TryAs(out InventoryItem<AmuletItemData> amuletItem)) {
-                    return;
-                }
-
-                Player.Inventory.Amulet = amuletItem;
-            } else if (_tileType == TileType.Weapon) {
-                if(!SelectedInventoryItem.TryAs(out InventoryItem<WeaponItemData> weaponItem)) {
-                    return;
-                }
-                AudioClip EquipWeaponClip = Resources.Load("SFX/bron/wyjmowaniebroni") as AudioClip;
-                SoundFXManager.Instance.PlaySoundFXClip(EquipWeaponClip,transform);
-                Player.Inventory.Weapon = weaponItem;
-            } else if (_tileType == TileType.Consumeable1) {
-                if(!SelectedInventoryItem.TryAs(out InventoryItem<ConsumableItemData> consumableItem)) {
-                    return;
-                }
-
-                Player.Instance.ConsumableItemOne = consumableItem;
-                Player.UICanvas.HUDCanvas.OnUpdateConsumables();
-            } else if (_tileType == TileType.Consumeable2) {
-                if(!SelectedInventoryItem.TryAs(out InventoryItem<ConsumableItemData> consumableItem)) {
-                    return;
-                }
-
-                Player.Instance.ConsumableItemTwo = consumableItem;
-                Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+        PlaceItem(item);
+    }
+    public void PlaceItem(InventoryItem item){
+        if (_tileType == TileType.Armor) {
+            if(!item.TryAs(out InventoryItem<ArmorItemData> armorItem)) {
+                return;
             }
+
+            Player.Inventory.Armor = armorItem;
+        } else if (_tileType == TileType.Amulet) {
+            if(!item.TryAs(out InventoryItem<AmuletItemData> amuletItem)) {
+                return;
+            }
+
+            Player.Inventory.Amulet = amuletItem;
+        } else if (_tileType == TileType.Weapon) {
+            if(!item.TryAs(out InventoryItem<WeaponItemData> weaponItem)) {
+                return;
+            }
+            AudioClip EquipWeaponClip = Resources.Load("SFX/bron/wyjmowaniebroni") as AudioClip;
+            SoundFXManager.Instance.PlaySoundFXClip(EquipWeaponClip,transform);
+            Player.Inventory.Weapon = weaponItem;
+        } else if (_tileType == TileType.Consumeable1) {
+            if(!item.TryAs(out InventoryItem<ConsumableItemData> consumableItem)) {
+                return;
+            }
+
+            Player.Instance.ConsumableItemOne = consumableItem;
+            Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+        } else if (_tileType == TileType.Consumeable2) {
+            if(!item.TryAs(out InventoryItem<ConsumableItemData> consumableItem)) {
+                return;
+            }
+
+            Player.Instance.ConsumableItemTwo = consumableItem;
+            Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+        }
 
 
         _hintImage.SetActive(false);
         
-        InventoryItem item = SelectedInventoryItem;
-        item.Rotated = _tileType == TileType.Weapon ? false : SelectedInventoryItem.Rotated;
+        
+        item.Rotated = _tileType == TileType.Weapon ? false : item.Rotated;
 
         if (_tileType == TileType.Weapon) {
 
@@ -214,7 +220,7 @@ public class InvTileEquipment : InvTile {
             });
         }
 
-        createItemUI(SelectedInventoryItem);
+        createItemUI(item);
 
         EventBus.ItemPlacedEvent?.Invoke();
         IsEmpty = false;
@@ -253,4 +259,43 @@ public class InvTileEquipment : InvTile {
         _itemUI = inventoryItem.ItemUI;
         return itemGameObject;
     }
+    #region Save and load methods
+    public void removeItem(){
+        switch (_tileType) {
+                case TileType.Armor:
+                    Player.Inventory.Armor = null;
+                    break;
+                case TileType.Amulet:
+                    Player.Inventory.Amulet = null;
+                    break;
+                case TileType.Weapon:
+                    Player.Inventory.Weapon = null;
+                    break;
+                case TileType.Consumeable1:
+                    Player.Instance.ConsumableItemOne = null;
+                    Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+                    break;
+                case TileType.Consumeable2:
+                    Player.Instance.ConsumableItemTwo = null;
+                    Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+                    break;
+            }
+            
+            IsEmpty = true;
+            _hintImage.SetActive(true);
+            if (_tileType == TileType.Weapon) {
+                _rectTransform.DOKill();
+                _rectTransform.DOSizeDelta(new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize * 3), 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutBack).OnComplete(() => {
+                    _bgImage.sprite = _tripleBg;
+                    _highlightImg.sprite = _tripleHighlight;
+                });
+            }
+
+            if (_itemUI != null) {
+                Player.UICanvas.SetSelectedItemUI(_itemUI);
+                Destroy(_itemUI.gameObject);
+                _itemUI = null;
+            }
+    }
+    #endregion
 }

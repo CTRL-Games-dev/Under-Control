@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -56,6 +57,7 @@ public class LivingEntity : MonoBehaviour {
     public AudioClip OnDamageSound;
     public AudioClip OnAttack;
     public AudioClip[] IdleSounds;
+    
 
     [Header("Events")]
     public UnityEvent OnDeath;
@@ -78,10 +80,12 @@ public class LivingEntity : MonoBehaviour {
     public EntityInventory Inventory { get; private set; }
     public HitFlashAnimator HitFlashAnimator { get; private set; }
     public TintAnimator TintAnimator { get; private set; }
+    private Animator _animator;
 
     public bool _isPlayer = false;
 
     void Awake() {
+        _animator = GetComponent<Animator>();
         ModifierSystem = GetComponent<ModifierSystem>();
         Inventory = GetComponent<EntityInventory>();
         HitFlashAnimator = GetComponent<HitFlashAnimator>();
@@ -95,6 +99,7 @@ public class LivingEntity : MonoBehaviour {
         _isPlayer = gameObject.GetComponent<Player>() != null;
         _health = StartingHealth;
         _mana = StartingMana;
+        
 
         if (_isPlayer) {
             MaxHealth.OnValueChanged.AddListener(() => Player.UICanvas.HUDCanvas.UpdateHealthBar());
@@ -104,7 +109,7 @@ public class LivingEntity : MonoBehaviour {
 
     void Update() {
         recheckEffects();
-
+        _animator.SetFloat("movementSpeed", MovementSpeed/MovementSpeed.Raw);
         if (Health <= 0) {
             Die();
         }
