@@ -26,8 +26,37 @@ public enum UITopState {
 }
 
 
-public class UICanvas : MonoBehaviour
-{
+public class UICanvas : MonoBehaviour {
+    #region Scalling
+    
+    public static Vector2 ScreenScale { get => new Vector2(Screen.width / 1920f, Screen.height / 1080f); }
+    public static Vector2 CanvasScale { get => new Vector2(1920f / Screen.width, 1080f / Screen.height); }
+
+    // Scales a vector to the virtual screen size (1920x1080).
+    public static Vector2 ScaleToCanvas(Vector2 original) {
+        Vector2 scale = CanvasScale;
+        return new Vector2(original.x * scale.x, original.y * scale.y);
+    }
+
+    // Scales a vector to the virtual screen size (1920x1080). Z is not scaled.
+    public static Vector3 ScaleToCanvas(Vector3 original) {
+        Vector2 scale = CanvasScale;
+        return new Vector3(original.x * scale.x, original.y * scale.y, original.z);
+    }
+
+    public static Vector2 ScaleToScreen(Vector2 original) {
+        Vector2 scale = ScreenScale;
+        return new Vector2(original.x * scale.x, original.y * scale.y);
+    }
+
+    // Scales a vector to the virtual screen size (1920x1080). Z is not scaled.
+    public static Vector3 ScaleToScreen(Vector3 original) {
+        Vector2 scale = ScreenScale;
+        return new Vector3(original.x * scale.x, original.y * scale.y, original.z);
+    }
+
+    #endregion
+
     public UIBottomState CurrentUIBottomState = UIBottomState.HUD;
     public UIMiddleState CurrentUIMiddleState = UIMiddleState.NotVisible;
     public UITopState CurrentUITopState = UITopState.NotVisible;
