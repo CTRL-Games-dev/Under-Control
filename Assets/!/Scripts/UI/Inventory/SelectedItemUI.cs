@@ -81,10 +81,12 @@ public class SelectedItemUI : MonoBehaviour
     private void Awake() {
         _rectTransform = GetComponent<RectTransform>();
         _image = GetComponentInChildren<Image>();
+        
     }
 
     private void Start() {
         Player.Instance.ItemRotateEvent.AddListener(OnRotate);
+        gameObject.SetActive(false);
     }
 
     private void Update()  {

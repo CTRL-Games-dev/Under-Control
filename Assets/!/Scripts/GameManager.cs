@@ -49,6 +49,8 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] private List<Card> _alreadyAddedCards = new();
     [HideInInspector] private List<Card> _availableCards = new();
     [SerializeField] private List<Card> _cards = new();
+    [Space]
+    public float SaveCooldown = 15f;
 
     // Events
     public UnityEvent LevelLoaded;

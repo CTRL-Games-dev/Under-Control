@@ -17,6 +17,10 @@ public class SaveSystem
         string saveFile = Application.persistentDataPath + "/savedata" + ".save";
         return saveFile;
     }
+    public static bool CheckIfSaveFileExists()
+    {
+        return File.Exists(SaveFileName());
+    }
     public static void Save()
     {
         HandleSaveData();

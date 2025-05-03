@@ -2,16 +2,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections;
+using TMPro;
 
 public class PauseCanvas : MonoBehaviour, IUICanvasState
 {
+    private float _saveTimer;
+    private bool _countSaveCooldownTimer = false;
     [SerializeField] private Image _bgImage;
     [SerializeField] private GameObject _blackBar, _resumeButton, _saveButton, _loadButton, _optionsButton, _exitButton;
     private RectTransform _blackBarRect, _resumeRect, _saveRect, _loadRect, _optionsRect, _exitRect;
     private float _resumeBtnStartingY, _saveBtnStartingY, _loadBtnStartingY, _optionsBtnStartingY, _exitBtnStartingY;
     private CanvasGroup _canvasGroup, _resumeGroup, _saveGroup, _loadGroup, _optionsGroup, _exitGroup;
     private TweenParams _tweenParams = new TweenParams().SetUpdate(true).SetEase(Ease.OutBack);
+    private TextMeshProUGUI _saveText, _loadText;
 
+#region Unity Methods
     private void Awake() {
         _blackBarRect = _blackBar.GetComponent<RectTransform>();
 
@@ -33,8 +38,21 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
         _loadBtnStartingY = _loadRect.anchoredPosition.y;
         _optionsBtnStartingY = _optionsRect.anchoredPosition.y;
         _exitBtnStartingY = _exitRect.anchoredPosition.y;
-    }
 
+        _saveText =  _saveButton.GetComponentInChildren<TextMeshProUGUI>();
+        _loadText =  _loadButton.GetComponentInChildren<TextMeshProUGUI>();
+
+        if(!SaveSystem.CheckIfSaveFileExists()) setTextDisabled(_loadText);
+    }
+    void Update()
+    {
+        if(_countSaveCooldownTimer && Time.time > _saveTimer) {
+            _countSaveCooldownTimer = false;
+            resetTextDecoration(_saveText);
+            resetTextDecoration(_loadText);
+        }
+    }
+    #endregion
     #region Public Methods
     public void ShowUI() {
         float fadeSpeed = 0.2f * Settings.AnimationSpeed;
@@ -71,6 +89,19 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
         hideUI();
     }
 
+    
+
+
+#endregion
+#region Private Methods
+    private void resetTextDecoration(TextMeshProUGUI text) {
+        text.color = Color.white;
+        text.fontStyle = FontStyles.Normal;
+    }
+    private void setTextDisabled(TextMeshProUGUI text) {
+        text.color = Color.gray;
+        text.fontStyle = FontStyles.Strikethrough;
+    }
     private Tween hideUI() {
         gameObject.SetActive(true);
         StopCoroutine(slowdownTime());
@@ -86,11 +117,6 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
             gameObject.SetActive(false);
         });
     }
-
-
-#endregion
-#region Private Methods
-
     private void killTweens() {
         _blackBarRect.DOKill();
         _canvasGroup.DOKill();
@@ -141,6 +167,7 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
         Time.timeScale = 1;
     }
 
+
 #endregion
 #region Button Clicks
     public void OnResumeBtnClick() {
@@ -148,11 +175,21 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
     }  
 
     public void OnSaveBtnClick() {
-        Debug.Log("Save button clicked");
+        if(Time.time < _saveTimer)  return;
+        _saveTimer = Time.time + GameManager.Instance.SaveCooldown;
+        setTextDisabled(_saveText);
+        setTextDisabled(_loadText);
+        _countSaveCooldownTimer = true;
+        SaveSystem.Save();
     }
 
     public void OnLoadBtnClick() {
-        Debug.Log("Load button clicked");
+        if(Time.time < _saveTimer)  return;
+        _saveTimer = Time.time + GameManager.Instance.SaveCooldown;
+        setTextDisabled(_saveText);
+        setTextDisabled(_loadText);
+        _countSaveCooldownTimer = true;
+        SaveSystem.Load();
     }
 
     public void OnSettingsBtnClick() {
@@ -160,6 +197,7 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
     }
 
     public void OnExitBtnClick() {
+        if(GameManager.Instance.CurrentDimension == Dimension.HUB) return;
         hideUI().OnComplete(() => {
             Player.LivingEntity.OnDeath.Invoke();
         });

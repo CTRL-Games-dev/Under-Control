@@ -216,6 +216,7 @@ public class Player : MonoBehaviour {
 
         LivingEntity.OnDeath.AddListener(onDeath);
         LivingEntity.OnStunned.AddListener(onStunned);
+        EventBus.ItemPlacedEvent.AddListener(UpdateEquipment);
         
         CameraDistance = MinCameraDistance;
 
@@ -660,6 +661,9 @@ public class Player : MonoBehaviour {
     }
 
     public void OnInventoryChanged() {
+        UpdateEquipment();
+    }
+    public void UpdateEquipment(){
         WeaponHolder.UpdateWeapon(CurrentWeapon);
         Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
 
