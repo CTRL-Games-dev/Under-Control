@@ -86,6 +86,8 @@ public class Player : MonoBehaviour {
     public Camera MainCamera;
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
+    [SerializeField] private Material _dissolveMaterial;
+    public Vector3 _startPosition;
 
     public int _evolutionPoints = 0;
     public int EvolutionPoints {
@@ -221,6 +223,8 @@ public class Player : MonoBehaviour {
         CameraDistance = MinCameraDistance;
 
         registerStats();
+
+        _startPosition = transform.position;
 
         OnEvolutionSelected.AddListener((evoUI) => {
             foreach (Modifier modifier in evoUI.GetModifiers()) {
@@ -882,9 +886,36 @@ public class Player : MonoBehaviour {
         UpdateDisabled = false;
         Instance.gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
+    public void PlayRespawnAnimation() {
+        Player.Animator.animatePhysics = false;
+        Player.Instance.UpdateDisabled = true;
+        transform.position = _startPosition - Vector3.up * 3f;
+        float dissolve = 1f;
+        DOTween.To(() => dissolve, x => dissolve = x, 0f, 2f).SetDelay(1f).OnUpdate(() => {
+            _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
+        }).OnComplete(() => {
+            Player.Instance.gameObject.transform.DOMoveY(-2, 0);
+            Player.Animator.SetTrigger("rise");
+            Player.Instance.gameObject.transform.DOComplete();
+
+            Player.Instance.gameObject.transform.DOKill();
+
+            dissolve = 0f;
+            DOTween.To(() => dissolve, x => dissolve = x, 1f, 4f).SetDelay(1f).OnUpdate(() => {
+                _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
+            });
+            Player.Instance.gameObject.transform.DOMoveY(1, 2f).SetEase(Ease.OutQuint).OnComplete(() => {
+                Player.Animator.SetTrigger("live");
+                Player.Instance.UpdateDisabled = false;
+                Player.Animator.animatePhysics = true;
+                
+            });
+        });
+   
+    }
 
     #endregion
-    #region Saving System
+    #region Save System
     public void Save(ref PlayerSaveData data){
         data.EvolutionPoints = EvolutionPoints;
         data.SelectedEvolutions = SelectedEvolutions;
