@@ -19,6 +19,7 @@ public class HubManager : MonoBehaviour
             Player.UICanvas.ChangeUIMiddleState(UIMiddleState.MainMenu);
         } else {
             Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
+            Player.Instance.PlayRespawnAnimation();
         }
         Player.UICanvas.ChangeUITopState(UITopState.NotVisible);
         Player.Instance.MaxCameraDistance = 7f;
@@ -29,7 +30,6 @@ public class HubManager : MonoBehaviour
         Player.Instance.HasPlayerDied = false;
         Player.LivingEntity.HasDied = false;
         Player.Instance.EvolutionPoints++;
-        // Player.Instance.PlayRespawnAnimation(); - moved to playing on new game
 
         GameManager.Instance.ResetInfluence();
         GameManager.Instance.ResetCards();
@@ -37,7 +37,7 @@ public class HubManager : MonoBehaviour
     }
 
     private void Update() {
-        if (Input.GetKeyUp(KeyCode.F4)) { //TODO: remove this
+        if (Input.GetKeyUp(KeyCode.F4)) {
             Player.Instance.PlayRespawnAnimation();
         }
     }

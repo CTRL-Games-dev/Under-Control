@@ -53,7 +53,6 @@ public class DeathScreenCanvas : MonoBehaviour, IUICanvasState
                     });
 
                     Player.Instance.ResetRun();
-                    Player.Instance.PlayRespawnAnimation();
                 });
             });
         });

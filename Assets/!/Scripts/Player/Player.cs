@@ -890,6 +890,7 @@ public class Player : MonoBehaviour {
         Player.Animator.animatePhysics = false;
         Player.Instance.UpdateDisabled = true;
         transform.position = _startPosition - Vector3.up * 3f;
+        transform.rotation = Quaternion.Euler(0, 45, 0);
         float dissolve = 1f;
         DOTween.To(() => dissolve, x => dissolve = x, 0f, 2f).SetDelay(1f).OnUpdate(() => {
             _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
