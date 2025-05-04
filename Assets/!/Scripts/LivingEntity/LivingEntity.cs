@@ -74,6 +74,7 @@ public class LivingEntity : MonoBehaviour {
     public bool HasDied = false;
 
     private readonly int _hurtHash = Animator.StringToHash("hurt");
+    private readonly int _movementSpeedHash = Animator.StringToHash("movement_speed");
 
     // References
     public ModifierSystem ModifierSystem { get; private set; }
@@ -109,7 +110,7 @@ public class LivingEntity : MonoBehaviour {
 
     void Update() {
         recheckEffects();
-        _animator.SetFloat("movementSpeed", MovementSpeed/MovementSpeed.Raw);
+        _animator.SetFloat(_movementSpeedHash, MovementSpeed);
         if (Health <= 0) {
             Die();
         }
