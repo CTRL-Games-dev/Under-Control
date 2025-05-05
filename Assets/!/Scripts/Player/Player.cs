@@ -193,6 +193,7 @@ public class Player : MonoBehaviour {
     public static HumanoidInventory Inventory => LivingEntity.Inventory as HumanoidInventory;
 
     [SerializeField] private LayerMask _groundLayerMask;
+    public LayerMask InteractionMask;
     public FaceAnimator FaceAnimator;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
@@ -235,6 +236,9 @@ public class Player : MonoBehaviour {
         LivingEntity.OnDamageTaken.AddListener((data) => {
             CameraManager.ShakeCamera(2, 0.1f);
         });
+ 
+        InteractionMask |= 1 << LayerMask.NameToLayer("Player");
+        InteractionMask |= 1 << LayerMask.NameToLayer("Hitboxes");
 
         // LoadKeybinds();
     }
@@ -629,12 +633,12 @@ public class Player : MonoBehaviour {
 
     private bool tryInteract(InteractionType interactionType) {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
-        int layerMask = ~LayerMask.GetMask("Player");
-        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask)) {
+        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, ~InteractionMask)) {
             return false;
         }
 
         Transform objectHit = hit.transform;
+        Debug.Log(objectHit.name);
 
         // Check if object is to far
         if(Vector3.Distance(objectHit.position, transform.position) > MaxInteractionRange) {
