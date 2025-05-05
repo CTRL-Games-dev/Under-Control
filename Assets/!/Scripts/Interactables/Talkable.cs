@@ -48,8 +48,6 @@ public class Talkable : MonoBehaviour, IInteractable
         Player.Instance.UICancelEvent.RemoveListener(EndInteract);
         Player.Instance.LockRotation = false;
         Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
-        Debug.Log("End Interact");
-        Debug.Log(Player.Instance.LockRotation);
     }
 
     private void AnimateMark() {

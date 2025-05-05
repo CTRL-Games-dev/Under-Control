@@ -52,7 +52,7 @@ public class Player : MonoBehaviour {
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 10f);
 
     public Stat DashSpeedMultiplier = new Stat(StatType.DASH_SPEED_MULTIPLIER, 2f);
-    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 3f);
+    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 2f);
     public Stat DashDuration = new Stat(StatType.DASH_COOLDOWN, 0.3f);
 
     // Coins
