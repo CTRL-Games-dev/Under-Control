@@ -178,6 +178,7 @@ public class GameManager : MonoBehaviour {
     public void OnLevelLoaded() {
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Choose);
         LevelLoaded.Invoke();
+        Player.Instance.CameraDistance = 10;
     }
 
 
