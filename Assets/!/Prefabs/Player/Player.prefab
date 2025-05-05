@@ -2411,7 +2411,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   DashCooldown:
-    _raw: 2
+    _raw: 3
     _adjusted: 5
     _initValue: 5
     OnValueChanged:
@@ -2443,6 +2443,8 @@ MonoBehaviour:
   MainCamera: {fileID: 469925352793417921}
   InputDisabled: 0
   DamageDisabled: 0
+  _dissolveMaterial: {fileID: 2100000, guid: bfe4b1304878755499f4d9d6c76b2471, type: 2}
+  StartPosition: {x: 0, y: 0, z: 0}
   _evolutionPoints: 0
   SelectedEvolutions: []
   _spellDataOne:
@@ -2517,6 +2519,9 @@ MonoBehaviour:
   _groundLayerMask:
     serializedVersion: 2
     m_Bits: 256
+  InteractionMask:
+    serializedVersion: 2
+    m_Bits: 0
   FaceAnimator: {fileID: 4932158786382918275}
   CurrentAnimationState: 0
   actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
@@ -15102,8 +15107,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1646664192321711085}
   m_HandleRect: {fileID: 8565112724246989343}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 0.999832
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -15303,8 +15308,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6609313837983394814}
   m_HandleRect: {fileID: 7294056453409053838}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 0.999832
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -15348,7 +15353,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.4749756, y: -0.00007520029}
+  m_AnchoredPosition: {x: 0.4749756, y: -0.00042283442}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6274736155342227322
@@ -16582,8 +16587,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8585513677951088947}
   m_HandleRect: {fileID: 5667783115067739898}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 0.99982864
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -17274,7 +17279,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.0000371933}
+  m_AnchoredPosition: {x: 0, y: -0.000013113022}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &3304424980708954453
@@ -20348,7 +20353,7 @@ Transform:
   m_GameObject: {fileID: 2942579809011625722}
   serializedVersion: 2
   m_LocalRotation: {x: 0.23071207, y: -0.0000000028210443, z: -0.0000000055874794, w: 0.97302204}
-  m_LocalPosition: {x: -0.15615273, y: 4.5071087, z: -4.698543}
+  m_LocalPosition: {x: -0.15615273, y: 3.6371088, z: -4.698543}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -22107,7 +22112,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.4749756, y: -0.00004476925}
+  m_AnchoredPosition: {x: 0.4749756, y: -0.00042283442}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2779757702894924477
@@ -30224,8 +30229,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6178054296097965533}
   m_HandleRect: {fileID: 4207946714231761430}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -30619,7 +30624,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 2.4, y: -0.00007261407}
+  m_AnchoredPosition: {x: 2.4, y: -0.00055800576}
   m_SizeDelta: {x: 1121.5598, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6049122339610106530
@@ -37783,8 +37788,8 @@ CanvasGroup:
   m_GameObject: {fileID: 5473473213468266804}
   m_Enabled: 1
   m_Alpha: 0
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!1 &5489609082917551852
 GameObject:
@@ -41313,7 +41318,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3078185046228858692
 RectTransform:
   m_ObjectHideFlags: 0
@@ -41452,15 +41457,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 0
-    callback:
-      m_PersistentCalls:
-        m_Calls: []
-  - eventID: 1
-    callback:
-      m_PersistentCalls:
-        m_Calls: []
+  m_Delegates: []
 --- !u!1 &6097177377589565127
 GameObject:
   m_ObjectHideFlags: 0

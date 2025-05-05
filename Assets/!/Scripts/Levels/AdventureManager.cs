@@ -34,5 +34,7 @@ public class AdventureManager : MonoBehaviour
         _navMeshSurface.BuildNavMesh();
 
         GameManager.Instance.OnLevelLoaded();
+
+        Player.Instance.ResetToDefault();
     }
 }

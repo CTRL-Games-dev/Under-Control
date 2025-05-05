@@ -36,7 +36,7 @@ public class HoverTooltip : MonoBehaviour {
         }
 
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray, out RaycastHit hit, 100)) {
+        if (!Physics.Raycast(ray, out RaycastHit hit, 100, ~Player.Instance.InteractionMask)) {
             return;
         }
 

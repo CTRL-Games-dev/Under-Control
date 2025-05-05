@@ -52,7 +52,7 @@ public class Player : MonoBehaviour {
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 10f);
 
     public Stat DashSpeedMultiplier = new Stat(StatType.DASH_SPEED_MULTIPLIER, 2f);
-    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 12f);
+    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 2f);
     public Stat DashDuration = new Stat(StatType.DASH_COOLDOWN, 0.3f);
 
     // Coins
@@ -86,6 +86,8 @@ public class Player : MonoBehaviour {
     public Camera MainCamera;
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
+    [SerializeField] private Material _dissolveMaterial;
+    public Vector3 StartPosition;
 
     public int _evolutionPoints = 0;
     public int EvolutionPoints {
@@ -191,6 +193,7 @@ public class Player : MonoBehaviour {
     public static HumanoidInventory Inventory => LivingEntity.Inventory as HumanoidInventory;
 
     [SerializeField] private LayerMask _groundLayerMask;
+    public LayerMask InteractionMask;
     public FaceAnimator FaceAnimator;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
@@ -222,6 +225,8 @@ public class Player : MonoBehaviour {
 
         registerStats();
 
+        StartPosition = transform.position;
+
         OnEvolutionSelected.AddListener((evoUI) => {
             foreach (Modifier modifier in evoUI.GetModifiers()) {
                 LivingEntity.ApplyIndefiniteModifier(modifier);
@@ -231,6 +236,9 @@ public class Player : MonoBehaviour {
         LivingEntity.OnDamageTaken.AddListener((data) => {
             CameraManager.ShakeCamera(2, 0.1f);
         });
+ 
+        InteractionMask |= 1 << LayerMask.NameToLayer("Player");
+        InteractionMask |= 1 << LayerMask.NameToLayer("Hitboxes");
 
         // LoadKeybinds();
     }
@@ -625,12 +633,12 @@ public class Player : MonoBehaviour {
 
     private bool tryInteract(InteractionType interactionType) {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
-        int layerMask = ~LayerMask.GetMask("Player");
-        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask)) {
+        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, ~InteractionMask)) {
             return false;
         }
 
         Transform objectHit = hit.transform;
+        //Debug.Log(objectHit.name);
 
         // Check if object is to far
         if(Vector3.Distance(objectHit.position, transform.position) > MaxInteractionRange) {
@@ -882,9 +890,48 @@ public class Player : MonoBehaviour {
         UpdateDisabled = false;
         Instance.gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
+    public void PlayRespawnAnimation() {
+        Player.Animator.animatePhysics = false;
+        Player.Instance.UpdateDisabled = true;
+        transform.position = StartPosition - Vector3.up * 3f;
+        transform.rotation = Quaternion.Euler(0, 45, 0);
+        float dissolve = 1f;
+        DOTween.To(() => dissolve, x => dissolve = x, 0f, 2f).SetDelay(1f).OnUpdate(() => {
+            _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
+        }).OnComplete(() => {
+            Player.Instance.gameObject.transform.DOMoveY(-2, 0);
+            Player.Animator.SetTrigger("rise");
+            Player.Instance.gameObject.transform.DOComplete();
+
+            Player.Instance.gameObject.transform.DOKill();
+
+            dissolve = 0f;
+            DOTween.To(() => dissolve, x => dissolve = x, 1f, 4f).SetDelay(1f).OnUpdate(() => {
+                _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
+            });
+            Player.Instance.gameObject.transform.DOMoveY(1, 2f).SetEase(Ease.OutQuint).OnComplete(() => {
+                Player.Animator.SetTrigger("live");
+                Player.Instance.UpdateDisabled = false;
+                Player.Animator.animatePhysics = true;
+                
+            });
+        });
+   
+    }
+
+    public void ResetToDefault() {
+        Instance.LockRotation = false;
+        Instance.UpdateDisabled = false;
+        Instance.DamageDisabled = false;
+        Instance.HasPlayerDied = false;
+        Instance._isAttacking = false;
+        Instance.CurrentAnimationState = AnimationState.Locomotion;
+        Instance.SlashManager.DisableSlash();
+        Instance.UpdateEquipment();
+    }
 
     #endregion
-    #region Saving System
+    #region Save System
     public void Save(ref PlayerSaveData data){
         data.EvolutionPoints = EvolutionPoints;
         data.SelectedEvolutions = SelectedEvolutions;
