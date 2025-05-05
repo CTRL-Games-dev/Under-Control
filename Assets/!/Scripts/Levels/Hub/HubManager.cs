@@ -13,6 +13,7 @@ public class HubManager : MonoBehaviour
     }
 
     private void Start() {
+        GameManager.Instance.SetDefault();
         CameraManager.SwitchCamera(MainMenuCamera);
         Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
         if (GameManager.Instance.ShowMainMenu) {
@@ -34,12 +35,6 @@ public class HubManager : MonoBehaviour
         GameManager.Instance.ResetInfluence();
         GameManager.Instance.ResetCards();
         // Player.Animator.SetTrigger("live");
-    }
-
-    private void Update() {
-        if (Input.GetKeyUp(KeyCode.F4)) {
-            Player.Instance.PlayRespawnAnimation();
-        }
     }
 
     

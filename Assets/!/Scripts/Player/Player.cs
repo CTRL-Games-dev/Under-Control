@@ -87,7 +87,7 @@ public class Player : MonoBehaviour {
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
     [SerializeField] private Material _dissolveMaterial;
-    public Vector3 _startPosition;
+    public Vector3 StartPosition;
 
     public int _evolutionPoints = 0;
     public int EvolutionPoints {
@@ -225,7 +225,7 @@ public class Player : MonoBehaviour {
 
         registerStats();
 
-        _startPosition = transform.position;
+        StartPosition = transform.position;
 
         OnEvolutionSelected.AddListener((evoUI) => {
             foreach (Modifier modifier in evoUI.GetModifiers()) {
@@ -893,7 +893,7 @@ public class Player : MonoBehaviour {
     public void PlayRespawnAnimation() {
         Player.Animator.animatePhysics = false;
         Player.Instance.UpdateDisabled = true;
-        transform.position = _startPosition - Vector3.up * 3f;
+        transform.position = StartPosition - Vector3.up * 3f;
         transform.rotation = Quaternion.Euler(0, 45, 0);
         float dissolve = 1f;
         DOTween.To(() => dissolve, x => dissolve = x, 0f, 2f).SetDelay(1f).OnUpdate(() => {
@@ -917,6 +917,17 @@ public class Player : MonoBehaviour {
             });
         });
    
+    }
+
+    public void ResetToDefault() {
+        Instance.LockRotation = false;
+        Instance.UpdateDisabled = false;
+        Instance.DamageDisabled = false;
+        Instance.HasPlayerDied = false;
+        Instance._isAttacking = false;
+        Instance.CurrentAnimationState = AnimationState.Locomotion;
+        Instance.SlashManager.DisableSlash();
+        Instance.UpdateEquipment();
     }
 
     #endregion
