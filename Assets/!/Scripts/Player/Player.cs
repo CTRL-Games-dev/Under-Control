@@ -919,6 +919,17 @@ public class Player : MonoBehaviour {
    
     }
 
+    public void ResetToDefault() {
+        Instance.LockRotation = false;
+        Instance.UpdateDisabled = false;
+        Instance.DamageDisabled = false;
+        Instance.HasPlayerDied = false;
+        Instance._isAttacking = false;
+        Instance.CurrentAnimationState = AnimationState.Locomotion;
+        Instance.SlashManager.DisableSlash();
+        Instance.UpdateEquipment();
+    }
+
     #endregion
     #region Save System
     public void Save(ref PlayerSaveData data){
