@@ -36,9 +36,9 @@ public class Talkable : MonoBehaviour, IInteractable
         Player.UICanvas.StartTalking(_dialogue, _faceImage, _faceAnimator, _nameKey, this);
         Player.Instance.LockRotation = true;
         _interacted = true;
-        _exclamationMark.DOComplete();
-        _exclamationMark.DOKill();
-        _exclamationMark.gameObject.SetActive(false);
+        _exclamationMark?.DOComplete();
+        _exclamationMark?.DOKill();
+        _exclamationMark?.gameObject.SetActive(false);
 
     }
 
@@ -53,22 +53,22 @@ public class Talkable : MonoBehaviour, IInteractable
     }
 
     private void AnimateMark() {
-        _exclamationMark.DOMoveY(2.2f, 0.8f).SetDelay(1f).SetEase(Ease.OutBack);
-        _exclamationMark.DOScale(0.8f, 0.8f).SetDelay(1f).SetEase(Ease.OutBack).OnComplete(() => {
-            _exclamationMark.DOScale(0.9f, 0.2f).OnComplete(() => {
-                _exclamationMark.DOScale(0.8f, 0.2f).SetDelay(0.2f);
+        _exclamationMark?.DOMoveY(2.2f, 0.8f).SetDelay(1f).SetEase(Ease.OutBack);
+        _exclamationMark?.DOScale(0.8f, 0.8f).SetDelay(1f).SetEase(Ease.OutBack).OnComplete(() => {
+            _exclamationMark?.DOScale(0.9f, 0.2f).OnComplete(() => {
+                _exclamationMark?.DOScale(0.8f, 0.2f).SetDelay(0.2f);
             });
-            _exclamationMark.DORotate(new Vector3(0, 180, 0), 0.3f, RotateMode.Fast).SetEase(Ease.InOutCirc).OnComplete(() => {
-                _exclamationMark.DORotate(new Vector3(0, 360, 0), 0.3f, RotateMode.Fast).SetEase(Ease.InOutCirc).OnComplete(() => {
+            _exclamationMark?.DORotate(new Vector3(0, 180, 0), 0.3f, RotateMode.Fast).SetEase(Ease.InOutCirc).OnComplete(() => {
+                _exclamationMark?.DORotate(new Vector3(0, 360, 0), 0.3f, RotateMode.Fast).SetEase(Ease.InOutCirc).OnComplete(() => {
                     _exclamationMark.rotation = Quaternion.identity;
         
-                    _exclamationMark.DOMoveY(1.9f, 0.8f).SetDelay(0.5f).SetEase(Ease.OutBack);
-                    _exclamationMark.DOScale(0.3f, 0.8f).SetDelay(0.5f).SetEase(Ease.OutBack).OnComplete(() => {
+                    _exclamationMark?.DOMoveY(1.9f, 0.8f).SetDelay(0.5f).SetEase(Ease.OutBack);
+                    _exclamationMark?.DOScale(0.3f, 0.8f).SetDelay(0.5f).SetEase(Ease.OutBack).OnComplete(() => {
                         if (!_interacted) AnimateMark();
                         else {
-                            _exclamationMark.DOComplete();
-                            _exclamationMark.DOKill();
-                            _exclamationMark.gameObject.SetActive(false);
+                            _exclamationMark?.DOComplete();
+                            _exclamationMark?.DOKill();
+                            _exclamationMark?.gameObject.SetActive(false);
                         }
                     });
                 });
