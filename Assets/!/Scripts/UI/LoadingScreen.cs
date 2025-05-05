@@ -68,7 +68,6 @@ public class LoadingScreen : MonoBehaviour
         }
 
         IsLoading = false;
-        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
     }
 
 
