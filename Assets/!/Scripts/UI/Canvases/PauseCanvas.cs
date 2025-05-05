@@ -197,11 +197,14 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
     }
 
     public void OnExitBtnClick() {
-        if(GameManager.Instance.CurrentDimension == Dimension.HUB) return;
         hideUI().OnComplete(() => {
-            Player.LivingEntity.OnDeath.Invoke();
+            if(GameManager.Instance.CurrentDimension == Dimension.HUB) {
+                Player.UICanvas.ChangeUIMiddleState(UIMiddleState.MainMenu);
+            } else {
+                GameManager.Instance.ShowMainMenu = true;
+                Player.LivingEntity.OnDeath?.Invoke();
+            }
         });
-        GameManager.Instance.ShowMainMenu = true;
     }
 
     public void OnPointerEnter(GameObject button) {
