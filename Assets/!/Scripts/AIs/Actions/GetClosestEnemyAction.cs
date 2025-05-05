@@ -5,7 +5,7 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "GetClosestEnemy", story: "Get closest enemy to [Agent] and store it in [Target]", category: "Action", id: "5b311c6235d0a9302f2d01e43ea3b67b")]
+[NodeDescription(name: "Get Closest Enemy", story: "Get closest enemy to [Agent] and store it in [Target]", category: "Action/LivingEntity", id: "5b311c6235d0a9302f2d01e43ea3b67b")]
 public partial class GetClosestEnemyAction : Action
 {
     [SerializeReference] public BlackboardVariable<LivingEntity> Agent;

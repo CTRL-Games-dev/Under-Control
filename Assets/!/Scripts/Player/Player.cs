@@ -52,7 +52,7 @@ public class Player : MonoBehaviour {
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 10f);
 
     public Stat DashSpeedMultiplier = new Stat(StatType.DASH_SPEED_MULTIPLIER, 2f);
-    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 3f);
+    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 12f);
     public Stat DashDuration = new Stat(StatType.DASH_COOLDOWN, 0.3f);
 
     // Coins
@@ -839,7 +839,7 @@ public class Player : MonoBehaviour {
             }
         }
 
-        Player.Instance.GetComponent<HumanoidInventory>().Clear();
+        // Player.Instance.GetComponent<HumanoidInventory>().Clear();
         Player.Instance.GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         Player.Instance.ConsumableItemOne = null;
         Player.Instance.ConsumableItemTwo = null;
@@ -854,7 +854,7 @@ public class Player : MonoBehaviour {
         Player.UICanvas.HUDCanvas.UpdateManaBar();
         Player.UICanvas.HUDCanvas.OnUpdateConsumables();
         EventBus.InventoryItemChangedEvent?.Invoke();
-        Player.Instance.GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+        // Player.Instance.GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         EventBus.InventoryItemChangedEvent?.Invoke();
 
     }
