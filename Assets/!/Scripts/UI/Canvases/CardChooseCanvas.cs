@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public class ChooseCanvas : MonoBehaviour, IUICanvasState
 {
@@ -76,6 +77,13 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
                 Player.UICanvas.HUDCanvas.SetSpellCooldownColor(3, ElementalInfo.GetColor(card.ElementalType));
             } else {
                 Debug.Log("All slots are full!");
+            }
+        }
+        WeaponCard weaponCard = card as WeaponCard;
+        if (weaponCard != null) {
+            if(!Player.Inventory.AddItem(weaponCard.WeaponData, 1, 1)) {
+                GameObject prefab = weaponCard.WeaponData.WeaponPrefab.gameObject;
+                Instantiate(prefab, Player.Instance.transform.position, Quaternion.identity);
             }
         }
 
