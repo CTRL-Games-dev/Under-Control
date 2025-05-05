@@ -3,14 +3,25 @@ using UnityEngine;
 public class CandleLight : MonoBehaviour
 {
     [SerializeField] private Material _lightMaterial;
-    [SerializeField] private float _lightIntensity = 1.0f;
-    [SerializeField] private float _lightRange = 5.0f;
+    [SerializeField] Color _lightColor1, _lightColor2;
+    [SerializeField] private float _changeSpeed = 0.1f;
+    [SerializeField] private float _moveSpeed = 10f;
+    private float _goalIntensity = 1.0f;
+    private float _colorChange = 0;
 
-    void Update() {
+    private void Start() {
+        InvokeRepeating(nameof(setGoalIntensity), 0f, _changeSpeed);
+    }
 
-        float flicker = Mathf.PingPong(Time.time * _lightIntensity, 1.0f);
-        _lightMaterial.SetFloat("_LightIntensity", flicker);
-        _lightMaterial.SetColor("_LightColor", Color.Lerp(Color.yellow, Color.white, flicker));
-        _lightMaterial.SetFloat("_LightRange", _lightRange);
+    void FixedUpdate() {
+        float intensity = Mathf.MoveTowards(_lightMaterial.GetFloat("_Intensity"), _goalIntensity, _moveSpeed * Time.deltaTime);
+        _lightMaterial.SetFloat("_Intensity", intensity);
+
+        _colorChange = Mathf.PingPong(Time.time, 1f);
+        _lightMaterial.SetColor("_EmissionColor", Color.Lerp(_lightColor1, _lightColor2, _colorChange));
+    }
+
+    private void setGoalIntensity() {
+        _goalIntensity = Random.Range(1.2f, 5f);
     }
 }
