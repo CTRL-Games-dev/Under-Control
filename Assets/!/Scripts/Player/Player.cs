@@ -73,6 +73,7 @@ public class Player : MonoBehaviour {
     [SerializeField] private float _currentSpeed = 0f;
     [SerializeField] private float _turnSpeed = 260f;
 
+    public bool ResetInventory = true;
     public float MinCameraDistance = 10f;
     public float MaxCameraDistance = 30f;
     public float CameraDistanceSpeed = 1f;
@@ -847,7 +848,12 @@ public class Player : MonoBehaviour {
             }
         }
 
-        // Player.Instance.GetComponent<HumanoidInventory>().Clear();
+        if(ResetInventory) {
+            Player.Instance.GetComponent<HumanoidInventory>().Clear();
+            Player.Instance.GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
+        }
+
+        Player.Instance.GetComponent<HumanoidInventory>().Clear();
         Player.Instance.GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         Player.Instance.ConsumableItemOne = null;
         Player.Instance.ConsumableItemTwo = null;
@@ -861,10 +867,12 @@ public class Player : MonoBehaviour {
         Player.UICanvas.HUDCanvas.UpdateHealthBar();
         Player.UICanvas.HUDCanvas.UpdateManaBar();
         Player.UICanvas.HUDCanvas.OnUpdateConsumables();
-        EventBus.InventoryItemChangedEvent?.Invoke();
-        // Player.Instance.GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
-        EventBus.InventoryItemChangedEvent?.Invoke();
 
+        EventBus.InventoryItemChangedEvent?.Invoke();
+        if(ResetInventory) {
+            Player.Instance.GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+            EventBus.InventoryItemChangedEvent?.Invoke();
+        }
     }
 
     private void registerStats() {
@@ -890,6 +898,7 @@ public class Player : MonoBehaviour {
         UpdateDisabled = false;
         Instance.gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
+
     public void PlayRespawnAnimation() {
         Player.Animator.animatePhysics = false;
         Player.Instance.UpdateDisabled = true;
