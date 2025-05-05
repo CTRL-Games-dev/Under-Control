@@ -34,16 +34,13 @@ public class CardUI : MonoBehaviour
         EventBus.RunCardClickedEvent.AddListener(OnRunCardClicked);
     }
 
-    private void FixedUpdate() {
-        if (_isHovered) {
-            Vector2 mousePosition = Input.mousePosition;
-            Vector2 cardPosition = RectTransformUtility.WorldToScreenPoint(Camera.main, _rectTransform.position);
-            Vector2 direction = (mousePosition - cardPosition).normalized;
 
-            float tiltAmount = 30f;
-            Quaternion targetRotation = Quaternion.Euler(direction.y * tiltAmount, -direction.x * tiltAmount, 0);
-            _rectTransform.rotation = Quaternion.Lerp(_rectTransform.rotation, targetRotation, Time.deltaTime * 5f);
-        }
+    public void SetTilt(float tiltAmount) {
+        _rectTransform.localRotation = Quaternion.Euler(0, 0, tiltAmount);
+    }
+
+    public void SetPosition(Vector3 position) {
+        _rectTransform.anchoredPosition = position;
     }
 
 
@@ -102,7 +99,6 @@ public class CardUI : MonoBehaviour
 
     public void OnPointerExit() {
         _isHovered = false;
-        _rectTransform.DORotate(Vector3.zero, 0.1f * Settings.AnimationSpeed);
         _rectTransform.DOScale(Vector3.one, 0.3f * Settings.AnimationSpeed);
         if (IsInCollection) {
             Player.UICanvas.InventoryCanvas.CardsPanel.ShowMoreInfo(null);

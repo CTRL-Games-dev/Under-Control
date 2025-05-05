@@ -89,7 +89,7 @@ public class SelectedItemUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void Update()  {
+    private void LateUpdate()  {
         if(_inventoryItem == null) {
             return;
         }
