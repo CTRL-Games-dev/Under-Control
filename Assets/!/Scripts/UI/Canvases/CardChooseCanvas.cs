@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
+using System.Collections;
 
 public class ChooseCanvas : MonoBehaviour, IUICanvasState
 {
@@ -32,6 +33,11 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
 
         _currentCards = new CardUI[_maxCards];
 
+        StopCoroutine(nameof(setupCards));
+        StartCoroutine(nameof(setupCards));
+    }
+
+    private IEnumerator setupCards() {
         Card[] randomCards = GameManager.Instance.GetRandomCards(_maxCards);
         for(int i = 0; i < randomCards.Length; i++) {
             _currentCards[i] = AddCard(randomCards[i]);
@@ -76,15 +82,24 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
 
         _canvasGroup.DOComplete();
         _canvasGroup.DOKill();
-        _canvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).OnComplete(() => {
-            _canvasGroup.interactable = true;
-            _canvasGroup.blocksRaycasts = true;
+        _canvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed);
+        yield return new WaitForSeconds(0.5f * Settings.AnimationSpeed);
+        _canvasGroup.interactable = true;
+        _canvasGroup.blocksRaycasts = true;
     
-            foreach (CardUI card in _currentCards) {
-                card.Setup();
-            }
-        });
+        foreach (CardUI card in _currentCards) {
+            card.Setup();
+            yield return new WaitForSeconds(0.1f * Settings.AnimationSpeed);
+        }
 
+        yield return new WaitForSeconds(0.2f);
+
+        foreach (CardUI card in _currentCards) {
+            card.RotateCard();
+            yield return new WaitForSeconds(0.25f);
+        }
+
+        yield return null;
     }
 
 

@@ -1,20 +1,21 @@
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.EventSystems;
-using TMPro;
 using UnityEngine.UI;
-using NUnit.Framework;
 
 public class CardUI : MonoBehaviour
 {
     [SerializeField] private TextLocalizer _nameTextLocalizer, _descriptionTextLocalizer;
     [SerializeField] private Image _barImg, _outlineImg, _icon;
+    [SerializeField] private GameObject _backCard, _frontCard;
+    [SerializeField] private RectTransform _holderRect;
 
     private Card _card;
     private CanvasGroup _canvasGroup;
     private RectTransform _rectTransform;
     private bool _isHovered = false;
     public bool IsInCollection = false;
+    private float _zTilt = 0f;
 
 
     private void Awake() {
@@ -36,6 +37,7 @@ public class CardUI : MonoBehaviour
 
 
     public void SetTilt(float tiltAmount) {
+        _zTilt = tiltAmount;
         _rectTransform.localRotation = Quaternion.Euler(0, 0, tiltAmount);
     }
 
@@ -48,17 +50,28 @@ public class CardUI : MonoBehaviour
         gameObject.SetActive(true);
         Awake();
 
-        _nameTextLocalizer.Key = _card.DisplayName;
-
-
-        _descriptionTextLocalizer.Key = _card.ShortDesc;
-
-        _icon.sprite = _card.Icon == null ? ElementalInfo.GetIconSprite(_card.ElementalType) : _card.Icon;        
-        _barImg.sprite = ElementalInfo.GetBarSprite(_card.ElementalType);
-        _outlineImg.color = ElementalInfo.GetColor(_card.ElementalType);
-
         _rectTransform.DOScale(Vector3.one, 0.5f * Settings.AnimationSpeed);
         _canvasGroup.DOFade(1, 0.3f * Settings.AnimationSpeed);
+    }
+
+    public void RotateCard() {
+        _rectTransform.DOComplete();
+        _holderRect.DOKill();
+        _holderRect.DOLocalRotate(new Vector3(0, 90, 0), 0.25f).SetEase(Ease.InCirc).OnComplete(() => {
+            _backCard.SetActive(false);
+            _frontCard.SetActive(true);
+            
+            _nameTextLocalizer.Key = _card.DisplayName;
+            _descriptionTextLocalizer.Key = _card.ShortDesc;
+
+            _icon.sprite = _card.Icon == null ? ElementalInfo.GetIconSprite(_card.ElementalType) : _card.Icon;        
+            _barImg.sprite = ElementalInfo.GetBarSprite(_card.ElementalType);
+            _outlineImg.color = ElementalInfo.GetColor(_card.ElementalType);
+            
+            _holderRect.DOLocalRotate(new Vector3(0, 0, 0), 0.25f).SetEase(Ease.InCirc).OnComplete(() => {
+                _holderRect.localRotation = Quaternion.Euler(0, 0, 0);
+            });
+        });
     }
 
 
