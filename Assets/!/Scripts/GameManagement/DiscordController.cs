@@ -37,7 +37,7 @@ public class DiscordController : MonoBehaviour
         // Log in with the Application ID
         discord = new Discord.Discord(applicationID, (System.UInt64)Discord.CreateFlags.NoRequireDiscord);
         time = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-        GameManager.Instance.LevelLoaded.AddListener(UpdateStatus);
+        EventBus.SceneReadyEvent.AddListener(UpdateStatus);
         UpdateStatus();
     }
 
