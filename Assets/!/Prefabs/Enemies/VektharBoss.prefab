@@ -636,12 +636,12 @@ MonoBehaviour:
   DropItemsOnDeath: 1
   DestroyOnDeath: 1
   IsInvisible: 0
-  StartingHealth: 225
+  StartingHealth: 80
   StartingMana: 100
   _health: 0
   _mana: 100
   MaxHealth:
-    _raw: 225
+    _raw: 80
     _adjusted: 100
     _initValue: 100
     OnValueChanged:
@@ -668,6 +668,10 @@ MonoBehaviour:
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
+  OnDeathSound: {fileID: 0}
+  OnDamageSound: {fileID: 0}
+  OnAttack: {fileID: 0}
+  IdleSounds: []
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -677,6 +681,7 @@ MonoBehaviour:
   OnStunned:
     m_PersistentCalls:
       m_Calls: []
+  HasDied: 0
   _isPlayer: 0
 --- !u!95 &9193845303120222920
 Animator:
