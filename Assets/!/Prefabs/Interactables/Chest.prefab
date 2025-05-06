@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 7335698715761343253}
   - component: {fileID: 5241673573868424186}
   - component: {fileID: 1055906593693397345}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Chest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -195,9 +195,10 @@ MonoBehaviour:
   ItemContainer:
     _size: {x: 4, y: 2}
     _items:
-    - ItemData: {fileID: 11400000, guid: 9df73015bdc274a4394a14e34153ecaf, type: 2}
+    - _itemData: {fileID: 11400000, guid: 9df73015bdc274a4394a14e34153ecaf, type: 2}
       Amount: 12
       Position: {x: 0, y: 0}
+      PowerScale: 1
       Rotated: 0
   OnInventoryChanged:
     m_PersistentCalls:
@@ -215,6 +216,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _uiPrefab: {fileID: 4045902477692341137, guid: ae88a351294f99d4a94bcb3ae5965c75, type: 3}
+  Inventory: {fileID: 0}
 --- !u!65 &1055906593693397345
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SO_Eff_FreezeEffect", menuName = "Effect/FreezeEffect")]

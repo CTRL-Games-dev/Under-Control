@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -52,7 +53,7 @@ public class Player : MonoBehaviour {
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 10f);
 
     public Stat DashSpeedMultiplier = new Stat(StatType.DASH_SPEED_MULTIPLIER, 2f);
-    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 3f);
+    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 2f);
     public Stat DashDuration = new Stat(StatType.DASH_COOLDOWN, 0.3f);
 
     // Coins
@@ -73,6 +74,7 @@ public class Player : MonoBehaviour {
     [SerializeField] private float _currentSpeed = 0f;
     [SerializeField] private float _turnSpeed = 260f;
 
+    public bool ResetInventory = true;
     public float MinCameraDistance = 10f;
     public float MaxCameraDistance = 30f;
     public float CameraDistanceSpeed = 1f;
@@ -193,7 +195,7 @@ public class Player : MonoBehaviour {
     public static HumanoidInventory Inventory => LivingEntity.Inventory as HumanoidInventory;
 
     [SerializeField] private LayerMask _groundLayerMask;
-    public LayerMask InteractionMask;
+    private LayerMask _interactionMask;
     public FaceAnimator FaceAnimator;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
@@ -237,8 +239,7 @@ public class Player : MonoBehaviour {
             CameraManager.ShakeCamera(2, 0.1f);
         });
  
-        InteractionMask |= 1 << LayerMask.NameToLayer("Player");
-        InteractionMask |= 1 << LayerMask.NameToLayer("Hitboxes");
+        _interactionMask |= 1 << LayerMask.NameToLayer("Interactable");
 
         // LoadKeybinds();
     }
@@ -481,6 +482,15 @@ public class Player : MonoBehaviour {
     void OnSecondaryInteraction(InputValue value) {
         _queuedInteraction = InteractionType.Secondary;
     }
+    void OnKeyboardInteraction(InputValue value){
+        if(UICanvas.CurrentUIMiddleState != UIMiddleState.NotVisible || UICanvas.CurrentUITopState != UITopState.NotVisible || UICanvas.CurrentUIBottomState != UIBottomState.HUD) return;
+        if(InputDisabled) return;
+        Collider[] colliders = Physics.OverlapSphere(transform.position,MaxInteractionRange, _interactionMask);
+        if (colliders.Length == 0) return;
+        colliders = colliders.OrderBy(x => Vector3.Distance(transform.position, x.gameObject.transform.position)).ToArray();
+        IInteractable closestInteractable = colliders[0].GetComponent<IInteractable>();
+        closestInteractable?.Interact();
+    }
 
     void OnScrollWheel(InputValue value) {
         var delta = value.Get<Vector2>();
@@ -585,19 +595,14 @@ public class Player : MonoBehaviour {
 
     private void handleInteraction() {
         if(_queuedInteraction == null) return;
+        if(EventSystem.current.IsPointerOverGameObject()) return;
+        if(UICanvas.CurrentUIMiddleState != UIMiddleState.NotVisible || UICanvas.CurrentUITopState != UITopState.NotVisible) return;
 
         interact(_queuedInteraction.Value);
 
         _queuedInteraction = null;
     }
-
-
     private void interact(InteractionType interactionType) {
-        if(EventSystem.current.IsPointerOverGameObject()) {
-            return;
-        }
-
-        if(UICanvas.CurrentUIMiddleState != UIMiddleState.NotVisible || UICanvas.CurrentUITopState != UITopState.NotVisible) return;
 
         bool interacted = tryInteract(interactionType);
         
@@ -633,12 +638,12 @@ public class Player : MonoBehaviour {
 
     private bool tryInteract(InteractionType interactionType) {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, ~InteractionMask)) {
+        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _interactionMask)) {
             return false;
         }
 
         Transform objectHit = hit.transform;
-        //Debug.Log(objectHit.name);
+        Debug.Log(objectHit.name);
 
         // Check if object is to far
         if(Vector3.Distance(objectHit.position, transform.position) > MaxInteractionRange) {
@@ -847,6 +852,11 @@ public class Player : MonoBehaviour {
             }
         }
 
+        if(ResetInventory) {
+            Player.Instance.GetComponent<HumanoidInventory>().Clear();
+            Player.Instance.GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
+        }
+
         Player.Instance.GetComponent<HumanoidInventory>().Clear();
         Player.Instance.GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         Player.Instance.ConsumableItemOne = null;
@@ -861,10 +871,12 @@ public class Player : MonoBehaviour {
         Player.UICanvas.HUDCanvas.UpdateHealthBar();
         Player.UICanvas.HUDCanvas.UpdateManaBar();
         Player.UICanvas.HUDCanvas.OnUpdateConsumables();
-        EventBus.InventoryItemChangedEvent?.Invoke();
-        Player.Instance.GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
-        EventBus.InventoryItemChangedEvent?.Invoke();
 
+        EventBus.InventoryItemChangedEvent?.Invoke();
+        if(ResetInventory) {
+            Player.Instance.GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+            EventBus.InventoryItemChangedEvent?.Invoke();
+        }
     }
 
     private void registerStats() {
@@ -890,6 +902,7 @@ public class Player : MonoBehaviour {
         UpdateDisabled = false;
         Instance.gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
+
     public void PlayRespawnAnimation() {
         Player.Animator.animatePhysics = false;
         Player.Instance.UpdateDisabled = true;
