@@ -27,7 +27,9 @@ public class VektharBossBattleManager : MonoBehaviour
     private float _previousMinCameraDistance;
 
     void Start() {
-        Player.Instance.transform.position = LevelStart.position;
+        Player.Instance.SetPlayerPosition(LevelStart.position);
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
+        EventBus.SceneReadyEvent?.Invoke();
     }
 
     void Update() {
