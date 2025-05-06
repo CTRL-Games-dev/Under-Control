@@ -670,6 +670,7 @@ public class Player : MonoBehaviour {
 
     public void OnInventoryChanged() {
         UpdateEquipment();
+        EventBus.InventoryItemChangedEvent.Invoke();
     }
     public void UpdateEquipment(){
         WeaponHolder.UpdateWeapon(CurrentWeapon);

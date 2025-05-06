@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -151,11 +152,28 @@ public class GameManager : MonoBehaviour {
         Debug.Log($"Normal {_availableCards.Count}");
         Debug.Log($"Copied cards {copiedCards.Count}");
 
-        for(int i = 0; i < numberOfcards; i++) {
-            Card card = copiedCards[UnityEngine.Random.Range(0, copiedCards.Count)];
-            copiedCards.Remove(card);
+        // Get all weapon cards
+        var weaponCards = copiedCards.Where(x => x.GetType() == typeof(WeaponCard)).ToList();
+        if (weaponCards.Count == 0)
+            throw new Exception("No WeaponCards available");
+
+        Card weaponCard = weaponCards[UnityEngine.Random.Range(0, weaponCards.Count)];
+        cards[0] = weaponCard;
+        copiedCards.Remove(weaponCard);
+
+        // Get non-weapon cards
+        var nonWeaponCards = copiedCards.Where(x => x.GetType() != typeof(WeaponCard)).ToList();
+
+        for (int i = 1; i < numberOfcards; i++) {
+            if (nonWeaponCards.Count == 0)
+                throw new Exception("Not enough non-WeaponCards available");
+
+            int index = UnityEngine.Random.Range(0, nonWeaponCards.Count);
+            Card card = nonWeaponCards[index];
+            nonWeaponCards.RemoveAt(index);
             cards[i] = card;
         }
+
         return cards;
     }
 
