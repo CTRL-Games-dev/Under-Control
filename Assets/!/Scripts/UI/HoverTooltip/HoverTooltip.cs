@@ -8,15 +8,11 @@ public class HoverTooltip : MonoBehaviour {
     public GenericInteractableTooltip GenericInteractableTooltip;
     public TalkableTooltip TalkableTooltip;
 
-    private LayerMask _playerMask;
-
     private GameObject _lastHoveredGameObject = null;
     private Camera _camera;
 
     void Start() {
         _camera = Player.Instance.MainCamera;
-        _playerMask |= 1 << LayerMask.NameToLayer("Player");
-        _playerMask |= 1 << LayerMask.NameToLayer("Hitboxes");
     }
 
     void Update() {
@@ -40,7 +36,7 @@ public class HoverTooltip : MonoBehaviour {
         }
 
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray, out RaycastHit hit, 100, ~_playerMask)) {
+        if (!Physics.Raycast(ray, out RaycastHit hit, 100, ~Player.Instance.InteractionMask)) {
             return;
         }
 

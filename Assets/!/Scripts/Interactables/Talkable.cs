@@ -31,12 +31,11 @@ public class Talkable : MonoBehaviour, IInteractable
 
     public void Interact() {
         Player.Instance.UICancelEvent.AddListener(EndInteract);
-        Player.UICanvas.StartTalking(_dialogue, _faceImage, _faceAnimator, _nameKey, this);
-        _interacted = true;
-        CameraManager.SwitchCamera(TalkCamera);
         Player.Instance.SetPlayerPosition(new Vector3(1.7f, 0, 1.2f), 0.5f, 114);
+        CameraManager.SwitchCamera(TalkCamera);
+        Player.UICanvas.StartTalking(_dialogue, _faceImage, _faceAnimator, _nameKey, this);
         Player.Instance.LockRotation = true;
-        
+        _interacted = true;
         _exclamationMark?.DOComplete();
         _exclamationMark?.DOKill();
         _exclamationMark?.gameObject.SetActive(false);
@@ -49,7 +48,6 @@ public class Talkable : MonoBehaviour, IInteractable
         Player.Instance.UICancelEvent.RemoveListener(EndInteract);
         Player.Instance.LockRotation = false;
         Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
-        
     }
 
     private void AnimateMark() {

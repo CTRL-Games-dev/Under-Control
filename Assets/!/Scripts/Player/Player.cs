@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using DG.Tweening;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -195,7 +194,7 @@ public class Player : MonoBehaviour {
     public static HumanoidInventory Inventory => LivingEntity.Inventory as HumanoidInventory;
 
     [SerializeField] private LayerMask _groundLayerMask;
-    private LayerMask _interactionMask;
+    public LayerMask InteractionMask;
     public FaceAnimator FaceAnimator;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
@@ -239,7 +238,8 @@ public class Player : MonoBehaviour {
             CameraManager.ShakeCamera(2, 0.1f);
         });
  
-        _interactionMask |= 1 << LayerMask.NameToLayer("Interactable");
+        InteractionMask |= 1 << LayerMask.NameToLayer("Player");
+        InteractionMask |= 1 << LayerMask.NameToLayer("Hitboxes");
 
         // LoadKeybinds();
     }
@@ -482,15 +482,6 @@ public class Player : MonoBehaviour {
     void OnSecondaryInteraction(InputValue value) {
         _queuedInteraction = InteractionType.Secondary;
     }
-    void OnKeyboardInteraction(InputValue value){
-        if(UICanvas.CurrentUIMiddleState != UIMiddleState.NotVisible || UICanvas.CurrentUITopState != UITopState.NotVisible || UICanvas.CurrentUIBottomState != UIBottomState.HUD) return;
-        if(InputDisabled) return;
-        Collider[] colliders = Physics.OverlapSphere(transform.position,MaxInteractionRange, _interactionMask);
-        if (colliders.Length == 0) return;
-        colliders = colliders.OrderBy(x => Vector3.Distance(transform.position, x.gameObject.transform.position)).ToArray();
-        IInteractable closestInteractable = colliders[0].GetComponent<IInteractable>();
-        closestInteractable?.Interact();
-    }
 
     void OnScrollWheel(InputValue value) {
         var delta = value.Get<Vector2>();
@@ -595,14 +586,19 @@ public class Player : MonoBehaviour {
 
     private void handleInteraction() {
         if(_queuedInteraction == null) return;
-        if(EventSystem.current.IsPointerOverGameObject()) return;
-        if(UICanvas.CurrentUIMiddleState != UIMiddleState.NotVisible || UICanvas.CurrentUITopState != UITopState.NotVisible) return;
 
         interact(_queuedInteraction.Value);
 
         _queuedInteraction = null;
     }
+
+
     private void interact(InteractionType interactionType) {
+        if(EventSystem.current.IsPointerOverGameObject()) {
+            return;
+        }
+
+        if(UICanvas.CurrentUIMiddleState != UIMiddleState.NotVisible || UICanvas.CurrentUITopState != UITopState.NotVisible) return;
 
         bool interacted = tryInteract(interactionType);
         
@@ -638,12 +634,12 @@ public class Player : MonoBehaviour {
 
     private bool tryInteract(InteractionType interactionType) {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
-        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _interactionMask)) {
+        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, ~InteractionMask)) {
             return false;
         }
 
         Transform objectHit = hit.transform;
-        Debug.Log(objectHit.name);
+        //Debug.Log(objectHit.name);
 
         // Check if object is to far
         if(Vector3.Distance(objectHit.position, transform.position) > MaxInteractionRange) {
