@@ -190,8 +190,6 @@ public class LivingEntity : MonoBehaviour {
         if (HasDied) return;
         HasDied = true;
 
-        Debug.Log(gameObject.name + " died");
-
         // Drop items
         if(DropItemsOnDeath) {
             // Drop common slots
