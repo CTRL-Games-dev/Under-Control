@@ -5,7 +5,7 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Apply Effect", story: "Applies [Effect] to [Target]", category: "Action/LivingEntity", id: "635d6f9975f583763c1e4221b44d33e3")]
+[NodeDescription(name: "ApplyEffect", story: "Applies [Effect] to [Target]", category: "Action/LivingEntity", id: "635d6f9975f583763c1e4221b44d33e3")]
 public partial class ApplyEffectAction : Action
 {
     [SerializeReference] public BlackboardVariable<Effect> Effect;

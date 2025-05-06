@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections.Generic;
-using System;
 
 public class HUDCanvas : MonoBehaviour, IUICanvasState
 {
@@ -68,6 +67,8 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private RectTransform _spellSlot2Rect;
     [SerializeField] private RectTransform _spellSlot3Rect;
 
+
+
     private void Start() {
         Player.Instance.UpdateConsumablesEvent.AddListener(OnUpdateConsumables);
 
@@ -98,6 +99,7 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
         }
     }
 
+
     private void handleEffect(LivingEntity.EffectData effectData) {
         EffectUI effectUI = Instantiate(_effectPrefab, _effectsHolder.transform).GetComponent<EffectUI>();
         effectUI.Setup(effectData);
@@ -108,9 +110,12 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
         _handledEffects.Remove(effectUI);
     }
 
+
+
+
     public void UpdateHealthBar() {
         _healthBarImg.fillAmount = Player.LivingEntity.Health / Player.LivingEntity.MaxHealth;
-        _healthText.text = $"{(int)Math.Ceiling(Player.LivingEntity.Health)}/{(int)Player.LivingEntity.MaxHealth}";
+        _healthText.text = $"{(int)Player.LivingEntity.Health}/{(int)Player.LivingEntity.MaxHealth}";
     }
 
     public void UpdateManaBar() {
@@ -184,6 +189,7 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
         });
 
     }
+
 
     public void ShowMoreInfo(EffectUI effectUI) {
         _moreInfoRect.DOKill();
