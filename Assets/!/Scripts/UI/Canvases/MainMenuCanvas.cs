@@ -124,6 +124,7 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
     public void OnContinueGameBtnClick() {
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
+        Player.Instance.InputDisabled = false;
     }
 
     public void OnNewGameBtnClick() {
