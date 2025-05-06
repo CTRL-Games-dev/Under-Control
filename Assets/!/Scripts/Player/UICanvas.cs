@@ -208,6 +208,7 @@ public class UICanvas : MonoBehaviour {
                 HUDCanvas.HideUI();
                 break;
             case UIBottomState.Talking:
+                Player.Instance.InputDisabled = false;
                 TalkingCanvas.HideUI();
                 break;
         }
@@ -216,6 +217,7 @@ public class UICanvas : MonoBehaviour {
     private void openUIBottomState(UIBottomState state) {
         switch (state) {
             case UIBottomState.HUD:
+                Player.Instance.InputDisabled = false;
                 HUDCanvas.ShowUI();
                 break;
             case UIBottomState.Talking:
