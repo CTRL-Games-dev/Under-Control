@@ -27,8 +27,6 @@ public class SlashEdge : MonoBehaviour
 
         LivingEntity victim = other.GetComponentInParent<LivingEntity>(includeInactive: true);
 
-        Debug.Log($"Hitbox hit {victim} by {GetComponentInParent<LivingEntity>()}");
-
         if(victim == null) return;
         _slashManager.HitEnemies.Add(other);
 

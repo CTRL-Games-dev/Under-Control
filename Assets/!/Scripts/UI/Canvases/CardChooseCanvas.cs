@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
-using Unity.VisualScripting;
+using System.Collections;
 
 public class ChooseCanvas : MonoBehaviour, IUICanvasState
 {
@@ -11,6 +11,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private CanvasGroup _longDescCanvasGroup;
     [SerializeField] private TextLocalizer _longDescTextLocalizer;
     [SerializeField] private ContentSizeFitter  _contentSizeFitter;
+    [SerializeField] private int _maxCards = 3;
 
     private CanvasGroup _canvasGroup;
     private CardUI[] _currentCards;
@@ -30,25 +31,75 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
         gameObject.SetActive(true);
         _longDescCanvasGroup.alpha = 0;
 
-        int numberOfCards = 3;
-        _currentCards = new CardUI[numberOfCards];
+        _currentCards = new CardUI[_maxCards];
 
-        Card[] randomCards = GameManager.Instance.GetRandomCards(numberOfCards);
+        StopCoroutine(nameof(setupCards));
+        StartCoroutine(nameof(setupCards));
+    }
+
+    private IEnumerator setupCards() {
+        Card[] randomCards = GameManager.Instance.GetRandomCards(_maxCards);
         for(int i = 0; i < randomCards.Length; i++) {
             _currentCards[i] = AddCard(randomCards[i]);
         }
 
+        int length = _currentCards.Length;
+
+        if (length % 2 == 0) {
+            int half = length / 2;
+
+            int index = 0; 
+            for (int l = half -1; l >= 0; l--) {
+                _currentCards[l].SetPosition(new Vector3(-250 * index -130, -20 * Mathf.Pow(index, 2), 0));
+                _currentCards[l].SetTilt(5 + 5 * index);
+                index++;
+            }
+            index = 0;
+            for (int r = half; r < length; r++) {
+                _currentCards[r].SetPosition(new Vector3(250 * index +130, -20 * Mathf.Pow(index, 2), 0));
+                _currentCards[r].SetTilt(-5 + (-5) * index);
+                index++;
+            }
+        } else {
+            int half = length / 2;
+
+            int index = 1; 
+            for (int l = half -1; l >= 0; l--) {
+                _currentCards[l].SetPosition(new Vector3(-250 * index, -20 * Mathf.Pow(index, 2), 0));
+                _currentCards[l].SetTilt(5 + 5 * index);
+                index++;
+            }
+            index = 1;
+            for (int r = half +1; r < length; r++) {
+                _currentCards[r].SetPosition(new Vector3(250 * index, -20 * Mathf.Pow(index, 2), 0));
+                _currentCards[r].SetTilt(-5 + -5 * index);
+                index++;
+            }
+
+            _currentCards[half].SetPosition(Vector3.zero);
+            _currentCards[half].SetTilt(0);
+        }
+
         _canvasGroup.DOComplete();
         _canvasGroup.DOKill();
-        _canvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).OnComplete(() => {
-            _canvasGroup.interactable = true;
-            _canvasGroup.blocksRaycasts = true;
+        _canvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed);
+        yield return new WaitForSeconds(0.5f * Settings.AnimationSpeed);
+        _canvasGroup.interactable = true;
+        _canvasGroup.blocksRaycasts = true;
     
-            foreach (CardUI card in _currentCards) {
-                card.Setup();
-            }
-        });
+        foreach (CardUI card in _currentCards) {
+            card.Setup();
+            yield return new WaitForSeconds(0.1f * Settings.AnimationSpeed);
+        }
 
+        yield return new WaitForSeconds(0.2f);
+
+        foreach (CardUI card in _currentCards) {
+            card.RotateCard();
+            yield return new WaitForSeconds(0.25f);
+        }
+
+        yield return null;
     }
 
 
