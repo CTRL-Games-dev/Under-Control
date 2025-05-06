@@ -120,7 +120,7 @@ public class UICanvas : MonoBehaviour {
     }   
 
     private void OnInventoryToggle() {
-        if (IsOtherUIOpen) return;
+        if (IsOtherUIOpen || CurrentUIBottomState == UIBottomState.Talking) return;
         if (CurrentUIMiddleState == UIMiddleState.NotVisible || CurrentUIMiddleState == UIMiddleState.Inventory) {
             ChangeUIMiddleState(CurrentUIMiddleState == UIMiddleState.Inventory ? UIMiddleState.NotVisible : UIMiddleState.Inventory);
         }

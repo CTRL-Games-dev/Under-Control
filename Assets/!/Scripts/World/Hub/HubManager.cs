@@ -34,7 +34,13 @@ public class HubManager : MonoBehaviour
 
         GameManager.Instance.ResetInfluence();
         GameManager.Instance.ResetCards();
+
+        Invoke(nameof(sceneReady), 0.2f);
         // Player.Animator.SetTrigger("live");
+    }
+
+    private void sceneReady() {
+        EventBus.SceneReadyEvent?.Invoke();
     }
 
     

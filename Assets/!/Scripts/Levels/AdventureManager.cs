@@ -10,8 +10,8 @@ public class AdventureManager : MonoBehaviour
 {
     [SerializeField] private GameObject _player;
     [SerializeField] private NavMeshSurface _navMeshSurface;
-    private void Start()
-    {
+    
+    private void Start() {
         Player.Instance.gameObject.SetActive(false);
 
         var generator = GetComponent<WorldGenerator>();
@@ -33,8 +33,12 @@ public class AdventureManager : MonoBehaviour
 
         _navMeshSurface.BuildNavMesh();
 
-        GameManager.Instance.OnLevelLoaded();
-
         Player.Instance.ResetToDefault();
+
+        Invoke(nameof(sceneReady), 0.2f);
+    }
+
+    private void sceneReady() {
+        EventBus.SceneReadyEvent?.Invoke();
     }
 }
