@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -28,6 +29,7 @@ public class GameManager : MonoBehaviour {
         {Dimension.HUB, "NewHub"},
         {Dimension.FOREST, "Adventure"},
         {Dimension.FOREST_VECTOR, "VectorBossBattle"},
+        {Dimension.CARD_CHOOSE, "CardChoose"}
     };
 
     [HideInInspector] public GameDifficulty Difficulty { get; private set; }
@@ -53,7 +55,7 @@ public class GameManager : MonoBehaviour {
     public float SaveCooldown = 15f;
 
     // Events
-    public UnityEvent LevelLoaded;
+    public UnityEvent SceneReadyEvent;
     public bool IsStarterDialogueOver = false;
 
     private void Awake()  {
@@ -89,9 +91,13 @@ public class GameManager : MonoBehaviour {
         DebugCommands();
     }
 
+    public void ChangeDimension(Dimension dimension) {
+        ChangeDimension(dimension, TotalInfluence);
+    }
+
     public void ChangeDimension(Dimension dimension, float newInfluence)  {
         Debug.Log($"New influence: {newInfluence}");
-        if(newInfluence <= TotalInfluence)
+        if(newInfluence < TotalInfluence)
         {
             Debug.LogError($"New influence ({newInfluence}) is smaller that previous influence ({TotalInfluence})!");
         }
@@ -151,11 +157,28 @@ public class GameManager : MonoBehaviour {
         Debug.Log($"Normal {_availableCards.Count}");
         Debug.Log($"Copied cards {copiedCards.Count}");
 
-        for(int i = 0; i < numberOfcards; i++) {
-            Card card = copiedCards[UnityEngine.Random.Range(0, copiedCards.Count)];
-            copiedCards.Remove(card);
+        // Get all weapon cards
+        var weaponCards = copiedCards.Where(x => x.GetType() == typeof(WeaponCard)).ToList();
+        if (weaponCards.Count == 0)
+            throw new Exception("No WeaponCards available");
+
+        Card weaponCard = weaponCards[UnityEngine.Random.Range(0, weaponCards.Count)];
+        cards[0] = weaponCard;
+        copiedCards.Remove(weaponCard);
+
+        // Get non-weapon cards
+        var nonWeaponCards = copiedCards.Where(x => x.GetType() != typeof(WeaponCard)).ToList();
+
+        for (int i = 1; i < numberOfcards; i++) {
+            if (nonWeaponCards.Count == 0)
+                throw new Exception("Not enough non-WeaponCards available");
+
+            int index = UnityEngine.Random.Range(0, nonWeaponCards.Count);
+            Card card = nonWeaponCards[index];
+            nonWeaponCards.RemoveAt(index);
             cards[i] = card;
         }
+
         return cards;
     }
 
@@ -176,9 +199,7 @@ public class GameManager : MonoBehaviour {
 
     // Each adventure manager calls this function once the level has been loaded
     public void OnLevelLoaded() {
-        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Choose);
-        LevelLoaded.Invoke();
-        Player.Instance.CameraDistance = 10f;
+        SceneReadyEvent?.Invoke();
     }
 
 

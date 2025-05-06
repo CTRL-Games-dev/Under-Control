@@ -12,6 +12,7 @@ public enum Dimension
     HUB,
     FOREST,
     FOREST_VECTOR,
+    CARD_CHOOSE
 }
 
 // [CreateAssetMenu(fileName = "SO_GameContext", menuName = "GameContext")]

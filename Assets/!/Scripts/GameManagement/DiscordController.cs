@@ -29,6 +29,7 @@ public class DiscordController : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        
     }
 
     void Start()
@@ -36,6 +37,7 @@ public class DiscordController : MonoBehaviour
         // Log in with the Application ID
         discord = new Discord.Discord(applicationID, (System.UInt64)Discord.CreateFlags.NoRequireDiscord);
         time = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+        EventBus.SceneReadyEvent.AddListener(UpdateStatus);
         UpdateStatus();
     }
 
@@ -52,14 +54,10 @@ public class DiscordController : MonoBehaviour
         }
     }
 
-    void LateUpdate() 
-    {
-        UpdateStatus();
-    }
 
     void UpdateStatus()
     {
-        // Update Status every frame
+        Debug.Log("Updating Discord Status...");
         try
         {
             ActivityManager activityManager = discord.GetActivityManager();
