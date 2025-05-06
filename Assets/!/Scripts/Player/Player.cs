@@ -594,8 +594,12 @@ public class Player : MonoBehaviour {
 
     private void handleInteraction() {
         if(_queuedInteraction == null) return;
+        if(UICanvas.CurrentUIMiddleState != UIMiddleState.NotVisible || UICanvas.CurrentUITopState != UITopState.NotVisible || UICanvas.CurrentUIBottomState != UIBottomState.HUD) {
+            _queuedInteraction = null;
+            return;
+        }
         if(EventSystem.current.IsPointerOverGameObject()) return;
-        if(UICanvas.CurrentUIMiddleState != UIMiddleState.NotVisible || UICanvas.CurrentUITopState != UITopState.NotVisible) return;
+
 
         interact(_queuedInteraction.Value);
 
