@@ -7,6 +7,7 @@ public class LanguageChange : MonoBehaviour
 
     private void Start() {
         _languageDropdown.onValueChanged.AddListener(OnLanguageChanged);
+        TextData.OnLanguageChanged.AddListener(OnLanguageChangeEvent);
     }
 
     public void ChangeLanguage(string languageCode) {
@@ -23,5 +24,9 @@ public class LanguageChange : MonoBehaviour
     private void OnLanguageChanged(int index) {
         string selectedLanguage = _languageDropdown.options[index].text;
         ChangeLanguage(selectedLanguage);
+    }
+
+    private void OnLanguageChangeEvent() {
+        _languageDropdown.value = TextData.CurrentLanguage == "en" ? 0 : 1;
     }
 }

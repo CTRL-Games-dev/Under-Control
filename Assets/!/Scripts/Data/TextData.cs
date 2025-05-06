@@ -20,7 +20,7 @@ public static class TextData {
                 CurrentLanguage = "pl";
                 break;
         }
-        OnLanguageChanged.Invoke();
+        OnLanguageChanged?.Invoke();
     }
 
     public static string CurrentLanguage = "en";
