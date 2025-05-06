@@ -92,7 +92,6 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     public void HideUI() {
         _canvasGroup.DOFade(0, 0.7f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnComplete(() => {
             gameObject.SetActive(false);
-            Player.Instance.InputDisabled = false;
         });
         _middleCanvasGroup.DOFade(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
         _otherImage.DOFade(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
@@ -100,7 +99,6 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         _topBarCanvasGroup.DOFade(0, 1f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
         _bottomBar.DOScaleY(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
         _bottomBarCanvasGroup.DOFade(0, 1f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
-        
     }
 
 

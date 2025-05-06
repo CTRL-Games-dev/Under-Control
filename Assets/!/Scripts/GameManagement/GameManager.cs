@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour {
         {Dimension.HUB, "NewHub"},
         {Dimension.FOREST, "Adventure"},
         {Dimension.FOREST_VECTOR, "VectorBossBattle"},
+        {Dimension.CARD_CHOOSE, "CardChoose"}
     };
 
     [HideInInspector] public GameDifficulty Difficulty { get; private set; }
@@ -53,7 +54,7 @@ public class GameManager : MonoBehaviour {
     public float SaveCooldown = 15f;
 
     // Events
-    public UnityEvent LevelLoaded;
+    public UnityEvent SceneReadyEvent;
     public bool IsStarterDialogueOver = false;
 
     private void Awake()  {
@@ -89,9 +90,13 @@ public class GameManager : MonoBehaviour {
         DebugCommands();
     }
 
+    public void ChangeDimension(Dimension dimension) {
+        ChangeDimension(dimension, TotalInfluence);
+    }
+
     public void ChangeDimension(Dimension dimension, float newInfluence)  {
         Debug.Log($"New influence: {newInfluence}");
-        if(newInfluence <= TotalInfluence)
+        if(newInfluence < TotalInfluence)
         {
             Debug.LogError($"New influence ({newInfluence}) is smaller that previous influence ({TotalInfluence})!");
         }
@@ -176,9 +181,7 @@ public class GameManager : MonoBehaviour {
 
     // Each adventure manager calls this function once the level has been loaded
     public void OnLevelLoaded() {
-        Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Choose);
-        LevelLoaded.Invoke();
-        Player.Instance.CameraDistance = 10f;
+        SceneReadyEvent?.Invoke();
     }
 
 
