@@ -23,6 +23,7 @@ public class AdventureManager : MonoBehaviour
 
         Player.Instance.MaxCameraDistance = 30f;
         Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
+        Player.Instance.InputDisabled = false;
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         Player.UICanvas.ChangeUITopState(UITopState.NotVisible);
         Player.Instance.SetPlayerPosition(new Vector3(spawn.x, 1, spawn.y));
