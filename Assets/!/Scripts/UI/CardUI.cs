@@ -13,7 +13,6 @@ public class CardUI : MonoBehaviour
     private Card _card;
     private CanvasGroup _canvasGroup;
     private RectTransform _rectTransform;
-    private bool _isHovered = false;
     public bool IsInCollection = false;
     private float _zTilt = 0f;
 
@@ -101,7 +100,6 @@ public class CardUI : MonoBehaviour
     }
 
     public void OnPointerEnter() {
-        _isHovered = true;
         _rectTransform.DOScale(Vector3.one * 1.1f, 0.3f * Settings.AnimationSpeed);
         if (IsInCollection) {
             Player.UICanvas.InventoryCanvas.CardsPanel.ShowMoreInfo(_card);
@@ -111,7 +109,6 @@ public class CardUI : MonoBehaviour
     }
 
     public void OnPointerExit() {
-        _isHovered = false;
         _rectTransform.DOScale(Vector3.one, 0.3f * Settings.AnimationSpeed);
         if (IsInCollection) {
             Player.UICanvas.InventoryCanvas.CardsPanel.ShowMoreInfo(null);

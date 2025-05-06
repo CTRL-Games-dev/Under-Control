@@ -10,4 +10,6 @@ public static class EventBus {
 
     public static UnityEvent InventoryClosedEvent = new();
     public static UnityEvent<Card> RunCardClickedEvent = new();
+
+    public static UnityEvent SceneReadyEvent = new();
 }
