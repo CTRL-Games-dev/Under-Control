@@ -19,11 +19,11 @@ public class PlayerDVD : MonoBehaviour
 
     void Update() {
         _rectTransform.Translate(_direction * Time.deltaTime * _speed);
-        if (_rectTransform.anchoredPosition.x > Screen.width / 2 - _rectTransform.sizeDelta.x / 2 || _rectTransform.anchoredPosition.x < -Screen.width / 2 + _rectTransform.sizeDelta.x / 2) {
+        if (_rectTransform.anchoredPosition.x > 1920 / 2 - _rectTransform.sizeDelta.x / 2 || _rectTransform.anchoredPosition.x < -1920 / 2 + _rectTransform.sizeDelta.x / 2) {
             _direction.x *= -1;
             onWallHit();
         }
-        if (_rectTransform.anchoredPosition.y > Screen.height / 2 - _rectTransform.sizeDelta.y / 2 || _rectTransform.anchoredPosition.y < -Screen.height / 2 + _rectTransform.sizeDelta.y / 2) {
+        if (_rectTransform.anchoredPosition.y > 1080 / 2 - _rectTransform.sizeDelta.y / 2 || _rectTransform.anchoredPosition.y < -1080 / 2 + _rectTransform.sizeDelta.y / 2) {
             _direction.y *= -1;
             onWallHit();
         }
