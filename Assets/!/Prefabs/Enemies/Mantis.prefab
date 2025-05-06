@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 1788708955510303747}
   - component: {fileID: 7305185371420938206}
   - component: {fileID: 175047421451410474}
+  - component: {fileID: 1694785320776515858}
   m_Layer: 0
   m_Name: Mantis
   m_TagString: Untagged
@@ -127,6 +128,8 @@ MonoBehaviour:
   IsInvisible: 0
   StartingHealth: 100
   StartingMana: 100
+  _health: 0
+  _mana: 100
   MaxHealth:
     _raw: 100
     _adjusted: 100
@@ -155,6 +158,10 @@ MonoBehaviour:
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
+  OnDeathSound: {fileID: 0}
+  OnDamageSound: {fileID: 0}
+  OnAttack: {fileID: 0}
+  IdleSounds: []
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -164,6 +171,7 @@ MonoBehaviour:
   OnStunned:
     m_PersistentCalls:
       m_Calls: []
+  HasDied: 0
   _isPlayer: 0
 --- !u!195 &3729301384412433323
 NavMeshAgent:
@@ -346,6 +354,21 @@ MonoBehaviour:
   - {fileID: 326655341236531035}
   - {fileID: 2570764306484731243}
   - {fileID: 6464232203355078663}
+--- !u!114 &1694785320776515858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 190397464907128413}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e0d9ad67a5ca4bb6b4110c5feaec539, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Weight: 0.5
+  Deceleration: 10
+  MaxKnockback: 15
 --- !u!1 &2873025247928300287
 GameObject:
   m_ObjectHideFlags: 0
