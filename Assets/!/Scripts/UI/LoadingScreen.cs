@@ -9,7 +9,8 @@ using JetBrains.Annotations;
 public class LoadingScreen : MonoBehaviour
 {
     public static LoadingScreen Instance;
-    [SerializeField] private RectTransform _topImgRect, _bottomImgRect;
+    [SerializeField] private RectTransform _topImgRect, _bottomImgRect, _rotatingImgRect;
+    [SerializeField] private float _rotateSpeed = -1f;
     public static bool IsLoading = false;
     // private static string _currentSceneName = string.Empty;
 
@@ -28,6 +29,12 @@ public class LoadingScreen : MonoBehaviour
         EventBus.SceneReadyEvent.AddListener(OnSceneReadyEvent);
     }
 
+    private void Update() {
+        if (_rotatingImgRect.gameObject.activeSelf == false) return;
+        _rotatingImgRect.Rotate(new Vector3(0, 0, _rotateSpeed));
+        
+    }
+
     public static void LoadScene(string sceneName) {
         if (IsLoading) return;
         Debug.Log($"Loading scene: {sceneName}");
@@ -40,7 +47,7 @@ public class LoadingScreen : MonoBehaviour
 
         Instance._topImgRect.DOAnchorPos(Vector2.zero, 1f).SetEase(Ease.InOutSine).SetUpdate(true).SetDelay(0.5f);
         Instance._bottomImgRect.DOAnchorPos(Vector2.zero, 1f).SetEase(Ease.InOutSine).SetUpdate(true).SetDelay(0.5f).OnComplete(() => {
-
+            Instance._rotatingImgRect.gameObject.SetActive(true);
             Instance.StartCoroutine(Instance.loadSceneAsync(sceneName)); 
         });
     }
@@ -62,6 +69,7 @@ public class LoadingScreen : MonoBehaviour
         Instance._topImgRect.DOAnchorPos(new Vector2(0, 540), 0.5f).SetEase(Ease.InOutSine).SetUpdate(true);
         Instance._bottomImgRect.DOAnchorPos(new Vector2(0, -540), 0.5f).SetEase(Ease.InOutSine).SetUpdate(true).OnComplete(() => {
             IsLoading = false;
+            Instance._rotatingImgRect.gameObject.SetActive(false);
         });
     }
 }
