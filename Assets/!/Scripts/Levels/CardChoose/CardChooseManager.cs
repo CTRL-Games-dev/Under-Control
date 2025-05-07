@@ -17,7 +17,9 @@ public class CardChooseManager : MonoBehaviour
         EventBus.RunCardClickedEvent.AddListener(OnRunCardClickedEvent);
     }
 
-    private void OnRunCardClickedEvent(Card _) {
+    private void OnRunCardClickedEvent(Card card) {
+        GameManager.Instance.ChooseCard(card);
+        GameManager.Instance.ResetCardChoice();
         GameManager.Instance.ChangeDimension(Dimension.FOREST);
     }
 
@@ -38,7 +40,7 @@ public class CardChooseManager : MonoBehaviour
     }
 
     public void OnSaveBtnClick(RectTransform rect) {
-        Debug.Log("Must save the game here!");
+        SaveSystem.SaveGame();
         rect.DOKill();
         rect.DOScale(1.1f, 0.1f * Settings.AnimationSpeed).SetEase(Ease.OutBack).OnComplete(() => {
             rect.DOScale(1f, 0.1f * Settings.AnimationSpeed).SetEase(Ease.OutBack);
