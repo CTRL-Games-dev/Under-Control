@@ -61,12 +61,12 @@ public class Knockback : MonoBehaviour {
             if (_navMeshAgentRootMotionInterop1D != null) {
                 _navMeshAgentRootMotionInterop1D.enabled = false;
             }
-        }
 
-        if (_characterController != null) {
-            _characterController.Move(_knockbackVector * Time.fixedDeltaTime);
-        } else {
-            _rigidbody.MovePosition(_rigidbody.position + _knockbackVector * Time.fixedDeltaTime);
+            if (_characterController != null) {
+                _characterController.Move(_knockbackVector * Time.fixedDeltaTime);
+            } else {
+                _rigidbody.MovePosition(_rigidbody.position + _knockbackVector * Time.fixedDeltaTime);
+            }
         }
     }
 
@@ -78,5 +78,9 @@ public class Knockback : MonoBehaviour {
         _knockbackVector += direction.normalized * data.ActualDamageAmount / Weight;
         _knockbackVector.y = 0;
         _knockbackVector = Vector3.ClampMagnitude(_knockbackVector, MaxKnockback);
+    }
+
+    public void Reset() {
+        _knockbackVector = Vector3.zero;
     }
 }
