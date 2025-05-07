@@ -646,7 +646,6 @@ public class Player : MonoBehaviour {
         }
 
         Transform objectHit = hit.transform;
-        Debug.Log(objectHit.name);
 
         // Check if object is to far
         if(Vector3.Distance(objectHit.position, transform.position) > MaxInteractionRange) {

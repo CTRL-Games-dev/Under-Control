@@ -30,10 +30,9 @@ public class ChestRandomizer : MonoBehaviour
         float influence = GameManager.Instance.TotalInfluence;
         float influenceDelta = GameManager.Instance.InfluenceDelta;
 
-        Chest chest = GetComponent<Chest>();
+        SimpleInventory inventory = GetComponent<SimpleInventory>();
 
-        foreach(var i in possibleItems)
-        {
+        foreach(var i in possibleItems) {
             if(influence < i.MinInfluence) continue;
             if(influenceDelta < i.MinInfluenceDelta) continue;
 
@@ -47,7 +46,7 @@ public class ChestRandomizer : MonoBehaviour
 
             float powerScale = (UnityEngine.Random.Range(0f, 0.33f) * GameManager.Instance.GetInfluenceModifier()) + 0.75f;
 
-            bool spotFound = chest.Inventory.AddItem(i.item, quantity, powerScale);
+            bool spotFound = inventory.AddItem(i.item, quantity, powerScale);
             if(!spotFound) Debug.Log($"Could not find empty spot for item {i.item} of quantity {quantity}");
         }
     }
