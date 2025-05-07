@@ -922,6 +922,7 @@ public class Player : MonoBehaviour {
                 Animator.SetTrigger("live");
                 UpdateDisabled = false;
                 Player.Animator.animatePhysics = true;
+                UICanvas.ChangeUIBottomState(UIBottomState.HUD);
                 
             });
         });

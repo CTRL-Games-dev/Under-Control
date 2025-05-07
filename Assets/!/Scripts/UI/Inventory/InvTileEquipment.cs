@@ -27,6 +27,8 @@ public class InvTileEquipment : InvTile {
         EventBus.TileSizeSetEvent.AddListener(OnTileSizeSetEvent);
         EventBus.ItemUILeftClickEvent.AddListener(OnItemUIClickEvent);
         EventBus.ItemUIRightClickEvent.AddListener(OnItemUIClickEvent);
+        Player.LivingEntity.OnDeath.AddListener(resetToDefault);
+        
 
         _rectTransform = GetComponent<RectTransform>();
         // EventBus.InvTileClickEvent.AddListener(OnTileClick);
@@ -110,6 +112,7 @@ public class InvTileEquipment : InvTile {
         if (itemUI != _itemUI) return;
         PickUpItem();
     }
+
     public void PickUpItem(){
         switch (_tileType) {
             case TileType.Armor:
@@ -131,8 +134,34 @@ public class InvTileEquipment : InvTile {
                 break;
         }
         
+        if (_itemUI != null) Player.UICanvas.SetSelectedItemUI(_itemUI);
+        resetToDefault();
+    }
+
+    private void resetToDefault() {
         IsEmpty = true;
         _hintImage.SetActive(true);
+    
+        switch (_tileType) {
+                case TileType.Armor:
+                    Player.Inventory.Armor = null;
+                    break;
+                case TileType.Amulet:
+                    Player.Inventory.Amulet = null;
+                    break;
+                case TileType.Weapon:
+                    Player.Inventory.Weapon = null;
+                    break;
+                case TileType.Consumeable1:
+                    Player.Instance.ConsumableItemOne = null;
+                    Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+                    break;
+                case TileType.Consumeable2:
+                    Player.Instance.ConsumableItemTwo = null;
+                    Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+                    break;
+            }
+
 
         if (_tileType == TileType.Weapon) {
             _rectTransform.DOKill();
@@ -143,7 +172,6 @@ public class InvTileEquipment : InvTile {
         }
 
         if (_itemUI != null) {
-            Player.UICanvas.SetSelectedItemUI(_itemUI);
             Destroy(_itemUI.gameObject);
             _itemUI = null;
         }
@@ -234,9 +262,7 @@ public class InvTileEquipment : InvTile {
         InventoryItem consumable = _tileType == TileType.Consumeable1 ? Player.Instance.ConsumableItemOne : Player.Instance.ConsumableItemTwo;
 
         if (consumable == null) {
-            Destroy(_itemUI.gameObject);
-            _itemUI = null;
-            IsEmpty = true;
+            resetToDefault();
         }  else {
             // Londek: wyglada na niepotrzebne bo item jest ustawiany przy
             // tworzeniu itemui i taki chyba powinien pozostac, nie?
