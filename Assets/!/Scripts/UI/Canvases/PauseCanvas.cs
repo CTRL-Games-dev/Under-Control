@@ -180,7 +180,7 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
         setTextDisabled(_saveText);
         setTextDisabled(_loadText);
         _countSaveCooldownTimer = true;
-        SaveSystem.Save();
+        SaveSystem.SaveGame();
     }
 
     public void OnLoadBtnClick() {
@@ -189,7 +189,7 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
         setTextDisabled(_saveText);
         setTextDisabled(_loadText);
         _countSaveCooldownTimer = true;
-        SaveSystem.Load();
+        SaveSystem.LoadGame();
     }
 
     public void OnSettingsBtnClick() {

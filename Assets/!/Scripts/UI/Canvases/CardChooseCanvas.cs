@@ -38,7 +38,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
     }
 
     private IEnumerator setupCards() {
-        Card[] randomCards = GameManager.Instance.GetRandomCards(_maxCards);
+        Card[] randomCards = GameManager.Instance.GetCards(_maxCards);
         for(int i = 0; i < randomCards.Length; i++) {
             _currentCards[i] = AddCard(randomCards[i]);
         }

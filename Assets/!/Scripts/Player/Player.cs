@@ -271,7 +271,6 @@ public class Player : MonoBehaviour {
         OnDashSound =  Resources.Load("SFX/bohater/dash") as AudioClip;
 
         ResetRun();
-        // ResetRun();
     }
 
     void Update() {
@@ -682,7 +681,7 @@ public class Player : MonoBehaviour {
 
     public void OnInventoryChanged() {
         UpdateEquipment();
-        EventBus.InventoryItemChangedEvent.Invoke();
+        
     }
     public void UpdateEquipment(){
         WeaponHolder.UpdateWeapon(CurrentWeapon);
@@ -692,6 +691,7 @@ public class Player : MonoBehaviour {
             Debug.Log(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
             SlashManager.SetSlashColor(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
         } 
+        EventBus.InventoryItemChangedEvent.Invoke();
     }
 
     public Vector3 GetMousePosition() {
@@ -875,6 +875,9 @@ public class Player : MonoBehaviour {
         Player.UICanvas.HUDCanvas.UpdateManaBar();
         Player.UICanvas.HUDCanvas.OnUpdateConsumables();
         // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+        GameManager.Instance.ResetCards();
+        GameManager.Instance.ResetInfluence();
+        GameManager.Instance.ResetCardChoice();
         // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         EventBus.InventoryItemChangedEvent?.Invoke();
@@ -952,18 +955,23 @@ public class Player : MonoBehaviour {
     public void Save(ref PlayerSaveData data){
         data.EvolutionPoints = EvolutionPoints;
         data.SelectedEvolutions = SelectedEvolutions;
+        data.ConsumableItemOne = ConsumableItemOne;
+        data.ConsumableItemTwo = ConsumableItemTwo;
     }
     public void Load(PlayerSaveData data){
         EvolutionPoints = data.EvolutionPoints;
         foreach(EvoUI evolution in data.SelectedEvolutions){
             evolution.AddEvolution();   
         }
+        ConsumableItemOne = data.ConsumableItemOne;
+        ConsumableItemTwo = data.ConsumableItemTwo;
     }
     [Serializable]
     public struct PlayerSaveData{
         public List<EvoUI> SelectedEvolutions;
         public int EvolutionPoints;
-
+        public InventoryItem<ConsumableItemData> ConsumableItemOne;
+        public InventoryItem<ConsumableItemData> ConsumableItemTwo;
     }
     #endregion
 }
