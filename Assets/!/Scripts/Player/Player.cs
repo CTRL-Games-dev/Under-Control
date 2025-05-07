@@ -869,9 +869,10 @@ public class Player : MonoBehaviour {
         Player.UICanvas.HUDCanvas.UpdateHealthBar();
         Player.UICanvas.HUDCanvas.UpdateManaBar();
         Player.UICanvas.HUDCanvas.OnUpdateConsumables();
-        EventBus.InventoryItemChangedEvent?.Invoke();
         Player.Instance.GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
-        EventBus.InventoryItemChangedEvent?.Invoke();
+        Player.Instance.GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+        Player.Instance.GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
+
 
     }
 

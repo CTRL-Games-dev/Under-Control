@@ -9,7 +9,7 @@ public class InvTile : MonoBehaviour {
     [SerializeField] protected Image _image;
     public InventoryPanel InventoryPanel;
     
-    private bool _isEmpty = true;
+    [SerializeField] private bool _isEmpty = true;
     public bool IsEmpty {
         get { return _isEmpty; }
         set {
