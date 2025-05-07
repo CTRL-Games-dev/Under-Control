@@ -63,7 +63,13 @@ public class CardUI : MonoBehaviour
             _nameTextLocalizer.Key = _card.DisplayName;
             _descriptionTextLocalizer.Key = _card.ShortDesc;
 
-            _icon.sprite = _card.Icon == null ? ElementalInfo.GetIconSprite(_card.ElementalType) : _card.Icon;        
+            WeaponCard weaponCard = _card as WeaponCard;
+            if (weaponCard != null) {
+                _icon.sprite = weaponCard.WeaponData.Icon;
+            } else {
+                _icon.sprite = _card.Icon == null ? ElementalInfo.GetIconSprite(_card.ElementalType) : _card.Icon;        
+            }
+
             _barImg.sprite = ElementalInfo.GetBarSprite(_card.ElementalType);
             _outlineImg.color = ElementalInfo.GetColor(_card.ElementalType);
             

@@ -22,6 +22,7 @@ public class CardsPanel : MonoBehaviour
         cardUI.SetCard(runCard);
         cardUI.Setup();
         cardUI.IsInCollection = true;
+        cardUI.RotateCard();
     }
 
     public void ShowMoreInfo(Card card) {
