@@ -14,7 +14,7 @@ public class Chest : MonoBehaviour, IInteractableInventory
 
     public void Interact() {
         _animator.SetTrigger("open");
-        Player.UICanvas.InventoryCanvas.SetOtherInventory(Inventory, _uiPrefab, this, "interactable_name_chest_key");
+        Player.UICanvas.InventoryCanvas.SetOtherInventory(Inventory, _uiPrefab, this, "interactable_name_chest_key", false, true);
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Inventory);
     }
 
