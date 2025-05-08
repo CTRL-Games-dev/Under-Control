@@ -150,6 +150,7 @@ GameObject:
   - component: {fileID: 6352633181318331955}
   - component: {fileID: 5744684486491145725}
   - component: {fileID: 3209199751430434601}
+  - component: {fileID: 8560861390301014960}
   m_Layer: 0
   m_Name: Mushroom
   m_TagString: Untagged
@@ -216,10 +217,6 @@ MonoBehaviour:
   _hitFlashMaterial: {fileID: 2100000, guid: a70176b5e5737f04f86db74d184df881, type: 2}
   _flashDuration: 0.1
   _isPlayer: 0
-  _meshRenderers:
-  - {fileID: 7035782137752244736}
-  - {fileID: 3734123564722177730}
-  - {fileID: 4328510552859375944}
 --- !u!114 &3031275941072877131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -508,12 +505,21 @@ MonoBehaviour:
     MinPowerScale: 0
     MaxPowerScale: 0
     Chance: 0.9
+--- !u!114 &8560861390301014960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5271461074364452250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5e0d9ad67a5ca4bb6b4110c5feaec539, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Weight: 0.5
+  Weight: 0.4
   Deceleration: 10
-  MaxKnockback: 15
+  MaxKnockback: 20
 --- !u!1 &5443999487696772618
 GameObject:
   m_ObjectHideFlags: 0
@@ -693,6 +699,18 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -5928395085533954453, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -5928395085533954453, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2b493efed72e03e43b2cbde2be943cc1, type: 2}
+    - target: {fileID: -5928395085533954453, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: acc3b20724406744cb8b49bdf4e3e028, type: 2}
     - target: {fileID: -4819223349682164798, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -704,15 +722,31 @@ PrefabInstance:
     - target: {fileID: -4812649186624270405, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: -876546973899608171, guid: b4c29f909c14142428fd0fec9ab23069, type: 3}
+      objectReference: {fileID: 4118795518051876401, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
     - target: {fileID: -4812649186624270405, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 4118795518051876401, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
+      objectReference: {fileID: 2100000, guid: acc3b20724406744cb8b49bdf4e3e028, type: 2}
+    - target: {fileID: -3699015304206882500, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -3699015304206882500, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: acc3b20724406744cb8b49bdf4e3e028, type: 2}
     - target: {fileID: -1206874426333947015, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -1206874426333947015, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -1206874426333947015, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: acc3b20724406744cb8b49bdf4e3e028, type: 2}
     - target: {fileID: 919132149155446097, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
       propertyPath: m_Name
       value: mushroom_creature
@@ -729,6 +763,14 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
       objectReference: {fileID: 9042272958893013123, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
+    - target: {fileID: 8510909844913884514, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8510909844913884514, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: acc3b20724406744cb8b49bdf4e3e028, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -755,10 +797,5 @@ SkinnedMeshRenderer:
 --- !u!4 &6412051379732603930 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -3019555485039874717, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
-  m_PrefabInstance: {fileID: 1073066763523869049}
-  m_PrefabAsset: {fileID: 0}
---- !u!137 &7035782137752244736 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -1206874426333947015, guid: dc8accfeda5d9354184d436f37c5277a, type: 3}
   m_PrefabInstance: {fileID: 1073066763523869049}
   m_PrefabAsset: {fileID: 0}
