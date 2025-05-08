@@ -24,7 +24,7 @@ public class DeathScreenCanvas : MonoBehaviour, IUICanvasState
         CameraManager.SwitchCamera(_deathCamera);
         Player.Instance.LockRotation = true;
         Player.Instance.InputDisabled = true;
-        Player.Instance.MainCamera.cullingMask = LayerMask.GetMask("Player") + LayerMask.GetMask("PlayerWeapon");
+        Player.Instance.MainCamera.cullingMask = LayerMask.GetMask("Player");
 
         float dissolve = 1f;
         _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
@@ -37,6 +37,8 @@ public class DeathScreenCanvas : MonoBehaviour, IUICanvasState
                 _canvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed);
             
             }).OnComplete(() => {
+                Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
+
                 DOTween.To(() => dissolve, x => dissolve = x, 0f, 1f).OnUpdate(() => {
                     _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
                 });
@@ -52,7 +54,6 @@ public class DeathScreenCanvas : MonoBehaviour, IUICanvasState
                         });
                     });
 
-                    Player.Instance.ResetRun();
                 });
             });
         });
