@@ -4,6 +4,7 @@ public class IceShard : MonoBehaviour {
     public Effect FreezeEffect;
     public float Range;
     public float Speed;
+    public float Damage;
 
     private Vector3 _startingPosition;
     private LivingEntity _caster;
@@ -28,10 +29,9 @@ public class IceShard : MonoBehaviour {
     void OnTriggerEnter(Collider other) {
         if(!other.TryGetComponent(out LivingEntity livingEntity)) return;
         if(livingEntity == _caster) return;
-
+        livingEntity.TakeDamage(new Damage{Value = Damage, Type =  DamageType.MAGICAL}, _caster);
         livingEntity.ApplyEffect(FreezeEffect);
 
         Destroy(gameObject);
-        Debug.Log("");
     }
 }
