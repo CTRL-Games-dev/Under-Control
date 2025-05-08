@@ -196,6 +196,7 @@ public class Player : MonoBehaviour {
     [SerializeField] private LayerMask _groundLayerMask;
     private LayerMask _interactionMask;
     public FaceAnimator FaceAnimator;
+    public Knockback Knockback;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
     private Vector3 _queuedRotation = Vector3.zero;
@@ -215,6 +216,7 @@ public class Player : MonoBehaviour {
         Animator = GetComponent<Animator>();
         CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
         SpellSpawner = GetComponentInChildren<SpellSpawner>();
+        Knockback = GetComponent<Knockback>();
 
         Instance = this;
 
@@ -364,6 +366,7 @@ public class Player : MonoBehaviour {
     private void onDeath() {
         if (HasPlayerDied) return;
         Debug.Log("Player died");
+        Knockback.Reset();
         GameManager.Instance.ShowMainMenu = false;
         HasPlayerDied = true;
         SlashManager.DisableSlash();
