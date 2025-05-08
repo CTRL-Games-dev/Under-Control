@@ -46,10 +46,6 @@ public class SimpleInventory : EntityInventory
         return ItemContainer.IsWithinBounds(position);
     }
 
-    public override bool FitsWithinBounds(Vector2Int position, Vector2Int size) {
-        return ItemContainer.FitsWithinBounds(position, size);
-    }
-
     public override bool CanBeAdded(ItemData itemData, int quantity, Vector2Int position, float powerScale) {
         return ItemContainer.CanBeAdded(itemData, quantity, position, powerScale);
     }

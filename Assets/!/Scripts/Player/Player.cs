@@ -39,22 +39,22 @@ public class Player : MonoBehaviour {
     public Stat MaxHealth => LivingEntity.MaxHealth;
     public Stat MaxMana => LivingEntity.MaxMana;
     public float Mana => LivingEntity.Mana;
-    public Stat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
-    public Stat Armor = new Stat(StatType.ARMOR, 0f);
+    public Stat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL);
+    public Stat Armor = new Stat(StatType.ARMOR);
 
     // public Stat LightAttackDamage = new Stat(StatType.LIGHT_ATTACK_DAMAGE, 10f);
-    public Stat LightAttackSpeed = new Stat(StatType.LIGHT_ATTACK_SPEED, 1f);
+    public Stat LightAttackSpeed = new Stat(StatType.LIGHT_ATTACK_SPEED);
     // public Stat LightAttackRange = new Stat(StatType.LIGHT_ATTACK_RANGE, 1f);
 
     // public Stat HeavyAttackDamage = new Stat(StatType.HEAVY_ATTACK_DAMAGE, 20f);
-    public Stat HeavyAttackSpeed = new Stat(StatType.HEAVY_ATTACK_SPEED, 1f);
+    public Stat HeavyAttackSpeed = new Stat(StatType.HEAVY_ATTACK_SPEED);
     // public Stat HeavyAttackRange = new Stat(StatType.HEAVY_ATTACK_RANGE, 1f);
 
-    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 10f);
+    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED);
 
-    public Stat DashSpeedMultiplier = new Stat(StatType.DASH_SPEED_MULTIPLIER, 2f);
-    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 2f);
-    public Stat DashDuration = new Stat(StatType.DASH_COOLDOWN, 0.3f);
+    public Stat DashSpeedMultiplier = new Stat(StatType.DASH_SPEED_MULTIPLIER);
+    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN);
+    public Stat DashDuration = new Stat(StatType.DASH_COOLDOWN);
 
     // Coins
     [SerializeField] private int _coins = 100;
@@ -67,6 +67,7 @@ public class Player : MonoBehaviour {
     }
     [Header("Sound effects")]
     AudioClip OnDashSound;
+
     [Header("Properties")]
     [SerializeField] private float _acceleration = 8f;
     [SerializeField] private float _deceleration = 4f;
@@ -194,9 +195,9 @@ public class Player : MonoBehaviour {
     public static HumanoidInventory Inventory => LivingEntity.Inventory as HumanoidInventory;
 
     [SerializeField] private LayerMask _groundLayerMask;
+    private Knockback _knockback;
     private LayerMask _interactionMask;
     public FaceAnimator FaceAnimator;
-    public Knockback Knockback;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
     private Vector3 _queuedRotation = Vector3.zero;
@@ -216,7 +217,7 @@ public class Player : MonoBehaviour {
         Animator = GetComponent<Animator>();
         CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
         SpellSpawner = GetComponentInChildren<SpellSpawner>();
-        Knockback = GetComponent<Knockback>();
+        _knockback = GetComponent<Knockback>();
 
         Instance = this;
 
@@ -366,7 +367,7 @@ public class Player : MonoBehaviour {
     private void onDeath() {
         if (HasPlayerDied) return;
         Debug.Log("Player died");
-        Knockback.Reset();
+        _knockback.Reset();
         GameManager.Instance.ShowMainMenu = false;
         HasPlayerDied = true;
         SlashManager.DisableSlash();
