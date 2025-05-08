@@ -146,6 +146,7 @@ GameObject:
   - component: {fileID: 3368291280208790634}
   - component: {fileID: 1713875709920120200}
   - component: {fileID: 4916225690785008828}
+  - component: {fileID: 7899724990026492040}
   m_Layer: 0
   m_Name: Ent
   m_TagString: Ent
@@ -230,10 +231,12 @@ MonoBehaviour:
   DropItemsOnDeath: 1
   DestroyOnDeath: 1
   IsInvisible: 1
-  StartingHealth: 100
+  StartingHealth: 300
   StartingMana: 100
+  _health: 0
+  _mana: 100
   MaxHealth:
-    _raw: 100
+    _raw: 300
     _adjusted: 100
     _initValue: 100
     OnValueChanged:
@@ -260,6 +263,10 @@ MonoBehaviour:
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
+  OnDeathSound: {fileID: 0}
+  OnDamageSound: {fileID: 0}
+  OnAttack: {fileID: 0}
+  IdleSounds: []
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -269,6 +276,7 @@ MonoBehaviour:
   OnStunned:
     m_PersistentCalls:
       m_Calls: []
+  HasDied: 0
   _isPlayer: 0
 --- !u!114 &5458015506996832666
 MonoBehaviour:
@@ -503,6 +511,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _meshRenderers: []
+--- !u!114 &7899724990026492040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4141503403699130468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e0d9ad67a5ca4bb6b4110c5feaec539, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Weight: 4
+  Deceleration: 10
+  MaxKnockback: 3
 --- !u!1 &7702671616660602075
 GameObject:
   m_ObjectHideFlags: 0

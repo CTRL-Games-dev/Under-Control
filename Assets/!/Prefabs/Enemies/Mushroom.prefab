@@ -148,6 +148,8 @@ GameObject:
   - component: {fileID: 7851922774242721807}
   - component: {fileID: 5099897550929685514}
   - component: {fileID: 6352633181318331955}
+  - component: {fileID: 5744684486491145725}
+  - component: {fileID: 4290619767596836216}
   m_Layer: 0
   m_Name: Mushroom
   m_TagString: Untagged
@@ -231,10 +233,12 @@ MonoBehaviour:
   DropItemsOnDeath: 1
   DestroyOnDeath: 1
   IsInvisible: 0
-  StartingHealth: 100
+  StartingHealth: 80
   StartingMana: 100
+  _health: 0
+  _mana: 100
   MaxHealth:
-    _raw: 100
+    _raw: 80
     _adjusted: 100
     _initValue: 100
     OnValueChanged:
@@ -261,6 +265,10 @@ MonoBehaviour:
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
+  OnDeathSound: {fileID: 0}
+  OnDamageSound: {fileID: 0}
+  OnAttack: {fileID: 0}
+  IdleSounds: []
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -270,6 +278,7 @@ MonoBehaviour:
   OnStunned:
     m_PersistentCalls:
       m_Calls: []
+  HasDied: 0
   _isPlayer: 0
 --- !u!95 &4191642132989170659
 Animator:
@@ -460,6 +469,34 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2, z: 1}
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &5744684486491145725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5271461074364452250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccbfbf48d8b4ca844a0f6084a171adbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _meshRenderers: []
+--- !u!114 &4290619767596836216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5271461074364452250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e0d9ad67a5ca4bb6b4110c5feaec539, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Weight: 0.5
+  Deceleration: 10
+  MaxKnockback: 15
 --- !u!1 &5443999487696772618
 GameObject:
   m_ObjectHideFlags: 0
