@@ -24,7 +24,7 @@ public class DeathScreenCanvas : MonoBehaviour, IUICanvasState
         CameraManager.SwitchCamera(_deathCamera);
         Player.Instance.LockRotation = true;
         Player.Instance.InputDisabled = true;
-        Player.Instance.MainCamera.cullingMask = LayerMask.GetMask("Player");
+        Player.Instance.MainCamera.cullingMask = LayerMask.GetMask("Player") + LayerMask.GetMask("PlayerWeapon");
 
         float dissolve = 1f;
         _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
