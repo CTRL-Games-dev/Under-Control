@@ -6,7 +6,7 @@ public class FreezeEffect : Effect {
     public Color FreezeColor;
     public float TintAlphaValue;
     public override void OnApply(LivingEntity entity) {
-        entity.TintAnimator.SetTint(FreezeColor,TintAlphaValue, Duration);
+        entity.TintAnimator.ApplyTint(FreezeColor,TintAlphaValue, Duration);
         Debug.Log("snigger");
         //TODO LONDEK DODAJ LOCK ROTATION :3
     }
