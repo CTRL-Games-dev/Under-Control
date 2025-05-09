@@ -38,7 +38,11 @@ public abstract class Portal : MonoBehaviour
 
 
     void OnTriggerEnter(Collider other) {
+        if (!other.CompareTag("Player")) return;
+
         Debug.Log("Player entered portal to: " + _dimension.ToString());
+
+        Player.Instance.FBXModel.SetActive(false);
         GetComponent<Collider>().enabled = false;
         GameManager.Instance.ChangeDimension(_dimension, Influence);
     }
