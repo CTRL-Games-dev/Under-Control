@@ -6,8 +6,6 @@ using TMPro;
 
 public class PauseCanvas : MonoBehaviour, IUICanvasState
 {
-    private float _saveTimer;
-    private bool _countSaveCooldownTimer = false;
     [SerializeField] private Image _bgImage;
     [SerializeField] private GameObject _blackBar, _resumeButton, _optionsButton, _exitButton;
     private RectTransform _blackBarRect, _resumeRect, _optionsRect, _exitRect;
