@@ -32,7 +32,7 @@ public class LoadingScreen : MonoBehaviour
 
     private void Update() {
         if (!IsLoading) return;
-        _rotatingImgRect.Rotate(new Vector3(0, 0, _rotateSpeed));
+        _rotatingImgRect.Rotate(new Vector3(0, 0, _rotateSpeed * Time.deltaTime));
         
     }
 
@@ -75,6 +75,7 @@ public class LoadingScreen : MonoBehaviour
         Instance._topImgRect.DOAnchorPos(new Vector2(0, 540), 0.7f).SetEase(Ease.InOutSine).SetUpdate(true);
         Instance._bottomImgRect.DOAnchorPos(new Vector2(0, -540), 0.7f).SetEase(Ease.InOutSine).SetUpdate(true).OnComplete(() => {
             IsLoading = false;
+            Player.Instance.FBXModel.SetActive(true);
             Instance._rotatingImgRect.gameObject.SetActive(false);
         });
     }

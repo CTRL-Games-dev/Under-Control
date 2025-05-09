@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -48,8 +49,8 @@ public class GameManager : MonoBehaviour {
     public float InfluenceDelta {get; private set; }
     [HideInInspector] public static readonly float MinInfluenceDelta = 5.0f; 
     [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f;
+    [HideInInspector] public float LevelDepth = 0;
     public bool ShowMainMenu = true;
-    public bool ShowNewGame = true;
 
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
@@ -63,6 +64,7 @@ public class GameManager : MonoBehaviour {
     [Header("State")]
     [HideInInspector] private List<Card> _alreadyAddedCards = new();
     [HideInInspector] private List<Card> _availableCards = new();
+    [SerializeField] private Card[] _currentCardChoice = null;
     [SerializeField] private List<Card> _cards = new();
     [Space]
     public float SaveCooldown = 15f;
@@ -87,9 +89,12 @@ public class GameManager : MonoBehaviour {
         // Remove initial ambient initialization from Awake
         // Ambient will be started in Start()
 
-        foreach(var c in _cards) {
-            _alreadyAddedCards.Add(c);
-        }
+        // Remove initial ambient initialization from Awake
+        // Ambient will be started in Start()
+
+        // foreach(var c in _cards) {
+        //     _alreadyAddedCards.Add(c);
+        // }
 
         ResetCards();
     }
@@ -175,6 +180,7 @@ public class GameManager : MonoBehaviour {
     public void ResetInfluence() {
         TotalInfluence = 0;
         InfluenceDelta = 0;
+        LevelDepth = 0;
     }
 
     public void ResetCards() {
@@ -185,8 +191,16 @@ public class GameManager : MonoBehaviour {
     public float GetInfluenceModifier() {
         return (InfluenceDelta / MaxInfluenceDelta) + 0.5f;
     }
+    public void ResetCardChoice() {
+        _currentCardChoice = null;
+    }
+    public Card[] GetCards(int randomCardCount = 3){
+        if (_currentCardChoice == null || _currentCardChoice.Length == 0) _currentCardChoice = GetRandomCards(randomCardCount);
+        return _currentCardChoice;
+    }
 
-    public Card[] GetRandomCards(int numberOfcards = 3) {
+    private Card[] GetRandomCards(int numberOfcards) {
+
         numberOfcards = Math.Min(numberOfcards, _availableCards.Count);
         Card[] cards = new Card[numberOfcards];
         List<Card> copiedCards = FluffyUtils.CloneList(_cards);
@@ -215,6 +229,32 @@ public class GameManager : MonoBehaviour {
     }
 
     public bool ChooseCard(Card chosenCard) {
+        ModifierCard modifierCard = chosenCard as ModifierCard;
+        if (modifierCard != null) {
+            Player.LivingEntity.ApplyIndefiniteModifier(modifierCard.Modifier);
+        }
+        SpellCard spellCard = chosenCard as SpellCard;
+        if (spellCard != null) {
+            if (Player.Instance.SpellSlotOne == null) {
+                Player.Instance.SpellSlotOne = spellCard.Spell;
+                Player.UICanvas.HUDCanvas.SetSpellCooldownColor(1, ElementalInfo.GetColor(chosenCard.ElementalType));
+            } else if (Player.Instance.SpellSlotTwo == null) {
+                Player.Instance.SpellSlotTwo = spellCard.Spell;
+                Player.UICanvas.HUDCanvas.SetSpellCooldownColor(2, ElementalInfo.GetColor(chosenCard.ElementalType));
+            } else if (Player.Instance.SpellSlotThree == null) {
+                Player.Instance.SpellSlotThree = spellCard.Spell;
+                Player.UICanvas.HUDCanvas.SetSpellCooldownColor(3, ElementalInfo.GetColor(chosenCard.ElementalType));
+            } else {
+                Debug.Log("All slots are full!");
+            }
+        }
+        WeaponCard weaponCard = chosenCard as WeaponCard;
+        if (weaponCard != null) {
+            if(!Player.Inventory.AddItem(weaponCard.WeaponData, 1, ItemRandomizer.GetPowerScale())) {
+                GameObject prefab = weaponCard.WeaponData.WeaponPrefab.gameObject;
+                Instantiate(prefab, Player.Instance.transform.position, Quaternion.identity);
+            }
+        }
         foreach(var card in _cards) {
             if(card != chosenCard)
                 continue;
@@ -223,8 +263,9 @@ public class GameManager : MonoBehaviour {
                 if(_alreadyAddedCards.Contains(c))
                     continue;
                 _availableCards.Add(c);
-                _alreadyAddedCards.Add(c);
+                
             }
+            _alreadyAddedCards.Add(chosenCard);
             return true;
         }
         return false;
@@ -240,14 +281,48 @@ public class GameManager : MonoBehaviour {
         }
         if(Input.GetKeyDown(KeyCode.F9)) {
             Debug.Log("<color=red>Debug Tools - Saved game via hotkey");
-            SaveSystem.Save();
+            SaveSystem.SaveGame();
         }
         if(Input.GetKeyDown(KeyCode.F10)) {
             Debug.Log("<color=red>Debug Tools - Loaded game via hotkey");
-            SaveSystem.Load();
+            SaveSystem.LoadGame();
         }
         if(Input.GetKeyDown(KeyCode.F8)) {
             TotalInfluence = 100;
         }
     }
+    #region Save System
+    public void Save(ref GlobalSaveData data){
+        data.CurrentCards = _alreadyAddedCards;
+        data.CardChoice = _currentCardChoice;
+        data.TotalInfluence = TotalInfluence;
+        data.InfluenceDelta = InfluenceDelta;
+    }
+    public void Load(GlobalSaveData data){
+        for (int i = 0; i < data.CurrentCards.Count; i++) {
+            if (data.CurrentCards[i] == null) continue;
+            Player.UICanvas.InventoryCanvas.CardsPanel.AddCard(data.CurrentCards[i]);
+            if(data.CurrentCards[i].GetType() != typeof(WeaponCard)) {
+                ChooseCard(data.CurrentCards[i]);
+                return;
+            }
+            _availableCards.Remove(data.CurrentCards[i]);
+            _alreadyAddedCards.Add(data.CurrentCards[i]);
+            foreach(var c in data.CurrentCards[i].NextCards) {
+                if(_alreadyAddedCards.Contains(c)) continue;
+                _availableCards.Add(c);
+            }
+        }
+        _currentCardChoice = data.CardChoice;
+        TotalInfluence = data.TotalInfluence;
+        InfluenceDelta = data.InfluenceDelta;
+    }
+    [Serializable]
+    public struct GlobalSaveData{
+        public List<Card> CurrentCards;
+        public Card[] CardChoice;
+        public float TotalInfluence;
+        public float InfluenceDelta;
+    }
+    #endregion
 }
