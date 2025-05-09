@@ -144,7 +144,6 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
 
     public void OnNewGameBtnClick() {
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
-        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
         Player.Instance.transform.position = Player.Instance.StartPosition;
         Player.Instance.PlayRespawnAnimation();
     }

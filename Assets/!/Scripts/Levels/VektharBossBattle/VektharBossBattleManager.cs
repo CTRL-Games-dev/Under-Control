@@ -28,6 +28,7 @@ public class VektharBossBattleManager : MonoBehaviour
 
     void Start() {
         Player.Instance.transform.position = LevelStart.position;
+        EventBus.SceneReadyEvent?.Invoke();
     }
 
     void Update() {

@@ -47,10 +47,10 @@ public class LivingEntity : MonoBehaviour {
         }
     }
    
-    public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
-    public Stat Armor = new Stat(StatType.ARMOR, 0);
-    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
-    public Stat MaxMana = new Stat(StatType.MAX_MANA, 100f);
+    public Stat MaxHealth = new Stat(StatType.MAX_HEALTH);
+    public Stat Armor = new Stat(StatType.ARMOR);
+    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED);
+    public Stat MaxMana = new Stat(StatType.MAX_MANA);
 
     [Header("Sounds")]
     public AudioClip OnDeathSound;
@@ -189,8 +189,6 @@ public class LivingEntity : MonoBehaviour {
     public void Die() {
         if (HasDied) return;
         HasDied = true;
-
-        Debug.Log(gameObject.name + " died");
 
         // Drop items
         if(DropItemsOnDeath) {

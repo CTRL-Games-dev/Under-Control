@@ -2,5 +2,10 @@ public enum ElementalType
 {
     Fire,
     Ice, 
-    Earth
+    Earth,
+    Charming,
+    LifeSteal,
+    ManaSteal,
+    Stun,
+    None
 }

@@ -10,8 +10,9 @@ public class InventoryPanel : MonoBehaviour
     [Header("Assign if not player inventory")]
     [SerializeField] private bool _isPlayerInventory = false;
     public bool IsSellerInventory = false;
+    public bool IsAwaitingChestInventory = false;
 
-    public EntityInventory TargetEntityInventory; 
+    public EntityInventory TargetEntityInventory = null; 
     public Sprite CustomInvTileSprite;
 
     [Header("Prefabs")]
@@ -28,7 +29,7 @@ public class InventoryPanel : MonoBehaviour
 
     // References set in Awake or Start
     private RectTransform _rectTransform;
-    private ItemContainer _currentEntityInventory;
+    private ItemContainer _currentEntityInventory = null;
     private GridLayoutGroup _gridLayoutGroup;
     private Image _layoutImage;
 
@@ -58,6 +59,7 @@ public class InventoryPanel : MonoBehaviour
     }
 
     public void Start() {
+        if (IsAwaitingChestInventory) return;
         _currentEntityInventory = getCurrentEntityInventory();
         if (_currentEntityInventory == null) {
             // Debug.LogError("No inventory found!");
@@ -82,7 +84,7 @@ public class InventoryPanel : MonoBehaviour
 
     private ItemContainer getCurrentEntityInventory() {
         if (_isPlayerInventory) return Player.Inventory.ItemContainer;
-        if (TargetEntityInventory is SimpleInventory s) return s.ItemContainer;
+        if (TargetEntityInventory is SimpleInventory s) return s.ItemContainer ?? null;
         return null; 
     }
 
@@ -220,6 +222,9 @@ public class InventoryPanel : MonoBehaviour
     }
 
     private GameObject createItemUI(InventoryItem inventoryItem){
+        if (inventoryItem == null || inventoryItem.ItemData == null) {
+            return null;
+        }
         GameObject itemGameObject = Instantiate(_itemPrefab, _itemHolder.transform);
         itemGameObject.name = inventoryItem.ItemData.DisplayName;
 
@@ -271,19 +276,11 @@ public class InventoryPanel : MonoBehaviour
                 Player.UICanvas.SelectedItemUI.SelectedOffsetInv;
         }
 
-        Vector2Int size = _selectedInventoryItem.Rotated ? new Vector2Int(_selectedInventoryItem.Size.y, _selectedInventoryItem.Size.x) : _selectedInventoryItem.Size;
-
-        if (!_currentEntityInventory.FitsWithinBounds(selectedTilePos, size)) {
+        if (!_currentEntityInventory.AddItem(_selectedInventoryItem.ItemData, _selectedInventoryItem.Amount, selectedTilePos, _selectedInventoryItem.PowerScale, _selectedInventoryItem.Rotated)) {
             StartCoroutine(redPanelShow());
             return;
-        }
-
-        if (!canBePlaced(selectedTilePos, size)) {
-            StartCoroutine(redPanelShow());
-            return;
-        }
-
-        _currentEntityInventory.AddItem(_selectedInventoryItem.ItemData, _selectedInventoryItem.Amount, selectedTilePos, _selectedInventoryItem.PowerScale, _selectedInventoryItem.Rotated);
+        };
+        
         GameObject item = createItemUI(_currentEntityInventory.GetInventoryItem(selectedTilePos));
         
         if (item.GetComponent<ItemUI>().CurrentInventoryPanel.IsSellerInventory) {
@@ -295,20 +292,6 @@ public class InventoryPanel : MonoBehaviour
         EventBus.ItemPlacedEvent?.Invoke();
 
         SelectedTile.SetHighlight(false);
-    }
-
-    private bool canBePlaced(Vector2Int pos, Vector2Int size) {
-        for (int y = pos.y; y < pos.y + size.y; y++) {
-            for (int x = pos.x; x < pos.x + size.x; x++) {
-                if (x < 0 || x >= _inventoryWidth || y < 0 || y >= _inventoryHeight) {
-                    return false;
-                }
-                if (!_inventoryTileArray[y, x].IsEmpty) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     #endregion
@@ -334,6 +317,7 @@ public class InventoryPanel : MonoBehaviour
         foreach (Transform child in _gridHolder.transform) {
             Destroy(child.gameObject);
         }
+        IsAwaitingChestInventory = false;
         Start();
     }
 
