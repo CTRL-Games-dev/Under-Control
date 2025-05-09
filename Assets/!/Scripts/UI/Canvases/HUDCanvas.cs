@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections.Generic;
+using System;
 
 public class HUDCanvas : MonoBehaviour, IUICanvasState
 {
@@ -67,10 +68,16 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private RectTransform _spellSlot2Rect;
     [SerializeField] private RectTransform _spellSlot3Rect;
 
+    private float _previousHealth;
+    private float _previousMana;
+
 
 
     private void Start() {
         Player.Instance.UpdateConsumablesEvent.AddListener(OnUpdateConsumables);
+
+        _previousHealth = Player.LivingEntity.Health;
+        _previousMana = Player.Instance.Mana;
 
         UpdateHealthBar();
         UpdateManaBar();
@@ -111,16 +118,28 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
     }
 
 
-
-
     public void UpdateHealthBar() {
-        _healthBarImg.fillAmount = Player.LivingEntity.Health / Player.LivingEntity.MaxHealth;
-        _healthText.text = $"{(int)Player.LivingEntity.Health}/{(int)Player.LivingEntity.MaxHealth}";
+        float health = _previousHealth;
+        DOTween.Complete(health);
+        DOTween.Kill(health);
+        DOTween.To(() => health, x => health = x, Player.LivingEntity.Health, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutCubic).OnUpdate(() => {
+            _healthBarImg.fillAmount = health / Player.LivingEntity.MaxHealth;
+            _healthText.text = $"{(int)Math.Ceiling(health)}/{(int)Player.LivingEntity.MaxHealth}";
+        });
+
+        _previousHealth = Player.LivingEntity.Health;
     }
 
     public void UpdateManaBar() {
-        _manaBarImg.fillAmount = Player.Instance.Mana / Player.Instance.MaxMana;
-        _manaText.text = $"{(int)Player.Instance.Mana}/{(int)Player.Instance.MaxMana}";
+        float mana = _previousMana;
+        DOTween.Complete(mana);
+        DOTween.Kill(mana);
+        DOTween.To(() => mana, x => mana = x, Player.Instance.Mana, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutCubic).OnUpdate(() => {
+            _manaBarImg.fillAmount = mana / Player.Instance.MaxMana;
+            _manaText.text = $"{(int)mana}/{(int)Player.Instance.MaxMana}";
+        });
+
+        _previousMana = Player.Instance.Mana;
     }
 
     public void UpdateSpellSlots() {

@@ -190,6 +190,12 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
             _inputField.Select();
             _inputField.ActivateInputField();
             _blockClick = true;
+        } else {
+            _inputField.gameObject.SetActive(false);
+            _confirmButton.SetActive(false);
+            _inputField.interactable = false;
+            _inputField.DeactivateInputField();
+            _blockClick = false;
         }
             
     }

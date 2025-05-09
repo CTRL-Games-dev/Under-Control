@@ -56,7 +56,7 @@ public class CardUI : MonoBehaviour
     public void RotateCard() {
         _rectTransform.DOComplete();
         _holderRect.DOKill();
-        _holderRect.DOLocalRotate(new Vector3(0, 90, 0), 0.25f).SetEase(Ease.InCirc).OnComplete(() => {
+        _holderRect.DOLocalRotate(new Vector3(0, 90, 0), 0.25f).SetEase(Ease.InOutSine).OnComplete(() => {
             _backCard.SetActive(false);
             _frontCard.SetActive(true);
             
@@ -73,12 +73,11 @@ public class CardUI : MonoBehaviour
             _barImg.sprite = ElementalInfo.GetBarSprite(_card.ElementalType);
             _outlineImg.color = ElementalInfo.GetColor(_card.ElementalType);
             
-            _holderRect.DOLocalRotate(new Vector3(0, 0, 0), 0.25f).SetEase(Ease.InCirc).OnComplete(() => {
+            _holderRect.DOLocalRotate(new Vector3(0, 0, 0), 0.25f).SetEase(Ease.InOutSine).OnComplete(() => {
                 _holderRect.localRotation = Quaternion.Euler(0, 0, 0);
             });
         });
     }
-
 
 
 
