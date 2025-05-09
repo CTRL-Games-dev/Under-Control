@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 using UnityEngine.Events;
+using Unity.VisualScripting;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -21,15 +23,14 @@ public class Stat {
     private float _adjusted;
     public float Adjusted { get => _adjusted; protected set => _adjusted = value; }
 
+    [SerializeField]
     private float _initValue;
+    public float InitValue { get => _initValue; protected set => _initValue = value; }
 
     public UnityEvent OnValueChanged;
 
-    public Stat(StatType statType, float initValue) {
+    public Stat(StatType statType) {
         StatType = statType;
-        Raw = initValue;
-        Adjusted = initValue;
-        _initValue = initValue;
     }
 
     public void Reset() {
@@ -86,8 +87,6 @@ public class StatPropertyField : PropertyField {
         AddToClassList("unity-base-field__inspector-field");
         AddToClassList(alignedFieldUssClassName);
 
-        var testField = new PropertyField();
-
         labelElement = new Label(property.displayName);
         labelElement.AddToClassList("unity-base-field__label");
         labelElement.AddToClassList("unity-base-text-field__label");
@@ -105,7 +104,14 @@ public class StatPropertyField : PropertyField {
         inputContainer.AddToClassList("unity-composite-field__input");
         inputContainer.AddToClassList("unity-vector2-field__input");
         
-        // // Create property fields
+        // Create property fields
+        var initField = new FloatField();
+        initField.style.width = 40;
+        // initField.style.flexBasis = 0;
+        initField.style.marginLeft = 0;
+        initField.style.marginRight = 5;
+        initField.BindProperty(property.FindPropertyRelative("_initValue"));
+
         var rawField = new FloatField();
         rawField.style.flexGrow = 1;
         rawField.style.flexBasis = 0;
@@ -126,6 +132,7 @@ public class StatPropertyField : PropertyField {
         adjustedField.BindProperty(property.FindPropertyRelative("_adjusted"));
         adjustedField.SetEnabled(false);
         
+        inputContainer.Add(initField);
         inputContainer.Add(rawField);
         inputContainer.Add(arrowLabel);
         inputContainer.Add(adjustedField);

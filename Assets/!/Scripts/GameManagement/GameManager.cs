@@ -215,8 +215,5 @@ public class GameManager : MonoBehaviour {
             Debug.Log("<color=red>Debug Tools - Loaded game via hotkey");
             SaveSystem.Load();
         }
-        if(Input.GetKeyDown(KeyCode.F8)) {
-            TotalInfluence = 100;
-        }
     }
 }
