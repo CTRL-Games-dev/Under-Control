@@ -217,7 +217,7 @@ public class GameManager : MonoBehaviour {
         }
         WeaponCard weaponCard = chosenCard as WeaponCard;
         if (weaponCard != null) {
-            if(!Player.Inventory.AddItem(weaponCard.WeaponData, 1, 1)) {
+            if(!Player.Inventory.AddItem(weaponCard.WeaponData, 1, ItemRandomizer.GetPowerScale())) {
                 GameObject prefab = weaponCard.WeaponData.WeaponPrefab.gameObject;
                 Instantiate(prefab, Player.Instance.transform.position, Quaternion.identity);
             }
