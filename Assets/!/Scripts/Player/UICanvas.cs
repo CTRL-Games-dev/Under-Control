@@ -127,7 +127,7 @@ public class UICanvas : MonoBehaviour {
     }
 
     private void OnUICancel() {
-        if (IsOtherUIOpen || CurrentUIMiddleState == UIMiddleState.Choose || CurrentUITopState == UITopState.Death || CurrentUIMiddleState == UIMiddleState.MainMenu) {
+        if (IsOtherUIOpen || CurrentUIMiddleState == UIMiddleState.Choose || CurrentUITopState == UITopState.Death || CurrentUIMiddleState == UIMiddleState.MainMenu || CurrentUITopState == UITopState.VideoPlayer) {
             Debug.Log("Other UI is open");
             return;
         }

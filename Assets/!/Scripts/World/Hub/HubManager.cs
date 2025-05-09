@@ -32,8 +32,10 @@ public class HubManager : MonoBehaviour
         Player.LivingEntity.HasDied = false;
         Player.Instance.EvolutionPoints++;
 
-
+        GameManager.Instance.ResetInfluence();
+        GameManager.Instance.ResetCards();
         Player.Instance.ResetRun();
+
         Invoke(nameof(sceneReady), 0.2f);
         // Player.Animator.SetTrigger("live");
     }
