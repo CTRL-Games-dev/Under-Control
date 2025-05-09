@@ -44,7 +44,6 @@ public class AdventureManager : MonoBehaviour
         _navMeshSurface.BuildNavMesh();
 
         Player.Instance.ResetToDefault();
-        Player.LivingEntity.Mana = Player.LivingEntity.MaxMana;
 
         Invoke(nameof(sceneReady), 0.2f);
     }

@@ -37,8 +37,6 @@ public class DeathScreenCanvas : MonoBehaviour, IUICanvasState
                 _canvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed);
             
             }).OnComplete(() => {
-                Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
-
                 DOTween.To(() => dissolve, x => dissolve = x, 0f, 1f).OnUpdate(() => {
                     _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
                 });
@@ -54,6 +52,7 @@ public class DeathScreenCanvas : MonoBehaviour, IUICanvasState
                         });
                     });
 
+                    Player.Instance.ResetRun();
                 });
             });
         });

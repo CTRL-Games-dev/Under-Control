@@ -1,5 +1,7 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class VektharBossBattleManager : MonoBehaviour
 {
@@ -26,7 +28,6 @@ public class VektharBossBattleManager : MonoBehaviour
 
     void Start() {
         Player.Instance.transform.position = LevelStart.position;
-        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
         EventBus.SceneReadyEvent?.Invoke();
     }
 
