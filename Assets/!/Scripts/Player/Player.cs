@@ -39,22 +39,22 @@ public class Player : MonoBehaviour {
     public Stat MaxHealth => LivingEntity.MaxHealth;
     public Stat MaxMana => LivingEntity.MaxMana;
     public float Mana => LivingEntity.Mana;
-    public Stat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
-    public Stat Armor = new Stat(StatType.ARMOR, 0f);
+    public Stat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL);
+    public Stat Armor = new Stat(StatType.ARMOR);
 
     // public Stat LightAttackDamage = new Stat(StatType.LIGHT_ATTACK_DAMAGE, 10f);
-    public Stat LightAttackSpeed = new Stat(StatType.LIGHT_ATTACK_SPEED, 1f);
+    public Stat LightAttackSpeed = new Stat(StatType.LIGHT_ATTACK_SPEED);
     // public Stat LightAttackRange = new Stat(StatType.LIGHT_ATTACK_RANGE, 1f);
 
     // public Stat HeavyAttackDamage = new Stat(StatType.HEAVY_ATTACK_DAMAGE, 20f);
-    public Stat HeavyAttackSpeed = new Stat(StatType.HEAVY_ATTACK_SPEED, 1f);
+    public Stat HeavyAttackSpeed = new Stat(StatType.HEAVY_ATTACK_SPEED);
     // public Stat HeavyAttackRange = new Stat(StatType.HEAVY_ATTACK_RANGE, 1f);
 
-    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 10f);
+    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED);
 
-    public Stat DashSpeedMultiplier = new Stat(StatType.DASH_SPEED_MULTIPLIER, 2f);
-    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 2f);
-    public Stat DashDuration = new Stat(StatType.DASH_COOLDOWN, 0.3f);
+    public Stat DashSpeedMultiplier = new Stat(StatType.DASH_SPEED_MULTIPLIER);
+    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN);
+    public Stat DashDuration = new Stat(StatType.DASH_COOLDOWN);
 
     // Coins
     [SerializeField] private int _coins = 100;
@@ -67,6 +67,7 @@ public class Player : MonoBehaviour {
     }
     [Header("Sound effects")]
     AudioClip OnDashSound;
+
     [Header("Properties")]
     [SerializeField] private float _acceleration = 8f;
     [SerializeField] private float _deceleration = 4f;
@@ -194,9 +195,9 @@ public class Player : MonoBehaviour {
     public static HumanoidInventory Inventory => LivingEntity.Inventory as HumanoidInventory;
 
     [SerializeField] private LayerMask _groundLayerMask;
+    private Knockback _knockback;
     private LayerMask _interactionMask;
     public FaceAnimator FaceAnimator;
-    public Knockback Knockback;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
     private Vector3 _queuedRotation = Vector3.zero;
@@ -216,7 +217,7 @@ public class Player : MonoBehaviour {
         Animator = GetComponent<Animator>();
         CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
         SpellSpawner = GetComponentInChildren<SpellSpawner>();
-        Knockback = GetComponent<Knockback>();
+        _knockback = GetComponent<Knockback>();
 
         Instance = this;
 
@@ -281,13 +282,14 @@ public class Player : MonoBehaviour {
 
         _currentSpeed = Mathf.MoveTowards(_currentSpeed, getGoalSpeed(), getSpeedChange() * Time.deltaTime);
         CharacterController.SimpleMove(getGoalDirection() * _currentSpeed);
+
     }
 
     void FixedUpdate() {
         // Magiczna liczba to predkosc animacji biegu
-        Animator.SetFloat(_speedHash, _currentSpeed / Instance.MovementSpeed);
-        Animator.SetFloat(_lightAttackSpeedHash, Instance.LightAttackSpeed);
-        Animator.SetFloat(_heavyAttackSpeedHash, Instance.HeavyAttackSpeed);
+        Animator.SetFloat(_speedHash, _currentSpeed / MovementSpeed);
+        Animator.SetFloat(_lightAttackSpeedHash, LightAttackSpeed);
+        Animator.SetFloat(_heavyAttackSpeedHash, HeavyAttackSpeed);
 
         ModifierSystem.GetActiveModifiers();
     }
@@ -366,7 +368,7 @@ public class Player : MonoBehaviour {
     private void onDeath() {
         if (HasPlayerDied) return;
         Debug.Log("Player died");
-        Knockback.Reset();
+        _knockback.Reset();
         GameManager.Instance.ShowMainMenu = false;
         HasPlayerDied = true;
         SlashManager.DisableSlash();
@@ -549,7 +551,7 @@ public class Player : MonoBehaviour {
         // UpdateDisabled = true;
         // Animator.animatePhysics = false;
 
-        // Instance.transform.DOMove(transform.position + transform.forward * Instance.DashDistance, Instance.DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
+        // transform.DOMove(transform.position + transform.forward * DashDistance, DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
         //     // Animator.applyRootMotion = true;
         //     Animator.animatePhysics = true;
         //     UpdateDisabled = false;
@@ -649,7 +651,6 @@ public class Player : MonoBehaviour {
         }
 
         Transform objectHit = hit.transform;
-        Debug.Log(objectHit.name);
 
         // Check if object is to far
         if(Vector3.Distance(objectHit.position, transform.position) > MaxInteractionRange) {
@@ -768,12 +769,12 @@ public class Player : MonoBehaviour {
                 _isAttacking = true;
                 _currentSpeed = 0;
                 SlashManager.EnableSlash();
-                WeaponHolder.EnableHitbox();
                 // SlashGO.SetActive(true);
 
                 break;
 
             case AnimationState.Attack_Contact:
+                WeaponHolder.EnableHitbox();
                 break;
 
             case AnimationState.Attack_ComboWindow:
@@ -859,20 +860,27 @@ public class Player : MonoBehaviour {
             }
         }
 
-        Player.Instance.GetComponent<HumanoidInventory>().Clear();
-        Player.Instance.GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
-        Player.Instance.ConsumableItemOne = null;
-        Player.Instance.ConsumableItemTwo = null;
-        Player.Instance.SpellSlotOne = null;
-        Player.Instance.SpellSlotTwo = null;
-        Player.Instance.SpellSlotThree = null;
-        Player.Instance.WeaponHolder.UpdateWeapon(null);
-        Player.Instance.WeaponHolder.DisableHitbox();
-        Player.Instance.WeaponHolder.EndAttack();
+        GetComponent<HumanoidInventory>().Clear();
+        GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
+        ConsumableItemOne = null;
+        ConsumableItemTwo = null;
+        SpellSlotOne = null;
+        SpellSlotTwo = null;
+        SpellSlotThree = null;
+        WeaponHolder.UpdateWeapon(null);
+        WeaponHolder.DisableHitbox();
+        WeaponHolder.EndAttack();
         Player.UICanvas.HUDCanvas.UpdateSpellSlots();
         Player.UICanvas.HUDCanvas.UpdateHealthBar();
         Player.UICanvas.HUDCanvas.UpdateManaBar();
         Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+        // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+        // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+        GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
+        EventBus.InventoryItemChangedEvent?.Invoke();
+
+        Instance.UpdateEquipment();
+        
     }
 
     private void registerStats() {
@@ -893,34 +901,35 @@ public class Player : MonoBehaviour {
     public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
         UpdateDisabled = true;
         Animator.animatePhysics = false;
-        Instance.gameObject.transform.position = position;
+        gameObject.transform.position = position;
         Animator.animatePhysics = true;
         UpdateDisabled = false;
-        Instance.gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
+        gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
     public void PlayRespawnAnimation() {
-        Player.Animator.animatePhysics = false;
-        Player.Instance.UpdateDisabled = true;
+        Animator.animatePhysics = false;
+        UpdateDisabled = true;
         transform.position = StartPosition - Vector3.up * 3f;
         transform.rotation = Quaternion.Euler(0, 45, 0);
         float dissolve = 1f;
         DOTween.To(() => dissolve, x => dissolve = x, 0f, 2f).SetDelay(1f).OnUpdate(() => {
             _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
         }).OnComplete(() => {
-            Player.Instance.gameObject.transform.DOMoveY(-2, 0);
+            gameObject.transform.DOMoveY(-2, 0);
             Player.Animator.SetTrigger("rise");
-            Player.Instance.gameObject.transform.DOComplete();
+            gameObject.transform.DOComplete();
 
-            Player.Instance.gameObject.transform.DOKill();
+            gameObject.transform.DOKill();
 
             dissolve = 0f;
             DOTween.To(() => dissolve, x => dissolve = x, 1f, 4f).SetDelay(1f).OnUpdate(() => {
                 _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
             });
-            Player.Instance.gameObject.transform.DOMoveY(1, 2f).SetEase(Ease.OutQuint).OnComplete(() => {
-                Player.Animator.SetTrigger("live");
-                Player.Instance.UpdateDisabled = false;
+            gameObject.transform.DOMoveY(1, 2f).SetEase(Ease.OutQuint).OnComplete(() => {
+                Animator.SetTrigger("live");
+                UpdateDisabled = false;
                 Player.Animator.animatePhysics = true;
+                UICanvas.ChangeUIBottomState(UIBottomState.HUD);
                 
             });
         });
@@ -928,14 +937,14 @@ public class Player : MonoBehaviour {
     }
 
     public void ResetToDefault() {
-        Instance.LockRotation = false;
-        Instance.UpdateDisabled = false;
-        Instance.DamageDisabled = false;
-        Instance.HasPlayerDied = false;
-        Instance._isAttacking = false;
-        Instance.CurrentAnimationState = AnimationState.Locomotion;
-        Instance.SlashManager.DisableSlash();
-        Instance.UpdateEquipment();
+        LockRotation = false;
+        UpdateDisabled = false;
+        DamageDisabled = false;
+        HasPlayerDied = false;
+        _isAttacking = false;
+        CurrentAnimationState = AnimationState.Locomotion;
+        SlashManager.DisableSlash();
+        UpdateEquipment();
     }
 
     #endregion

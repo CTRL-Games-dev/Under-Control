@@ -4,6 +4,8 @@ using TMPro;
 using System.Collections.Generic;
 using DG.Tweening;
 using System;
+using NUnit.Framework.Internal;
+using System.Collections;
 
 public class InventoryCanvas : MonoBehaviour, IUICanvasState
 {
@@ -211,7 +213,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
         _playerInventoryPanelGO.GetComponent<RectTransform>().DOKill();
     }
 
-    public void SetOtherInventory(EntityInventory entityInventory, GameObject prefab, IInteractableInventory interactable = null, string title = null, bool changeAlpha = false) {
+    public void SetOtherInventory(EntityInventory entityInventory, GameObject prefab, IInteractableInventory interactable = null, string title = null, bool changeAlpha = false, bool isChest = false) {
         if (_currentOtherInventory == entityInventory) return;
         _currentTab = entityInventory == null ? InventoryTab.Armor : InventoryTab.Other;
 
@@ -227,11 +229,18 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
                 Destroy(_otherInventoryHolder.transform.GetChild(0).gameObject);
             
             InventoryPanel inventoryPanel = Instantiate(prefab, _otherInventoryHolder.transform).GetComponentInChildren<InventoryPanel>();
-            inventoryPanel.SetTargetInventory(entityInventory);
+            StartCoroutine(siur(inventoryPanel, entityInventory));
         } else {
             if (_otherInventoryHolder.transform.childCount > 0)
                 Destroy(_otherInventoryHolder.transform.GetChild(0).gameObject);
         }
+    }
+
+
+    private IEnumerator siur(InventoryPanel inv, EntityInventory entInv) {
+        yield return new WaitForEndOfFrame();
+
+        inv.SetTargetInventory(entInv);
     }
 
     public void SetOtherTabTitle(string text) {

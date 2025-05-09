@@ -38,8 +38,8 @@ public class ItemInfoPanel : MonoBehaviour
         if (itemUI.InventoryItem.ItemData is WeaponItemData weaponItemData) {
             _lightAttackHolder.SetActive(true);
             _heavyAttackHolder.SetActive(true);
-            _itemLightDamage.text = $"{weaponItemData.LightDamageMin * item.PowerScale} - {weaponItemData.LightDamageMax * item.PowerScale}";
-            _itemHeavyDamage.text = $"{weaponItemData.HeavyDamageMin * item.PowerScale} - {weaponItemData.HeavyDamageMax * item.PowerScale}";
+            _itemLightDamage.text = $"{(int)(weaponItemData.LightDamageMin * item.PowerScale)} - {(int)(weaponItemData.LightDamageMax * item.PowerScale)}";
+            _itemHeavyDamage.text = $"{(int)(weaponItemData.HeavyDamageMin * item.PowerScale)} - {(int)(weaponItemData.HeavyDamageMax * item.PowerScale)}";
         } else {
             _lightAttackHolder.SetActive(false);
             _heavyAttackHolder.SetActive(false);

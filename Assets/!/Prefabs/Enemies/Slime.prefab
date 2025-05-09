@@ -118,6 +118,8 @@ GameObject:
   - component: {fileID: 2067770035702373121}
   - component: {fileID: 4752538227665094709}
   - component: {fileID: 8769867406414444011}
+  - component: {fileID: 8532890818533065815}
+  - component: {fileID: -5342702583041411022}
   m_Layer: 0
   m_Name: Slime
   m_TagString: Untagged
@@ -217,7 +219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a23e42751b3623c4a938cdd3448ecea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DisplayName: Slime
+  DisplayName: enemy_name_slime_key
   Guild: {fileID: 11400000, guid: 734b0a650a008d14ab9d8696640c3a05, type: 2}
   DropItemsOnDeath: 1
   DestroyOnDeath: 1
@@ -229,7 +231,7 @@ MonoBehaviour:
   MaxHealth:
     _raw: 75
     _adjusted: 100
-    _initValue: 100
+    _initValue: 75
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
@@ -388,6 +390,41 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _meshRenderers:
   - {fileID: 1237172211013393839}
+--- !u!114 &8532890818533065815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8136527368806167904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35813691813018c40bc9b2fad741c40a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DropOnDeath: 1
+  PossibleLoot:
+  - Item: {fileID: 11400000, guid: a0450a26234635d4184a9095aa2af3bf, type: 2}
+    MinAmount: 1
+    MaxAmount: 8
+    MinPowerScale: 0
+    MaxPowerScale: 0
+    Chance: 1
+--- !u!114 &-5342702583041411022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8136527368806167904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e0d9ad67a5ca4bb6b4110c5feaec539, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Weight: 0.5
+  Deceleration: 10
+  MaxKnockback: 5
 --- !u!1001 &7049046558909537568
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -473,9 +510,13 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8140379391370592399, guid: 850b196421d4bdb4a8d171fde8aa4192, type: 3}
-      propertyPath: 'm_Materials.Array.data[1]'
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: acc3b20724406744cb8b49bdf4e3e028, type: 2}
+    - target: {fileID: 8140379391370592399, guid: 850b196421d4bdb4a8d171fde8aa4192, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 7383868390552105761, guid: 850b196421d4bdb4a8d171fde8aa4192, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

@@ -17,13 +17,18 @@ public class CardChooseManager : MonoBehaviour
         EventBus.RunCardClickedEvent.AddListener(OnRunCardClickedEvent);
     }
 
-    private void OnRunCardClickedEvent(Card _) {
-        GameManager.Instance.ChangeDimension(Dimension.FOREST);
-    }
-
     private void sceneReady() {
         EventBus.SceneReadyEvent?.Invoke();
     }
+    
+    private void OnRunCardClickedEvent(Card _) {
+        Invoke(nameof(changeScene), 0.4f);
+    }
+
+    private void changeScene() {
+        GameManager.Instance.ChangeDimension(Dimension.FOREST);
+    }
+
 
     public void OnBtnPointerEnter(RectTransform rect) {
         rect.DOKill();

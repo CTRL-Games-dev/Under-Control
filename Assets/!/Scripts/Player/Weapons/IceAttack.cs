@@ -7,6 +7,6 @@ public class IceAttack : PlayerWeaponAttack {
     protected override void OnHit(LivingEntity victim) {
         if (Random.Range(0f, 1f) > ApplyChance || victim.CompareTag("Player")) return;
         victim.ApplyEffect(IceEffect);
-        victim.TintAnimator.SetTint(TintColor, TintAlpha, UseEffectDuration ? IceEffect.Duration : Duration);
+        victim.TintAnimator.ApplyTint(TintColor, TintAlpha, UseEffectDuration ? IceEffect.Duration : Duration);
     }
 }
