@@ -1,6 +1,8 @@
+using System;
 using UnityEngine;
-[CreateAssetMenu(fileName = "SO_Chest_Item", menuName = "Items/ChestItemData")]
-public class ChestItemData : ScriptableObject
+
+[Serializable]
+public struct SpawnItemData
 {
     public ItemData item;
     public float MaxQuantity;
