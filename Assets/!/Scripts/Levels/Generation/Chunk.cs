@@ -17,7 +17,7 @@ public class Chunk : MonoBehaviour
         _meshCollider = GetComponent<MeshCollider>();
         _meshRenderer = GetComponent<MeshRenderer>();
     }
-    public void GenerateChunkMesh(Vector2 topLeftCornerPosition, int gridWidth, int gridHeight)
+    public void GenerateChunkMesh(Vector2 topLeftCornerPosition, float gridWidth, float gridHeight)
     {
         Mesh newMesh = new();
         
@@ -48,8 +48,8 @@ public class Chunk : MonoBehaviour
                 int startX = px * gridWidthPart;
                 int startY = py * gridHeightPart;
 
-                int partWidth = Math.Min(gridWidthPart, gridWidth - startX);
-                int partHeight = Math.Min(gridHeightPart, gridHeight - startY);
+                float partWidth = Math.Min(gridWidthPart, gridWidth - startX);
+                float partHeight = Math.Min(gridHeightPart, gridHeight - startY);
 
                 int x = (int)(startX + topLeftCornerPosition.x);
                 int y = (int)(startY + topLeftCornerPosition.y);
