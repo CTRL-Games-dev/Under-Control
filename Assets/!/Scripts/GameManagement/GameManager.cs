@@ -263,24 +263,49 @@ public class GameManager : MonoBehaviour {
         data.TotalInfluence = TotalInfluence;
         data.InfluenceDelta = InfluenceDelta;
     }
-    public void Load(GlobalSaveData data){
+    public void Load(GlobalSaveData data) {
+        // Clear existing card lists to avoid duplicates
+        _alreadyAddedCards.Clear();
+        _availableCards.Clear();
+
+        // Add all cards to the available pool initially
+        _cards.ForEach(x => _availableCards.Add(x));
+
+        // Process the loaded cards
         for (int i = 0; i < data.CurrentCards.Count; i++) {
             if (data.CurrentCards[i] == null) continue;
+
+            // Add the card to the inventory UI
             Player.UICanvas.InventoryCanvas.CardsPanel.AddCard(data.CurrentCards[i]);
-            if(data.CurrentCards[i].GetType() != typeof(WeaponCard)) {
+
+            // Handle card-specific logic
+            if (data.CurrentCards[i].GetType() != typeof(WeaponCard)) {
                 ChooseCard(data.CurrentCards[i]);
-                return;
+                continue;
             }
+
+            // Remove the card from available cards and add it to already added cards
             _availableCards.Remove(data.CurrentCards[i]);
-            _alreadyAddedCards.Add(data.CurrentCards[i]);
-            foreach(var c in data.CurrentCards[i].NextCards) {
-                if(_alreadyAddedCards.Contains(c)) continue;
-                _availableCards.Add(c);
+            if (!_alreadyAddedCards.Contains(data.CurrentCards[i])) {
+                _alreadyAddedCards.Add(data.CurrentCards[i]);
+            }
+
+            // Add next cards to the available pool
+            foreach (var c in data.CurrentCards[i].NextCards) {
+                if (!_alreadyAddedCards.Contains(c) && !_availableCards.Contains(c)) {
+                    _availableCards.Add(c);
+                }
             }
         }
+
+        // Restore the current card choice
         _currentCardChoice = data.CardChoice;
+
+        // Restore influence values
         TotalInfluence = data.TotalInfluence;
         InfluenceDelta = data.InfluenceDelta;
+
+        Debug.Log($"Current Card Choice: {_currentCardChoice?.Length ?? 0}");
     }
     [Serializable]
     public struct GlobalSaveData{
