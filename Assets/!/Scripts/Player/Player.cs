@@ -836,6 +836,7 @@ public class Player : MonoBehaviour {
     #region Misc Methods
 
     public void ResetRun() {
+        Debug.Log("Resetting player run state");
         ModifierSystem.Reset();
 
         // Evolution modifiers
@@ -869,10 +870,11 @@ public class Player : MonoBehaviour {
         WeaponHolder.UpdateWeapon(null);
         WeaponHolder.DisableHitbox();
         WeaponHolder.EndAttack();
-        Player.UICanvas.HUDCanvas.UpdateSpellSlots();
-        Player.UICanvas.HUDCanvas.UpdateHealthBar();
-        Player.UICanvas.HUDCanvas.UpdateManaBar();
-        Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+        UICanvas.HUDCanvas.UpdateSpellSlots();
+        UICanvas.HUDCanvas.UpdateHealthBar();
+        UICanvas.HUDCanvas.UpdateManaBar();
+        UICanvas.HUDCanvas.OnUpdateConsumables();
+        UICanvas.ChooseCanvas.ResetCardUI();
         GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GameManager.Instance.ResetCards();
         GameManager.Instance.ResetInfluence();

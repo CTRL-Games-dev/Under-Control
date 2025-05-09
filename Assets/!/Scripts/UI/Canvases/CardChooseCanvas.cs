@@ -114,6 +114,14 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         _currentCards = null;
     }
+    public void ResetCardUI(){
+        for (int i = 0; i < _currentCards.Length; i++) {
+            if (_currentCards[i] != null) {
+                _currentCards[i].DestroyCard();
+            }
+        }
+        _currentCards = null;
+    }
 
     public CardUI AddCard(Card runCard) {
         CardUI card = Instantiate(_cardPrefab, _cardsHolder.transform).GetComponent<CardUI>();

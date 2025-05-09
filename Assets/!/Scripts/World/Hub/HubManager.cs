@@ -33,6 +33,7 @@ public class HubManager : MonoBehaviour
         Player.Instance.EvolutionPoints++;
 
 
+        Player.Instance.ResetRun();
         Invoke(nameof(sceneReady), 0.2f);
         // Player.Animator.SetTrigger("live");
     }
