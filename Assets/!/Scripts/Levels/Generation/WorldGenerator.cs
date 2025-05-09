@@ -538,9 +538,9 @@ public class WorldGenerator : MonoBehaviour {
         int widthLeft = grid.GetWidthCeil();
         int heightLeft = grid.GetHeightCeil();
 
-        for(int ix = 0; ix < grid.Dimensions.x / maxChunkWidth; ix++)
+        for(int ix = 0; ix < grid.GetWidthCeil() / maxChunkWidth + 1; ix++)
         {
-            for (int iy = 0; iy < grid.Dimensions.y / maxChunkHeight; iy++)
+            for (int iy = 0; iy < grid.GetHeightCeil() / maxChunkHeight + 1; iy++)
             {
                 int chunkWidth;
                 int chunkHeight;
@@ -565,7 +565,7 @@ public class WorldGenerator : MonoBehaviour {
         foreach(var ci in chunkInfo)
         {
             Chunk chunk = Instantiate(_chunkPrefab, Vector3.zero, Quaternion.identity, _terrainChunkHolder.transform);
-            chunk.GenerateChunkMesh(ci.TopLeftCorner, ci.Width, ci.Height);
+            chunk.GenerateChunkMesh(ci.TopLeftCorner, (int)ci.Width, (int)ci.Height);
         }
     }
 
