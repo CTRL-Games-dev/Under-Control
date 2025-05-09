@@ -23,6 +23,7 @@ public class Stat {
     private float _adjusted;
     public float Adjusted { get => _adjusted; protected set => _adjusted = value; }
 
+    [SerializeField]
     private float _initValue;
     public float InitValue { get => _initValue; protected set => _initValue = value; }
 
