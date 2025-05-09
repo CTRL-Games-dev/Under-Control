@@ -90,6 +90,8 @@ public class Player : MonoBehaviour {
     public bool DamageDisabled = false;
     [SerializeField] private Material _dissolveMaterial;
     public Vector3 StartPosition;
+    [SerializeField] private AudioClip _walkingSound;
+    private AudioSource _walkingAudioSource;
 
     public int _evolutionPoints = 0;
     public int EvolutionPoints {
@@ -247,6 +249,10 @@ public class Player : MonoBehaviour {
     }
 
     void Start() {
+        _walkingAudioSource = gameObject.GetComponent<AudioSource>();
+        _walkingAudioSource.clip = _walkingSound;
+        _walkingAudioSource.loop = true;
+        _walkingAudioSource.playOnAwake = false;
         if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
             WeaponHolder.UpdateWeapon(CurrentWeapon);
         }
@@ -281,6 +287,15 @@ public class Player : MonoBehaviour {
         handleRotation();
 
         _currentSpeed = Mathf.MoveTowards(_currentSpeed, getGoalSpeed(), getSpeedChange() * Time.deltaTime);
+        if (_currentSpeed > 0.1f) {
+            if (!_walkingAudioSource.isPlaying && _walkingSound != null) {
+                _walkingAudioSource.Play();
+            }
+        } else {
+            if (_walkingAudioSource.isPlaying) {
+                _walkingAudioSource.Stop();
+            }
+        }
         CharacterController.SimpleMove(getGoalDirection() * _currentSpeed);
 
     }
