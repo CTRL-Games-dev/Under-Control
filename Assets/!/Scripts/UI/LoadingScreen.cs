@@ -32,7 +32,7 @@ public class LoadingScreen : MonoBehaviour
 
     private void Update() {
         if (!IsLoading) return;
-        _rotatingImgRect.Rotate(new Vector3(0, 0, _rotateSpeed));
+        _rotatingImgRect.Rotate(new Vector3(0, 0, _rotateSpeed * Time.deltaTime));
         
     }
 
