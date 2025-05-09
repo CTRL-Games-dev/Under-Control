@@ -15,18 +15,20 @@ public class TintAnimator : MonoBehaviour
         }
     }
 
-    public void SetTint(Color color, float alpha, float duration) {
+    public void ApplyTint(Color color, float alpha, float duration) {
+        SetTint(color, alpha);
+        Invoke(nameof(ResetTint), duration);
+    }
+    public void SetTint(Color color, float alpha) {
         if (_meshRenderers.Count == 0) return;
-        Debug.Log(_materials.Count);
+        //Debug.Log(_materials.Count);
 
         foreach (Material m in _materials) {
             if (m == null) continue;
-            Debug.Log(m);
+            //Debug.Log(m);
             m.SetColor("_TintColor", color);
             m.SetFloat("_Alpha", alpha);
         }
-
-        Invoke(nameof(ResetTint), duration);
     }
 
     public void ResetTint() {
