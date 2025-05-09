@@ -132,7 +132,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
         }
         WeaponCard weaponCard = card as WeaponCard;
         if (weaponCard != null) {
-            if(!Player.Inventory.AddItem(weaponCard.WeaponData, 1, 1)) {
+            if(!Player.Inventory.AddItem(weaponCard.WeaponData, 1, ItemRandomizer.GetPowerScale())) {
                 GameObject prefab = weaponCard.WeaponData.WeaponPrefab.gameObject;
                 Instantiate(prefab, Player.Instance.transform.position, Quaternion.identity);
             }
