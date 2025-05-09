@@ -21,6 +21,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
         _canvasGroup.alpha = 0;
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
+        _currentCards = new CardUI[_maxCards];
     }
 
     private void Start() {
@@ -38,7 +39,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
     }
 
     private IEnumerator setupCards() {
-        Card[] randomCards = GameManager.Instance.GetRandomCards(_maxCards);
+        Card[] randomCards = GameManager.Instance.GetCards(_maxCards);
         for(int i = 0; i < randomCards.Length; i++) {
             _currentCards[i] = AddCard(randomCards[i]);
         }
@@ -111,39 +112,20 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
     }
 
     private void OnRunCardClicked(Card card) {
-        ModifierCard modifierCard = card as ModifierCard;
-        if (modifierCard != null) {
-            Player.LivingEntity.ApplyIndefiniteModifier(modifierCard.Modifier);
-        }
-        SpellCard spellCard = card as SpellCard;
-        if (spellCard != null) {
-            if (Player.Instance.SpellSlotOne == null) {
-                Player.Instance.SpellSlotOne = spellCard.Spell;
-                Player.UICanvas.HUDCanvas.SetSpellCooldownColor(1, ElementalInfo.GetColor(card.ElementalType));
-            } else if (Player.Instance.SpellSlotTwo == null) {
-                Player.Instance.SpellSlotTwo = spellCard.Spell;
-                Player.UICanvas.HUDCanvas.SetSpellCooldownColor(2, ElementalInfo.GetColor(card.ElementalType));
-            } else if (Player.Instance.SpellSlotThree == null) {
-                Player.Instance.SpellSlotThree = spellCard.Spell;
-                Player.UICanvas.HUDCanvas.SetSpellCooldownColor(3, ElementalInfo.GetColor(card.ElementalType));
-            } else {
-                Debug.Log("All slots are full!");
-            }
-        }
-        WeaponCard weaponCard = card as WeaponCard;
-        if (weaponCard != null) {
-            if(!Player.Inventory.AddItem(weaponCard.WeaponData, 1, ItemRandomizer.GetPowerScale())) {
-                GameObject prefab = weaponCard.WeaponData.WeaponPrefab.gameObject;
-                Instantiate(prefab, Player.Instance.transform.position, Quaternion.identity);
-            }
-        }
-
-        GameManager.Instance.ChooseCard(card);
 
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         _currentCards = null;
     }
 
+    public void ResetCardUI(){
+        if (_currentCards == null) return;
+        for (int i = 0; i < _currentCards.Length; i++) {
+            if (_currentCards[i] != null) {
+                _currentCards[i].DestroyCard();
+            }
+        }
+        _currentCards = null;
+    }
     public CardUI AddCard(Card runCard) {
         CardUI card = Instantiate(_cardPrefab, _cardsHolder.transform).GetComponent<CardUI>();
         card.SetCard(runCard);
