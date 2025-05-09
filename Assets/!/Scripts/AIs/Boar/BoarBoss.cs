@@ -20,7 +20,7 @@ public class BoarBoss : MonoBehaviour
         Vector3 pos = transform.position;
 
         // WorldData wd = _generator.wd;
-        // ForestBossArena location = _generator.Getlocation<ForestBossArena>();
+        // ForestBossArena location = _generator.GetLocation<ForestBossArena>();
         // Vector2 corner = location.GetWorldCorner(wd.Offset, wd.Scale);
     
         // if
