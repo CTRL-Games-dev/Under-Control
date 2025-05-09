@@ -151,7 +151,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
                     var InvClickClip = Resources.Load($"NEWSFX/ALPHABET/FASTER/{char.ToLower(letter)}") as AudioClip;  
                     if(InvClickClip != null) {
                         if(_dialogue.DialogueEntries[_currentDialogueIndex].IsPlayer){
-                            SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform, 1.5f);
+                            SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform, 1f, 1.2f);
                         } else {
                             SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform, 1f);
                         }

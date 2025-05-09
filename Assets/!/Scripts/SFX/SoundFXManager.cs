@@ -14,7 +14,7 @@ public class SoundFXManager : MonoBehaviour
             Instance = this;
         }
     }
-    public void PlaySoundFXClip(AudioClip audioClip, Transform _transform, float custompitch = 1f, float volume = 1f, float speed = 1f){
+    public void PlaySoundFXClip(AudioClip audioClip, Transform _transform, float volume = 1f, float custompitch = 1f, float speed = 1f){
         if(_transform ==null){
             _transform = transform;
         }
