@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour {
     public float InfluenceDelta {get; private set; }
     [HideInInspector] public static readonly float MinInfluenceDelta = 5.0f; 
     [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f;
+    [HideInInspector] public float LevelDepth = 0;
     public bool ShowMainMenu = true;
     public bool ShowNewGame = true;
 
@@ -137,6 +138,7 @@ public class GameManager : MonoBehaviour {
     public void ResetInfluence() {
         TotalInfluence = 0;
         InfluenceDelta = 0;
+        LevelDepth = 0;
     }
 
     public void ResetCards() {
