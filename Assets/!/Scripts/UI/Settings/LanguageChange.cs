@@ -27,6 +27,6 @@ public class LanguageChange : MonoBehaviour
     }
 
     private void OnLanguageChangeEvent() {
-        _languageDropdown.value = TextData.CurrentLanguage == "en" ? 0 : 1;
+        _languageDropdown.value = (int)TextData.GetLanguageEnum(TextData.CurrentLanguage);
     }
 }
