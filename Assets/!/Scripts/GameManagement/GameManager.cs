@@ -76,9 +76,9 @@ public class GameManager : MonoBehaviour {
         DontDestroyOnLoad(this);
         SetDefault();
 
-        foreach(var c in _cards) {
-            _alreadyAddedCards.Add(c);
-        }
+        // foreach(var c in _cards) {
+        //     _alreadyAddedCards.Add(c);
+        // }
 
         ResetCards();
     }
@@ -153,9 +153,7 @@ public class GameManager : MonoBehaviour {
     public void ResetCardChoice() {
         _currentCardChoice = null;
     }
-    public Card[] GetCards(int randomCardCount = 5){
-        Debug.Log(_currentCardChoice);
-        Debug.Log($"GetCards: {_currentCardChoice?.Count()}");
+    public Card[] GetCards(int randomCardCount = 3){
         if (_currentCardChoice == null || _currentCardChoice.Length == 0) _currentCardChoice = GetRandomCards(randomCardCount);
         return _currentCardChoice;
     }
@@ -228,8 +226,9 @@ public class GameManager : MonoBehaviour {
             foreach(var c in chosenCard.NextCards) {
                 if(_alreadyAddedCards.Contains(c)) continue;
                 _availableCards.Add(c);
-                _alreadyAddedCards.Add(c);
+                
             }
+            _alreadyAddedCards.Add(chosenCard);
             return true;
         }
         return false;
@@ -265,9 +264,20 @@ public class GameManager : MonoBehaviour {
         data.InfluenceDelta = InfluenceDelta;
     }
     public void Load(GlobalSaveData data){
-        _alreadyAddedCards = data.CurrentCards;
-        _alreadyAddedCards.ForEach(x => Player.UICanvas.InventoryCanvas.CardsPanel.AddCard(x));
-        _availableCards = _cards.Except(_alreadyAddedCards).ToList();
+        for (int i = 0; i < data.CurrentCards.Count; i++) {
+            if (data.CurrentCards[i] == null) continue;
+            Player.UICanvas.InventoryCanvas.CardsPanel.AddCard(data.CurrentCards[i]);
+            if(data.CurrentCards[i].GetType() != typeof(WeaponCard)) {
+                ChooseCard(data.CurrentCards[i]);
+                return;
+            }
+            _availableCards.Remove(data.CurrentCards[i]);
+            _alreadyAddedCards.Add(data.CurrentCards[i]);
+            foreach(var c in data.CurrentCards[i].NextCards) {
+                if(_alreadyAddedCards.Contains(c)) continue;
+                _availableCards.Add(c);
+            }
+        }
         _currentCardChoice = data.CardChoice;
         TotalInfluence = data.TotalInfluence;
         InfluenceDelta = data.InfluenceDelta;

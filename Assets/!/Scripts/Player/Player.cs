@@ -958,6 +958,8 @@ public class Player : MonoBehaviour {
         data.SelectedEvolutions = SelectedEvolutions;
         data.ConsumableItemOne = ConsumableItemOne;
         data.ConsumableItemTwo = ConsumableItemTwo;
+        data.Health = Health;
+        data.Mana = Mana;
     }
     public void Load(PlayerSaveData data){
         EvolutionPoints = data.EvolutionPoints;
@@ -966,9 +968,13 @@ public class Player : MonoBehaviour {
         }
         ConsumableItemOne = data.ConsumableItemOne;
         ConsumableItemTwo = data.ConsumableItemTwo;
+        LivingEntity.Health = data.Health;
+        LivingEntity.Mana = data.Mana;
     }
     [Serializable]
     public struct PlayerSaveData{
+        public float Health;
+        public float Mana;
         public List<EvoUI> SelectedEvolutions;
         public int EvolutionPoints;
         public InventoryItem<ConsumableItemData> ConsumableItemOne;
