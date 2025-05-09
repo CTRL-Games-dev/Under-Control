@@ -81,7 +81,6 @@ public class CardUI : MonoBehaviour
 
 
 
-
     public void DestroyCard() {
         _rectTransform.DOScale(Vector3.zero, 0.3f * Settings.AnimationSpeed);
         _rectTransform.DOShakeRotation(0.3f * Settings.AnimationSpeed, 90, 10, 90);
