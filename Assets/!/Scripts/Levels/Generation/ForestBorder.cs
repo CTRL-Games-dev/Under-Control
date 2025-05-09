@@ -9,4 +9,7 @@ public class ForestBorder : Location
     //     tree.eulerAngles = new(0,UnityEngine.Random.Range(0f, 359f));
     //     tree.position += new Vector3(UnityEngine.Random.Range(-0.1f, 0.1f), 0, UnityEngine.Random.Range(-0.1f, 0.1f));
     // }
+    public void SetDeadZone(bool enable) {
+        transform.Find("DeadZone").gameObject.SetActive(enable);
+    }
 }
