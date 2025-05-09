@@ -14,6 +14,7 @@ public class Fire : MonoBehaviour {
 
     void Start() {
         _self = GetComponent<LivingEntity>();
+        _self.TintAnimator.SetTint(Color.red, 0.5f);
     }
 
     public void Stack() {
@@ -24,6 +25,7 @@ public class Fire : MonoBehaviour {
         Stacks--;
 
         if(Stacks <= 0) {
+            _self.TintAnimator.ResetTint();
             Destroy(this);
         }
     }
