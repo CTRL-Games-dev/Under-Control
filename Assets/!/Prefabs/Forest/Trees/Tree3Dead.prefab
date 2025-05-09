@@ -48,6 +48,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4328719633998419813, guid: d85179527b8b47ff0ac7e8f6b19e550c, type: 3}
+      propertyPath: _leaves
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4613297611767217006, guid: d85179527b8b47ff0ac7e8f6b19e550c, type: 3}
       propertyPath: m_Name
       value: Tree3Dead
@@ -56,5 +60,43 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 3928407609612398972, guid: d85179527b8b47ff0ac7e8f6b19e550c, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4613297611767217006, guid: d85179527b8b47ff0ac7e8f6b19e550c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8074093633921137396}
   m_SourcePrefab: {fileID: 100100000, guid: d85179527b8b47ff0ac7e8f6b19e550c, type: 3}
+--- !u!23 &4209282733553707897 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1194085753593363792, guid: d85179527b8b47ff0ac7e8f6b19e550c, type: 3}
+  m_PrefabInstance: {fileID: 3096329140428477993}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7709572463254105415 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4613297611767217006, guid: d85179527b8b47ff0ac7e8f6b19e550c, type: 3}
+  m_PrefabInstance: {fileID: 3096329140428477993}
+  m_PrefabAsset: {fileID: 0}
+--- !u!205 &8074093633921137396
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7709572463254105415}
+  serializedVersion: 2
+  m_LocalReferencePoint: {x: 0, y: 0, z: 0}
+  m_Size: 1
+  m_FadeMode: 1
+  m_AnimateCrossFading: 1
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.05
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 4209282733553707897}
+  - screenRelativeHeight: 0.05
+    fadeTransitionWidth: 0
+    renderers: []
+  - screenRelativeHeight: 0.05
+    fadeTransitionWidth: 0
+    renderers: []
+  m_Enabled: 1
