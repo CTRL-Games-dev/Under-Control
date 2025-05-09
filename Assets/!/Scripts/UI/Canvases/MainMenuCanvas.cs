@@ -1,6 +1,4 @@
-using System.IO;
 using DG.Tweening;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +9,6 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
     private RectTransform _continueRect, _newGameRect, _optionsRect, _creditsRect, _exitRect;
     private float _continueBtnStartingX, _newGameBtnStartingX, _optionsBtnStartingX, _creditsBtnStartingX, _exitBtnStartingX;
     private CanvasGroup _canvasGroup, _continueGroup, _newGameGroup, _optionsGroup, _creditsGroup, _exitGroup;
-    private TextMeshProUGUI _continueText;
 
     private void Awake() {
         _canvasGroup = GetComponent<CanvasGroup>();
@@ -33,8 +30,6 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         _optionsBtnStartingX = _optionsRect.anchoredPosition.x;
         _creditsBtnStartingX = _creditsRect.anchoredPosition.x;
         _exitBtnStartingX = _exitRect.anchoredPosition.x;
-
-        _continueText = _continueButton.GetComponentInChildren<TextMeshProUGUI>();
     }
 
 
@@ -47,13 +42,12 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         if (HubManager.MainMenuCamera != null) CameraManager.SwitchCamera(HubManager.MainMenuCamera);
 
         gameObject.SetActive(true);
+        _newGameButton.GetComponentInChildren<TextLocalizer>().Key = GameManager.Instance.ShowNewGame ? "btn_new_game_key" : "btn_continue_key";
 
         _canvasGroup.alpha = 1;
         _bgImage.DOFade(230.0f / 255.0f, 1f * Settings.AnimationSpeed).OnComplete(() => {
             animateButtons();
         });
-        if(!File.Exists(SaveSystem.SaveFileName())) setTextDisabled(_continueText);
-        else resetTextDecoration(_continueText);
     }
 
     public void HideUI() {
@@ -67,14 +61,6 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
             gameObject.SetActive(false);
         });
     }
-    private void resetTextDecoration(TextMeshProUGUI text) {
-        text.color = Color.white;
-        text.fontStyle = FontStyles.Normal;
-    }
-    private void setTextDisabled(TextMeshProUGUI text) {
-        text.color = Color.gray;
-        text.fontStyle = FontStyles.Strikethrough;
-    }
 
     private void animateButtons() {
         Ease ease = Ease.OutQuint;
@@ -86,10 +72,10 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         resetBtnPositions();
 
         _logoImage.DOFade(1, 0.6f * Settings.AnimationSpeed).SetEase(Ease.InSine).OnComplete(() => {
-            _newGameRect.DOAnchorPosX(_newGameBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
-            _newGameGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
-                _continueRect.DOAnchorPosX(_continueBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
-                _continueGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+            _continueRect.DOAnchorPosX(_continueBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
+            _continueGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+                _newGameRect.DOAnchorPosX(_newGameBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
+                _newGameGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
                     _optionsRect.DOAnchorPosX(_optionsBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
                     _optionsGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
                         _creditsRect.DOAnchorPosX(_creditsBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
@@ -136,16 +122,17 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
     }
 
     public void OnContinueGameBtnClick() {
-        if(!File.Exists(SaveSystem.SaveFileName())) return;
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
-        Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
-        SaveSystem.LoadGame();
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
+        Player.Instance.InputDisabled = false;
     }
 
     public void OnNewGameBtnClick() {
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         Player.Instance.transform.position = Player.Instance.StartPosition;
         Player.Instance.PlayRespawnAnimation();
+        if (!GameManager.Instance.ShowNewGame) return;
+        GameManager.Instance.ShowNewGame = false;
     }
 
     public void OnSettingsBtnClick() {

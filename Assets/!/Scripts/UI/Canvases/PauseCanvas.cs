@@ -6,29 +6,51 @@ using TMPro;
 
 public class PauseCanvas : MonoBehaviour, IUICanvasState
 {
+    private float _saveTimer;
+    private bool _countSaveCooldownTimer = false;
     [SerializeField] private Image _bgImage;
-    [SerializeField] private GameObject _blackBar, _resumeButton, _optionsButton, _exitButton;
-    private RectTransform _blackBarRect, _resumeRect, _optionsRect, _exitRect;
-    private float _resumeBtnStartingY, _optionsBtnStartingY, _exitBtnStartingY;
-    private CanvasGroup _canvasGroup, _resumeGroup, _optionsGroup, _exitGroup;
+    [SerializeField] private GameObject _blackBar, _resumeButton, _saveButton, _loadButton, _optionsButton, _exitButton;
+    private RectTransform _blackBarRect, _resumeRect, _saveRect, _loadRect, _optionsRect, _exitRect;
+    private float _resumeBtnStartingY, _saveBtnStartingY, _loadBtnStartingY, _optionsBtnStartingY, _exitBtnStartingY;
+    private CanvasGroup _canvasGroup, _resumeGroup, _saveGroup, _loadGroup, _optionsGroup, _exitGroup;
     private TweenParams _tweenParams = new TweenParams().SetUpdate(true).SetEase(Ease.OutBack);
+    private TextMeshProUGUI _saveText, _loadText;
 
 #region Unity Methods
     private void Awake() {
         _blackBarRect = _blackBar.GetComponent<RectTransform>();
 
         _resumeRect = _resumeButton.GetComponent<RectTransform>();
+        _saveRect = _saveButton.GetComponent<RectTransform>();
+        _loadRect = _loadButton.GetComponent<RectTransform>();
         _optionsRect = _optionsButton.GetComponent<RectTransform>();
         _exitRect = _exitButton.GetComponent<RectTransform>();
 
         _canvasGroup = GetComponent<CanvasGroup>();
         _resumeGroup = _resumeButton.GetComponent<CanvasGroup>();
+        _saveGroup = _saveButton.GetComponent<CanvasGroup>();
+        _loadGroup = _loadButton.GetComponent<CanvasGroup>();
         _optionsGroup = _optionsButton.GetComponent<CanvasGroup>();
         _exitGroup = _exitButton.GetComponent<CanvasGroup>();
         
         _resumeBtnStartingY = _resumeRect.anchoredPosition.y;
+        _saveBtnStartingY = _saveRect.anchoredPosition.y;
+        _loadBtnStartingY = _loadRect.anchoredPosition.y;
         _optionsBtnStartingY = _optionsRect.anchoredPosition.y;
         _exitBtnStartingY = _exitRect.anchoredPosition.y;
+
+        _saveText =  _saveButton.GetComponentInChildren<TextMeshProUGUI>();
+        _loadText =  _loadButton.GetComponentInChildren<TextMeshProUGUI>();
+
+        if(!SaveSystem.CheckIfSaveFileExists()) setTextDisabled(_loadText);
+    }
+    void Update()
+    {
+        if(_countSaveCooldownTimer && Time.time > _saveTimer) {
+            _countSaveCooldownTimer = false;
+            resetTextDecoration(_saveText);
+            resetTextDecoration(_loadText);
+        }
     }
     #endregion
     #region Public Methods
@@ -48,10 +70,16 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
         _blackBarRect.DOAnchorPosY(-1080, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutQuint).SetUpdate(true).OnComplete(() => {
             _resumeRect.DOAnchorPosY(_resumeBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
             _resumeGroup.DOFade(1, fadeSpeed).SetAs(_tweenParams).OnComplete(() => {
-                _optionsRect.DOAnchorPosY(_optionsBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
-                _optionsGroup.DOFade(1, fadeSpeed).SetAs(_tweenParams).OnComplete(() => {
-                    _exitRect.DOAnchorPosY(_exitBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
-                    _exitGroup.DOFade(1, fadeSpeed).SetAs(_tweenParams);
+                _saveRect.DOAnchorPosY(_saveBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
+                _saveGroup.DOFade(1, fadeSpeed).SetAs(_tweenParams).OnComplete(() => {
+                    _loadRect.DOAnchorPosY(_loadBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
+                    _loadGroup.DOFade(1, fadeSpeed).SetAs(_tweenParams).OnComplete(() => {
+                        _optionsRect.DOAnchorPosY(_optionsBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
+                        _optionsGroup.DOFade(1, fadeSpeed).SetAs(_tweenParams).OnComplete(() => {
+                            _exitRect.DOAnchorPosY(_exitBtnStartingY + 20, moveSpeed).SetAs(_tweenParams);
+                            _exitGroup.DOFade(1, fadeSpeed).SetAs(_tweenParams);
+                        });
+                    });
                 });
             });
         });
@@ -66,6 +94,14 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
 
 #endregion
 #region Private Methods
+    private void resetTextDecoration(TextMeshProUGUI text) {
+        text.color = Color.white;
+        text.fontStyle = FontStyles.Normal;
+    }
+    private void setTextDisabled(TextMeshProUGUI text) {
+        text.color = Color.gray;
+        text.fontStyle = FontStyles.Strikethrough;
+    }
     private Tween hideUI() {
         gameObject.SetActive(true);
         StopCoroutine(slowdownTime());
@@ -87,6 +123,10 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
         _bgImage.DOKill();
         _resumeRect.DOKill();
         _resumeGroup.DOKill();
+        _saveRect.DOKill();
+        _saveGroup.DOKill();
+        _loadRect.DOKill();
+        _loadGroup.DOKill();
         _optionsRect.DOKill();
         _optionsGroup.DOKill();
         _exitRect.DOKill();
@@ -95,12 +135,16 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
 
     private void resetBtnPositions() {
         _resumeRect.anchoredPosition = new Vector2(_resumeRect.anchoredPosition.x, _resumeBtnStartingY);
+        _saveRect.anchoredPosition = new Vector2(_saveRect.anchoredPosition.x, _saveBtnStartingY);
+        _loadRect.anchoredPosition = new Vector2(_loadRect.anchoredPosition.x, _loadBtnStartingY);
         _optionsRect.anchoredPosition = new Vector2(_optionsRect.anchoredPosition.x, _optionsBtnStartingY);
         _exitRect.anchoredPosition = new Vector2(_exitRect.anchoredPosition.x, _exitBtnStartingY);
     }
 
     private void resetBtnAlphas() {
         _resumeGroup.alpha = 0;
+        _saveGroup.alpha = 0;
+        _loadGroup.alpha = 0;
         _optionsGroup.alpha = 0;
         _exitGroup.alpha = 0;
     }
@@ -130,9 +174,28 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
     }  
 
+    public void OnSaveBtnClick() {
+        if(Time.time < _saveTimer)  return;
+        _saveTimer = Time.time + GameManager.Instance.SaveCooldown;
+        setTextDisabled(_saveText);
+        setTextDisabled(_loadText);
+        _countSaveCooldownTimer = true;
+        SaveSystem.Save();
+    }
+
+    public void OnLoadBtnClick() {
+        if(Time.time < _saveTimer)  return;
+        _saveTimer = Time.time + GameManager.Instance.SaveCooldown;
+        setTextDisabled(_saveText);
+        setTextDisabled(_loadText);
+        _countSaveCooldownTimer = true;
+        SaveSystem.Load();
+    }
+
     public void OnSettingsBtnClick() {
         Player.UICanvas.ChangeUITopState(UITopState.Settings);
     }
+
     public void OnExitBtnClick() {
         hideUI().OnComplete(() => {
             if(GameManager.Instance.CurrentDimension == Dimension.HUB) {
