@@ -30,8 +30,7 @@ public class SlashEdge : MonoBehaviour
         if(victim == null) return;
         _slashManager.HitEnemies.Add(other);
 
-
-        // victim.TakeDamage(Player.Instance.CurrentWeapon.ItemData.HeavyDamageMax, null);
+        victim.TakeDamage(SlashDamage, null);
     }
 
 

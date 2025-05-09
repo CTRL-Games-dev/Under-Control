@@ -23,10 +23,13 @@ public class CardsPanel : MonoBehaviour
         }
     }
     
-    private void OnCardClicked(Card runCard) {
-        GameObject card = Instantiate(_cardPrefab, _cardsParent);
-        CardUI cardUI = card.GetComponent<CardUI>();
-        cardUI.SetCard(runCard);
+    private void OnCardClicked(Card card) {
+        AddCard(card);
+    }
+    public void AddCard(Card card) {
+        GameObject cardGameobject = Instantiate(_cardPrefab, _cardsParent);
+        CardUI cardUI = cardGameobject.GetComponent<CardUI>();
+        cardUI.SetCard(card);
         cardUI.Setup();
         cardUI.IsInCollection = true;
         cardUI.RotateCard();
