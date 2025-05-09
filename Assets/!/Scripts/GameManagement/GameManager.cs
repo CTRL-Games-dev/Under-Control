@@ -60,6 +60,7 @@ public class GameManager : MonoBehaviour {
     public bool IsStarterDialogueOver = false;
 
     private void Awake()  {
+        UnityEngine.Random.InitState((int)DateTime.Now.TimeOfDay.TotalMilliseconds);
         _musicPlayer = GetComponent<MusicPlayer>();
         // SceneManager.sceneLoaded += OnLevelChange;
 
