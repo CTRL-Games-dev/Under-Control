@@ -21,6 +21,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
         _canvasGroup.alpha = 0;
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
+        _currentCards = new CardUI[_maxCards];
     }
 
     private void Start() {
@@ -144,6 +145,15 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
         _currentCards = null;
     }
 
+    public void ResetCardUI(){
+        if (_currentCards == null) return;
+        for (int i = 0; i < _currentCards.Length; i++) {
+            if (_currentCards[i] != null) {
+                _currentCards[i].DestroyCard();
+            }
+        }
+        _currentCards = null;
+    }
     public CardUI AddCard(Card runCard) {
         CardUI card = Instantiate(_cardPrefab, _cardsHolder.transform).GetComponent<CardUI>();
         card.SetCard(runCard);
