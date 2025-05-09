@@ -27,11 +27,6 @@ public class NoInventory : EntityInventory
         return false;
     }
     
-    public override bool FitsWithinBounds(Vector2Int position, Vector2Int size)
-    {
-        return false;
-    }
-
     public override InventoryItem GetInventoryItem(Vector2Int position)
     {
         return null;

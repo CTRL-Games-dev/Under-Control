@@ -16,6 +16,7 @@ public class CharmAttack : PlayerWeaponAttack {
     private void resetGuild() {
         if (_victim != null) {
             _victim.Guild = _previousGuild;
+            Debug.Log($"Resetting guild of {_victim.name} to {_previousGuild}");
             _victim.TintAnimator.ResetTint();
         }
     }
