@@ -282,6 +282,7 @@ public class Player : MonoBehaviour {
 
         _currentSpeed = Mathf.MoveTowards(_currentSpeed, getGoalSpeed(), getSpeedChange() * Time.deltaTime);
         CharacterController.SimpleMove(getGoalDirection() * _currentSpeed);
+
     }
 
     void FixedUpdate() {
@@ -876,8 +877,10 @@ public class Player : MonoBehaviour {
         GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
+        EventBus.InventoryItemChangedEvent?.Invoke();
 
-
+        Instance.UpdateEquipment();
+        
     }
 
     private void registerStats() {
