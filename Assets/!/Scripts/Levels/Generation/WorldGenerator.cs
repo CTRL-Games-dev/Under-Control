@@ -16,6 +16,7 @@ public enum CellType
 {
     Empty,
     Forest,
+    DeadZone,
 }
 
 public struct Grid
@@ -41,7 +42,7 @@ public class WorldGenerator : MonoBehaviour {
     [SerializeField] private GameObject _terrainChunkHolder;
     [HideInInspector] public List<Location> PlacedLocations = new();
 
-    public T Getlocation<T>()
+    public T GetLocation<T>()
     where T : Location
     {
         foreach(var l in PlacedLocations)
@@ -313,16 +314,18 @@ public class WorldGenerator : MonoBehaviour {
 
                     grid.Cells[x, y] = new WorldCell
                     {
-                        Type = CellType.Forest,
+                        Type = CellType.DeadZone,
                         WasPlaced = true
                     };
                 }
             }
 
+            int locationOffset = 12;
+
             // Dig out the actual location
-            for(int ix = 0; ix < (int)l.Width - 1; ix++)
+            for(int ix = -locationOffset; ix < (int)l.Width + locationOffset - 1; ix++)
             {
-                for (int iy = 0; iy < (int)l.Height - 1; iy++)
+                for (int iy = -locationOffset; iy < (int)l.Height + locationOffset - 1; iy++)
                 {
                     Vector2 pos = l.GetTopLeftCorner();
                     int x = (int)(pos.x + ix - grid.Offset.x);
@@ -330,7 +333,11 @@ public class WorldGenerator : MonoBehaviour {
 
                     // Debug.Log($"Index: {new Vector2(x, y)}");
 
-                    grid.Cells[x,y] = new WorldCell { Type = CellType.Empty, WasPlaced = true };
+                    if(ix >= 0 && ix < l.Width && iy >= 0 && iy < l.Height) {
+                        grid.Cells[x,y] = new WorldCell { Type = CellType.Empty, WasPlaced = true };   
+                    } else {
+                        grid.Cells[x,y] = new WorldCell { Type = CellType.Forest, WasPlaced = true };
+                    }
                 }
             }
         }
@@ -373,6 +380,8 @@ public class WorldGenerator : MonoBehaviour {
 
             int thickness = UnityEngine.Random.Range(10, 15);
 
+
+            int locationOffset = 12;
             if(point2.x != point1.x)
             {
                 float a = (point2.y - point1.y)/(point2.x - point1.x);
@@ -384,6 +393,7 @@ public class WorldGenerator : MonoBehaviour {
                 int ySymbol = a > 0 ? 1 : -1;
 
                 // Debug.LogFormat("yLen = {0}, a = {1}, b = {2}", yLength, a, b);
+
 
                 for(int ix = (int)Math.Floor(point1.x); ix < (int)Math.Floor(point2.x); ix++)
                 {
@@ -400,6 +410,17 @@ public class WorldGenerator : MonoBehaviour {
                             for(int ty = 0; ty < thickness; ty++)
                             {
                                 grid.Cells[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = new WorldCell { Type = CellType.Empty };
+                            }
+                        }
+
+                        for(int tx = -locationOffset; tx < thickness + locationOffset; tx++)
+                        {
+                            for(int ty = -locationOffset; ty < thickness + locationOffset; ty++)
+                            {
+                                WorldCell cell = grid.Cells[indexX+tx-(thickness/2),indexY+ty-(thickness/2)];
+                                if(cell.Type == CellType.DeadZone) {
+                                    grid.Cells[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = new WorldCell { Type = CellType.Forest };
+                                }
                             }
                         }
                     }
@@ -424,6 +445,16 @@ public class WorldGenerator : MonoBehaviour {
                         for (int ty = 0; ty < thickness; ty++)
                         {
                             grid.Cells[indexX + tx - (thickness / 2), indexY + ty - (thickness / 2)] = new WorldCell { Type = CellType.Empty };
+                        }
+                    }
+
+                    for(int tx = -locationOffset; tx < thickness + locationOffset; tx++)
+                    {
+                        for(int ty = -locationOffset; ty < thickness + locationOffset; ty++)
+                        {
+                            WorldCell cell = grid.Cells[indexX+tx-(thickness/2),indexY+ty-(thickness/2)];
+                            if(cell.Type == CellType.DeadZone)
+                                grid.Cells[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = new WorldCell { Type = CellType.Forest };
                         }
                     }
                 }
@@ -459,13 +490,29 @@ public class WorldGenerator : MonoBehaviour {
                 int gridPositionX = ix * spaceBetweenTrees;
                 int gridPositionY = iy * spaceBetweenTrees;
 
-                if(grid.Cells[gridPositionX, gridPositionY].Type != CellType.Forest) continue;
+                switch(grid.Cells[gridPositionX, gridPositionY].Type) {
+                    case CellType.Empty: continue; break;
+                    case CellType.Forest: {
+                        float worldPositionX = gridPositionX + grid.Offset.x;
+                        float worldPositionY = gridPositionY + grid.Offset.y;
 
-                float worldPositionX = gridPositionX + grid.Offset.x;
-                float worldPositionY = gridPositionY + grid.Offset.y;
+                        Location forestTilePrefab = forestTilePrefabs[UnityEngine.Random.Range(0, forestTilePrefabs.Length)];
+                        if(forestTilePrefab is ForestBorder borderPrefab) {
+                            Instantiate(borderPrefab, new Vector3(worldPositionX + 0.5f , 0, worldPositionY + 0.5f), Quaternion.identity, _terrainHolder.transform)
+                                .SetDeadZone(false);
+                        }
+                    } break;
+                    case CellType.DeadZone: {
+                        float worldPositionX = gridPositionX + grid.Offset.x;
+                        float worldPositionY = gridPositionY + grid.Offset.y;
 
-                Location forestTilePrefab = forestTilePrefabs[UnityEngine.Random.Range(0, forestTilePrefabs.Length)];
-                Instantiate(forestTilePrefab, new Vector3(worldPositionX + 0.5f , 0, worldPositionY + 0.5f), Quaternion.identity, _terrainHolder.transform);
+                        Location forestTilePrefab = forestTilePrefabs[UnityEngine.Random.Range(0, forestTilePrefabs.Length)];
+                        if(forestTilePrefab is ForestBorder borderPrefab) {
+                            Instantiate(borderPrefab, new Vector3(worldPositionX + 0.5f , 0, worldPositionY + 0.5f), Quaternion.identity, _terrainHolder.transform)
+                                .SetDeadZone(true);
+                        }
+                    } break;
+                }
             }
         }   
     }

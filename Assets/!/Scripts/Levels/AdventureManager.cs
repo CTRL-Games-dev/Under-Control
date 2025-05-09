@@ -12,16 +12,21 @@ public class AdventureManager : MonoBehaviour
     [SerializeField] private GameObject _player;
     [SerializeField] private NavMeshSurface _navMeshSurface;
     public WeaponItemData[] PossibleStartingItems;
-    
-    private void Start() {
+    private WorldGenerator _generator;
+    public static AdventureManager Instance;
+
+    void Awake() {
+        Instance = this;
+    }
+    void Start() {
         GameManager.Instance.LevelDepth++;
 
         Player.Instance.gameObject.SetActive(false);
 
-        var generator = GetComponent<WorldGenerator>();
-        generator.GenerateMap(GameManager.Instance.CurrentDimension);
+        _generator = GetComponent<WorldGenerator>();
+        _generator.GenerateMap(GameManager.Instance.CurrentDimension);
         
-        ForestPortalLocation portal = generator.Getlocation<ForestPortalLocation>();
+        ForestPortalLocation portal = _generator.GetLocation<ForestPortalLocation>();
 
         if(GameManager.Instance.LevelDepth == 1) {
             Vector3 weaponSpawnPosition = portal.transform.Find("ItemSpawn").position;
@@ -51,5 +56,17 @@ public class AdventureManager : MonoBehaviour
 
     private void sceneReady() {
         EventBus.SceneReadyEvent?.Invoke();
+    }
+
+    public static void ReturnPlayerToStart() {
+        ForestPortalLocation portal = Instance._generator.GetLocation<ForestPortalLocation>();
+
+        var pos = portal.LocationCenterInWorld;
+
+        Player.Instance.SetPlayerPosition(new Vector3(pos.x, 1, pos.y));
+        Player.LivingEntity.TakeDamage(new Damage {
+            Type = DamageType.TRUE_DAMAGE,
+            Value = 33,
+        });
     }
 }
