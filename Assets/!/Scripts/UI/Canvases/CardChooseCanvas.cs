@@ -12,6 +12,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private TextLocalizer _longDescTextLocalizer;
     [SerializeField] private ContentSizeFitter  _contentSizeFitter;
     [SerializeField] private int _maxCards = 3;
+    [SerializeField] private AudioClip CardSoundClip;
 
     private CanvasGroup _canvasGroup;
     private CardUI[] _currentCards;
@@ -96,6 +97,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
         yield return new WaitForSeconds(0.2f);
 
         foreach (CardUI card in _currentCards) {
+            SoundFXManager.Instance.PlaySoundFXClip(CardSoundClip,transform);
             card.RotateCard();
             yield return new WaitForSeconds(0.25f);
         }

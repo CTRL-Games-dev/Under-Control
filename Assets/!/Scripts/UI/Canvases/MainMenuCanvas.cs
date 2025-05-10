@@ -135,28 +135,38 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         _exitRect.anchoredPosition = new Vector2(_exitBtnStartingX +50, _exitRect.anchoredPosition.y);
     }
 
+    public void playClickSound(){
+        AudioClip InvClickClip = Resources.Load("NEWSFX/UI/ClickEdited") as AudioClip;
+        SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform);
+    }
+
     public void OnContinueGameBtnClick() {
         if(!File.Exists(SaveSystem.SaveFileName())) return;
+        playClickSound();
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
         SaveSystem.LoadGame();
     }
 
     public void OnNewGameBtnClick() {
+        playClickSound();
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         Player.Instance.transform.position = Player.Instance.StartPosition;
         Player.Instance.PlayRespawnAnimation();
     }
 
     public void OnSettingsBtnClick() {
+        playClickSound();
         Player.UICanvas.ChangeUITopState(UITopState.Settings);
     }
 
     public void OnCreditsBtnClick() {
+        playClickSound();
         Debug.Log("BY Ctrl Games");
     }
 
     public void OnExitBtnClick() {
+        playClickSound();
         Application.Quit();
     }
 
