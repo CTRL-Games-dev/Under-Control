@@ -38,6 +38,10 @@ public class Pinecone : MonoBehaviour {
             Value = Random.Range(MinDamage, MaxDamage)
         });
 
+        if(entity.IsPlayer) {
+            CameraManager.ShakeCamera(7, 0.35f);
+        }
+
         Destroy(gameObject);
     }
 }

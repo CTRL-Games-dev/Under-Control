@@ -33,7 +33,7 @@ public class LivingEntity : MonoBehaviour {
         get => _health;
         set {
             _health = value;
-            if (_isPlayer) Player.UICanvas.HUDCanvas.UpdateHealthBar();
+            if (IsPlayer) Player.UICanvas.HUDCanvas.UpdateHealthBar();
         }
     }
    
@@ -43,7 +43,7 @@ public class LivingEntity : MonoBehaviour {
         get => _mana;
         set {
             _mana = value;
-            if (_isPlayer) Player.UICanvas.HUDCanvas.UpdateManaBar();
+            if (IsPlayer) Player.UICanvas.HUDCanvas.UpdateManaBar();
         }
     }
    
@@ -83,7 +83,9 @@ public class LivingEntity : MonoBehaviour {
     public TintAnimator TintAnimator { get; private set; }
     private Animator _animator;
 
-    public bool _isPlayer = false;
+    [SerializeField]
+    private bool _isPlayer = false;
+    public bool IsPlayer { get => _isPlayer; private set => _isPlayer = value; }
 
     void Awake() {
         _animator = GetComponent<Animator>();
@@ -97,12 +99,12 @@ public class LivingEntity : MonoBehaviour {
         ModifierSystem.RegisterStat(ref MovementSpeed);
         ModifierSystem.RegisterStat(ref MaxMana);
  
-        _isPlayer = gameObject.GetComponent<Player>() != null;
+        IsPlayer = gameObject.GetComponent<Player>() != null;
         _health = StartingHealth;
         _mana = StartingMana;
         
 
-        if (_isPlayer) {
+        if (IsPlayer) {
             MaxHealth.OnValueChanged.AddListener(() => Player.UICanvas.HUDCanvas.UpdateHealthBar());
             MaxMana.OnValueChanged.AddListener(() => Player.UICanvas.HUDCanvas.UpdateManaBar());
         }
@@ -135,7 +137,7 @@ public class LivingEntity : MonoBehaviour {
     }
 
     public void TakeDamage(Damage damage, LivingEntity source = null) {
-        if (_isPlayer) {
+        if (IsPlayer) {
             if (Player.Instance.DamageDisabled) {
                 return;
             }

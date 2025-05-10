@@ -22,8 +22,7 @@ public class TreeBossController : MonoBehaviour {
         _behaviorGraphAgent = GetComponent<BehaviorGraphAgent>();
     }
 
-    public void Start()
-    {
+    public void Start() {
         CameraManager.SwitchCamera(Player.Instance.TopDownCamera);
     }
 
@@ -50,7 +49,7 @@ public class TreeBossController : MonoBehaviour {
     }
 
     public void OnPineconeThrow() {
-        CameraManager.ShakeCamera(1, 0.5f);
+        CameraManager.ShakeCamera(1, 0.3f);
       
         Vector3 targetSpeed = (_target.transform.position - _targetStartingPosition) / (Time.time - _targetStartingPositionTime);
 
@@ -58,7 +57,7 @@ public class TreeBossController : MonoBehaviour {
             PineconeSpawner.transform.position,
             _target.transform.position + Vector3.up,
             targetSpeed,
-            20
+            15
         );
 
         Vector3 direction = (predictedPlayerPosition - PineconeSpawner.transform.position).normalized;
@@ -86,10 +85,10 @@ public class TreeBossController : MonoBehaviour {
         RootAttack1.transform.rotation = Quaternion.LookRotation(direction);
         RootAttack1.Attack();
 
-        RootAttack2.transform.rotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, Random.Range(15, 75), 0);
+        RootAttack2.transform.rotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, Random.Range(10, 60), 0);
         RootAttack2.Attack();
 
-        RootAttack3.transform.rotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, Random.Range(-15, -75), 0);
+        RootAttack3.transform.rotation = Quaternion.LookRotation(direction) * Quaternion.Euler(0, Random.Range(-10, -60), 0);
         RootAttack3.Attack();
     }
 

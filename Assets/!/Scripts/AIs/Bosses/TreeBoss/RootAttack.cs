@@ -26,6 +26,10 @@ public class RootAttack : MonoBehaviour {
             Type = DamageType.PHYSICAL,
             Value = Random.Range(MinDamage, MaxDamage)
         });
+
+        if(entity.IsPlayer) {
+            CameraManager.ShakeCamera(7, 0.35f);
+        }
     }
 
     public void Attack() {
