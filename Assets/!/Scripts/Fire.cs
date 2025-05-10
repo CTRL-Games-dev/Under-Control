@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class Fire : MonoBehaviour {
     public static List<float> DamageOverStacks = new List<float> {
@@ -11,10 +12,16 @@ public class Fire : MonoBehaviour {
     public int Stacks = 0;
 
     private LivingEntity _self;
+    private VisualEffect _fireVFX;
 
     void Start() {
         _self = GetComponent<LivingEntity>();
+        
         _self.TintAnimator.SetTint(Color.red, 0.5f);
+
+        _fireVFX = Instantiate(GameManager.Instance.FireEffectPrefab, gameObject.transform);
+
+        _fireVFX.Play();
     }
 
     public void Stack() {
@@ -26,6 +33,7 @@ public class Fire : MonoBehaviour {
 
         if(Stacks <= 0) {
             _self.TintAnimator.ResetTint();
+            Destroy(_fireVFX.gameObject);
             Destroy(this);
         }
     }

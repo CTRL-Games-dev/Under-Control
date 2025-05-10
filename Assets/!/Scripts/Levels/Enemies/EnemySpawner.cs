@@ -12,6 +12,8 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private EnemySpawnExit _enemySpawnerExitPrefab;
     [SerializeField] private EntAIController _entPrefab;
     public int MaxExitsAtOnce = 1;
+    public int MaxNumberOfWaves = 1;
+    public int MinNumberOfWaves = 1;
     public List<WaveInfo> Waves;
     enum SpawnerState
     {
@@ -29,7 +31,8 @@ public class EnemySpawner : MonoBehaviour
     private GameObject _enemies;
     [HideInInspector] public List<Transform> SpawnPoints;
     [HideInInspector] public int NumberOfEnemies { get; private set; }
-    [HideInInspector] public int WaveNumber = 0;
+    private int _waveNumber = 0;
+    private int _numberOfWaves = 0;
     public UnityEvent DefeatedEnemies;
     void Awake()
     {
@@ -105,12 +108,16 @@ public class EnemySpawner : MonoBehaviour
     private void startFight()
     {
         spawnWalls();
+
+        _numberOfWaves = UnityEngine.Random.Range(MinNumberOfWaves, MaxNumberOfWaves + 1);
+        _waveNumber = 0;
+
         _state = SpawnerState.DuringFight;
     } 
 
     private void duringFight()
     {
-        if(NumberOfEnemies == 0 && Waves.Count == WaveNumber)
+        if(NumberOfEnemies == 0 && _numberOfWaves == _waveNumber)
         {
             Debug.Log("Last wave has ended");
             _state = SpawnerState.TriggerEnts;
@@ -119,38 +126,30 @@ public class EnemySpawner : MonoBehaviour
 
         if(NumberOfEnemies != 0) return;
 
-        WaveInfo currentWave = Waves[WaveNumber];
-        WaveNumber++;
+        Debug.Log("=== Starting new wave ===");
 
-        int newNumberOfEnemies = UnityEngine.Random.Range(currentWave.MinEnemies, currentWave.MaxEnemies + 1);
+        float influence = GameManager.Instance.TotalInfluence;
 
-        Debug.Log($"Number of all enemies enemies: {newNumberOfEnemies}");
-        Debug.Log($"=== Wave {WaveNumber} ===");
+        List<WaveInfo> shuffledWaves = FluffyUtils.ShuffleList(Waves);
+        WaveInfo currentWave = shuffledWaves
+            .Where(x => x.MinInfluence <= influence && x.MaxInfluence >= influence)
+            .First();
+        _waveNumber++;
 
-        var currentEnemies = currentWave.EnemyInfo
-            .Where(x => x.minInfluence <= GameManager.Instance.TotalInfluence)
-            .Where(x => x.maxInfluence >= GameManager.Instance.TotalInfluence)
-            .ToList();
+        Debug.Log($"Number of enemies: {currentWave.EnemyPrefabs.Count()}");
+        NumberOfEnemies = currentWave.EnemyPrefabs.Count();
 
-        if(currentEnemies.Count == 0) {
-            Debug.LogWarning("No Enemies in wave");
-            return;
-        }
-
-        NumberOfEnemies = newNumberOfEnemies;
-
-        for(int i = 0; i < NumberOfEnemies; i++)
+        for(int i = 0; i < currentWave.EnemyPrefabs.Count(); i++)
         {
             List<Transform> randomSpawnPoints = FluffyUtils.ShuffleList(SpawnPoints)
                 .Select(x=>x)
                 .Take(MaxExitsAtOnce)
                 .ToList();
 
+            GameObject enemy = currentWave.EnemyPrefabs[i];
+
             int batch = i / randomSpawnPoints.Count;
             Transform spawnPoint = randomSpawnPoints[i%randomSpawnPoints.Count];
-
-            int randomIndex = UnityEngine.Random.Range(0, currentEnemies.Count);
-            EnemySpawnInfo enemy = currentEnemies[randomIndex];
 
             float firstBatchDelay = 3f;
             float delayBetweenEach = 1f;
@@ -158,7 +157,7 @@ public class EnemySpawner : MonoBehaviour
             // Total delay = initial delay + time based on batch index
             float totalSmokeDelay = firstBatchDelay + (batch * delayBetweenEach);
 
-            StartCoroutine(spawnEnemy(enemy.EnemyPrefab, spawnPoint.position, totalSmokeDelay, delayBetweenEach));
+            StartCoroutine(spawnEnemy(enemy, spawnPoint.position, totalSmokeDelay, delayBetweenEach));
         }
     }
 

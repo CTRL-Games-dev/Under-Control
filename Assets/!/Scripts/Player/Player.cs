@@ -90,6 +90,8 @@ public class Player : MonoBehaviour {
     public bool DamageDisabled = false;
     [SerializeField] private Material _dissolveMaterial;
     public Vector3 StartPosition;
+    [SerializeField] private AudioClip _walkingSound;
+    private AudioSource _walkingAudioSource;
 
     public int _evolutionPoints = 0;
     public int EvolutionPoints {
@@ -231,11 +233,7 @@ public class Player : MonoBehaviour {
 
         StartPosition = transform.position;
 
-        OnEvolutionSelected.AddListener((evoUI) => {
-            foreach (Modifier modifier in evoUI.GetModifiers()) {
-                LivingEntity.ApplyIndefiniteModifier(modifier);
-            }
-        });
+        OnEvolutionSelected.AddListener(x => ApplyEvolution(x));
 
         LivingEntity.OnDamageTaken.AddListener((data) => {
             CameraManager.ShakeCamera(2, 0.1f);
@@ -247,6 +245,10 @@ public class Player : MonoBehaviour {
     }
 
     void Start() {
+        _walkingAudioSource = gameObject.GetComponent<AudioSource>();
+        _walkingAudioSource.clip = _walkingSound;
+        _walkingAudioSource.loop = true;
+        _walkingAudioSource.playOnAwake = false;
         if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
             WeaponHolder.UpdateWeapon(CurrentWeapon);
         }
@@ -271,7 +273,6 @@ public class Player : MonoBehaviour {
         OnDashSound =  Resources.Load("SFX/bohater/dash") as AudioClip;
 
         ResetRun();
-        // ResetRun();
     }
 
     void Update() {
@@ -281,6 +282,15 @@ public class Player : MonoBehaviour {
         handleRotation();
 
         _currentSpeed = Mathf.MoveTowards(_currentSpeed, getGoalSpeed(), getSpeedChange() * Time.deltaTime);
+        if (_currentSpeed > 0.1f) {
+            if (!_walkingAudioSource.isPlaying && _walkingSound != null) {
+                _walkingAudioSource.Play();
+            }
+        } else {
+            if (_walkingAudioSource.isPlaying) {
+                _walkingAudioSource.Stop();
+            }
+        }
         CharacterController.SimpleMove(getGoalDirection() * _currentSpeed);
 
     }
@@ -682,7 +692,7 @@ public class Player : MonoBehaviour {
 
     public void OnInventoryChanged() {
         UpdateEquipment();
-        EventBus.InventoryItemChangedEvent.Invoke();
+        
     }
     public void UpdateEquipment(){
         WeaponHolder.UpdateWeapon(CurrentWeapon);
@@ -692,6 +702,7 @@ public class Player : MonoBehaviour {
             Debug.Log(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
             SlashManager.SetSlashColor(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
         } 
+        EventBus.InventoryItemChangedEvent.Invoke();
     }
 
     public Vector3 GetMousePosition() {
@@ -870,11 +881,16 @@ public class Player : MonoBehaviour {
         WeaponHolder.UpdateWeapon(null);
         WeaponHolder.DisableHitbox();
         WeaponHolder.EndAttack();
-        Player.UICanvas.HUDCanvas.UpdateSpellSlots();
-        Player.UICanvas.HUDCanvas.UpdateHealthBar();
-        Player.UICanvas.HUDCanvas.UpdateManaBar();
-        Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+        UICanvas.HUDCanvas.UpdateSpellSlots();
+        UICanvas.HUDCanvas.UpdateHealthBar();
+        UICanvas.HUDCanvas.UpdateManaBar();
+        UICanvas.HUDCanvas.OnUpdateConsumables();
+        UICanvas.ChooseCanvas.ResetCardUI();
         // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+        GameManager.Instance.ResetCards();
+        GameManager.Instance.ResetInfluence();
+        GameManager.Instance.ResetCardChoice();
+        GameManager.Instance.RandomCardCount = 3;
         // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         EventBus.InventoryItemChangedEvent?.Invoke();
@@ -896,6 +912,22 @@ public class Player : MonoBehaviour {
         ModifierSystem.RegisterStat(ref DashSpeedMultiplier);
         ModifierSystem.RegisterStat(ref DashCooldown);
         ModifierSystem.RegisterStat(ref DashDuration);
+    }
+    public void ApplyEvolution(EvoUI evoUI) {
+        switch (evoUI.ElementalType) {
+            case ElementalType.Fire:
+            case ElementalType.Ice:
+                foreach (Modifier modifier in evoUI.GetModifiers()) {
+                    LivingEntity.ApplyIndefiniteModifier(modifier);
+                }
+                break;
+            case ElementalType.Earth:
+                GameManager.Instance.RandomCardCount++;
+                break;
+        }
+        LivingEntity.Health = LivingEntity.MaxHealth;
+        LivingEntity.Mana = LivingEntity.MaxMana;
+         
     }
 
     public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
@@ -952,18 +984,29 @@ public class Player : MonoBehaviour {
     public void Save(ref PlayerSaveData data){
         data.EvolutionPoints = EvolutionPoints;
         data.SelectedEvolutions = SelectedEvolutions;
+        data.ConsumableItemOne = ConsumableItemOne;
+        data.ConsumableItemTwo = ConsumableItemTwo;
+        data.Health = Health;
+        data.Mana = Mana;
     }
     public void Load(PlayerSaveData data){
         EvolutionPoints = data.EvolutionPoints;
         foreach(EvoUI evolution in data.SelectedEvolutions){
             evolution.AddEvolution();   
         }
+        ConsumableItemOne = data.ConsumableItemOne;
+        ConsumableItemTwo = data.ConsumableItemTwo;
+        LivingEntity.Health = data.Health;
+        LivingEntity.Mana = data.Mana;
     }
     [Serializable]
     public struct PlayerSaveData{
+        public float Health;
+        public float Mana;
         public List<EvoUI> SelectedEvolutions;
         public int EvolutionPoints;
-
+        public InventoryItem<ConsumableItemData> ConsumableItemOne;
+        public InventoryItem<ConsumableItemData> ConsumableItemTwo;
     }
     #endregion
 }

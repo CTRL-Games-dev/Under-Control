@@ -43,6 +43,8 @@ public class WeaponHolder : MonoBehaviour {
         }
 
         _currentWeaponHitter.OnHit.AddListener(OnHit);
+
+        DisableHitbox();
     }
 
     public void UpdateWeapon(WeaponItemData weaponData, float powerScale = 1) {

@@ -105,6 +105,8 @@ public class CardUI : MonoBehaviour
     }
 
     public void OnPointerEnter() {
+        var InvClickClip = Resources.Load($"NEWSFX/hihatdmg") as AudioClip;  
+        SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform);
         _rectTransform.DOScale(Vector3.one * 1.1f, 0.3f * Settings.AnimationSpeed);
         if (IsInCollection) {
             Player.UICanvas.InventoryCanvas.CardsPanel.ShowMoreInfo(_card);

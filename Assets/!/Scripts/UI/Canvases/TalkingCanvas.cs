@@ -15,7 +15,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private TextLocalizer _nameTextLocalizer, _dialogueTextLocalizer;
     [SerializeField] private TMP_InputField _inputField;
     [SerializeField] private GameObject _confirmButton;
-
+ 
     private bool _isTalking = false;
 
     private int _currentDialogueIndex = 0;
@@ -132,12 +132,13 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     private IEnumerator animateText() {
         _isTalking = true;
         _dialogueText.text = string.Empty;
-
+        bool SkipNextOne = true;
         foreach (char letter in _goalString.ToCharArray()) {
             _dialogueText.text += letter;
             float _letterInterval;
             if (letter == ' ') {
                 _letterInterval = 0.05f;
+                
             }
             else if (letter == '.' || letter == ',' || letter == ';' || letter == ':') {
                 _letterInterval = 0.2f;
@@ -146,7 +147,18 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
                 _letterInterval = 0.3f;
             }
             else {
-                _letterInterval = Mathf.Clamp(_textSpeed / _goalString.Length, 0.02f, 0.07f);
+                if(SkipNextOne){
+                    var InvClickClip = Resources.Load($"NEWSFX/ALPHABET/FASTER/{char.ToLower(letter)}") as AudioClip;  
+                    if(InvClickClip != null) {
+                        if(_dialogue.DialogueEntries[_currentDialogueIndex].IsPlayer){
+                            SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform, 1f, 1.2f);
+                        } else {
+                            SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform, 1f);
+                        }
+                    }
+                }
+                _letterInterval = Mathf.Clamp(_textSpeed / _goalString.Length, 0.02f, 0.03f);
+
             }
 
             yield return new WaitForSeconds(_letterInterval);
