@@ -11,7 +11,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private CanvasGroup _longDescCanvasGroup;
     [SerializeField] private TextLocalizer _longDescTextLocalizer;
     [SerializeField] private ContentSizeFitter  _contentSizeFitter;
-    [SerializeField] private int _maxCards = 3;
+    private int _maxCards => GameManager.Instance.RandomCardCount;
     [SerializeField] private AudioClip CardSoundClip;
 
     private CanvasGroup _canvasGroup;

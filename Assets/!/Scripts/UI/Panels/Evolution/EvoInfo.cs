@@ -4,18 +4,40 @@ using DG.Tweening;
 using UnityEngine.UI;
 
 
-
+public enum Tiers{
+    Tier1,
+    Tier2,
+    Tier3
+}
 public class EvoInfo : MonoBehaviour
 {
-    [SerializeField] private TextLocalizer _titleTextLocalizer, _descText;
-    [SerializeField] private TextMeshProUGUI _titleText;
+    [SerializeField] private TextLocalizer _titleTextLocalizer, _descText, _flavorText;
+    [SerializeField] private TextMeshProUGUI _titleText, _tierText;
     [SerializeField] private Image _outlineImg, _barImg;
     [SerializeField] private RectTransform _barRect;
+    [SerializeField] private Color _tier1Color = new(0.749f, 0.431f, 0);
+    [SerializeField] private Color _tier2Color = new(0.82f, 0.82f, 0.82f);
+    [SerializeField] private Color _tier3Color = new(1f, 0.941f, 0.243f);
     private ElementalType _currentEvoType;
 
-    public void SetInfo(string title, string desc, ElementalType elementalType) {
+    public void SetInfo(string title, string desc, string flavor, Tiers tier, ElementalType elementalType) {
         _titleTextLocalizer.Key = title;
         _descText.Key = desc;
+        _flavorText.Key = flavor;
+        switch(tier) {
+            case Tiers.Tier1:
+                _tierText.text = "Tier 1";
+                _tierText.color = _tier1Color;
+                break;
+            case Tiers.Tier2:
+                _tierText.text = "Tier 2";
+                _tierText.color = _tier2Color;
+                break;
+            case Tiers.Tier3:
+                _tierText.text = "Tier 3";
+                _tierText.color = _tier3Color;
+                break;
+        }
 
         _titleText.DOKill();
         _outlineImg.DOKill();
