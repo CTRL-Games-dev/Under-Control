@@ -2105,6 +2105,7 @@ MonoBehaviour:
   _dialogueText: {fileID: 131154125}
   _dialogueTextLocalizer: {fileID: 131154123}
   _textSpeed: 1
+  _faceAnimator: {fileID: 778315060648287425}
 --- !u!1 &389600442
 GameObject:
   m_ObjectHideFlags: 0
@@ -2155,18 +2156,21 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 30302cd9a48714e4b99fa83f76660d61, type: 2}
   - {fileID: 11400000, guid: 272ebe9c57661a445928d427918981f6, type: 2}
   - {fileID: 11400000, guid: b2527a1ad7e954873ad230d31a1c6965, type: 2}
-  _dialogues:
-  - {fileID: 11400000, guid: 6be5099ad2266384a995a24eb98fbb21, type: 2}
-  - {fileID: 11400000, guid: 80939e4d565a68844a5b8613af9972d6, type: 2}
-  - {fileID: 11400000, guid: 57af321129a42b5db9d29c75b7470558, type: 2}
-  - {fileID: 11400000, guid: 7b318015d73db7f98bfcecfcb58179fc, type: 2}
-  - {fileID: 11400000, guid: 18690c7db65a32540a93c4c40ec12804, type: 2}
-  - {fileID: 11400000, guid: 3e9677dfb83cf34deb82c65bd0804b68, type: 2}
-  - {fileID: 11400000, guid: 64b0b532d7466a6ac84b53aa496844db, type: 2}
   _talkingCanvas: {fileID: 383995775}
   _faceAnimator: {fileID: 778315060648287425}
   _faceImage: {fileID: 8400000, guid: ccf9a14e734805446ba19d749d50c71c, type: 2}
   _nameKey: 
+  _dialogues:
+  - TextKey: dlg_tut_intro_key
+    State: 1
+  - TextKey: dlg_tut_pickupsword_key
+    State: 2
+  - TextKey: dlg_tut_killboar_key
+    State: 3
+  - TextKey: dlg_tut_goportal_key
+    State: 4
+  - TextKey: 
+    State: 5
 --- !u!1001 &405522439
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11621,7 +11625,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1703127760
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11710,6 +11714,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _languageChooseCanvasGroup: {fileID: 1703127763}
+  LanguageChooseEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &1720973634
 PrefabInstance:
   m_ObjectHideFlags: 0

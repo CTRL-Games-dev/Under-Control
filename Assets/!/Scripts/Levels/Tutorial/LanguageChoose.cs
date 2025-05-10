@@ -1,10 +1,12 @@
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.Events;
 
 public class LanguageChoose : MonoBehaviour
 {
     [SerializeField] private CanvasGroup _languageChooseCanvasGroup;
     private bool _languageChoosen = false;
+    public UnityEvent LanguageChooseEvent;
 
     public void OnBtnPointerEnter(RectTransform rect) {
         if (_languageChoosen) return;
@@ -26,7 +28,7 @@ public class LanguageChoose : MonoBehaviour
             rect.DOScale(1, 0.1f).SetEase(Ease.OutBack).SetUpdate(true).OnComplete(() => {
                 _languageChooseCanvasGroup.DOFade(0, 0.2f).SetUpdate(true).OnComplete(() => {
                     _languageChooseCanvasGroup.gameObject.SetActive(false);
-                    Player.Animator.SetTrigger("wakeup");
+                    LanguageChooseEvent?.Invoke();
                 });
             });
         });
