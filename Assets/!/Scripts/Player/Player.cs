@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using FMOD.Studio;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Animator))]
@@ -90,8 +91,9 @@ public class Player : MonoBehaviour {
     public bool DamageDisabled = false;
     [SerializeField] private Material _dissolveMaterial;
     public Vector3 StartPosition;
-    [SerializeField] private AudioClip _walkingSound;
-    private AudioSource _walkingAudioSource;
+
+    //Audio
+    private EventInstance _PlayerWalkSound;
 
     public int _evolutionPoints = 0;
     public int EvolutionPoints {
@@ -249,10 +251,7 @@ public class Player : MonoBehaviour {
     }
 
     void Start() {
-        _walkingAudioSource = gameObject.GetComponent<AudioSource>();
-        _walkingAudioSource.clip = _walkingSound;
-        _walkingAudioSource.loop = true;
-        _walkingAudioSource.playOnAwake = false;
+        _PlayerWalkSound = AudioManager.instance.CreateEventInstance(FMODEvents.instance._PlayerWalkSound);
         if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
             WeaponHolder.UpdateWeapon(CurrentWeapon);
         }
@@ -279,33 +278,40 @@ public class Player : MonoBehaviour {
         ResetRun();
     }
 
-    void Update() {
-        if (UpdateDisabled) return;
+void Update() {
+    if (UpdateDisabled) return;
 
-        handleInteraction();
-        handleRotation();
+    handleInteraction();
+    handleRotation();
 
-        _currentSpeed = Mathf.MoveTowards(_currentSpeed, getGoalSpeed(), getSpeedChange() * Time.deltaTime);
+    _currentSpeed = Mathf.MoveTowards(_currentSpeed, getGoalSpeed(), getSpeedChange() * Time.deltaTime);
+    CharacterController.SimpleMove(getGoalDirection() * _currentSpeed);
+
+    if (_PlayerWalkSound.isValid()) {
+        _PlayerWalkSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(transform.position));
+
+        FMOD.Studio.PLAYBACK_STATE playbackState;
+        _PlayerWalkSound.getPlaybackState(out playbackState);
+
         if (_currentSpeed > 0.1f) {
-            if (!_walkingAudioSource.isPlaying && _walkingSound != null) {
-                _walkingAudioSource.Play();
+            if (playbackState == FMOD.Studio.PLAYBACK_STATE.STOPPED || playbackState == FMOD.Studio.PLAYBACK_STATE.STOPPING) {
+                _PlayerWalkSound.start();
             }
         } else {
-            if (_walkingAudioSource.isPlaying) {
-                _walkingAudioSource.Stop();
+            if (playbackState == FMOD.Studio.PLAYBACK_STATE.PLAYING) {
+                _PlayerWalkSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
             }
         }
-        CharacterController.SimpleMove(getGoalDirection() * _currentSpeed);
-
     }
+}
 
     void FixedUpdate() {
         // Magiczna liczba to predkosc animacji biegu
         Animator.SetFloat(_speedHash, _currentSpeed / MovementSpeed);
         Animator.SetFloat(_lightAttackSpeedHash, LightAttackSpeed);
         Animator.SetFloat(_heavyAttackSpeedHash, HeavyAttackSpeed);
-
         ModifierSystem.GetActiveModifiers();
+
     }
 
     #endregion
@@ -559,7 +565,6 @@ public class Player : MonoBehaviour {
         foreach (ParticleSystem trail in _trailParticles) { trail.Play(); }
 
         CurrentAnimationState = AnimationState.Dash;
-        SoundFXManager.Instance.PlaySoundFXClip(OnDashSound, transform,1.2f);
         
 
         // UpdateDisabled = true;
@@ -925,7 +930,11 @@ public class Player : MonoBehaviour {
         UpdateDisabled = false;
         gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
+
+
+
     public void PlayRespawnAnimation() {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance._RespawnSound, this.transform.position);
         Animator.animatePhysics = false;
         UpdateDisabled = true;
         transform.position = StartPosition - Vector3.up * 3f;
@@ -996,4 +1005,5 @@ public class Player : MonoBehaviour {
         public InventoryItem<ConsumableItemData> ConsumableItemTwo;
     }
     #endregion
+    
 }

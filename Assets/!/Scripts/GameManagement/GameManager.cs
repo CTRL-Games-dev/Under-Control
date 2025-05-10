@@ -5,14 +5,13 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.VFX;
 
-[RequireComponent(typeof(MusicPlayer))]
 public class GameManager : MonoBehaviour {
 
-    [Serializable]
-    public struct DimensionMusic {
-        public Dimension Dimension;
-        public AudioClip[] Clips;
-    }
+    // [Serializable]
+    // public struct DimensionMusic {
+    //     public Dimension Dimension;
+    //     public AudioClip[] Clips;
+    // }
 
     // New struct for ambient sounds per dimension
     [Serializable]
@@ -53,14 +52,14 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public float LevelDepth = 0;
     public bool ShowMainMenu = true;
 
-    [Header("Music")]
-    public DimensionMusic[] MusicPalette;
-    private MusicPlayer _musicPlayer;
+    // [Header("Music")]
+    // public DimensionMusic[] MusicPalette;
+    // private MusicPlayer _musicPlayer;
 
-    [Header("Ambient")]
-    // Changed to use DimensionAmbient
-    public DimensionAmbient[] AmbientPalette;
-    private List<AudioSource> ambientAudioSources = new List<AudioSource>();
+    // [Header("Ambient")]
+    // // Changed to use DimensionAmbient
+    // public DimensionAmbient[] AmbientPalette;
+    // private List<AudioSource> ambientAudioSources = new List<AudioSource>();
 
     [Header("State")]
     [HideInInspector] private List<Card> _alreadyAddedCards = new();
@@ -75,7 +74,7 @@ public class GameManager : MonoBehaviour {
     public bool IsStarterDialogueOver = false;
 
     private void Awake()  {
-        _musicPlayer = GetComponent<MusicPlayer>();
+        // _musicPlayer = GetComponent<MusicPlayer>();
         // SceneManager.sceneLoaded += OnLevelChange;
 
         if(Instance == null) {
@@ -101,8 +100,8 @@ public class GameManager : MonoBehaviour {
     }
 
     private void Start() {
-        playMusicForDimension(CurrentDimension);
-        playAmbientForDimension(CurrentDimension);
+        // playMusicForDimension(CurrentDimension);
+        // playAmbientForDimension(CurrentDimension);
         // For some reason "scene change" is being called, even if it is the first scene?
         // ConnectPortals();
     }
@@ -132,44 +131,44 @@ public class GameManager : MonoBehaviour {
         Debug.Log("Loading new scene: " + CurrentDimension.ToString());
         LoadingScreen.LoadScene(SceneDictionary[CurrentDimension]);
 
-        playMusicForDimension(dimension);
-        playAmbientForDimension(dimension);
+        // playMusicForDimension(dimension);
+        // playAmbientForDimension(dimension);
     }
 
-    private void playMusicForDimension(Dimension dimension) {
-        _musicPlayer.Stop();
+    // private void playMusicForDimension(Dimension dimension) {
+    //     _musicPlayer.Stop();
 
-        int dimensionMusicIndex = Array.FindIndex(MusicPalette, x => x.Dimension == dimension);
-        if(dimensionMusicIndex != -1) {
-            _musicPlayer.MusicClips = MusicPalette[dimensionMusicIndex].Clips;
-            _musicPlayer.Play();
-        }
-    }
+    //     int dimensionMusicIndex = Array.FindIndex(MusicPalette, x => x.Dimension == dimension);
+    //     if(dimensionMusicIndex != -1) {
+    //         _musicPlayer.MusicClips = MusicPalette[dimensionMusicIndex].Clips;
+    //         _musicPlayer.Play();
+    //     }
+    // }
 
     // New method to play ambient sounds for a specific dimension.
     // All the clips defined for that dimension are played concurrently.
-    private void playAmbientForDimension(Dimension dimension) {
-        // Stop previous ambient sounds
-        foreach(var source in ambientAudioSources) {
-            source.Stop();
-            Destroy(source.gameObject);
-        }
-        ambientAudioSources.Clear();
+    // private void playAmbientForDimension(Dimension dimension) {
+    //     // Stop previous ambient sounds
+    //     foreach(var source in ambientAudioSources) {
+    //         source.Stop();
+    //         Destroy(source.gameObject);
+    //     }
+    //     ambientAudioSources.Clear();
 
-        int index = Array.FindIndex(AmbientPalette, a => a.Dimension == dimension);
-        if(index != -1) {
-            foreach(var clip in AmbientPalette[index].Clips) {
-                GameObject ambientPlayer = new GameObject("Ambient_" + clip.name);
-                ambientPlayer.transform.parent = transform;
-                AudioSource source = ambientPlayer.AddComponent<AudioSource>();
-                source.clip = clip;
-                source.loop = true;
-                source.playOnAwake = false;
-                source.Play();
-                ambientAudioSources.Add(source);
-            }
-        }
-    }
+    //     int index = Array.FindIndex(AmbientPalette, a => a.Dimension == dimension);
+    //     if(index != -1) {
+    //         foreach(var clip in AmbientPalette[index].Clips) {
+    //             GameObject ambientPlayer = new GameObject("Ambient_" + clip.name);
+    //             ambientPlayer.transform.parent = transform;
+    //             AudioSource source = ambientPlayer.AddComponent<AudioSource>();
+    //             source.clip = clip;
+    //             source.loop = true;
+    //             source.playOnAwake = false;
+    //             source.Play();
+    //             ambientAudioSources.Add(source);
+    //         }
+    //     }
+    // }
 
     public void SetDefault() {
         Difficulty = GameDifficulty.NORMAL;

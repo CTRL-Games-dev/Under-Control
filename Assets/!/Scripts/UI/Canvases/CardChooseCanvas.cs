@@ -3,6 +3,7 @@ using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
 using System.Collections;
+using FMOD;
 
 public class ChooseCanvas : MonoBehaviour, IUICanvasState
 {
@@ -12,7 +13,6 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private TextLocalizer _longDescTextLocalizer;
     [SerializeField] private ContentSizeFitter  _contentSizeFitter;
     [SerializeField] private int _maxCards = 3;
-    [SerializeField] private AudioClip CardSoundClip;
 
     private CanvasGroup _canvasGroup;
     private CardUI[] _currentCards;
@@ -97,7 +97,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
         yield return new WaitForSeconds(0.2f);
 
         foreach (CardUI card in _currentCards) {
-            SoundFXManager.Instance.PlaySoundFXClip(CardSoundClip,transform);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance._GiveCard, this.transform.position);
             card.RotateCard();
             yield return new WaitForSeconds(0.25f);
         }
