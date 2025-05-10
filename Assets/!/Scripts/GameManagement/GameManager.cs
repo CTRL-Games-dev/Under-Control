@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour {
     public InvTileEquipment Consumable1Tile;
     public InvTileEquipment Consumable2Tile;
 
+
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
         {Dimension.HUB, "NewHub"},
         {Dimension.FOREST, "Adventure"},
@@ -53,6 +54,7 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] private List<Card> _availableCards = new();
     [SerializeField] private Card[] _currentCardChoice = null;
     [SerializeField] private List<Card> _cards = new();
+    [Range(3,6)] public int RandomCardCount = 3;
     [Space]
     public float SaveCooldown = 15f;
 
@@ -118,7 +120,6 @@ public class GameManager : MonoBehaviour {
 
         playMusicForDimension(dimension);
     }
-
     private void playMusicForDimension(Dimension dimension) {
         _musicPlayer.Stop();
 
