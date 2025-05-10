@@ -337,7 +337,7 @@ public class InventoryPanel : MonoBehaviour
         playInventorySound();
     }
     private void playInventorySound(){
-        AudioClip InvClickClip = Resources.Load("SFX/click") as AudioClip;
+        AudioClip InvClickClip = Resources.Load("NEWSFX/UI/Click") as AudioClip;
         SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform);
     }
     public void ChangeCurrentInventory(ItemContainer newInventory){
