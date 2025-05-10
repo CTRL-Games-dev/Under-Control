@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.VFX;
 
 [RequireComponent(typeof(MusicPlayer))]
 public class GameManager : MonoBehaviour {
@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour {
     public InvTileEquipment AmuletTile;
     public InvTileEquipment Consumable1Tile;
     public InvTileEquipment Consumable2Tile;
+    public VisualEffect FireEffectPrefab;
 
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
         {Dimension.HUB, "NewHub"},
