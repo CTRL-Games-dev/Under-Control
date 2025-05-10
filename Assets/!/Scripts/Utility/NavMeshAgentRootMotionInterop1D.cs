@@ -83,7 +83,7 @@ public class NavMeshAgentRootMotionInterop1D : MonoBehaviour {
 
         _animator.SetFloat(_speedHash, _speed);
 
-        if(_velocity != Vector3.zero) {
+        if(_velocity * MovementSpeedMultiplier != Vector3.zero) {
             transform.rotation = Quaternion.RotateTowards(
                 transform.rotation,
                 Quaternion.LookRotation(_velocity),
