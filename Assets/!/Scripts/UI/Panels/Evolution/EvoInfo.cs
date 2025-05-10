@@ -12,7 +12,7 @@ public enum Tiers{
 public class EvoInfo : MonoBehaviour
 {
     [SerializeField] private TextLocalizer _titleTextLocalizer, _descText, _flavorText;
-    [SerializeField] private TextMeshProUGUI _titleText, _tierText;
+    [SerializeField] private TextMeshProUGUI _titleText;
     [SerializeField] private Image _outlineImg, _barImg;
     [SerializeField] private RectTransform _barRect;
     [SerializeField] private Color _tier1Color = new(0.749f, 0.431f, 0);
@@ -24,20 +24,6 @@ public class EvoInfo : MonoBehaviour
         _titleTextLocalizer.Key = title;
         _descText.Key = desc;
         _flavorText.Key = flavor;
-        switch(tier) {
-            case Tiers.Tier1:
-                _tierText.text = "Tier 1";
-                _tierText.color = _tier1Color;
-                break;
-            case Tiers.Tier2:
-                _tierText.text = "Tier 2";
-                _tierText.color = _tier2Color;
-                break;
-            case Tiers.Tier3:
-                _tierText.text = "Tier 3";
-                _tierText.color = _tier3Color;
-                break;
-        }
 
         _titleText.DOKill();
         _outlineImg.DOKill();
