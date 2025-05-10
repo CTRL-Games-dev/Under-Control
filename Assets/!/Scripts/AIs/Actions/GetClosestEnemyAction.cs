@@ -27,7 +27,7 @@ public partial class GetClosestEnemyAction : Action
                     continue;
                 }
 
-                if(Vector3.Distance(closestEnemy.transform.position, otherEntity.transform.position) > Vector3.Distance(closestEnemy.transform.position, Agent.Value.transform.position)) {
+                if(Vector3.Distance(closestEnemy.transform.position, Agent.Value.transform.position) > Vector3.Distance(otherEntity.transform.position, Agent.Value.transform.position)) {
                     closestEnemy = otherEntity;
                 }
             }

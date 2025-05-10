@@ -36,12 +36,15 @@ public class NavMeshAgentRootMotionInterop1D : MonoBehaviour {
     public float Deceleration => DecelerationIsAcceleration ? Acceleration : _deceleration;
     public AnimationCurve AngularSpeedMultiplierCurve = AnimationCurve.Constant(0, 1, 1);
 
+    public float MovementSpeedMultiplier { get => _livingEntity != null ? _livingEntity.MovementSpeed : 1; }
+
     [SerializeField]
     private float _deceleration = 4f;
     [SerializeField]
     private float _acceleration = 2f;
 
     private NavMeshAgent _navMeshAgent;
+    private LivingEntity _livingEntity;
     private Animator _animator;
     private float _speed = 0;
     private Vector3 _velocity = Vector3.zero;
@@ -49,6 +52,7 @@ public class NavMeshAgentRootMotionInterop1D : MonoBehaviour {
     void Awake() {
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
+        _livingEntity = GetComponent<LivingEntity>();
 
         _animator.applyRootMotion = true;
 
@@ -89,7 +93,7 @@ public class NavMeshAgentRootMotionInterop1D : MonoBehaviour {
 
         HandleMotionCoherence();
 
-        _navMeshAgent.velocity = _velocity;
+        _navMeshAgent.velocity = _velocity * MovementSpeedMultiplier;
     }
 
     public void OnAnimatorMove() {
