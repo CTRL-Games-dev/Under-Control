@@ -33,6 +33,7 @@ public class Fire : MonoBehaviour {
 
         if(Stacks <= 0) {
             _self.TintAnimator.ResetTint();
+            Destroy(_fireVFX.gameObject);
             Destroy(this);
         }
     }
