@@ -22,7 +22,7 @@ public class CardChooseManager : MonoBehaviour
     }
     
     private void OnRunCardClickedEvent(Card _) {
-        Invoke(nameof(changeScene), 0.4f);
+        Invoke(nameof(changeScene),  0.3f * Settings.AnimationSpeed);
     }
 
     private void changeScene() {

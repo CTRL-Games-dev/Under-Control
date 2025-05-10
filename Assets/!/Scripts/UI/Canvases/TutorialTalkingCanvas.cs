@@ -42,14 +42,15 @@ public class TutorialTalkingCanvas : MonoBehaviour
 
 
 
-    public void SetupDialogue(string dialogue) {
+    public void StartDialogue(string dialogue) {
         gameObject.SetActive(true);
         _dialogue = dialogue;
+        updateDialogueBox();
     }
 
 
 
-    public void ShowUI() {
+    private void animate() {
         gameObject.SetActive(true);
         _dialogueText.text = string.Empty;
 
@@ -78,10 +79,8 @@ public class TutorialTalkingCanvas : MonoBehaviour
         _dialogueText.text = string.Empty;
 
 
-        Debug.Log("Animate Text: " + _goalString);
         foreach (char letter in _goalString.ToCharArray()) {
             _dialogueText.text += letter;
-            Debug.Log(letter + " " + _dialogueText.text);
             float _letterInterval;
             if (letter == ' ') {
                 _letterInterval = 0.05f;
