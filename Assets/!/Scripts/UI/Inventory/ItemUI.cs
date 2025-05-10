@@ -70,12 +70,10 @@ public class ItemUI : MonoBehaviour
     }
 
     public void OnPointerEnter() {
-        _imageRectTransform.localScale = new Vector3(1.1f, 1.1f, 1);
         EventBus.ItemUIHoverEvent.Invoke(this);
     }
 
     public void OnPointerExit() {
-        _imageRectTransform.localScale = new Vector3(1, 1, 1);
         EventBus.ItemUIHoverEvent.Invoke(null);
     }
 

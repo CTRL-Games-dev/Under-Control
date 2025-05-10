@@ -35,7 +35,7 @@ public class SelectedItemUI : MonoBehaviour
                     itemUiOffset = _inventoryItem.ItemUI.transform.position - Input.mousePosition;
                     if (_inventoryItem.Rotated) {
                         itemUiOffset = new Vector3(
-                            itemUiOffset.y - InventoryPanel.TileSize * value.Size.x,
+                            itemUiOffset.y - InventoryPanel.TileSize * value.Size.x * UICanvas.ScreenScale.x,
                             -itemUiOffset.x,
                             0
                         );
