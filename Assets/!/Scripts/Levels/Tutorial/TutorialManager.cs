@@ -30,11 +30,13 @@ public class TutorialManager : MonoBehaviour
     
     [SerializeField] private TutorialTalkingCanvas _talkingCanvas;
 
-    [SerializeField] private FaceAnimator _faceAnimator;
-    [SerializeField] private Texture _faceImage;
-    [SerializeField] private string _nameKey;
-
     [SerializeField] private List<TutDialogue> _dialogues = new List<TutDialogue>();
+
+
+    [SerializeField] private Transform _enemySpawnLocation, _wall;
+    [SerializeField] private GameObject _enemyPrefab;
+
+
     private Dictionary<TutorialState, string> _dialogueDictionary = new Dictionary<TutorialState, string>();
     private void Awake() {
         _dialogueDictionary.Clear();
@@ -68,11 +70,17 @@ public class TutorialManager : MonoBehaviour
         StartCoroutine(StartDialogue(TutorialState.SwordEquip));
     }
 
+    private void OnEnemyDeathEvent() {
+        StartCoroutine(StartDialogue(TutorialState.GoPortal));
+    }
+
     public IEnumerator StartDialogue(TutorialState state) {
         switch (state) {
             case TutorialState.Intro:
                 Player.Instance.FaceAnimator.StartInfiniteAnimation("CONFUSED");
                 yield return new WaitForSeconds(2f);
+                _talkingCanvas.ShowUI();
+                yield return new WaitForSeconds(3.5f);
                 _talkingCanvas.StartDialogue(_dialogueDictionary[state]);
                 yield return new WaitForSeconds(1f);
                 Player.Animator.SetTrigger("wakeup");
@@ -102,10 +110,16 @@ public class TutorialManager : MonoBehaviour
             
             case TutorialState.KillBoar:
                 _talkingCanvas.StartDialogue(_dialogueDictionary[state]);
+                LivingEntity livingEntity = Instantiate(_enemyPrefab, _enemySpawnLocation.position, Quaternion.identity).GetComponent<LivingEntity>();
+                livingEntity.OnDeath.AddListener(OnEnemyDeathEvent);
+                _wall.DOScaleY(0, 3f).SetEase(Ease.InOutSine);
+
 
                 break;
             case TutorialState.GoPortal:
                 _talkingCanvas.StartDialogue(_dialogueDictionary[state]);
+                yield return new WaitForSeconds(7f);
+                _talkingCanvas.HideUI();
 
                 break;
             case TutorialState.Fine:

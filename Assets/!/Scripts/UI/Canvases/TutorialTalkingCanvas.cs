@@ -8,12 +8,12 @@ using System.Collections;
 public class TutorialTalkingCanvas : MonoBehaviour
 {
     [SerializeField] private RawImage _otherImage;
-    [SerializeField] private CanvasGroup _middleCanvasGroup;
+    [SerializeField] private CanvasGroup _portalCanvasGroup, _bubbleCanvasGroup;
     private CanvasGroup _canvasGroup;
     [SerializeField] private TextMeshProUGUI _dialogueText;
     [SerializeField] private TextLocalizer _dialogueTextLocalizer;
+    [SerializeField] private Transform _wizardTransform;
 
-    private bool _isTalking = false;
 
     private string _goalString = string.Empty;
 
@@ -21,9 +21,6 @@ public class TutorialTalkingCanvas : MonoBehaviour
 
     private string _dialogue;
     [SerializeField] private FaceAnimator _faceAnimator;
-    private bool _blockClick = false;
-    private Talkable _talkable = null;
-
 
     
     private void Awake() {
@@ -36,7 +33,6 @@ public class TutorialTalkingCanvas : MonoBehaviour
 
     private void OnLanguageChanged() {
         StopAllCoroutines();
-        _isTalking = false;
         _dialogueText.text = _goalString;
     }
 
@@ -45,37 +41,35 @@ public class TutorialTalkingCanvas : MonoBehaviour
     public void StartDialogue(string dialogue) {
         gameObject.SetActive(true);
         _dialogue = dialogue;
-        updateDialogueBox();
-    }
-
-
-
-    private void animate() {
-        gameObject.SetActive(true);
-        _dialogueText.text = string.Empty;
-
-        _canvasGroup.DOFade(1, 0.25f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnComplete(() => {
-            _middleCanvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnComplete(() => {
-                updateDialogueBox();
-            });
+        _bubbleCanvasGroup.DOKill();
+        _bubbleCanvasGroup.DOFade(1, 0.2f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnComplete(() => {
+            updateDialogueBox();
         });
     }
 
 
     public void HideUI() {
-        _canvasGroup.DOFade(0, 0.7f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnComplete(() => {
-            gameObject.SetActive(false);
-            Player.Instance.InputDisabled = false;
+        _bubbleCanvasGroup.DOKill();
+        _bubbleCanvasGroup.DOFade(0, 0.2f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnComplete(() => {
+            _wizardTransform.DOKill();
+            _wizardTransform.DOLocalMoveY(6, 3f).SetEase(Ease.InOutCirc).OnComplete(() => {
+                _portalCanvasGroup.DOKill();
+                _portalCanvasGroup.DOFade(0, 1f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
+            });
         });
-        _middleCanvasGroup.DOFade(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
-        _otherImage.DOFade(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
-        
+    }
+
+    public void ShowUI() {
+        _portalCanvasGroup.DOKill();
+        _portalCanvasGroup.DOFade(1, 1f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnComplete(() => {
+            _wizardTransform.DOKill();
+            _wizardTransform.DOLocalMoveY(7.4f, 3f).SetEase(Ease.InOutCirc);
+        });
     }
 
 
 
     private IEnumerator animateText() {
-        _isTalking = true;
         _dialogueText.text = string.Empty;
 
 
@@ -100,7 +94,6 @@ public class TutorialTalkingCanvas : MonoBehaviour
 
         if (_faceAnimator != null)
             _faceAnimator.EndAnimation();
-        _isTalking = false;
     }
 
 
