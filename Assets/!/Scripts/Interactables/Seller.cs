@@ -29,7 +29,7 @@ public class Seller : MonoBehaviour, IInteractableInventory
 
     void Start() {
         SimpleInventory inventory = GetComponent<SimpleInventory>();
-        ItemRandomizer.SetRandomItems(_possibleItems, inventory);
+        ItemRandomizer.SetRandomItems(_possibleItems, inventory, 5, 10);
     }
 
 

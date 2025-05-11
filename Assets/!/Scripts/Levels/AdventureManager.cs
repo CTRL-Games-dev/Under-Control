@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Unity.AI.Navigation;
 using UnityEngine;
@@ -26,15 +27,15 @@ public class AdventureManager : MonoBehaviour
         _generator = GetComponent<WorldGenerator>();
         _generator.GenerateMap(GameManager.Instance.CurrentDimension);
         
-        ForestPortalLocation portal = _generator.GetLocation<ForestPortalLocation>();
+        ForestSpawnLocation spawnLocation = _generator.GetLocation<ForestSpawnLocation>();
 
         if(GameManager.Instance.LevelDepth == 1) {
-            Vector3 weaponSpawnPosition = portal.transform.Find("ItemSpawn").position;
+            Vector3 weaponSpawnPosition = spawnLocation.transform.Find("ItemSpawn").position;
             WeaponItemData randomWeapon = PossibleStartingItems[UnityEngine.Random.Range(0, PossibleStartingItems.Count())]; 
-            ItemEntity.Spawn(randomWeapon, 1, weaponSpawnPosition, ItemRandomizer.GetPowerScale(), Quaternion.Euler(new(0, 120, 30)));
+            ItemEntity.Spawn(randomWeapon, 1, weaponSpawnPosition, ItemRandomizer.GetStartPowerScale(), Quaternion.Euler(new(0, 120, 30)));
         }
 
-        Vector2 spawn = portal.LocationCenterInWorld;
+        Vector2 spawn = spawnLocation.LocationCenterInWorld;
 
         Player.Instance.MaxCameraDistance = 30f;
         Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
@@ -49,8 +50,31 @@ public class AdventureManager : MonoBehaviour
         _navMeshSurface.BuildNavMesh();
 
         Player.Instance.ResetToDefault();
+        setPortals();
 
         Invoke(nameof(sceneReady), 0.2f);
+    }
+
+    private void setPortals() {
+        List<ForestPortalLocation> portals = _generator.GetAllLocations<ForestPortalLocation>();
+        
+        int bossesDefeated = GameManager.Instance.BossesDefeated;
+        float influence = GameManager.Instance.TotalInfluence;
+
+        Dimension dimension;
+        if(influence >= 100 && bossesDefeated == 2) {
+            dimension = Dimension.VEKTHAR_BOSS;
+        } else if(influence >= 66 && bossesDefeated == 1) {
+            dimension = Dimension.ENT_BOSS;
+        } else if(influence >= 33 && bossesDefeated == 0) {
+            dimension = Dimension.SLIME_BOSS;
+        } else {
+            dimension = Dimension.CARD_CHOOSE;
+        }
+
+        foreach(var p in portals) {
+            p.Portal.SetDimension(dimension);
+        }
     }
 
     private void sceneReady() {

@@ -41,7 +41,9 @@ public class GameManager : MonoBehaviour {
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
         {Dimension.HUB, "NewHub"},
         {Dimension.FOREST, "Adventure"},
-        {Dimension.FOREST_VECTOR, "VectorBossBattle"},
+        {Dimension.VEKTHAR_BOSS, "VectorBossBattle"},
+        {Dimension.ENT_BOSS, "EntBossBattle"},
+        {Dimension.SLIME_BOSS, "Adventure"},
         {Dimension.CARD_CHOOSE, "CardChoose"}
     };
 
@@ -53,6 +55,7 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public static readonly float MinInfluenceDelta = 5.0f; 
     [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f;
     [HideInInspector] public float LevelDepth = 0;
+    [HideInInspector] public int BossesDefeated = 0;
     public bool ShowMainMenu = true;
 
     [Header("Music")]
