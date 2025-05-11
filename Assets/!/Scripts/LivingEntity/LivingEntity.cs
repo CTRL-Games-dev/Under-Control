@@ -5,7 +5,6 @@ using UnityEngine.Events;
 
 [RequireComponent(typeof(ModifierSystem))]
 [RequireComponent(typeof(EntityInventory))]
-[RequireComponent(typeof(HitFlashAnimator))]
 [RequireComponent(typeof(TintAnimator))]
 public class LivingEntity : MonoBehaviour {
     public struct EffectData {
@@ -82,7 +81,6 @@ public class LivingEntity : MonoBehaviour {
     // References
     public ModifierSystem ModifierSystem { get; private set; }
     public EntityInventory Inventory { get; private set; }
-    public HitFlashAnimator HitFlashAnimator { get; private set; }
     public TintAnimator TintAnimator { get; private set; }
     private Animator _animator;
 
@@ -94,7 +92,6 @@ public class LivingEntity : MonoBehaviour {
         _animator = GetComponent<Animator>();
         ModifierSystem = GetComponent<ModifierSystem>();
         Inventory = GetComponent<EntityInventory>();
-        HitFlashAnimator = GetComponent<HitFlashAnimator>();
         TintAnimator = GetComponent<TintAnimator>();
 
         ModifierSystem.RegisterStat(ref MaxHealth);
@@ -184,7 +181,7 @@ public class LivingEntity : MonoBehaviour {
             Victim = this
         });
 
-        HitFlashAnimator.Flash();
+        TintAnimator.HitTint();
 
         if (Health == 0) {
             Die();
