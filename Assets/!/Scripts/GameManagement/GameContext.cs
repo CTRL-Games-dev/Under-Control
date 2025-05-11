@@ -11,7 +11,9 @@ public enum Dimension
 {
     HUB,
     FOREST,
-    FOREST_VECTOR,
+    VEKTHAR_BOSS,
+    ENT_BOSS,
+    SLIME_BOSS,
     CARD_CHOOSE
 }
 

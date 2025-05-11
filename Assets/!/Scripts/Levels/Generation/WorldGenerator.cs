@@ -52,7 +52,7 @@ public class WorldGenerator : MonoBehaviour {
         return null;
     }
 
-    public List<T> GetAllLocation<T>()
+    public List<T> GetAllLocations<T>()
     where T : Location
     {
         List<T> locations = new();
@@ -74,9 +74,9 @@ public class WorldGenerator : MonoBehaviour {
                 (locations, grid) = PlaceLocationsForest();
             } break;
             default: {
-                Debug.LogError($"This type of dimension is not implemented! -> {type}");
-                return;
-            };
+                Debug.LogError($"This type of dimension is not implemented ({type}). Spawning regular forest");
+                (locations, grid) = PlaceLocationsForest();
+            } break;
         }
 
         Debug.Log("Locations have been placed");
