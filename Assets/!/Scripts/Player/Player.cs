@@ -934,6 +934,7 @@ void Update() {
 
 
     public void PlayRespawnAnimation() {
+        AudioManager.instance.setMusicArea(MusicArea.HUB);
         AudioManager.instance.PlayOneShot(FMODEvents.instance._RespawnSound, this.transform.position);
         Animator.animatePhysics = false;
         UpdateDisabled = true;

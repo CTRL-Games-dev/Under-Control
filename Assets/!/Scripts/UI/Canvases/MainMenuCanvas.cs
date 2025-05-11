@@ -43,6 +43,7 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
     }
 
     public void ShowUI() {
+        AudioManager.instance.setMusicArea(MusicArea.MAIN_MENU);
         killTweens();
         if (HubManager.MainMenuCamera != null) CameraManager.SwitchCamera(HubManager.MainMenuCamera);
 

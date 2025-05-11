@@ -24,8 +24,7 @@ public class AudioManager : MonoBehaviour
     }
 
     private void Start(){
-        InitializeAmbience(FMODEvents.instance._ambience);
-        InitializeAmbience(FMODEvents.instance._MusicPlayer);
+        InitializeMusic(FMODEvents.instance._MusicPlayer);
     }
 
     private void InitializeMusic(EventReference eventReference){
@@ -36,6 +35,10 @@ public class AudioManager : MonoBehaviour
         ambientInstance = RuntimeManager.CreateInstance(eventReference);
         ambientInstance.start();
     } 
+
+    public void setMusicArea(MusicArea area){
+        musicInstance.setParameterByName("Area", (float )area);
+    }
 
     public void PlayOneShot(EventReference sound, Vector3 position){
         RuntimeManager.PlayOneShot(sound, position);

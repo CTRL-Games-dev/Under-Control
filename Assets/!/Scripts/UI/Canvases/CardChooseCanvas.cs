@@ -30,6 +30,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
     }
 
     public void ShowUI() {
+        AudioManager.instance.setMusicArea(MusicArea.CARD_CHOOSE);
         gameObject.SetActive(true);
         _longDescCanvasGroup.alpha = 0;
 
