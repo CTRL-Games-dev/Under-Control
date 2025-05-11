@@ -99,7 +99,7 @@ public class SelectedItemUI : MonoBehaviour
             return;
         }
         
-        transform.position = Input.mousePosition;
+        _rectTransform.anchoredPosition = UICanvas.ScaleToCanvas(Input.mousePosition);
 
         if (transform.rotation != _goalRotation) {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, _goalRotation, _rotationSpeed * Settings.AnimationSpeed * Time.deltaTime);

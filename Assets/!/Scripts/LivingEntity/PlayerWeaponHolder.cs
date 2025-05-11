@@ -22,6 +22,8 @@ public class PlayerWeaponHolder : MonoBehaviour {
             _currentWeaponData = null;
         }
 
+        SlashManager.OnHit.RemoveAllListeners();
+        
         if(weaponItem == null) return;
 
         WeaponItemData weaponData = weaponItem.ItemData;
@@ -45,7 +47,6 @@ public class PlayerWeaponHolder : MonoBehaviour {
 
         _currentWeaponHitter.OnHit.AddListener(OnHit);
 
-        SlashManager.OnHit.RemoveAllListeners();
         SlashManager.OnHit.AddListener((victim) => {
             _currentWeaponHitter.OnHit?.Invoke(victim);
         });
