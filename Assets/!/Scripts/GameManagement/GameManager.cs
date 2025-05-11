@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour {
     public float SaveCooldown = 15f;
     
     [Header("Debug")]
-    public List<ConsumableItemData> DebugItems;
+    public List<ItemData> DebugItems;
 
     // Events
     public UnityEvent SceneReadyEvent;

@@ -88,6 +88,7 @@ public class Player : MonoBehaviour {
     public Camera MainCamera;
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
+    public bool CanFish = false;
     [SerializeField] private Material _dissolveMaterial;
     public Vector3 StartPosition;
     [SerializeField] private AudioClip _walkingSound;
@@ -185,6 +186,7 @@ public class Player : MonoBehaviour {
     [SerializeField] private UICanvas _uiCanvas;
     [SerializeField] private ParticleSystem[] _trailParticles;
     public GameObject FBXModel;
+    public WeaponItemData FishingRod;
 
     // Static reference getters
     public static LivingEntity LivingEntity { get; private set; }
@@ -618,6 +620,7 @@ public class Player : MonoBehaviour {
 
         // Default to attacking if no interaction was commited
         
+
         if (CurrentAnimationState == AnimationState.Attack_ComboWindow) {
             _queuedRotation = GetMousePosition() - transform.position;
             LockRotation = false;
@@ -628,8 +631,12 @@ public class Player : MonoBehaviour {
         if (!LockRotation) {
             transform.LookAt(GetMousePosition());   
         }
-
         LockRotation = true;
+
+        if(CurrentWeapon.ItemData == FishingRod){
+            tryFish();
+            return;
+        }
         switch(interactionType) {
             case InteractionType.Primary:
                 performLightAttack();
@@ -640,7 +647,12 @@ public class Player : MonoBehaviour {
         }
     }
 
-    
+    private bool tryFish(){
+        if (!CanFish) return false;
+        return true;
+        //not yet implemented
+        
+    }
 
     private bool tryInteract(InteractionType interactionType) {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
@@ -680,14 +692,13 @@ public class Player : MonoBehaviour {
 
     public void OnInventoryChanged() {
         UpdateEquipment();
-        
     }
     public void UpdateEquipment(){
         WeaponHolder.UpdateWeapon(CurrentWeapon);
         Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
 
         if (CurrentWeapon?.ItemData != null) {
-            Debug.Log(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
+            // Debug.Log(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
             SlashManager.SetSlashColor(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
         } 
         EventBus.InventoryItemChangedEvent.Invoke();
@@ -879,6 +890,7 @@ public class Player : MonoBehaviour {
         GameManager.Instance.ResetInfluence();
         GameManager.Instance.ResetCardChoice();
         GameManager.Instance.RandomCardCount = 3;
+        CanFish = false;
         // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         EventBus.InventoryItemChangedEvent?.Invoke();
