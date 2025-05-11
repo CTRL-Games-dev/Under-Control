@@ -150,6 +150,7 @@ public class EnemySpawner : MonoBehaviour
 
             int batch = i / randomSpawnPoints.Count;
             Transform spawnPoint = randomSpawnPoints[i%randomSpawnPoints.Count];
+            randomSpawnPoints.RemoveAt(i%randomSpawnPoints.Count);
 
             float firstBatchDelay = 3f;
             float delayBetweenEach = 1f;

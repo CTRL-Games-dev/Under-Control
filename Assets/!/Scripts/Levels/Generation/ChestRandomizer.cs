@@ -9,6 +9,8 @@ public class ChestRandomizer : MonoBehaviour
     public float ChanceToSpawn = 1;
     public SpawnItemData[] possibleItems;
     public EnemySpawner Spawner;
+    public int MinItems = 1;
+    public int MaxItems = 1;
     void Awake()
     {
         gameObject.SetActive(false);
@@ -28,6 +30,6 @@ public class ChestRandomizer : MonoBehaviour
     private void setLoot()
     {
         SimpleInventory inventory = GetComponent<SimpleInventory>();
-        ItemRandomizer.SetRandomItems(possibleItems, inventory);
+        ItemRandomizer.SetRandomItems(possibleItems, inventory, MinItems, MaxItems);
     }
 }
