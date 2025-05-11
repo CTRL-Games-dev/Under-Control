@@ -26,10 +26,15 @@ public class SelectedItemUI : MonoBehaviour
             _inventoryItem = value;
             gameObject.SetActive(_inventoryItem != null);
             if (_inventoryItem == null) {
+                EventBus.SelectedItemSet?.Invoke(null);
+                
+
                 _image.sprite = null;
                 transform.rotation = Quaternion.identity;
                 gameObject.SetActive(false);
             } else {
+                EventBus.SelectedItemSet?.Invoke(_inventoryItem.ItemData);
+
                 Vector3 itemUiOffset = Vector3.zero;
                 if(_inventoryItem.ItemUI != null) {
                     itemUiOffset = _inventoryItem.ItemUI.transform.position - Input.mousePosition;
