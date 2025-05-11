@@ -50,6 +50,7 @@ public class AdventureManager : MonoBehaviour
         _navMeshSurface.BuildNavMesh();
 
         Player.Instance.ResetToDefault();
+        setPortals();
 
         Invoke(nameof(sceneReady), 0.2f);
     }
@@ -58,7 +59,7 @@ public class AdventureManager : MonoBehaviour
         List<ForestPortalLocation> portals = _generator.GetAllLocations<ForestPortalLocation>();
         
         int bossesDefeated = GameManager.Instance.BossesDefeated;
-        float influence = GameManager.Instance.BossesDefeated;
+        float influence = GameManager.Instance.TotalInfluence;
 
         Dimension dimension;
         if(influence >= 100 && bossesDefeated == 2) {
