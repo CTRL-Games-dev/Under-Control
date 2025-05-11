@@ -47,7 +47,7 @@ public class PlayerWeaponHolder : MonoBehaviour {
 
         SlashManager.OnHit.RemoveAllListeners();
         SlashManager.OnHit.AddListener((victim) => {
-            _currentWeaponHitter.OnHit.Invoke(victim);
+            _currentWeaponHitter.OnHit?.Invoke(victim);
         });
 
         DisableHitbox();

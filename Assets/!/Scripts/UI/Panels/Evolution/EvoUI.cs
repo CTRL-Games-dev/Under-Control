@@ -80,4 +80,6 @@ public class EvoUI : MonoBehaviour
     public List<Modifier> GetModifiers() {
         return new List<Modifier>(_modifiers);
     }
+
+
 }

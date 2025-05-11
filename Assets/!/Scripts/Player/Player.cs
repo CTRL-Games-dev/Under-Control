@@ -269,7 +269,6 @@ public class Player : MonoBehaviour {
         });
         
         OnDashSound =  Resources.Load("SFX/bohater/dash") as AudioClip;
-
         ResetRun();
     }
 
@@ -875,13 +874,13 @@ public class Player : MonoBehaviour {
         GameManager.Instance.ResetCards();
         GameManager.Instance.ResetInfluence();
         GameManager.Instance.ResetCardChoice();
-        GameManager.Instance.RandomCardCount = 3;
         // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         EventBus.InventoryItemChangedEvent?.Invoke();
 
         Instance.UpdateEquipment();
-        
+        Player.LivingEntity.Health = Player.LivingEntity.MaxHealth;
+        Player.LivingEntity.Mana = Player.LivingEntity.MaxMana;     
     }
 
     private void registerStats() {
@@ -900,6 +899,8 @@ public class Player : MonoBehaviour {
     }
     
     public void ApplyEvolution(EvoUI evoUI) {
+        GameManager.Instance.RandomCardCount = 3;
+        
         switch (evoUI.ElementalType) {
             case ElementalType.Fire:
             case ElementalType.Ice:
