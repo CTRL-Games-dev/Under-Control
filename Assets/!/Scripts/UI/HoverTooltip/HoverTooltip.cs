@@ -19,7 +19,7 @@ public class HoverTooltip : MonoBehaviour {
         _playerMask |= 1 << LayerMask.NameToLayer("Hitboxes");
     }
 
-    void Update() {
+    void LateUpdate() {
         if(!InputUtility.IsMousePositionAvailable()) return;
 
         transform.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);

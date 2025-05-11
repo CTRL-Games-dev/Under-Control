@@ -71,6 +71,9 @@ public class GameManager : MonoBehaviour {
     [Range(3,6)] public int RandomCardCount = 3;
     [Space]
     public float SaveCooldown = 15f;
+    
+    [Header("Debug")]
+    public List<ConsumableItemData> DebugItems;
 
     // Events
     public UnityEvent SceneReadyEvent;
@@ -282,12 +285,20 @@ public class GameManager : MonoBehaviour {
             Player.Instance.DamageDisabled = true;
         }
         if(Input.GetKeyDown(KeyCode.F9)) {
-            Debug.Log("<color=red>Debug Tools - Saved game via hotkey");
-            SaveSystem.SaveGame();
+            Debug.Log("<color=blue>Debug Tools - added item1");
+            Player.LivingEntity.Inventory.AddItem(DebugItems[0],1,1);
         }
         if(Input.GetKeyDown(KeyCode.F10)) {
-            Debug.Log("<color=red>Debug Tools - Loaded game via hotkey");
-            SaveSystem.LoadGame();
+            Debug.Log("<color=blue>Debug Tools - added item2");
+            Player.LivingEntity.Inventory.AddItem(DebugItems[1],1,1);
+        }
+        if(Input.GetKeyDown(KeyCode.F11)) {
+            Debug.Log("<color=blue>Debug Tools - added item3");
+            Player.LivingEntity.Inventory.AddItem(DebugItems[2],1,1);
+        }
+        if(Input.GetKeyDown(KeyCode.F12)) {
+            Debug.Log("<color=red>Debug Tools - damaged player");
+            Player.LivingEntity.TakeDamage(new Damage{Value = 50, Type = DamageType.PHYSICAL});
         }
         if(Input.GetKeyDown(KeyCode.F8)) {
             TotalInfluence = 100;

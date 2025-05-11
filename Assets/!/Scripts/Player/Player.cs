@@ -418,39 +418,27 @@ public class Player : MonoBehaviour {
     }
 
     void OnUseConsumableOne(InputValue value) {
-        if(ConsumableItemOne == null) return;
-        if(!ConsumableCooldown.Execute()) return;
-        if(ConsumableItemOne.Amount <= 0) return;
-
-        ConsumableItemData c =  ConsumableItemOne.ItemData;
-
-        if(c == null) return;
-        c.Consume(LivingEntity);
-        ConsumableItemOne.Amount--;
-
-        if (ConsumableItemOne.Amount <= 0) {
-            ConsumableItemOne = null;
-        }
-
-        UICanvas.HUDCanvas.UseConsumable1();
-        UpdateConsumablesEvent?.Invoke();
+        useConsumable(ref ConsumableItemOne, 1);
     }
 
     void OnUseConsumableTwo(InputValue value) {
-        if(ConsumableItemTwo == null) return;
+        useConsumable(ref ConsumableItemTwo, 2);
+    }
+    private void useConsumable(ref InventoryItem<ConsumableItemData> consumable, int slotIndex) {
+        if(consumable == null) return;
         if(!ConsumableCooldown.Execute()) return;
-        if(ConsumableItemTwo.Amount <= 0) return;
+        if(consumable.Amount <= 0) return;
 
-        ConsumableItemData c =  ConsumableItemTwo.ItemData as ConsumableItemData;
+        ConsumableItemData c =  consumable.ItemData as ConsumableItemData;
         
         if(c == null) return;
-        c.Consume(LivingEntity);
-        ConsumableItemTwo.Amount--;
-        if (ConsumableItemTwo.Amount <= 0) {
-            ConsumableItemTwo = null;
+        if(!c.Consume(LivingEntity)) return;
+        consumable.Amount--;
+        if (consumable.Amount <= 0) {
+            consumable = null;
         }
 
-        UICanvas.HUDCanvas.UseConsumable2();
+        UICanvas.HUDCanvas.UseConsumable(slotIndex);
         UpdateConsumablesEvent?.Invoke();
     }
 
