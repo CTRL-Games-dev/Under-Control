@@ -528,33 +528,31 @@ public class WorldGenerator : MonoBehaviour {
         public float Height;
     }
 
-    public void GenerateChunks(ref Grid grid)
-    {
+    public void GenerateChunks(ref Grid grid) {
         List<ChunkData> chunkInfo = new();
 
         int maxChunkWidth = 100;
         int maxChunkHeight = 100;
 
-        int widthLeft = grid.GetWidthCeil();
-        int heightLeft = grid.GetHeightCeil();
+        int gridWidth = grid.GetWidthCeil();
+        int gridHeight = grid.GetHeightCeil();
 
-        for(int ix = 0; ix < grid.GetWidthCeil() / maxChunkWidth + 1; ix++)
+        int numChunksX = (int)Math.Ceiling((float)gridWidth / maxChunkWidth);
+        int numChunksY = (int)Math.Ceiling((float)gridHeight / maxChunkHeight);
+
+        for (int ix = 0; ix < numChunksX; ix++)
         {
-            for (int iy = 0; iy < grid.GetHeightCeil() / maxChunkHeight + 1; iy++)
+            for (int iy = 0; iy < numChunksY; iy++)
             {
-                int chunkWidth;
-                int chunkHeight;
-
-                if(widthLeft - maxChunkWidth > 0) chunkWidth = maxChunkWidth;
-                else chunkWidth = widthLeft;
-
-                if(heightLeft - maxChunkHeight > 0) chunkHeight = maxChunkHeight;
-                else chunkHeight = maxChunkHeight;
+                // Calculate remaining width/height for edge chunks
+                int chunkWidth = Math.Min(maxChunkWidth, gridWidth - ix * maxChunkWidth);
+                int chunkHeight = Math.Min(maxChunkHeight, gridHeight - iy * maxChunkHeight);
 
                 float x = ix * maxChunkWidth + grid.Offset.x;
                 float y = iy * maxChunkHeight + grid.Offset.y;
 
-                chunkInfo.Add(new ChunkData {
+                chunkInfo.Add(new ChunkData
+                {
                     TopLeftCorner = new(x, y),
                     Width = chunkWidth,
                     Height = chunkHeight,
@@ -562,12 +560,13 @@ public class WorldGenerator : MonoBehaviour {
             }
         }
 
-        foreach(var ci in chunkInfo)
+        foreach (var ci in chunkInfo)
         {
             Chunk chunk = Instantiate(_chunkPrefab, Vector3.zero, Quaternion.identity, _terrainChunkHolder.transform);
             chunk.GenerateChunkMesh(ci.TopLeftCorner, (int)ci.Width, (int)ci.Height);
         }
     }
+
 
     #endregion
 }

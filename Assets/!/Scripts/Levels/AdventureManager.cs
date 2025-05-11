@@ -68,7 +68,7 @@ public class AdventureManager : MonoBehaviour
         } else if(influence >= 33 && bossesDefeated == 0) {
             dimension = Dimension.SLIME_BOSS;
         } else {
-            dimension = Dimension.FOREST;
+            dimension = Dimension.CARD_CHOOSE;
         }
 
         foreach(var p in portals) {
