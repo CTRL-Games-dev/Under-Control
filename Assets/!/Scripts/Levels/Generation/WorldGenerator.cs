@@ -491,7 +491,7 @@ public class WorldGenerator : MonoBehaviour {
                 int gridPositionY = iy * spaceBetweenTrees;
 
                 switch(grid.Cells[gridPositionX, gridPositionY].Type) {
-                    case CellType.Empty: continue; break;
+                    case CellType.Empty: continue;
                     case CellType.Forest: {
                         float worldPositionX = gridPositionX + grid.Offset.x;
                         float worldPositionY = gridPositionY + grid.Offset.y;

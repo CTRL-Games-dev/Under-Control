@@ -225,6 +225,7 @@ public class Player : MonoBehaviour {
 
         LivingEntity.OnDeath.AddListener(onDeath);
         LivingEntity.OnStunned.AddListener(onStunned);
+        LivingEntity.OnDamageTaken.AddListener(onDamageTaken);
         EventBus.ItemPlacedEvent.AddListener(UpdateEquipment);
         
         CameraDistance = MinCameraDistance;
@@ -235,9 +236,6 @@ public class Player : MonoBehaviour {
 
         OnEvolutionSelected.AddListener(x => ApplyEvolution(x));
 
-        LivingEntity.OnDamageTaken.AddListener((data) => {
-            CameraManager.ShakeCamera(2, 0.1f);
-        });
  
         _interactionMask |= 1 << LayerMask.NameToLayer("Interactable");
 
@@ -292,7 +290,6 @@ public class Player : MonoBehaviour {
             }
         }
         CharacterController.SimpleMove(getGoalDirection() * _currentSpeed);
-
     }
 
     void FixedUpdate() {
@@ -391,6 +388,12 @@ public class Player : MonoBehaviour {
 
     private void onStunned(float duration) {
         CameraManager.ShakeCamera(2, duration);
+    }
+    
+    private void onDamageTaken(DamageTakenEventData _) {
+        FaceAnimator.StartAnimation("HURT", 0.3f);
+        CameraManager.ShakeCamera(0.7f, 0.1f);
+
     }
 
     
@@ -548,7 +551,6 @@ public class Player : MonoBehaviour {
         }
         
         Animator.speed = 0;
-        // Animator.applyRootMotion = false;
         Animator.SetBool(_lightAttackHash, false);
         Animator.SetBool(_heavyAttackHash, false);
 
@@ -557,22 +559,6 @@ public class Player : MonoBehaviour {
         CurrentAnimationState = AnimationState.Dash;
         SoundFXManager.Instance.PlaySoundFXClip(OnDashSound, transform,1.2f);
         
-
-        // UpdateDisabled = true;
-        // Animator.animatePhysics = false;
-
-        // transform.DOMove(transform.position + transform.forward * DashDistance, DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
-        //     // Animator.applyRootMotion = true;
-        //     Animator.animatePhysics = true;
-        //     UpdateDisabled = false;
-        //     Animator.speed = 1;
-        //     DamageDisabled = false;
-        //     LockRotation = false;
-        //     foreach (ParticleSystem trail in _trailParticles) {
-        //         trail.Clear();
-        //         trail.Stop();
-        //     }
-        // }
         Invoke(nameof(endDash), DashDuration);
     }
 
@@ -699,7 +685,6 @@ public class Player : MonoBehaviour {
         Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
 
         if (CurrentWeapon?.ItemData != null) {
-            Debug.Log(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
             SlashManager.SetSlashColor(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
         } 
         EventBus.InventoryItemChangedEvent.Invoke();
@@ -913,6 +898,7 @@ public class Player : MonoBehaviour {
         ModifierSystem.RegisterStat(ref DashCooldown);
         ModifierSystem.RegisterStat(ref DashDuration);
     }
+    
     public void ApplyEvolution(EvoUI evoUI) {
         switch (evoUI.ElementalType) {
             case ElementalType.Fire:
@@ -938,6 +924,7 @@ public class Player : MonoBehaviour {
         UpdateDisabled = false;
         gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
+
     public void PlayRespawnAnimation() {
         Animator.animatePhysics = false;
         UpdateDisabled = true;
@@ -978,6 +965,8 @@ public class Player : MonoBehaviour {
         SlashManager.DisableSlash();
         UpdateEquipment();
     }
+
+    
 
     #endregion
     #region Save System
