@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -16,10 +15,14 @@ public class LivingEntity : MonoBehaviour {
 
     [Header("Properties")]
     public string DisplayName;
+
+    [SerializeField]
     public Guild Guild;
+
     public bool DropItemsOnDeath = true;
     public bool DestroyOnDeath = true;
     public bool IsInvisible = false;
+    public bool AvoidGuildChange = false;
 
     public string DebugName => $"{DisplayName} ({Guild.Name} {gameObject.name})";
 
@@ -83,7 +86,7 @@ public class LivingEntity : MonoBehaviour {
     public TintAnimator TintAnimator { get; private set; }
     private Animator _animator;
 
-    [SerializeField]
+    [SerializeField, HideInInspector]
     private bool _isPlayer = false;
     public bool IsPlayer { get => _isPlayer; private set => _isPlayer = value; }
 

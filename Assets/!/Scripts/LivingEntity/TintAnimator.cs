@@ -10,7 +10,6 @@ public class TintAnimator : MonoBehaviour
         if (_meshRenderers.Count == 0) return;
         foreach (SkinnedMeshRenderer s in _meshRenderers) {
             if (s == null) continue;
-            Debug.Log(s.materials[0]);
             _materials.Add(s.materials[0]);
         }
     }
@@ -19,6 +18,7 @@ public class TintAnimator : MonoBehaviour
         SetTint(color, alpha);
         Invoke(nameof(ResetTint), duration);
     }
+
     public void SetTint(Color color, float alpha) {
         if (_meshRenderers.Count == 0) return;
         //Debug.Log(_materials.Count);
@@ -38,5 +38,4 @@ public class TintAnimator : MonoBehaviour
             m.SetFloat("_Alpha", 0f);
         }
     }
-    
 }
