@@ -14,6 +14,7 @@ public class ItemRandomizer {
         var shuffledItems = FluffyUtils.ShuffleList(items);
         shuffledItems = shuffledItems
             .Where(x => influence >= x.MinInfluence)
+            .Where(x => influenceDelta >= x.MinInfluenceDelta)
             .ToList();
         int numberOfItems = UnityEngine.Random.Range(minAmount, maxAmount + 1);
 
