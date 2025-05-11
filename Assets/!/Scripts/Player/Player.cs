@@ -111,7 +111,7 @@ public class Player : MonoBehaviour {
         get => _spellDataOne.Spell;
         set {
             _spellDataOne.Spell = value;
-            // _spellDataOne.Cooldown = new Cooldown(value.CooldownTime); 
+            _spellDataOne.Cooldown = new Cooldown(value.CooldownTime); 
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -122,7 +122,7 @@ public class Player : MonoBehaviour {
         get => _spellDataTwo.Spell;
         set {
             _spellDataTwo.Spell = value;
-            // _spellDataTwo.Cooldown = new Cooldown(value.CooldownTime);
+            _spellDataTwo.Cooldown = new Cooldown(value.CooldownTime);
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -133,7 +133,7 @@ public class Player : MonoBehaviour {
         get => _spellDataThree.Spell;
         set {
             _spellDataThree.Spell = value;
-            // _spellDataThree.Cooldown = new Cooldown(value.CooldownTime);
+            _spellDataThree.Cooldown = new Cooldown(value.CooldownTime);
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
