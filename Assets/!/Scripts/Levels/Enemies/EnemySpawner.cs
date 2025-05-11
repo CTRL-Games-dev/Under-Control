@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -30,6 +31,7 @@ public class EnemySpawner : MonoBehaviour
     private List<Wall> _activeWalls = new();
     private GameObject _enemies;
     [HideInInspector] public List<Transform> SpawnPoints;
+    private List<Transform> _usedSpawnPoints;
     [HideInInspector] public int NumberOfEnemies { get; private set; }
     private int _waveNumber = 0;
     private int _numberOfWaves = 0;
@@ -41,6 +43,8 @@ public class EnemySpawner : MonoBehaviour
 
     void Start()
     {
+
+        _usedSpawnPoints = new();
         foreach(Transform child in SpawnPointsParent) SpawnPoints.Add(child);
         if(MaxExitsAtOnce > SpawnPoints.Count)
         {
@@ -139,26 +143,40 @@ public class EnemySpawner : MonoBehaviour
         Debug.Log($"Number of enemies: {currentWave.EnemyPrefabs.Count()}");
         NumberOfEnemies = currentWave.EnemyPrefabs.Count();
 
+        int previousBatch = 0;
+        List<Transform> randomSpawnPoints = FluffyUtils.ShuffleList(SpawnPoints)
+                    .Select(x=>x)
+                    .Take(MaxExitsAtOnce)
+                    .ToList();
+
         for(int i = 0; i < currentWave.EnemyPrefabs.Count(); i++)
         {
-            List<Transform> randomSpawnPoints = FluffyUtils.ShuffleList(SpawnPoints)
-                .Select(x=>x)
-                .Take(MaxExitsAtOnce)
-                .ToList();
-
             GameObject enemy = currentWave.EnemyPrefabs[i];
 
-            int batch = i / randomSpawnPoints.Count;
+            int batch = i / SpawnPoints.Count;
+
+            if(previousBatch > batch) {
+                randomSpawnPoints = FluffyUtils.ShuffleList(SpawnPoints)
+                    .Select(x=>x)
+                    .Take(MaxExitsAtOnce)
+                    .ToList();
+            }
+
             Transform spawnPoint = randomSpawnPoints[i%randomSpawnPoints.Count];
+
+            if(_usedSpawnPoints.Count(x => x == spawnPoint) != 0 )
+                _usedSpawnPoints.Add(spawnPoint);
+
             randomSpawnPoints.RemoveAt(i%randomSpawnPoints.Count);
 
             float firstBatchDelay = 3f;
-            float delayBetweenEach = 1f;
+            float spawnTime = 3f;
+            float delayBetweenEach = 0.5f;
 
-            // Total delay = initial delay + time based on batch index
-            float totalSmokeDelay = firstBatchDelay + (batch * delayBetweenEach);
+            // Total delay = initial delay + time based on batch index + some additional delay
+            float totalSmokeDelay = firstBatchDelay + (batch * spawnTime + delayBetweenEach) + 0.2f * i;
 
-            StartCoroutine(spawnEnemy(enemy, spawnPoint.position, totalSmokeDelay, delayBetweenEach));
+            StartCoroutine(spawnEnemy(enemy, spawnPoint.position, totalSmokeDelay, delayBetweenEach, delayBetweenEach));
         }
     }
 
@@ -185,14 +203,15 @@ public class EnemySpawner : MonoBehaviour
         _state = SpawnerState.StartingFight;
     }
 
-    private IEnumerator spawnEnemy(GameObject enemy, Vector3 position, float smokeDelay, float enemySpawnDelay)
+    private IEnumerator spawnEnemy(GameObject enemy, Vector3 position, float smokeDelay, float enemySpawnDelay, float smokeFade)
     {
         yield return new WaitForSeconds(smokeDelay);
 
         Vector3 smokePosition = position;
         smokePosition.y += 1.5f;
         EnemySpawnExit smoke = Instantiate(_enemySpawnerExitPrefab, smokePosition, Quaternion.identity);
-        smoke.SetDestroyTimer(enemySpawnDelay);
+
+        smoke.SetDestroyTimer(enemySpawnDelay + smokeFade);
 
         yield return new WaitForSeconds(enemySpawnDelay);
 
