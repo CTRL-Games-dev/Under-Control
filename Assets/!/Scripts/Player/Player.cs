@@ -113,7 +113,7 @@ public class Player : MonoBehaviour {
         get => _spellDataOne.Spell;
         set {
             _spellDataOne.Spell = value;
-            // _spellDataOne.Cooldown = new Cooldown(value.CooldownTime); 
+            _spellDataOne.Cooldown = value == null ? null : new Cooldown(value.CooldownTime); 
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -124,7 +124,7 @@ public class Player : MonoBehaviour {
         get => _spellDataTwo.Spell;
         set {
             _spellDataTwo.Spell = value;
-            // _spellDataTwo.Cooldown = new Cooldown(value.CooldownTime);
+            _spellDataTwo.Cooldown = value == null ? null : new Cooldown(value.CooldownTime);
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -135,7 +135,7 @@ public class Player : MonoBehaviour {
         get => _spellDataThree.Spell;
         set {
             _spellDataThree.Spell = value;
-            // _spellDataThree.Cooldown = new Cooldown(value.CooldownTime);
+            _spellDataThree.Cooldown = value == null ? null : new Cooldown(value.CooldownTime);
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -227,6 +227,7 @@ public class Player : MonoBehaviour {
 
         LivingEntity.OnDeath.AddListener(onDeath);
         LivingEntity.OnStunned.AddListener(onStunned);
+        LivingEntity.OnDamageTaken.AddListener(onDamageTaken);
         EventBus.ItemPlacedEvent.AddListener(UpdateEquipment);
         
         CameraDistance = MinCameraDistance;
@@ -235,15 +236,8 @@ public class Player : MonoBehaviour {
 
         StartPosition = transform.position;
 
-        OnEvolutionSelected.AddListener((evoUI) => {
-            foreach (Modifier modifier in evoUI.GetModifiers()) {
-                LivingEntity.ApplyIndefiniteModifier(modifier);
-            }
-        });
+        OnEvolutionSelected.AddListener(x => ApplyEvolution(x));
 
-        LivingEntity.OnDamageTaken.AddListener((data) => {
-            CameraManager.ShakeCamera(2, 0.1f);
-        });
  
         _interactionMask |= 1 << LayerMask.NameToLayer("Interactable");
 
@@ -402,6 +396,12 @@ void Update() {
     private void onStunned(float duration) {
         CameraManager.ShakeCamera(2, duration);
     }
+    
+    private void onDamageTaken(DamageTakenEventData _) {
+        FaceAnimator.StartAnimation("HURT", 0.3f);
+        CameraManager.ShakeCamera(0.7f, 0.1f);
+
+    }
 
     
     #region Input Events
@@ -557,7 +557,6 @@ void Update() {
         }
         
         Animator.speed = 0;
-        // Animator.applyRootMotion = false;
         Animator.SetBool(_lightAttackHash, false);
         Animator.SetBool(_heavyAttackHash, false);
 
@@ -567,22 +566,6 @@ void Update() {
         CurrentAnimationState = AnimationState.Dash;
 
         
-
-        // UpdateDisabled = true;
-        // Animator.animatePhysics = false;
-
-        // transform.DOMove(transform.position + transform.forward * DashDistance, DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
-        //     // Animator.applyRootMotion = true;
-        //     Animator.animatePhysics = true;
-        //     UpdateDisabled = false;
-        //     Animator.speed = 1;
-        //     DamageDisabled = false;
-        //     LockRotation = false;
-        //     foreach (ParticleSystem trail in _trailParticles) {
-        //         trail.Clear();
-        //         trail.Stop();
-        //     }
-        // }
         Invoke(nameof(endDash), DashDuration);
     }
 
@@ -705,7 +688,6 @@ void Update() {
         Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
 
         if (CurrentWeapon?.ItemData != null) {
-            Debug.Log(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
             SlashManager.SetSlashColor(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
         } 
         EventBus.InventoryItemChangedEvent.Invoke();
@@ -889,10 +871,10 @@ void Update() {
         WeaponHolder.UpdateWeapon(null);
         WeaponHolder.DisableHitbox();
         WeaponHolder.EndAttack();
-        Player.UICanvas.HUDCanvas.UpdateSpellSlots();
-        Player.UICanvas.HUDCanvas.UpdateHealthBar();
-        Player.UICanvas.HUDCanvas.UpdateManaBar();
-        Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+        UICanvas.HUDCanvas.UpdateSpellSlots();
+        UICanvas.HUDCanvas.UpdateHealthBar();
+        UICanvas.HUDCanvas.UpdateManaBar();
+        UICanvas.HUDCanvas.OnUpdateConsumables();
         UICanvas.ChooseCanvas.ResetCardUI();
         // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GameManager.Instance.ResetCards();
@@ -903,7 +885,8 @@ void Update() {
         EventBus.InventoryItemChangedEvent?.Invoke();
 
         Instance.UpdateEquipment();
-        
+        Player.LivingEntity.Health = Player.LivingEntity.MaxHealth;
+        Player.LivingEntity.Mana = Player.LivingEntity.MaxMana;     
     }
 
     private void registerStats() {
@@ -919,6 +902,25 @@ void Update() {
         ModifierSystem.RegisterStat(ref DashSpeedMultiplier);
         ModifierSystem.RegisterStat(ref DashCooldown);
         ModifierSystem.RegisterStat(ref DashDuration);
+    }
+    
+    public void ApplyEvolution(EvoUI evoUI) {
+        GameManager.Instance.RandomCardCount = 3;
+        
+        switch (evoUI.ElementalType) {
+            case ElementalType.Fire:
+            case ElementalType.Ice:
+                foreach (Modifier modifier in evoUI.GetModifiers()) {
+                    LivingEntity.ApplyIndefiniteModifier(modifier);
+                }
+                break;
+            case ElementalType.Earth:
+                GameManager.Instance.RandomCardCount++;
+                break;
+        }
+        LivingEntity.Health = LivingEntity.MaxHealth;
+        LivingEntity.Mana = LivingEntity.MaxMana;
+         
     }
 
     public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
@@ -974,6 +976,8 @@ void Update() {
         SlashManager.DisableSlash();
         UpdateEquipment();
     }
+
+    
 
     #endregion
     #region Save System

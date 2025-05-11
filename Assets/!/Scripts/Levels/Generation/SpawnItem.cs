@@ -8,6 +8,4 @@ public struct SpawnItemData
     public float MaxQuantity;
     public float MinInfluence;
     public float MinInfluenceDelta;
-    [Range(0f, 1f)]
-    public float ChanceToSpawn;
 }

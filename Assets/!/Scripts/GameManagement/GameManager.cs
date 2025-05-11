@@ -34,11 +34,15 @@ public class GameManager : MonoBehaviour {
     public InvTileEquipment Consumable1Tile;
     public InvTileEquipment Consumable2Tile;
     public VisualEffect FireEffectPrefab;
+    public Guild FriendlyGuild;
+    public Guild EnemyGuild;
 
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
         {Dimension.HUB, "NewHub"},
         {Dimension.FOREST, "Adventure"},
-        {Dimension.FOREST_VECTOR, "VectorBossBattle"},
+        {Dimension.VEKTHAR_BOSS, "VectorBossBattle"},
+        {Dimension.ENT_BOSS, "EntBossBattle"},
+        {Dimension.SLIME_BOSS, "Adventure"},
         {Dimension.CARD_CHOOSE, "CardChoose"}
     };
 
@@ -50,6 +54,7 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public static readonly float MinInfluenceDelta = 5.0f; 
     [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f;
     [HideInInspector] public float LevelDepth = 0;
+    [HideInInspector] public int BossesDefeated = 0;
     public bool ShowMainMenu = true;
 
     // [Header("Music")]
@@ -66,6 +71,7 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] private List<Card> _availableCards = new();
     [SerializeField] private Card[] _currentCardChoice = null;
     [SerializeField] private List<Card> _cards = new();
+    [Range(3,6)] public int RandomCardCount = 3;
     [Space]
     public float SaveCooldown = 15f;
 

@@ -12,7 +12,8 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private CanvasGroup _longDescCanvasGroup;
     [SerializeField] private TextLocalizer _longDescTextLocalizer;
     [SerializeField] private ContentSizeFitter  _contentSizeFitter;
-    [SerializeField] private int _maxCards = 3;
+    private int _maxCards => GameManager.Instance.RandomCardCount;
+    [SerializeField] private AudioClip CardSoundClip;
 
     private CanvasGroup _canvasGroup;
     private CardUI[] _currentCards;
@@ -22,10 +23,11 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
         _canvasGroup.alpha = 0;
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
-        _currentCards = new CardUI[_maxCards];
     }
 
     private void Start() {
+        _currentCards = new CardUI[_maxCards];
+
         EventBus.RunCardClickedEvent.AddListener(OnRunCardClicked);
     }
 

@@ -13,11 +13,12 @@ public class Fire : MonoBehaviour {
 
     private LivingEntity _self;
     private VisualEffect _fireVFX;
+    private TintAnimator.Tint _fireTint;
 
     void Start() {
         _self = GetComponent<LivingEntity>();
         
-        _self.TintAnimator.SetTint(Color.red, 0.5f);
+        _fireTint = _self.TintAnimator.ApplyTint(Color.red, 0.5f, 100000);
 
         _fireVFX = Instantiate(GameManager.Instance.FireEffectPrefab, gameObject.transform);
 
@@ -32,7 +33,7 @@ public class Fire : MonoBehaviour {
         Stacks--;
 
         if(Stacks <= 0) {
-            _self.TintAnimator.ResetTint();
+            _fireTint.Stop();
             Destroy(_fireVFX.gameObject);
             Destroy(this);
         }

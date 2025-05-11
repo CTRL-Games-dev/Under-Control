@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SlashManager : MonoBehaviour
 {
@@ -9,11 +10,22 @@ public class SlashManager : MonoBehaviour
         public WeaponTrait Trait;
         public Color Color;
     }
+
     public List<SlashColor> SlashColorsList = new List<SlashColor>();
     public List<GameObject> SlashObjects = new List<GameObject>();
     public Material SlashMaterial;
     public List<Collider> HitEnemies = new List<Collider>();
-    
+
+    [HideInInspector]
+    public UnityEvent<LivingEntity> OnHit = new();
+
+    public void OnTriggerEnter(Collider other) {
+        LivingEntity victim = other.GetComponentInParent<LivingEntity>(includeInactive: true);
+
+        if(victim == null) return;
+
+        OnHit?.Invoke(victim);
+    }
 
     public void SetSlashColor(WeaponTrait weaponTrait) {
         if (SlashMaterial == null) return;

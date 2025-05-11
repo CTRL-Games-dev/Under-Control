@@ -56,8 +56,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8580386617105963349}
   - component: {fileID: 4248762910866899357}
-  m_Layer: 10
-  m_Name: Hitbox
+  m_Layer: 16
+  m_Name: Hurtbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -111,7 +111,6 @@ GameObject:
   - component: {fileID: 7991884007475633377}
   - component: {fileID: 5382022739188377206}
   - component: {fileID: 3433351756953560314}
-  - component: {fileID: 4187022244060618223}
   - component: {fileID: 1259368281537823718}
   - component: {fileID: 8528608844679578767}
   - component: {fileID: 521736618556922946}
@@ -138,7 +137,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.409, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7375074307627776715}
   - {fileID: 8580386617105963349}
@@ -192,21 +191,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _activeModifiers: []
   _stats: []
---- !u!114 &4187022244060618223
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8136527368806167904}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99dbd46cc69694b43ac0166c94fd82c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hitFlashMaterial: {fileID: 2100000, guid: a70176b5e5737f04f86db74d184df881, type: 2}
-  _flashDuration: 0.1
-  _isPlayer: 0
 --- !u!114 &1259368281537823718
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -224,6 +208,7 @@ MonoBehaviour:
   DropItemsOnDeath: 1
   DestroyOnDeath: 1
   IsInvisible: 0
+  AvoidGuildChange: 0
   StartingHealth: 75
   StartingMana: 100
   _health: 0
@@ -390,6 +375,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _meshRenderers:
   - {fileID: 1237172211013393839}
+  _hitTintColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &8532890818533065815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -409,7 +395,7 @@ MonoBehaviour:
     MaxAmount: 8
     MinPowerScale: 0
     MaxPowerScale: 0
-    Chance: 1
+    Chance: 0.3
 --- !u!114 &-5342702583041411022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -507,7 +493,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8140379391370592399, guid: 850b196421d4bdb4a8d171fde8aa4192, type: 3}
       propertyPath: m_Materials.Array.size
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 8140379391370592399, guid: 850b196421d4bdb4a8d171fde8aa4192, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -516,7 +502,15 @@ PrefabInstance:
     - target: {fileID: 8140379391370592399, guid: 850b196421d4bdb4a8d171fde8aa4192, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
+      objectReference: {fileID: 2100000, guid: c6a91334cc142a9469d7e11991cd1bd5, type: 2}
+    - target: {fileID: 8140379391370592399, guid: 850b196421d4bdb4a8d171fde8aa4192, type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
+      value: 
       objectReference: {fileID: 7383868390552105761, guid: 850b196421d4bdb4a8d171fde8aa4192, type: 3}
+    - target: {fileID: 8140379391370592399, guid: 850b196421d4bdb4a8d171fde8aa4192, type: 3}
+      propertyPath: 'm_Materials.Array.data[3]'
+      value: 
+      objectReference: {fileID: 2100000, guid: fd1ebe14847ca50a3ac36a4c3aacfa8a, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

@@ -14,11 +14,12 @@ public abstract class Portal : MonoBehaviour
     [HideInInspector] public float Influence;
 
     private void Awake() {
-        _portalInsideRenderer = _portalInside.GetComponent<Renderer>();        
+        _portalInsideRenderer = _portalInside.GetComponent<Renderer>();
+        setInfluence();     
     }
 
     void Start() {
-        setInfluence();
+
     }
 
     protected void FixedUpdate() {
@@ -47,7 +48,7 @@ public abstract class Portal : MonoBehaviour
         GameManager.Instance.ChangeDimension(_dimension, Influence);
     }
 
-    public void SetDimension(Dimension d) {
+    public virtual void SetDimension(Dimension d) {
         _dimension = d;
     }
 

@@ -20,7 +20,6 @@ GameObject:
   - component: {fileID: 4198091276035405759}
   - component: {fileID: 944497780338279808}
   - component: {fileID: 8495430180178546008}
-  - component: {fileID: 1303237322038029711}
   - component: {fileID: 2426849268657618550}
   - component: {fileID: -2734128752090127570}
   m_Layer: 0
@@ -39,7 +38,7 @@ Transform:
   m_GameObject: {fileID: 3366227734027736264}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.5, y: 3.12, z: 4.31}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -80,6 +79,7 @@ MonoBehaviour:
   DropItemsOnDeath: 1
   DestroyOnDeath: 1
   IsInvisible: 0
+  AvoidGuildChange: 0
   StartingHealth: 30
   StartingMana: 10
   _health: 0
@@ -172,19 +172,19 @@ MonoBehaviour:
     MaxAmount: 4
     MinPowerScale: 0
     MaxPowerScale: 0
-    Chance: 1
+    Chance: 0.3
   - Item: {fileID: 11400000, guid: 9df73015bdc274a4394a14e34153ecaf, type: 2}
     MinAmount: 0
     MaxAmount: 2
     MinPowerScale: 0
     MaxPowerScale: 0
-    Chance: 1
+    Chance: 0.4
   - Item: {fileID: 11400000, guid: e238eb001208bff4ab3b431ed6ee2db0, type: 2}
     MinAmount: 0
     MaxAmount: 2
     MinPowerScale: 0
     MaxPowerScale: 0
-    Chance: 1
+    Chance: 0.3
 --- !u!195 &8974613204039339173
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -297,7 +297,7 @@ MonoBehaviour:
           m_Value0: 10149414230425188516
           m_Value1: 17553428434321282803
         Name: ChargingDistance
-        m_Value: 10
+        m_Value: 8
     - rid: 4560525000716845984
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -385,21 +385,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1303237322038029711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3366227734027736264}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99dbd46cc69694b43ac0166c94fd82c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hitFlashMaterial: {fileID: 2100000, guid: a70176b5e5737f04f86db74d184df881, type: 2}
-  _flashDuration: 0.1
-  _isPlayer: 0
 --- !u!114 &2426849268657618550
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -414,6 +399,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _meshRenderers:
   - {fileID: 1048271120803497581}
+  _hitTintColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &-2734128752090127570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -485,8 +471,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7495280357175526758}
   - component: {fileID: 790272168344437805}
-  m_Layer: 10
-  m_Name: Hitbox
+  m_Layer: 16
+  m_Name: Hurtbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -526,8 +512,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 2.6032457, z: 2}
-  m_Center: {x: 0, y: 1.411623, z: 0}
+  m_Size: {x: 0.7, y: 2, z: 1.5}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &8487048513762263559
 GameObject:
   m_ObjectHideFlags: 0
@@ -672,7 +658,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -3314160729480047072, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
       propertyPath: m_Materials.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: -3314160729480047072, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -680,6 +666,10 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: acc3b20724406744cb8b49bdf4e3e028, type: 2}
     - target: {fileID: -3314160729480047072, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: c6a91334cc142a9469d7e11991cd1bd5, type: 2}
+    - target: {fileID: -3314160729480047072, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
       value: 
       objectReference: {fileID: -7674537378844400586, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
     - target: {fileID: 919132149155446097, guid: 53dbb18eeca23ee419e9ddeaa9c69d66, type: 3}
