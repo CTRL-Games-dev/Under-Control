@@ -186,25 +186,27 @@ public class InvTileEquipment : InvTile {
     }
     public void PlaceItem(InventoryItem item){
         if (_tileType == TileType.Armor) {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance._EquipArmor, this.transform.position);
             if(!item.TryAs(out InventoryItem<ArmorItemData> armorItem)) {
                 return;
             }
 
             Player.Inventory.Armor = armorItem;
         } else if (_tileType == TileType.Amulet) {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance._EquipAmulet, this.transform.position);
             if(!item.TryAs(out InventoryItem<AmuletItemData> amuletItem)) {
                 return;
             }
 
             Player.Inventory.Amulet = amuletItem;
         } else if (_tileType == TileType.Weapon) {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance._EquipItem, this.transform.position);
             if(!item.TryAs(out InventoryItem<WeaponItemData> weaponItem)) {
                 return;
             }
-            AudioClip EquipWeaponClip = Resources.Load("SFX/bron/wyjmowaniebroni") as AudioClip;
-            SoundFXManager.Instance.PlaySoundFXClip(EquipWeaponClip,transform);
             Player.Inventory.Weapon = weaponItem;
         } else if (_tileType == TileType.Consumeable1) {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance._EquipWeapon, this.transform.position);
             if(!item.TryAs(out InventoryItem<ConsumableItemData> consumableItem)) {
                 return;
             }

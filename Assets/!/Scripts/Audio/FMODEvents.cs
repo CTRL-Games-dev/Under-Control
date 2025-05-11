@@ -29,7 +29,13 @@ public class FMODEvents : MonoBehaviour
 
     [field: Header("Player SFX")]
     [field: SerializeField] public EventReference _PlayerWalkSound { get; private set; }
+    [field: SerializeField] public EventReference _PlayerDashSound { get; private set; }
 
+    [field: Header("Item Equip SFX")]
+    [field: SerializeField] public EventReference _EquipArmor { get; private set; }
+    [field: SerializeField] public EventReference _EquipWeapon { get; private set; }
+    [field: SerializeField] public EventReference _EquipItem { get; private set; }
+    [field: SerializeField] public EventReference _EquipAmulet { get; private set; }
     [field: Header("Player Attack SFX")]
     [field: SerializeField] public EventReference _shortSword { get; private set; }
     [field: SerializeField] public EventReference _longSword { get; private set; }

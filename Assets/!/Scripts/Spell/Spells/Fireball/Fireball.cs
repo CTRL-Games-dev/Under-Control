@@ -17,6 +17,7 @@ public class Fireball : MonoBehaviour {
     }
 
     public void Awake() {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance._fireball, transform.position);
         _startingPosition = transform.position;
     }
 
@@ -39,6 +40,7 @@ public class Fireball : MonoBehaviour {
         Destroy(gameObject);
     }
     void OnTriggerEnter(Collider other) {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance._fireballHit, this.transform.position);
         if(!other.TryGetComponent(out LivingEntity livingEntity)) return;
         if(livingEntity == _caster) return;
         Explode();

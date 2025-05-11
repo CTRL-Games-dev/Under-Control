@@ -13,6 +13,8 @@ public class AudioManager : MonoBehaviour
 
     private EventInstance musicInstance;
 
+    private EventInstance attackInstance;
+
     public static AudioManager instance {get; private set;}
     private void Awake(){
         if(instance != null){
@@ -42,6 +44,14 @@ public class AudioManager : MonoBehaviour
 
     public void PlayOneShot(EventReference sound, Vector3 position){
         RuntimeManager.PlayOneShot(sound, position);
+    }
+
+    public void PlayAttackSound(EventReference sound, Vector3 position, WeaponType weaponType)
+    {
+        EventInstance attackInstance = RuntimeManager.CreateInstance(sound);
+        attackInstance.setParameterByName("WeaponType", (float)weaponType);
+        attackInstance.start();
+        attackInstance.release();
     }
 
     public EventInstance CreateEventInstance(EventReference eventReference){

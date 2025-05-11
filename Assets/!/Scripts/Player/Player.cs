@@ -273,7 +273,7 @@ public class Player : MonoBehaviour {
             }
         });
         
-        OnDashSound =  Resources.Load("SFX/bohater/dash") as AudioClip;
+
 
         ResetRun();
     }
@@ -541,7 +541,6 @@ void Update() {
 
     void OnDodge() {
         if (_isAttacking || InputDisabled) return;
-
         _dashCooldown.CooldownTime = DashCooldown;
         
         if (!_dashCooldown.Execute()) {
@@ -563,8 +562,10 @@ void Update() {
         Animator.SetBool(_heavyAttackHash, false);
 
         foreach (ParticleSystem trail in _trailParticles) { trail.Play(); }
-
+        
+        AudioManager.instance.PlayOneShot(FMODEvents.instance._PlayerDashSound, this.transform.position);
         CurrentAnimationState = AnimationState.Dash;
+
         
 
         // UpdateDisabled = true;
@@ -688,15 +689,11 @@ void Update() {
     private void performLightAttack() {
         Animator.SetBool(_heavyAttackHash, false);
         Animator.SetTrigger(_lightAttackHash);
-        AudioClip attackSound = Resources.Load("SFX/bron/atak4") as AudioClip;
-        SoundFXManager.Instance.PlaySoundFXClip(attackSound, transform, 0.35f);
     }
 
     private void performHeavyAttack() {
         Animator.SetBool(_lightAttackHash, false);
         Animator.SetTrigger(_heavyAttackHash);
-        AudioClip attackSound = Resources.Load("SFX/bron/atak2") as AudioClip;
-        SoundFXManager.Instance.PlaySoundFXClip(attackSound, transform, 0.35f);
     }
 
     public void OnInventoryChanged() {
