@@ -22,10 +22,11 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
         _canvasGroup.alpha = 0;
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
-        _currentCards = new CardUI[_maxCards];
     }
 
     private void Start() {
+        _currentCards = new CardUI[_maxCards];
+
         EventBus.RunCardClickedEvent.AddListener(OnRunCardClicked);
     }
 

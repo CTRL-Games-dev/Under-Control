@@ -12,10 +12,11 @@ public class Charm : MonoBehaviour {
     public void Initialize(float duration) {
         PreviousGuild = _self.Guild;
         _self.Guild = Player.LivingEntity.Guild;
-        Invoke(nameof(resetGuild), duration);
+        
+        Invoke(nameof(Stop), duration);
     }
 
-    private void resetGuild() {
+    public void Stop() {
         _self.Guild = PreviousGuild;
         _self.TintAnimator.ResetTint();
         Destroy(this);

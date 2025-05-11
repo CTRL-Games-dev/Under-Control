@@ -1,7 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -25,17 +25,26 @@ public class EnemySpawner : MonoBehaviour
         DuringFightWithEnts,
         FightEnded,
     }
+
     private SpawnerState _state = SpawnerState.BeforeFight;
+
     public Transform SpawnPointsParent;
+
     private Location _location;
     private List<Wall> _activeWalls = new();
-    private GameObject _enemies;
+
+    private GameObject _enemiesParent;
+    private List<LivingEntity> _enemies = new List<LivingEntity>();
+    private List<EntAIController> _ents = new List<EntAIController>();
+
     [HideInInspector] public List<Transform> SpawnPoints;
-    private List<Transform> _usedSpawnPoints;
-    [HideInInspector] public int NumberOfEnemies { get; private set; }
+
     private int _waveNumber = 0;
     private int _numberOfWaves = 0;
+    private bool _hasSpawned = false;
+
     public UnityEvent DefeatedEnemies;
+
     void Awake()
     {
         _location = GetComponent<Location>();
@@ -43,9 +52,8 @@ public class EnemySpawner : MonoBehaviour
 
     void Start()
     {
-
-        _usedSpawnPoints = new();
         foreach(Transform child in SpawnPointsParent) SpawnPoints.Add(child);
+
         if(MaxExitsAtOnce > SpawnPoints.Count)
         {
             Debug.LogWarning($"Maximum number of exit locations used at once was set to {MaxExitsAtOnce}, but number of them is only {SpawnPoints.Count}.");
@@ -54,8 +62,8 @@ public class EnemySpawner : MonoBehaviour
 
         if(transform.Find("Enemies") == null)
         {
-            _enemies = new GameObject("Enemies");
-            _enemies.transform.parent = transform;
+            _enemiesParent = new GameObject("Enemies");
+            _enemiesParent.transform.parent = transform;
         }
 
         Transform trees = transform.Find("Trees");
@@ -69,8 +77,12 @@ public class EnemySpawner : MonoBehaviour
                 Transform treeTransform = t.transform;
                 Destroy(t.gameObject);
 
-                EntAIController newEnt = Instantiate(_entPrefab, treeTransform.position, Quaternion.identity);
-                newEnt.transform.parent = _enemies.transform;
+                EntAIController newEnt = Instantiate(_entPrefab, treeTransform.position, Quaternion.identity, _enemiesParent.transform);
+                newEnt.GetComponent<LivingEntity>().OnDeath.AddListener(() => {
+                    _ents.Remove(newEnt);
+                });
+
+                _ents.Add(newEnt);
 
                 Debug.Log($"New ent was spawned at position: {newEnt.transform.position}.");
             }
@@ -81,7 +93,6 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         switch(_state)
@@ -90,11 +101,10 @@ public class EnemySpawner : MonoBehaviour
             case SpawnerState.StartingFight: { startFight(); break; }
             case SpawnerState.DuringFight: { duringFight(); break; }
             case SpawnerState.TriggerEnts: {
-                if(GetEntCount() > 0)
+                if(_ents.Count > 0)
                 {   
-                    List<EntAIController> ents = GetEnts();
                     Debug.Log("Last wave has been defeated, triggering ents.");
-                    ents.ForEach(e => e.TriggerEndgame());
+                    _ents.ForEach(e => e.TriggerEndgame());
                     _state = SpawnerState.DuringFightWithEnts;
                 }
                 else
@@ -102,6 +112,7 @@ public class EnemySpawner : MonoBehaviour
                     Debug.Log("Last wave has been defeated and there are no more ents to trigger.");
                     _state = SpawnerState.FightEnded;
                 }
+
                 break; 
             }
             case SpawnerState.DuringFightWithEnts: { duringFightWithEnts(); break; }
@@ -111,24 +122,44 @@ public class EnemySpawner : MonoBehaviour
 
     private void startFight()
     {
+        Debug.Log("Starting fight");
+
         spawnWalls();
 
         _numberOfWaves = UnityEngine.Random.Range(MinNumberOfWaves, MaxNumberOfWaves + 1);
         _waveNumber = 0;
 
         _state = SpawnerState.DuringFight;
+   
+        Debug.Log($"Waves count: {_numberOfWaves}");
     } 
 
     private void duringFight()
     {
-        if(NumberOfEnemies == 0 && _numberOfWaves == _waveNumber)
+        if(!_hasSpawned && _waveNumber != 0) return;
+
+        if(_enemies.Count == 0 && _numberOfWaves == _waveNumber)
         {
             Debug.Log("Last wave has ended");
             _state = SpawnerState.TriggerEnts;
             return;
         }
 
-        if(NumberOfEnemies != 0) return;
+        if(_enemies.Count > 0 && hasOnlyFriendlyEnemies()) {
+            Debug.Log($"Wave {_waveNumber} has only friendly enemies: {_enemies.Count}");
+
+            foreach(LivingEntity enemy in _enemies) {
+                enemy.Guild = GameManager.Instance.EnemyGuild;
+                enemy.AvoidGuildChange = true;
+                
+                Charm enemyCharm = enemy.GetComponent<Charm>();
+                if(enemyCharm != null) {
+                    enemyCharm.Stop();
+                }
+            }
+        }
+
+        if(_enemies.Count != 0) return;
 
         Debug.Log("=== Starting new wave ===");
 
@@ -141,48 +172,36 @@ public class EnemySpawner : MonoBehaviour
         _waveNumber++;
 
         Debug.Log($"Number of enemies: {currentWave.EnemyPrefabs.Count()}");
-        NumberOfEnemies = currentWave.EnemyPrefabs.Count();
 
-        int previousBatch = 0;
-        List<Transform> randomSpawnPoints = FluffyUtils.ShuffleList(SpawnPoints)
-                    .Select(x=>x)
-                    .Take(MaxExitsAtOnce)
-                    .ToList();
+        _hasSpawned = false;
+
+        float firstBatchDelay = 3f;
+        float delayBetweenEach = 1f;
 
         for(int i = 0; i < currentWave.EnemyPrefabs.Count(); i++)
         {
+            List<Transform> randomSpawnPoints = FluffyUtils.ShuffleList(SpawnPoints)
+                .Select(x=>x)
+                .Take(MaxExitsAtOnce)
+                .ToList();
+
             GameObject enemy = currentWave.EnemyPrefabs[i];
 
-            int batch = i / SpawnPoints.Count;
-
-            if(previousBatch > batch) {
-                randomSpawnPoints = FluffyUtils.ShuffleList(SpawnPoints)
-                    .Select(x=>x)
-                    .Take(MaxExitsAtOnce)
-                    .ToList();
-            }
-
+            int batch = i / randomSpawnPoints.Count;
             Transform spawnPoint = randomSpawnPoints[i%randomSpawnPoints.Count];
 
-            if(_usedSpawnPoints.Count(x => x == spawnPoint) != 0 )
-                _usedSpawnPoints.Add(spawnPoint);
+            // Total delay = initial delay + time based on batch index
+            float totalSmokeDelay = firstBatchDelay + (batch * delayBetweenEach);
 
-            randomSpawnPoints.RemoveAt(i%randomSpawnPoints.Count);
-
-            float firstBatchDelay = 3f;
-            float spawnTime = 3f;
-            float delayBetweenEach = 0.5f;
-
-            // Total delay = initial delay + time based on batch index + some additional delay
-            float totalSmokeDelay = firstBatchDelay + (batch * spawnTime + delayBetweenEach) + 0.2f * i;
-
-            StartCoroutine(spawnEnemy(enemy, spawnPoint.position, totalSmokeDelay, delayBetweenEach, delayBetweenEach));
+            StartCoroutine(spawnEnemy(enemy, spawnPoint.position, totalSmokeDelay, delayBetweenEach));
         }
+
+        StartCoroutine(setToSpawned(firstBatchDelay + ((currentWave.EnemyPrefabs.Count() - 1) / Math.Min(SpawnPoints.Count, MaxExitsAtOnce) * delayBetweenEach) + delayBetweenEach + 1));
     }
 
     private void duringFightWithEnts()
     {
-        if(GetEntCount() == 0)
+        if(_ents.Count == 0)
         {
             _state = SpawnerState.FightEnded;
         }
@@ -203,28 +222,40 @@ public class EnemySpawner : MonoBehaviour
         _state = SpawnerState.StartingFight;
     }
 
-    private IEnumerator spawnEnemy(GameObject enemy, Vector3 position, float smokeDelay, float enemySpawnDelay, float smokeFade)
+    private IEnumerator setToSpawned(float delay) {
+        yield return new WaitForSeconds(delay);
+        _hasSpawned = true;
+        Debug.Log("Set to spawned after delay " + delay);
+    }
+
+    private IEnumerator spawnEnemy(GameObject enemy, Vector3 position, float smokeDelay, float enemySpawnDelay)
     {
+        Debug.Log($"Spawning enemy after {smokeDelay + enemySpawnDelay} seconds");
+
         yield return new WaitForSeconds(smokeDelay);
 
         Vector3 smokePosition = position;
         smokePosition.y += 1.5f;
         EnemySpawnExit smoke = Instantiate(_enemySpawnerExitPrefab, smokePosition, Quaternion.identity);
-
-        smoke.SetDestroyTimer(enemySpawnDelay + smokeFade);
+        smoke.SetDestroyTimer(enemySpawnDelay);
 
         yield return new WaitForSeconds(enemySpawnDelay);
 
-        GameObject newEnemy = Instantiate(enemy, position, Quaternion.identity, _enemies.transform);
-        newEnemy.transform.parent = _enemies.transform;
+        GameObject newEnemy = Instantiate(enemy, position, Quaternion.identity, _enemiesParent.transform);
+
         Debug.Log($"Spawned new enemy at: {newEnemy.transform.position}");
-        newEnemy.GetComponent<LivingEntity>().OnDeath.AddListener(enemyDied);
+
+        LivingEntity newEnemyEntity = newEnemy.GetComponent<LivingEntity>();
+
+        newEnemyEntity.OnDeath.AddListener(() => {
+            _enemies.Remove(newEnemyEntity);
+        });
+
+        _enemies.Add(newEnemyEntity);
+        Debug.Log("Added new enemy to list");
+        Debug.Log($"Enemies count: {_enemies.Count}");
     }
 
-    private void enemyDied()
-    {
-        NumberOfEnemies--;
-    }
     private void spawnWalls()
     {
         Vector3 a = _location.GetTopLeftCorner3();
@@ -262,41 +293,13 @@ public class EnemySpawner : MonoBehaviour
         Debug.Log("Removed walls");
     }
 
-    public int GetAllEnemiesCount()
-    {
-        return _enemies.transform.childCount;
-    }
-
-    public int GetEntCount()
-    {
-        int enemyCount = 0;
-        foreach(Transform e in _enemies.transform)
-        {
-            if(e.tag == "Ent") enemyCount++;
-        }
-        return enemyCount;
-    }
-
-    // public int GetEnemiesCountWithoutEnts()
-    // {
-    //     int enemyCount = 0;
-    //     foreach(Transform e in _enemies.transform)
-    //     {
-    //         if(e.tag != "Ent") enemyCount++;
-    //     }
-    //     return enemyCount;
-    // }
-
-    public List<EntAIController> GetEnts()
-    {
-        List<EntAIController> ents = new();
-        foreach(Transform e in _enemies.transform)
-        {
-            if(e.tag == "Ent") {
-                EntAIController entController = e.gameObject.GetComponent<EntAIController>();
-                if(entController != null) ents.Add(entController);
+    private bool hasOnlyFriendlyEnemies() {
+        foreach(LivingEntity enemy in _enemies) {
+            if(enemy.Guild != Player.LivingEntity.Guild && !enemy.IsInvisible) {
+                return false;
             }
         }
-        return ents;
+
+        return true;
     }
 }

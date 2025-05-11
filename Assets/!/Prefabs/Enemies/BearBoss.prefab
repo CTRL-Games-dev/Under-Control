@@ -387,6 +387,7 @@ GameObject:
   - component: {fileID: 8824370750566887721}
   - component: {fileID: 801651726614500412}
   - component: {fileID: 5495688591996147809}
+  - component: {fileID: 1865126210290877685}
   m_Layer: 0
   m_Name: BearBoss
   m_TagString: Boar
@@ -444,8 +445,11 @@ MonoBehaviour:
   DropItemsOnDeath: 1
   DestroyOnDeath: 1
   IsInvisible: 0
+  AvoidGuildChange: 0
   StartingHealth: 100
   StartingMana: 100
+  _health: 0
+  _mana: 100
   MaxHealth:
     _raw: 200
     _adjusted: 100
@@ -474,6 +478,10 @@ MonoBehaviour:
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
+  OnDeathSound: {fileID: 0}
+  OnDamageSound: {fileID: 0}
+  OnAttack: {fileID: 0}
+  IdleSounds: []
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -483,6 +491,7 @@ MonoBehaviour:
   OnStunned:
     m_PersistentCalls:
       m_Calls: []
+  HasDied: 0
   _isPlayer: 0
 --- !u!114 &5971722301657437975
 MonoBehaviour:
@@ -764,6 +773,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9da7b95f89283f86a9473c918dd21b80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1865126210290877685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6519855406994269912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccbfbf48d8b4ca844a0f6084a171adbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _meshRenderers: []
 --- !u!1 &7396373853440051534
 GameObject:
   m_ObjectHideFlags: 0

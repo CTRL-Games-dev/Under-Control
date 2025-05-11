@@ -35,7 +35,8 @@ public class GameManager : MonoBehaviour {
     public InvTileEquipment Consumable1Tile;
     public InvTileEquipment Consumable2Tile;
     public VisualEffect FireEffectPrefab;
-
+    public Guild FriendlyGuild;
+    public Guild EnemyGuild;
 
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
         {Dimension.HUB, "NewHub"},
