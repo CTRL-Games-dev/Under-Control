@@ -87,19 +87,19 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         resetBtnPositions();
 
         _logoImage.DOFade(1, 0.6f * Settings.AnimationSpeed).SetEase(Ease.InSine).OnComplete(() => {
-            AudioManager.instance.PlayOneShot(FMODEvents.instance._TitleScreenAnim, this.transform.position);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.TitleScreenAnim, this.transform.position);
             _newGameRect.DOAnchorPosX(_newGameBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
             _newGameGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
-                AudioManager.instance.PlayOneShot(FMODEvents.instance._TitleScreenAnim, this.transform.position);
+                AudioManager.instance.PlayOneShot(FMODEvents.instance.TitleScreenAnim, this.transform.position);
                 _continueRect.DOAnchorPosX(_continueBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
                 _continueGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
-                    AudioManager.instance.PlayOneShot(FMODEvents.instance._TitleScreenAnim, this.transform.position);
+                    AudioManager.instance.PlayOneShot(FMODEvents.instance.TitleScreenAnim, this.transform.position);
                     _optionsRect.DOAnchorPosX(_optionsBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
                     _optionsGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
-                        AudioManager.instance.PlayOneShot(FMODEvents.instance._TitleScreenAnim, this.transform.position);
+                        AudioManager.instance.PlayOneShot(FMODEvents.instance.TitleScreenAnim, this.transform.position);
                         _creditsRect.DOAnchorPosX(_creditsBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
                         _creditsGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
-                            AudioManager.instance.PlayOneShot(FMODEvents.instance._TitleScreenAnim, this.transform.position);
+                            AudioManager.instance.PlayOneShot(FMODEvents.instance.TitleScreenAnim, this.transform.position);
                             _exitRect.DOAnchorPosX(_exitBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
                             _exitGroup.DOFade(1, 0.2f * Settings.AnimationSpeed);
                         });
@@ -142,7 +142,7 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
     }
 
     public void playClickSound(){
-        AudioManager.instance.PlayOneShot(FMODEvents.instance._UIClickSound, this.transform.position);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.UIClickSound, this.transform.position);
     }
 
     public void OnContinueGameBtnClick() {

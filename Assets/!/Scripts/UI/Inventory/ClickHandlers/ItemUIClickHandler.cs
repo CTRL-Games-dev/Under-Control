@@ -7,7 +7,7 @@ public class ItemUIClickHandler : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance._UIClickSound, transform.position);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.UIClickSound, transform.position);
         if (eventData.button == PointerEventData.InputButton.Left) {
             EventBus.ItemUILeftClickEvent.Invoke(_itemUI);
         } else if (eventData.button == PointerEventData.InputButton.Right) {

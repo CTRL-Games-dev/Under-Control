@@ -169,7 +169,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     }
 
     private void openTab(InventoryTab tab) {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance._UIClickSound, this.transform.position);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.UIClickSound, this.transform.position);
         switch (tab) {
             case InventoryTab.Other:
                 otherTabEnter();

@@ -4,82 +4,82 @@ using FMODUnity;
 public class FMODEvents : MonoBehaviour
 {
     [field: Header("Music")]
-    [field: SerializeField] public EventReference _MusicPlayer { get; private set; }
+    [field: SerializeField] public EventReference MusicPlayer { get; private set; }
     
     [field: Header("UI SFX")]
-    [field: SerializeField] public EventReference _UIClickSound { get; private set; }
-    [field: SerializeField] public EventReference _showOtherPane { get; private set; }
-    [field: SerializeField] public EventReference _TitleScreenAnim { get; private set; }
-    [field: SerializeField] public EventReference _GiveCard { get; private set; }
-    [field: SerializeField] public EventReference _CardSelect { get; private set; }
-    [field: SerializeField] public EventReference _CardHover { get; private set; }
-    [field: SerializeField] public EventReference _CardHoverExit { get; private set; }
-    [field: SerializeField] public EventReference _MoneySpend { get; private set; }
-    [field: SerializeField] public EventReference _MoneyEarned { get; private set; }
+    [field: SerializeField] public EventReference UIClickSound { get; private set; }
+    [field: SerializeField] public EventReference showOtherPane { get; private set; }
+    [field: SerializeField] public EventReference TitleScreenAnim { get; private set; }
+    [field: SerializeField] public EventReference GiveCard { get; private set; }
+    [field: SerializeField] public EventReference CardSelect { get; private set; }
+    [field: SerializeField] public EventReference CardHover { get; private set; }
+    [field: SerializeField] public EventReference CardHoverExit { get; private set; }
+    [field: SerializeField] public EventReference MoneySpend { get; private set; }
+    [field: SerializeField] public EventReference MoneyEarned { get; private set; }
 
     [field: Header("Forest Ambience")]
-    [field: SerializeField] public EventReference _forestAmbience { get; private set; }
-    [field: SerializeField] public EventReference _bossAmbience { get; private set; }
-    [field: SerializeField] public EventReference _fightAmbience { get; private set; }
-    [field: SerializeField] public EventReference _hubAmbience { get; private set; }
+    [field: SerializeField] public EventReference ForestAmbience { get; private set; }
+    [field: SerializeField] public EventReference BossAmbience { get; private set; }
+    [field: SerializeField] public EventReference FightAmbience { get; private set; }
+    [field: SerializeField] public EventReference HubAmbience { get; private set; }
 
 
     [field: Header("Respawn SFX")]
-    [field: SerializeField] public EventReference _RespawnSound { get; private set; }
+    [field: SerializeField] public EventReference RespawnSound { get; private set; }
 
     [field: Header("Player SFX")]
-    [field: SerializeField] public EventReference _PlayerWalkSound { get; private set; }
-    [field: SerializeField] public EventReference _PlayerDashSound { get; private set; }
+    [field: SerializeField] public EventReference PlayerWalkSound { get; private set; }
+    [field: SerializeField] public EventReference PlayerDashSound { get; private set; }
 
     [field: Header("Item Equip SFX")]
-    [field: SerializeField] public EventReference _EquipArmor { get; private set; }
-    [field: SerializeField] public EventReference _EquipWeapon { get; private set; }
-    [field: SerializeField] public EventReference _EquipItem { get; private set; }
-    [field: SerializeField] public EventReference _EquipAmulet { get; private set; }
+    [field: SerializeField] public EventReference EquipArmor { get; private set; }
+    [field: SerializeField] public EventReference EquipWeapon { get; private set; }
+    [field: SerializeField] public EventReference EquipItem { get; private set; }
+    [field: SerializeField] public EventReference EquipAmulet { get; private set; }
     [field: Header("Player Attack SFX")]
-    [field: SerializeField] public EventReference _shortSword { get; private set; }
-    [field: SerializeField] public EventReference _longSword { get; private set; }
-    [field: SerializeField] public EventReference _axe { get; private set; }
-    [field: SerializeField] public EventReference _fireball { get; private set; }
-    [field: SerializeField] public EventReference _iceShard { get; private set; }
+    [field: SerializeField] public EventReference PlayerAttack { get; private set; }
+    [field: SerializeField] public EventReference AttackContact { get; private set; }
+    [field: SerializeField] public EventReference Fireball { get; private set; }
+    [field: SerializeField] public EventReference IceShard { get; private set; }
     
     [field: Header("Hit SFX")]
-    [field: SerializeField] public EventReference _fireballHit { get; private set; }
+    [field: SerializeField] public EventReference FireballHit { get; private set; }
 
     [field: Header("Hog SFX")]
-    [field: SerializeField] public EventReference _HogAttack { get; private set; }
-    [field: SerializeField] public EventReference _HogDeath { get; private set; }
-    [field: SerializeField] public EventReference _HogHit { get; private set; }
+    [field: SerializeField] public EventReference HogAttack { get; private set; }
+    [field: SerializeField] public EventReference HogDeath { get; private set; }
+    [field: SerializeField] public EventReference HogHit { get; private set; }
 
     [field: Header("Slime SFX")]
-    [field: SerializeField] public EventReference _SlimeAttack { get; private set; }
-    [field: SerializeField] public EventReference _SlimeDeath { get; private set; }
-    [field: SerializeField] public EventReference _SlimeHit { get; private set; }
+    [field: SerializeField] public EventReference SlimeAttack { get; private set; }
+    [field: SerializeField] public EventReference SlimeDeath { get; private set; }
+    [field: SerializeField] public EventReference SlimeHit { get; private set; }
 
     [field: Header("Mantis SFX")]
-    [field: SerializeField] public EventReference _MantisAttack { get; private set; }
-    [field: SerializeField] public EventReference _MantisDeath { get; private set; }
-    [field: SerializeField] public EventReference _MantisHit { get; private set; }
+    [field: SerializeField] public EventReference MantisAttack { get; private set; }
+    [field: SerializeField] public EventReference MantisDeath { get; private set; }
+    [field: SerializeField] public EventReference MantisHit { get; private set; }
 
     [field: Header("Tree SFX")]
-    [field: SerializeField] public EventReference _TreeAttack { get; private set; }
-    [field: SerializeField] public EventReference _TreeDeath { get; private set; }
-    [field: SerializeField] public EventReference _TreeHit { get; private set; }
+    [field: SerializeField] public EventReference TreeAttack { get; private set; }
+    [field: SerializeField] public EventReference TreeDeath { get; private set; }
+    [field: SerializeField] public EventReference TreeHit { get; private set; }
 
     [field: Header("Slime Boss SFX")]
-    [field: SerializeField] public EventReference _SlimeBossNormalAttack { get; private set; }
-    [field: SerializeField] public EventReference _SlimeBossDeath { get; private set; }
-    [field: SerializeField] public EventReference _SlimeBossHit { get; private set; }
+    [field: SerializeField] public EventReference SlimeBossNormalAttack { get; private set; }
+    [field: SerializeField] public EventReference SlimeBossDeath { get; private set; }
+    [field: SerializeField] public EventReference SlimeBossHit { get; private set; }
 
     [field: Header("Ent Boss SFX")]
-    [field: SerializeField] public EventReference _EntBossAttack { get; private set; }
-    [field: SerializeField] public EventReference _EntBossDeath { get; private set; }
-    [field: SerializeField] public EventReference _EntBossHit { get; private set; }
+    [field: SerializeField] public EventReference EntBossAttack { get; private set; }
+    [field: SerializeField] public EventReference EntBossDeath { get; private set; }
+    [field: SerializeField] public EventReference EntBossHit { get; private set; }
 
     [field: Header("VekThar Boss SFX")]
-    [field: SerializeField] public EventReference _VekTharAttack { get; private set; }
-    [field: SerializeField] public EventReference _VekTharDeath { get; private set; }
-    [field: SerializeField] public EventReference _VekTharHit { get; private set; }
+    [field: SerializeField] public EventReference VekTharAttack { get; private set; }
+    [field: SerializeField] public EventReference VekTharDeath { get; private set; }
+    [field: SerializeField] public EventReference VekTharHit { get; private set; }
+    
 
     public static FMODEvents instance { get; private set; }
 

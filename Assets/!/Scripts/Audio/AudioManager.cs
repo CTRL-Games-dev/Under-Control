@@ -26,7 +26,7 @@ public class AudioManager : MonoBehaviour
     }
 
     private void Start(){
-        InitializeMusic(FMODEvents.instance._MusicPlayer);
+        InitializeMusic(FMODEvents.instance.MusicPlayer);
     }
 
     private void InitializeMusic(EventReference eventReference){
@@ -50,6 +50,7 @@ public class AudioManager : MonoBehaviour
     {
         EventInstance attackInstance = RuntimeManager.CreateInstance(sound);
         attackInstance.setParameterByName("WeaponType", (float)weaponType);
+        attackInstance.set3DAttributes(RuntimeUtils.To3DAttributes(position));
         attackInstance.start();
         attackInstance.release();
     }

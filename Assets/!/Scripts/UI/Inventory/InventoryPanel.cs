@@ -337,7 +337,7 @@ public class InventoryPanel : MonoBehaviour
         playInventorySound();
     }
     private void playInventorySound(){
-        AudioManager.instance.PlayOneShot(FMODEvents.instance._UIClickSound, this.transform.position);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.UIClickSound, this.transform.position);
     }
     public void ChangeCurrentInventory(ItemContainer newInventory){
         _currentEntityInventory = newInventory;

@@ -98,7 +98,7 @@ public class ChooseCanvas : MonoBehaviour, IUICanvasState
         yield return new WaitForSeconds(0.2f);
 
         foreach (CardUI card in _currentCards) {
-            AudioManager.instance.PlayOneShot(FMODEvents.instance._GiveCard, this.transform.position);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.GiveCard, this.transform.position);
             card.RotateCard();
             yield return new WaitForSeconds(0.25f);
         }

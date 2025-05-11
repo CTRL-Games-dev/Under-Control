@@ -33,7 +33,7 @@ public class PauseCanvas : MonoBehaviour, IUICanvasState
     #endregion
     #region Public Methods
     public void ShowUI() {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance._showOtherPane, this.transform.position);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.showOtherPane, this.transform.position);
         float fadeSpeed = 0.2f * Settings.AnimationSpeed;
         float moveSpeed = 0.4f * Settings.AnimationSpeed;
         

@@ -251,7 +251,7 @@ public class Player : MonoBehaviour {
     }
 
     void Start() {
-        _PlayerWalkSound = AudioManager.instance.CreateEventInstance(FMODEvents.instance._PlayerWalkSound);
+        _PlayerWalkSound = AudioManager.instance.CreateEventInstance(FMODEvents.instance.PlayerWalkSound);
         if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
             WeaponHolder.UpdateWeapon(CurrentWeapon);
         }
@@ -563,7 +563,7 @@ void Update() {
 
         foreach (ParticleSystem trail in _trailParticles) { trail.Play(); }
         
-        AudioManager.instance.PlayOneShot(FMODEvents.instance._PlayerDashSound, this.transform.position);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.PlayerDashSound, this.transform.position);
         CurrentAnimationState = AnimationState.Dash;
 
         
@@ -782,6 +782,7 @@ void Update() {
                 break;
 
             case AnimationState.Attack_Windup:
+                AudioManager.instance.PlayAttackSound(FMODEvents.instance.PlayerAttack, this.transform.position, CurrentWeapon.ItemData.WeaponType);
                 LockRotation = true;
                 _isAttacking = true;
                 _currentSpeed = 0;
@@ -791,6 +792,7 @@ void Update() {
                 break;
 
             case AnimationState.Attack_Contact:
+                AudioManager.instance.PlayAttackSound(FMODEvents.instance.AttackContact, this.transform.position, CurrentWeapon.ItemData.WeaponType);
                 WeaponHolder.EnableHitbox();
                 break;
 
@@ -932,7 +934,7 @@ void Update() {
 
     public void PlayRespawnAnimation() {
         AudioManager.instance.setMusicArea(MusicArea.HUB);
-        AudioManager.instance.PlayOneShot(FMODEvents.instance._RespawnSound, this.transform.position);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.RespawnSound, this.transform.position);
         Animator.animatePhysics = false;
         UpdateDisabled = true;
         transform.position = StartPosition - Vector3.up * 3f;
