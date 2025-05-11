@@ -22,11 +22,13 @@ public class Weapon : MonoBehaviour {
 
     public void EnableHitbox() {
         if(Hitbox == null) return;
+        
         Hitbox.enabled = true;
     }
 
     public void DisableHitbox() {
         if(Hitbox == null) return;
+
         Hitbox.enabled = false;
     }
 }
