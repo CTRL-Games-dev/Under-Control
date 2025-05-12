@@ -198,6 +198,7 @@ public class Player : MonoBehaviour {
     [SerializeField] private UICanvas _uiCanvas;
     [SerializeField] private ParticleSystem[] _trailParticles;
     [SerializeField] public GameObject FBXModel;
+    public GameObject  FishingRod;
 
     // Static reference getters
     public static LivingEntity LivingEntity { get; private set; }
@@ -262,6 +263,9 @@ public class Player : MonoBehaviour {
         _walkingAudioSource.clip = _walkingSound;
         _walkingAudioSource.loop = true;
         _walkingAudioSource.playOnAwake = false;
+
+        CameraManager.SwitchCamera(TopDownCamera);
+
         if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
             WeaponHolder.UpdateWeapon(CurrentWeapon);
         }
@@ -633,7 +637,8 @@ public class Player : MonoBehaviour {
         if(CurrentWeapon.ItemData == _fishingRod){
             if(!CanFish) return;
             if (!LockRotation) transform.LookAt(GetMousePosition());
-            tryFish();
+            Animator.SetTrigger("castRod");
+            // tryFish();
             return;
         }
 
@@ -666,9 +671,12 @@ public class Player : MonoBehaviour {
     private bool tryFish(){
         if(_currentBobber == null){
             _currentBobber = Instantiate(_bobberPrefab,FishingBone.position,transform.rotation,null);
-            _currentBobber.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0,0.6f,1)*FishingForce,ForceMode.Impulse);
+            _currentBobber.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0.6f, 1) * FishingForce, ForceMode.Impulse);
+            Player.Instance.InputDisabled = true;
             return true;
         }
+        Animator.SetTrigger("catchFish");
+        Player.Instance.InputDisabled = false;
         if(FishCatchWindow){
             ConsumableItemData caughtFish = GameManager.Instance.CatchableFish[UnityEngine.Random.Range(0, GameManager.Instance.CatchableFish.Count())] as ConsumableItemData;
             Inventory.AddItem(caughtFish,1,1);
@@ -676,6 +684,7 @@ public class Player : MonoBehaviour {
             AvailableFish -= 1;
             FishCaughtEvent?.Invoke();
             FishCatchWindow = false;
+
         }
         Destroy(_currentBobber);
 
@@ -962,6 +971,10 @@ public class Player : MonoBehaviour {
         return true;
     }
 
+    public void EquipFishingRod(bool val) {
+        FishingRod.SetActive(val);
+    }
+
     public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
         UpdateDisabled = true;
         Animator.animatePhysics = false;
@@ -970,6 +983,7 @@ public class Player : MonoBehaviour {
         UpdateDisabled = false;
         gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
+    
     public void PlayRespawnAnimation() {
         Animator.animatePhysics = false;
         UpdateDisabled = true;
@@ -1009,6 +1023,10 @@ public class Player : MonoBehaviour {
         CurrentAnimationState = AnimationState.Locomotion;
         SlashManager.DisableSlash();
         UpdateEquipment();
+    }
+    
+    public void TryCatchFish() {
+        tryFish();
     }
 
     #endregion
