@@ -27,6 +27,7 @@ public class TreeBossController : MonoBehaviour {
     }
 
     public void PrepareThrowAttack() {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.PrepareRock, this.transform.position);
         if(!_behaviorGraphAgent.BlackboardReference.GetVariable("Target", out BlackboardVariable<LivingEntity> target)) return;
         if(target.Value == null) return;
         
@@ -38,6 +39,7 @@ public class TreeBossController : MonoBehaviour {
     }
 
     public void PrepareRootAttack() {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.PrepareRoots, this.transform.position);
         if(!_behaviorGraphAgent.BlackboardReference.GetVariable("Target", out BlackboardVariable<LivingEntity> target)) return;
         if(target.Value == null) return;
         
@@ -49,7 +51,8 @@ public class TreeBossController : MonoBehaviour {
     }
 
     public void OnPineconeThrow() {
-        CameraManager.ShakeCamera(2f, 1f);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.RockThrow, this.transform.position);
+        CameraManager.ShakeCamera(1, 0.3f);
       
         Vector3 targetSpeed = (_target.transform.position - _targetStartingPosition) / (Time.time - _targetStartingPositionTime);
 
@@ -69,7 +72,8 @@ public class TreeBossController : MonoBehaviour {
     }
 
     public void OnRootAttack() {
-        CameraManager.ShakeCamera(6, 1f);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.Roots, this.transform.position);
+        CameraManager.ShakeCamera(10, 1);
    
         Vector3 targetSpeed = (_target.transform.position - _targetStartingPosition) / (Time.time - _targetStartingPositionTime);
 

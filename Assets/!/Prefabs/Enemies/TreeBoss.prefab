@@ -440,6 +440,7 @@ GameObject:
   - component: {fileID: 5810588128092205621}
   - component: {fileID: 627536424327143826}
   - component: {fileID: 6706629266250412613}
+  - component: {fileID: 6294995827517171446}
   m_Layer: 0
   m_Name: TreeBoss
   m_TagString: Untagged
@@ -558,10 +559,34 @@ MonoBehaviour:
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
-  OnDeathSound: {fileID: 0}
-  OnDamageSound: {fileID: 0}
-  OnAttack: {fileID: 0}
-  IdleSounds: []
+  OnDeathSound:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  OnDamageSound:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  OnAttack:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  IdleSounds:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -688,6 +713,37 @@ MonoBehaviour:
   RootAttack1: {fileID: 757071902185331945}
   RootAttack2: {fileID: 8719509680002321784}
   RootAttack3: {fileID: 497911756580322711}
+--- !u!114 &6294995827517171446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5316458913486293354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CollisionTag: 
+  EventReference:
+    Guid:
+      Data1: 1308039628
+      Data2: 1305964352
+      Data3: -2031183205
+      Data4: -199662908
+    Path: event:/Bosses/Tree/Idle
+  Event: 
+  EventPlayTrigger: 1
+  EventStopTrigger: 2
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  NonRigidbodyVelocity: 0
+  Params: []
+  OverrideAttenuation: 1
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 50.07
 --- !u!1 &7780605480647451796
 GameObject:
   m_ObjectHideFlags: 0

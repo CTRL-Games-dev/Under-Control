@@ -37,6 +37,7 @@ public class LoadingScreen : MonoBehaviour
     }
 
     public static void LoadScene(string sceneName) {
+        AudioManager.instance.setMusicArea(MusicArea.LOADING);
         if (IsLoading) return;
         Debug.Log($"Loading scene: {sceneName}");
         // if (sceneName == _currentSceneName) return;

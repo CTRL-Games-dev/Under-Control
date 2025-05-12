@@ -20,8 +20,6 @@ public class MantisAIController : MonoBehaviour {
         WeaponHolder.InitializeAttack(AttackType.LIGHT);
         WeaponHolder.BeginAttack();
         WeaponHolder.EnableHitbox();
-        AudioClip slamAttack = Resources.Load("SFX/mantis/attack") as AudioClip;
-        SoundFXManager.Instance.PlaySoundFXClip(slamAttack, transform,1f);
     }
 
     public void OnAttackAnimationEnd() {

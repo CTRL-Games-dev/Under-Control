@@ -99,14 +99,14 @@ public class CardUI : MonoBehaviour
 
 
     public void OnClick() {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.UIClickSound, this.transform.position);
         if (IsInCollection) return;
         _rectTransform.DOScale(Vector3.one * 1.4f, 0.3f * Settings.AnimationSpeed);
         EventBus.RunCardClickedEvent?.Invoke(_card);
     }
 
     public void OnPointerEnter() {
-        var InvClickClip = Resources.Load($"NEWSFX/hihatdmg") as AudioClip;  
-        SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.CardHover, this.transform.position);
         _rectTransform.DOScale(Vector3.one * 1.1f, 0.3f * Settings.AnimationSpeed);
         if (IsInCollection) {
             Player.UICanvas.InventoryCanvas.CardsPanel.ShowMoreInfo(_card);
@@ -116,6 +116,7 @@ public class CardUI : MonoBehaviour
     }
 
     public void OnPointerExit() {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.CardHoverExit, this.transform.position);
         _rectTransform.DOScale(Vector3.one, 0.3f * Settings.AnimationSpeed);
         if (IsInCollection) {
             Player.UICanvas.InventoryCanvas.CardsPanel.ShowMoreInfo(null);

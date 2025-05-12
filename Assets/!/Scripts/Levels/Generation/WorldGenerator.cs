@@ -164,6 +164,7 @@ public class WorldGenerator : MonoBehaviour {
         Location[] rockyFieldsPrefabs = Resources.LoadAll<Location>("Prefabs/Forest/Locations/RockyFields");
         Location wellPrefab = Resources.Load<Location>("Prefabs/Forest/Locations/Well");
         Location sellerPrefab = Resources.Load<Location>("Prefabs/Forest/Locations/Seller");
+        Location pondPrefab = Resources.Load<Location>("Prefabs/Forest/Locations/FishingPond");
 
         Debug.Log("Loaded location prefabs");
 
@@ -190,6 +191,7 @@ public class WorldGenerator : MonoBehaviour {
 
         allLocations.Add(Instantiate(sellerPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform));
         allLocations.Add(Instantiate(wellPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform));
+        allLocations.Add(Instantiate(pondPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform));
 
         List<LocationNode> nodes = new()
         {

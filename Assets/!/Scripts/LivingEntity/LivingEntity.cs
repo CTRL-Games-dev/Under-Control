@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using FMODUnity;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -56,10 +57,10 @@ public class LivingEntity : MonoBehaviour {
     public Stat MaxMana = new Stat(StatType.MAX_MANA);
 
     [Header("Sounds")]
-    public AudioClip OnDeathSound;
-    public AudioClip OnDamageSound;
-    public AudioClip OnAttack;
-    public AudioClip[] IdleSounds;
+    public EventReference OnDeathSound;
+    public EventReference OnDamageSound;
+    public EventReference OnAttack;
+    public EventReference IdleSounds;
     
 
     [Header("Events")]
@@ -134,10 +135,13 @@ public class LivingEntity : MonoBehaviour {
     }
 
     public void Attack(Damage damage, LivingEntity target) {
+        AudioManager.instance.PlayOneShot(OnAttack, transform.position);
         target.TakeDamage(damage, this);
     }
 
     public void TakeDamage(Damage damage, LivingEntity source = null) {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.PlayerAttackIndicator, transform.position);
+        AudioManager.instance.PlayOneShot(OnDamageSound, transform.position);
         if (IsPlayer) {
             if (Player.Instance.DamageDisabled) {
                 return;
@@ -223,11 +227,10 @@ public class LivingEntity : MonoBehaviour {
                 }
             }
         } else {
-            AudioClip hitSound = Resources.Load("SFX/uderzenie") as AudioClip; //hitsound
-            SoundFXManager.Instance.PlaySoundFXClip(hitSound, transform, 0.7f);
+            AudioManager.instance.PlayOneShot(OnAttack, transform.position);
         }
 
-        if(OnDeathSound!=null) SoundFXManager.Instance.PlaySoundFXClip(OnDeathSound, transform, 0.4f);
+        AudioManager.instance.PlayOneShot(OnDeathSound, transform.position);
 
         OnDeath?.Invoke();
 

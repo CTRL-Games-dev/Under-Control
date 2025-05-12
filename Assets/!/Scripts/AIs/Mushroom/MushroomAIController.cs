@@ -33,19 +33,22 @@ public class MushroomAIController : MonoBehaviour {
     }
 
     public void OnPrimaryAttackAnimationStart() {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.MushAttackStart, this.transform.position);
         WeaponHolder.InitializeAttack(AttackType.LIGHT);
         WeaponHolder.BeginAttack();
         WeaponHolder.EnableHitbox();
         AudioClip mainAttack = Resources.Load("SFX/grzyb/uderzenie") as AudioClip;
-        SoundFXManager.Instance.PlaySoundFXClip(mainAttack, transform, 1f);
+        // SoundFXManager.Instance.PlaySoundFXClip(mainAttack, transform, 1f);
     }
 
     public void OnPrimaryAttackAnimationEnd() {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.MushAttack, this.transform.position);
         WeaponHolder.DisableHitbox();
         WeaponHolder.EndAttack();
     }
 
     public void OnSecondaryAttackAnimationStart() {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.MushAttackStart, this.transform.position);
         if(!_behaviorGraphAgent.GetVariable("Target", out BlackboardVariable<LivingEntity> blackboardTarget)) {
             Debug.LogWarning($"Failed to get target from behavior graph agent");
             return;
@@ -67,6 +70,7 @@ public class MushroomAIController : MonoBehaviour {
     }
 
     public void OnSecondaryAttackAnimationEnd() {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.MushAttack, this.transform.position);
         PullVFX.Stop();
                 
         if(_pullTarget == null) return;

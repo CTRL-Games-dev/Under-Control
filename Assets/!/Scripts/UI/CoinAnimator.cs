@@ -35,7 +35,12 @@ public class CoinAnimator : MonoBehaviour
         if (change == 0) {
             _coinsText.text = $"{Player.Instance.Coins}";
             return;
-        };
+        }
+        if(change > 0) {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.MoneyEarned, this.transform.position);
+        } else {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.MoneySpend, this.transform.position);
+        }
         float coins = Player.Instance.Coins;
         _coinsRectTransform.DOComplete();
         _changeRectTransform.DOComplete();

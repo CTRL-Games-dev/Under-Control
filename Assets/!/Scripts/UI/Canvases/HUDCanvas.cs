@@ -427,6 +427,7 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
 
     public void HideBossBar() {
         _bossBarGO.SetActive(false);
+        if (_bossEntity == null) return;
         _bossEntity.OnDamageTaken.RemoveListener(updateBossBar);
         _bossEntity.OnDeath.RemoveAllListeners();
     }
