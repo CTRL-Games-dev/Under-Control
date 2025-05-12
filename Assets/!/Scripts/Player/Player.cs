@@ -628,6 +628,7 @@ void Update() {
         _queuedInteraction = null;
     }
     private void interact(InteractionType interactionType) {
+        Debug.Log($"Interacting with {interactionType}");
 
         bool interacted = tryInteract(interactionType);
         
