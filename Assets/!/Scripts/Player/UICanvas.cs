@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Video;
 
 
@@ -22,7 +23,8 @@ public enum UITopState {
     NotVisible,
     Death,
     Settings,
-    VideoPlayer
+    VideoPlayer,
+    BlackScreen
 }
 
 
@@ -88,6 +90,7 @@ public class UICanvas : MonoBehaviour {
     [Header("UI Elements")]
     [SerializeField] private RectTransform _navBarRectTransform;
     [SerializeField] private ActionNotifierManager _actionNotifierManager;
+    [SerializeField] private GameObject _blackScreenGO;
 
     public bool IsOtherUIOpen = false;
 
@@ -310,6 +313,15 @@ public class UICanvas : MonoBehaviour {
                     _videoPlayer.gameObject.SetActive(false);
                 });
                 break;
+            case UITopState.BlackScreen:
+                Image image = _blackScreenGO.GetComponent<Image>();
+                image.DOKill();
+                image.fillAmount = 1;
+                image.DOFillAmount(0, 1.5f).SetDelay(0.5f);  
+                CanvasGroup canvasGroup1 = _blackScreenGO.GetComponent<CanvasGroup>();
+                canvasGroup1.blocksRaycasts = false;
+                canvasGroup1.interactable = false;
+                break;
         }
     }
 
@@ -333,6 +345,16 @@ public class UICanvas : MonoBehaviour {
                 });
 
                 Invoke(nameof(endCredits), 40f);
+                break;
+            case UITopState.BlackScreen:
+                CanvasGroup canvasGroup1 = _blackScreenGO.GetComponent<CanvasGroup>();
+                canvasGroup1.blocksRaycasts = true;
+                canvasGroup1.interactable = true;
+                Image image = _blackScreenGO.GetComponent<Image>();
+                image.DOKill();
+                image.fillAmount = 0;
+                image.DOFillAmount(1, 1.5f);           
+
                 break;
         }
     }

@@ -15,10 +15,12 @@ public class AdventureManager : MonoBehaviour
     public WeaponItemData[] PossibleStartingItems;
     private WorldGenerator _generator;
     public static AdventureManager Instance;
+    public static Vector3 SpawnPosition; 
 
     void Awake() {
         Instance = this;
     }
+    
     void Start() {
         AudioManager.instance.setMusicArea(MusicArea.EXPLORING);
         GameManager.Instance.LevelDepth++;
@@ -32,19 +34,19 @@ public class AdventureManager : MonoBehaviour
 
         if(GameManager.Instance.LevelDepth == 1) {
             Vector3 weaponSpawnPosition = spawnLocation.transform.Find("ItemSpawn").position;
-            WeaponItemData randomWeapon = PossibleStartingItems[UnityEngine.Random.Range(0, PossibleStartingItems.Count())]; 
+            WeaponItemData randomWeapon = PossibleStartingItems[Random.Range(0, PossibleStartingItems.Count())]; 
             ItemEntity.Spawn(randomWeapon, 1, weaponSpawnPosition, ItemRandomizer.GetStartPowerScale(), Quaternion.Euler(new(0, 120, 30)));
         }
 
-        Vector2 spawn = spawnLocation.LocationCenterInWorld;
+        AdventureManager.SpawnPosition  = new Vector3(spawnLocation.LocationCenterInWorld.x, 1, spawnLocation.LocationCenterInWorld.y);
 
         Player.Instance.MaxCameraDistance = 30f;
         Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         Player.UICanvas.ChangeUITopState(UITopState.NotVisible);
-        Player.Instance.SetPlayerPosition(new Vector3(spawn.x, 1, spawn.y));
 
         Player.Instance.gameObject.SetActive(true);
+        Player.Instance.SetPlayerPosition(AdventureManager.SpawnPosition);
         
         CameraManager.SwitchCamera(Player.Instance.TopDownCamera);
 
@@ -88,11 +90,19 @@ public class AdventureManager : MonoBehaviour
         ForestPortalLocation portal = Instance._generator.GetLocation<ForestPortalLocation>();
 
         var pos = portal.LocationCenterInWorld;
-
-        Player.Instance.SetPlayerPosition(new Vector3(pos.x, 1, pos.y));
+        Player.Instance.DamageDisabled = true;
         Player.LivingEntity.TakeDamage(new Damage {
             Type = DamageType.TRUE_DAMAGE,
-            Value = 33,
+            Value = 15,
         });
+
+        Player.UICanvas.ChangeUITopState(UITopState.BlackScreen);
+        Instance.Invoke(nameof(setPositionDelayed), 1.5f);
+    }
+
+    private void setPositionDelayed() {
+        Player.Instance.SetPlayerPosition(AdventureManager.SpawnPosition);
+        Player.Instance.DamageDisabled = false;
+        Player.UICanvas.ChangeUITopState(UITopState.NotVisible);
     }
 }

@@ -61,7 +61,7 @@ public class TerrainRandomizer : MonoBehaviour
                 worldScale.z / parentScale.z
             );
 
-            newTree.transform.eulerAngles = new(worldRot.x, UnityEngine.Random.Range(0f, 359f), worldRot.z);
+            newTree.transform.eulerAngles = new(worldRot.x, Random.Range(0f, 359f), worldRot.z);
         }
     }
 
@@ -109,7 +109,7 @@ public class TerrainRandomizer : MonoBehaviour
                 worldScale.z / parentScale.z
             );
 
-            newRock.transform.eulerAngles = new(worldRot.x, UnityEngine.Random.Range(0f, 359f), worldRot.z);
+            newRock.transform.eulerAngles = new(worldRot.x, Random.Range(0f, 359f), worldRot.z);
         }
     }
 
