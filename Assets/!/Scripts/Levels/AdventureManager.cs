@@ -25,7 +25,7 @@ public class AdventureManager : MonoBehaviour
         AudioManager.instance.setMusicArea(MusicArea.EXPLORING);
         GameManager.Instance.LevelDepth++;
 
-        Player.Instance.gameObject.SetActive(false);
+        Player.Instance.FBXModel.SetActive(false);
 
         _generator = GetComponent<WorldGenerator>();
         _generator.GenerateMap(GameManager.Instance.CurrentDimension);
@@ -45,8 +45,10 @@ public class AdventureManager : MonoBehaviour
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         Player.UICanvas.ChangeUITopState(UITopState.NotVisible);
 
-        Player.Instance.gameObject.SetActive(true);
+        Player.Instance.FBXModel.SetActive(true);
         Player.Instance.SetPlayerPosition(AdventureManager.SpawnPosition);
+
+        Player.UICanvas.HUDCanvas.UpdateIndicatorImg();
         
         CameraManager.SwitchCamera(Player.Instance.TopDownCamera);
 
