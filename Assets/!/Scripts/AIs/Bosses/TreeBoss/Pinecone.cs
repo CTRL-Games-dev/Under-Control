@@ -40,6 +40,7 @@ public class Pinecone : MonoBehaviour {
         });
 
         if(entity.IsPlayer) {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.RockHit, this.transform.position);
             CameraManager.ShakeCamera(7, 0.35f);
         }
 

@@ -12,6 +12,7 @@ public class Wall : MonoBehaviour
 
     public void PlaceWall(Location location, Vector3 start, Vector3 end)
     {
+        AudioManager.instance.setMusicArea(MusicArea.FIGHTING);
         transform.position = Vector3.Lerp(start, end, 0.5f);
 
         Vector3 positionDelta = Vector3.Normalize(transform.position - location.transform.position);
@@ -41,6 +42,7 @@ public class Wall : MonoBehaviour
 
     public void RemoveWall()
     {
+        AudioManager.instance.setMusicArea(MusicArea.EXPLORING);
         WallObject.transform.DOMoveY(-6, 1f);
         StartCoroutine(destroyWall(1f));
     }

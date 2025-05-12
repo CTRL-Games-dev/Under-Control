@@ -339,15 +339,8 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
         }
     }
 
-    public void UseConsumable1() {
-        useConsumable(1);
-    }
-
-    public void UseConsumable2() {
-        useConsumable(2);
-    }
-
-    private void useConsumable(int type) {
+    public void UseConsumable(int type) {
+        if(type != 1 && type != 2) return;
         RectTransform consumableRect = type == 1 ? _consumable1Rect : _consumable2Rect;
 
         consumableRect.DOComplete();
@@ -434,6 +427,7 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
 
     public void HideBossBar() {
         _bossBarGO.SetActive(false);
+        if (_bossEntity == null) return;
         _bossEntity.OnDamageTaken.RemoveListener(updateBossBar);
         _bossEntity.OnDeath.RemoveAllListeners();
     }

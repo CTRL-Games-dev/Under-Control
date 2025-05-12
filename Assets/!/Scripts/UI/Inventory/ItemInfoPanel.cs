@@ -35,7 +35,7 @@ public class ItemInfoPanel : MonoBehaviour
         _nameTextLocalizer.Key = item.ItemData.DisplayName;
         _descriptionTextLocalizer.Key = item.ItemData.Description;
 
-        if (itemUI.InventoryItem.ItemData is WeaponItemData weaponItemData) {
+        if (itemUI.InventoryItem.ItemData is WeaponItemData weaponItemData && weaponItemData.LightDamageMax > 0 && weaponItemData.HeavyDamageMax > 0) {
             _lightAttackHolder.SetActive(true);
             _heavyAttackHolder.SetActive(true);
             _itemLightDamage.text = $"{(int)(weaponItemData.LightDamageMin * item.PowerScale)} - {(int)(weaponItemData.LightDamageMax * item.PowerScale)}";

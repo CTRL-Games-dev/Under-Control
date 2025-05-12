@@ -22,6 +22,7 @@ public class AdventureManager : MonoBehaviour
     }
     
     void Start() {
+        AudioManager.instance.setMusicArea(MusicArea.EXPLORING);
         GameManager.Instance.LevelDepth++;
 
         Player.Instance.gameObject.SetActive(false);

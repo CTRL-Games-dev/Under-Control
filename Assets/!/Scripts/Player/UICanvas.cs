@@ -304,7 +304,6 @@ public class UICanvas : MonoBehaviour {
                 SettingsCanvas.HideUI();
                 break;
             case UITopState.VideoPlayer:
-                GameManager.Instance.MusicPlayer.Play();
 
                 _videoPlayer.Stop();
                 CanvasGroup canvasGroup = _videoPlayer.gameObject.GetComponent<CanvasGroup>();
@@ -335,7 +334,6 @@ public class UICanvas : MonoBehaviour {
                 SettingsCanvas.ShowUI();
                 break;
             case UITopState.VideoPlayer:
-                GameManager.Instance.MusicPlayer.Stop();
                 _videoPlayer.gameObject.SetActive(true);
                 CanvasGroup canvasGroup = _videoPlayer.gameObject.GetComponent<CanvasGroup>();
                 canvasGroup.alpha = 0;

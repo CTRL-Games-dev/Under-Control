@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.VFX;
 
-[RequireComponent(typeof(MusicPlayer))]
 public class GameManager : MonoBehaviour {
 
     [Serializable]
@@ -60,7 +59,6 @@ public class GameManager : MonoBehaviour {
 
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
-    public MusicPlayer MusicPlayer;
 
     [Header("Ambient")]
     // Changed to use DimensionAmbient
@@ -75,13 +73,16 @@ public class GameManager : MonoBehaviour {
     [Range(3,6)] public int RandomCardCount = 3;
     [Space]
     public float SaveCooldown = 15f;
+    public List<ItemData> CatchableFish;
+    
+    [Header("Debug")]
+    public List<ItemData> DebugItems;
 
     // Events
     public UnityEvent SceneReadyEvent;
     public bool IsStarterDialogueOver = false;
 
     private void Awake()  {
-        MusicPlayer = GetComponent<MusicPlayer>();
         // SceneManager.sceneLoaded += OnLevelChange;
 
         if(Instance == null) {
@@ -106,12 +107,7 @@ public class GameManager : MonoBehaviour {
         ResetCards();
     }
 
-    private void Start() {
-        playMusicForDimension(CurrentDimension);
-        playAmbientForDimension(CurrentDimension);
-        // For some reason "scene change" is being called, even if it is the first scene?
-        // ConnectPortals();
-    }
+
 
     void Update() {
         DebugCommands();
@@ -137,44 +133,9 @@ public class GameManager : MonoBehaviour {
 
         Debug.Log("Loading new scene: " + CurrentDimension.ToString());
         LoadingScreen.LoadScene(SceneDictionary[CurrentDimension]);
-
-        playMusicForDimension(dimension);
-        playAmbientForDimension(dimension);
-    }
-    private void playMusicForDimension(Dimension dimension) {
-        MusicPlayer.Stop();
-
-        int dimensionMusicIndex = Array.FindIndex(MusicPalette, x => x.Dimension == dimension);
-        if(dimensionMusicIndex != -1) {
-            MusicPlayer.MusicClips = MusicPalette[dimensionMusicIndex].Clips;
-            MusicPlayer.Play();
-        }
     }
 
-    // New method to play ambient sounds for a specific dimension.
-    // All the clips defined for that dimension are played concurrently.
-    private void playAmbientForDimension(Dimension dimension) {
-        // Stop previous ambient sounds
-        foreach(var source in ambientAudioSources) {
-            source.Stop();
-            Destroy(source.gameObject);
-        }
-        ambientAudioSources.Clear();
 
-        int index = Array.FindIndex(AmbientPalette, a => a.Dimension == dimension);
-        if(index != -1) {
-            foreach(var clip in AmbientPalette[index].Clips) {
-                GameObject ambientPlayer = new GameObject("Ambient_" + clip.name);
-                ambientPlayer.transform.parent = transform;
-                AudioSource source = ambientPlayer.AddComponent<AudioSource>();
-                source.clip = clip;
-                source.loop = true;
-                source.playOnAwake = false;
-                source.Play();
-                ambientAudioSources.Add(source);
-            }
-        }
-    }
 
     public void SetDefault() {
         Difficulty = GameDifficulty.NORMAL;
@@ -290,12 +251,20 @@ public class GameManager : MonoBehaviour {
             Player.Instance.DamageDisabled = true;
         }
         if(Input.GetKeyDown(KeyCode.F9)) {
-            Debug.Log("<color=red>Debug Tools - Saved game via hotkey");
-            SaveSystem.SaveGame();
+            Debug.Log("<color=blue>Debug Tools - added item1");
+            Player.LivingEntity.Inventory.AddItem(DebugItems[0],1,1);
         }
         if(Input.GetKeyDown(KeyCode.F10)) {
-            Debug.Log("<color=red>Debug Tools - Loaded game via hotkey");
-            SaveSystem.LoadGame();
+            Debug.Log("<color=blue>Debug Tools - added item2");
+            Player.LivingEntity.Inventory.AddItem(DebugItems[1],1,1);
+        }
+        if(Input.GetKeyDown(KeyCode.F11)) {
+            Debug.Log("<color=blue>Debug Tools - added item3");
+            Player.LivingEntity.Inventory.AddItem(DebugItems[2],1,1);
+        }
+        if(Input.GetKeyDown(KeyCode.F12)) {
+            Debug.Log("<color=red>Debug Tools - damaged player");
+            Player.LivingEntity.TakeDamage(new Damage{Value = 50, Type = DamageType.PHYSICAL});
         }
         if(Input.GetKeyDown(KeyCode.F8)) {
             TotalInfluence = 100;
