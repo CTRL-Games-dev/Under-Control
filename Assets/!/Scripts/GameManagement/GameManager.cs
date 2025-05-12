@@ -170,7 +170,7 @@ public class GameManager : MonoBehaviour {
 
         numberOfcards = Math.Min(numberOfcards, _availableCards.Count);
         Card[] cards = new Card[numberOfcards];
-        List<Card> copiedCards = FluffyUtils.CloneList(_cards);
+        List<Card> copiedCards = FluffyUtils.CloneList(_availableCards);
         Debug.Log($"Normal {_availableCards.Count}");
         Debug.Log($"Copied cards {copiedCards.Count}");
 
@@ -226,7 +226,7 @@ public class GameManager : MonoBehaviour {
                 Instantiate(prefab, Player.Instance.transform.position, Quaternion.identity);
             }
         }
-        foreach(var card in _cards) {
+        foreach(var card in _availableCards) {
             if(card != chosenCard)
                 continue;
             _availableCards.Remove(chosenCard);
@@ -249,6 +249,14 @@ public class GameManager : MonoBehaviour {
     public void DebugCommands() {
         if (Input.GetKeyDown(KeyCode.F1)) {
             Player.Instance.DamageDisabled = true;
+        }
+        if (Input.GetKeyDown(KeyCode.F2)) {
+            TotalInfluence = 50;
+            ChangeDimension(Dimension.ENT_BOSS);
+        }
+        if (Input.GetKeyDown(KeyCode.F3)) {
+            TotalInfluence = 100;
+            ChangeDimension(Dimension.VEKTHAR_BOSS);
         }
         if(Input.GetKeyDown(KeyCode.F9)) {
             Debug.Log("<color=blue>Debug Tools - added item1");

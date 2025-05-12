@@ -78,6 +78,8 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private TextLocalizer _bossNameTextLocalizer;
     [SerializeField] private GameObject _bossBarGO;
 
+    [SerializeField] private Image _controlIndicatorImg;
+
     private LivingEntity _bossEntity;
     private float _previousBossHealth;
      
@@ -430,5 +432,9 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
         if (_bossEntity == null) return;
         _bossEntity.OnDamageTaken.RemoveListener(updateBossBar);
         _bossEntity.OnDeath.RemoveAllListeners();
+    }
+
+    public void UpdateIndicatorImg() {
+        _controlIndicatorImg.fillAmount = GameManager.Instance.TotalInfluence / 100f;
     }
 }
