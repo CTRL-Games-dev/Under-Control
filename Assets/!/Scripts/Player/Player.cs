@@ -795,6 +795,9 @@ void Update() {
                 break;
 
             case AnimationState.Attack_Recovery:
+                WeaponHolder.DisableHitbox();
+                SlashManager.DisableSlash();
+                WeaponHolder.EndAttack();
                 _isAttacking = false;
                 _attackType = null;
                 LockRotation = false;
