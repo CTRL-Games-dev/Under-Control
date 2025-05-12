@@ -231,6 +231,10 @@ public class GameManager : MonoBehaviour {
             nonWeaponCards.RemoveAt(index);
             cards[i] = card;
         }
+
+        if (cards.Length == 0)
+            Debug.LogError("No cards available!");
+            
         return cards;
     }
 

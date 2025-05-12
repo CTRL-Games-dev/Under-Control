@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -918,13 +919,21 @@ public class Player : MonoBehaviour {
          
     }
 
-    public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
+    public void SetPlayerPosition(Vector3 position, float time = 0.1f, float yRotation = 45) {
+        Instance.gameObject.SetActive(true);
+        transform.rotation = Quaternion.Euler(0, yRotation, 0);
+        StartCoroutine(setPlayerPositionCoroutine(position, time));
+    }
+
+    private IEnumerator setPlayerPositionCoroutine(Vector3 position, float time) {
         UpdateDisabled = true;
         Animator.animatePhysics = false;
+        Animator.speed = 0;
         gameObject.transform.position = position;
+        yield return new WaitForSeconds(time);
         Animator.animatePhysics = true;
+        Animator.speed = 1;
         UpdateDisabled = false;
-        gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
 
     public void PlayRespawnAnimation() {

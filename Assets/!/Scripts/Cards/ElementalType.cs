@@ -7,5 +7,13 @@ public enum ElementalType
     LifeSteal,
     ManaSteal,
     Stun,
+    Health,
+    Mana,
+    Armor,
+    LightAttack,
+    HeavyAttack,
+    EvoHealth,
+    EvoMana,
+    EvoCards,
     None
 }

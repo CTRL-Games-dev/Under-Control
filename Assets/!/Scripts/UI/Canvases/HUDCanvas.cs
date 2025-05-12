@@ -72,6 +72,14 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private Button _rebindEventButton;
     [SerializeField] private List<BindReferences> _bindReferences = new();
     [SerializeField] private Image _keyConsumable1Img, _keyConsumable2Img, _keySpell1Img, _keySpell2Img, _keySpell3Img;
+
+    [Header("Boss Bar")]
+    [SerializeField] private Image _bossBarImg;
+    [SerializeField] private TextLocalizer _bossNameTextLocalizer;
+    [SerializeField] private GameObject _bossBarGO;
+
+    private LivingEntity _bossEntity;
+    private float _previousBossHealth;
      
     [Serializable] 
     public struct BindReferences {
@@ -389,5 +397,31 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
                 });
             });
         });
+    }
+
+    public void ShowBossBar(LivingEntity bossEntity) {
+        _bossEntity = bossEntity;
+        _bossBarImg.gameObject.SetActive(true);
+        _bossBarGO.SetActive(true);
+        _bossNameTextLocalizer.Key = bossEntity.DisplayName;
+        _bossBarImg.fillAmount = bossEntity.Health / bossEntity.MaxHealth;
+        _previousBossHealth = bossEntity.Health;
+
+        _bossEntity.OnDamageTaken.AddListener(updateBossBar);
+        _bossEntity.OnDeath.AddListener(() => {
+            Debug.Log("Boss dead");
+            _bossBarGO.SetActive(false);
+            _bossEntity.OnDeath.RemoveAllListeners();
+            _bossEntity.OnDamageTaken.RemoveListener(updateBossBar);
+        });
+    }
+
+    private void updateBossBar(DamageTakenEventData _) {
+        if (_bossEntity == null) return;
+        _bossBarImg.DOKill();
+        Debug.Log($"Boss health: {_bossEntity.Health}");
+        _bossBarImg.DOFillAmount(_bossEntity.Health / _bossEntity.MaxHealth, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+
+        _previousBossHealth = _bossEntity.Health;
     }
 }

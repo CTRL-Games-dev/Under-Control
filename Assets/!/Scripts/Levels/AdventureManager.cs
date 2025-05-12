@@ -15,6 +15,7 @@ public class AdventureManager : MonoBehaviour
     public WeaponItemData[] PossibleStartingItems;
     private WorldGenerator _generator;
     public static AdventureManager Instance;
+    public static Vector3 SpawnPosition; 
 
     void Awake() {
         Instance = this;
@@ -36,15 +37,15 @@ public class AdventureManager : MonoBehaviour
             ItemEntity.Spawn(randomWeapon, 1, weaponSpawnPosition, ItemRandomizer.GetStartPowerScale(), Quaternion.Euler(new(0, 120, 30)));
         }
 
-        Vector2 spawn = spawnLocation.LocationCenterInWorld;
+        AdventureManager.SpawnPosition  = new Vector3(spawnLocation.LocationCenterInWorld.x, 1, spawnLocation.LocationCenterInWorld.y);
 
         Player.Instance.MaxCameraDistance = 30f;
         Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
         Player.UICanvas.ChangeUITopState(UITopState.NotVisible);
-        Player.Instance.SetPlayerPosition(new Vector3(spawn.x, 1, spawn.y));
 
         Player.Instance.gameObject.SetActive(true);
+        Player.Instance.SetPlayerPosition(AdventureManager.SpawnPosition);
         
         CameraManager.SwitchCamera(Player.Instance.TopDownCamera);
 
@@ -63,12 +64,13 @@ public class AdventureManager : MonoBehaviour
         float influence = GameManager.Instance.TotalInfluence;
 
         Dimension dimension;
-        if(influence >= 100 && bossesDefeated == 2) {
+        if(influence >= 100 && bossesDefeated == 1) {
             dimension = Dimension.VEKTHAR_BOSS;
-        } else if(influence >= 66 && bossesDefeated == 1) {
+        } else if(influence >= 50 && bossesDefeated == 0) {
             dimension = Dimension.ENT_BOSS;
-        } else if(influence >= 33 && bossesDefeated == 0) {
-            dimension = Dimension.SLIME_BOSS;
+        
+        // } else if(influence >= 33 && bossesDefeated == 0) {
+        //     dimension = Dimension.SLIME_BOSS;
         } else {
             dimension = Dimension.CARD_CHOOSE;
         }
@@ -87,11 +89,19 @@ public class AdventureManager : MonoBehaviour
         ForestPortalLocation portal = Instance._generator.GetLocation<ForestPortalLocation>();
 
         var pos = portal.LocationCenterInWorld;
-
-        Player.Instance.SetPlayerPosition(new Vector3(pos.x, 1, pos.y));
+        Player.Instance.DamageDisabled = true;
         Player.LivingEntity.TakeDamage(new Damage {
             Type = DamageType.TRUE_DAMAGE,
-            Value = 33,
+            Value = 15,
         });
+
+        Player.UICanvas.ChangeUITopState(UITopState.BlackScreen);
+        Instance.Invoke(nameof(setPositionDelayed), 1.5f);
+    }
+
+    private void setPositionDelayed() {
+        Player.Instance.SetPlayerPosition(AdventureManager.SpawnPosition);
+        Player.Instance.DamageDisabled = false;
+        Player.UICanvas.ChangeUITopState(UITopState.NotVisible);
     }
 }
