@@ -7,6 +7,7 @@ public class TreeBossBattleManager : MonoBehaviour
     
 
     void Start() {
+        AudioManager.instance.setMusicArea(MusicArea.BOSSFIGHT);
         Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
         Player.UICanvas.HUDCanvas.ShowBossBar(_treeBoss);
         Player.Instance.MaxCameraDistance = 50f;

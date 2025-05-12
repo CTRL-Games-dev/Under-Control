@@ -10,5 +10,6 @@ public enum MusicArea
     FIGHTING = 5,
     FISHING = 6,
     BOSSFIGHT = 7,
-    ALLSEEING = 8
+    ALLSEEING = 8,
+    VEKTHAR = 9
 }

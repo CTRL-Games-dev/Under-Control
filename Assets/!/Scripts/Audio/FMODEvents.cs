@@ -71,21 +71,30 @@ public class FMODEvents : MonoBehaviour
     [field: SerializeField] public EventReference TreeAppear { get; private set; }
     [field: SerializeField] public EventReference TreeAttackStart { get; private set; }
 
+        [field: Header("Mushroom SFX")]
+    [field: SerializeField] public EventReference MushAttack { get; private set; }
+    [field: SerializeField] public EventReference MushDeath { get; private set; }
+    [field: SerializeField] public EventReference MushHit { get; private set; }
+    [field: SerializeField] public EventReference MushAttackStart { get; private set; }
 
-    [field: Header("Slime Boss SFX")]
-    [field: SerializeField] public EventReference SlimeBossNormalAttack { get; private set; }
-    [field: SerializeField] public EventReference SlimeBossDeath { get; private set; }
-    [field: SerializeField] public EventReference SlimeBossHit { get; private set; }
 
     [field: Header("Ent Boss SFX")]
-    [field: SerializeField] public EventReference EntBossAttack { get; private set; }
-    [field: SerializeField] public EventReference EntBossDeath { get; private set; }
-    [field: SerializeField] public EventReference EntBossHit { get; private set; }
+    [field: SerializeField] public EventReference RockThrow { get; private set; }
+    [field: SerializeField] public EventReference RockSound { get; private set; }
+    [field: SerializeField] public EventReference RockHit { get; private set; }
+    [field: SerializeField] public EventReference Roots { get; private set; }
+    [field: SerializeField] public EventReference TreeBossIdle { get; private set; }
+    [field: SerializeField] public EventReference TreeBossLaugh { get; private set; }
+    [field: SerializeField] public EventReference PrepareRock { get; private set; }
+    [field: SerializeField] public EventReference PrepareRoots { get; private set; }
+    [field: SerializeField] public EventReference TreeBossDie { get; private set; }
 
     [field: Header("VekThar Boss SFX")]
-    [field: SerializeField] public EventReference VekTharAttack { get; private set; }
-    [field: SerializeField] public EventReference VekTharDeath { get; private set; }
-    [field: SerializeField] public EventReference VekTharHit { get; private set; }
+    [field: SerializeField] public EventReference Fist { get; private set; }
+    [field: SerializeField] public EventReference Clap { get; private set; }
+    [field: SerializeField] public EventReference OpenHand { get; private set; }
+    [field: SerializeField] public EventReference VekTharLaugh { get; private set; }
+    [field: SerializeField] public EventReference VekTharDie { get; private set; }
 
     [field: Header("World Interaction SFX")]
     [field: SerializeField] public EventReference ChestOpen { get; private set; }

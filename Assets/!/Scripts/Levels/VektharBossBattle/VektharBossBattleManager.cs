@@ -25,6 +25,7 @@ public class VektharBossBattleManager : MonoBehaviour
     private float _previousMinCameraDistance;
 
     void Start() {
+        AudioManager.instance.setMusicArea(MusicArea.VEKTHAR);
         Player.Instance.SetPlayerPosition(LevelStart.position);
         Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
         EventBus.SceneReadyEvent?.Invoke();

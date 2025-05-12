@@ -508,6 +508,7 @@ GameObject:
   - component: {fileID: 8429601944035574594}
   - component: {fileID: 6227680140406103345}
   - component: {fileID: 9193845303120222920}
+  - component: {fileID: -9189480786730781808}
   m_Layer: 0
   m_Name: VektharBoss
   m_TagString: Untagged
@@ -619,6 +620,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _meshRenderers: []
+  _hitTintColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &6227680140406103345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -632,11 +634,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DisplayName: Vekhtar
-  _guild: {fileID: 11400000, guid: 734b0a650a008d14ab9d8696640c3a05, type: 2}
+  Guild: {fileID: 0}
   DropItemsOnDeath: 1
   DestroyOnDeath: 1
   IsInvisible: 0
-  LockGuild: 0
+  IsBoss: 0
+  AvoidGuildChange: 0
   StartingHealth: 80
   StartingMana: 100
   _health: 0
@@ -669,10 +672,34 @@ MonoBehaviour:
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
-  OnDeathSound: {fileID: 0}
-  OnDamageSound: {fileID: 0}
-  OnAttack: {fileID: 0}
-  IdleSounds: []
+  OnDeathSound:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  OnDamageSound:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  OnAttack:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  IdleSounds:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -706,6 +733,37 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-9189480786730781808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6155330673100670952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CollisionTag: 
+  EventReference:
+    Guid:
+      Data1: -554231161
+      Data2: 1284781232
+      Data3: -1695865166
+      Data4: 1261474488
+    Path: event:/Bosses/Vek'Thar/Idle
+  Event: 
+  EventPlayTrigger: 1
+  EventStopTrigger: 2
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  NonRigidbodyVelocity: 0
+  Params: []
+  OverrideAttenuation: 1
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 50.23
 --- !u!1 &8181253854560887060
 GameObject:
   m_ObjectHideFlags: 0
