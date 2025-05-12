@@ -595,7 +595,6 @@ void Update() {
 {
         _PlayerWalkSound.release();
     }
-    _PlayerWalkSound = AudioManager.instance.CreateEventInstance(FMODEvents.instance.PlayerWalkSound);
         var rebinds = PlayerPrefs.GetString("rebinds");
         if (!string.IsNullOrEmpty(rebinds))
             actions.LoadBindingOverridesFromJson(rebinds);

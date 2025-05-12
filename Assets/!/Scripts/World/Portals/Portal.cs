@@ -15,10 +15,10 @@ public abstract class Portal : MonoBehaviour
 
     private void Awake() {
         _portalInsideRenderer = _portalInside.GetComponent<Renderer>();
-        setInfluence();     
     }
 
     void Start() {
+        setInfluence();     
 
     }
 
