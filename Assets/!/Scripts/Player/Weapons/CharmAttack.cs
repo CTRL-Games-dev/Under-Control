@@ -2,7 +2,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 public class CharmAttack : PlayerWeaponAttack {
-    protected override void OnHit(LivingEntity victim) {
+    public override void Attack(LivingEntity victim) {
         if (Random.Range(0f, 1f) < ApplyChance) return;
         if (victim.CompareTag("Player")) return;
         if (victim.Guild == Player.LivingEntity.Guild) return;

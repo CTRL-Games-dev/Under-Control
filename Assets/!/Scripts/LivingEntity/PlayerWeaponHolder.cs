@@ -9,6 +9,7 @@ public class PlayerWeaponHolder : MonoBehaviour {
     public bool PreventSelfDamage = true;
 
     private Weapon _currentWeaponHitter;
+    private PlayerWeaponAttack _currentPlayerWeaponAttack;
     private WeaponItemData _currentWeaponData;
     private float _currentWeaponPowerScale;
     private List<LivingEntity> _hitEntities = new List<LivingEntity>();
@@ -19,6 +20,7 @@ public class PlayerWeaponHolder : MonoBehaviour {
         if (_currentWeaponHitter != null) {
             Destroy(_currentWeaponHitter.gameObject);
             _currentWeaponHitter = null;
+            _currentPlayerWeaponAttack = null;
             _currentWeaponData = null;
         }
 
@@ -38,6 +40,8 @@ public class PlayerWeaponHolder : MonoBehaviour {
         } else {
             _currentWeaponHitter = InstantiateUnknownWeapon();
         }
+
+        _currentPlayerWeaponAttack = _currentWeaponHitter.GetComponent<PlayerWeaponAttack>();
 
         _currentWeaponData = weaponData;
 
@@ -70,6 +74,8 @@ public class PlayerWeaponHolder : MonoBehaviour {
         } else {
             _currentWeaponHitter = InstantiateUnknownWeapon();
         }
+
+        _currentPlayerWeaponAttack = _currentWeaponHitter.GetComponent<PlayerWeaponAttack>();
 
         _currentWeaponData = weaponData;
 
@@ -206,6 +212,10 @@ public class PlayerWeaponHolder : MonoBehaviour {
             damageValue = Self.ModifierSystem.CalculateForStatType(StatType.LIGHT_ATTACK_DAMAGE, damageValue);
         } else {
             damageValue = Self.ModifierSystem.CalculateForStatType(StatType.HEAVY_ATTACK_DAMAGE, damageValue);
+        }
+
+        if(_currentPlayerWeaponAttack != null) {
+            _currentPlayerWeaponAttack.Attack(victim);
         }
 
         Self.Attack(new Damage{
