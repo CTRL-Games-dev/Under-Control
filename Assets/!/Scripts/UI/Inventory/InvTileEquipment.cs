@@ -214,27 +214,35 @@ public class InvTileEquipment : InvTile {
         if(!IsEmpty) return;
         PlaceItem(item);
     }
+
     public void PlaceItem(InventoryItem item){
         if (_tileType == TileType.Armor) {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.EquipArmor, this.transform.position);
             if(!item.TryAs(out InventoryItem<ArmorItemData> armorItem)) {
                 return;
             }
 
             Player.Inventory.Armor = armorItem;
         } else if (_tileType == TileType.Amulet) {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.EquipAmulet, this.transform.position);
             if(!item.TryAs(out InventoryItem<AmuletItemData> amuletItem)) {
                 return;
             }
 
             Player.Inventory.Amulet = amuletItem;
         } else if (_tileType == TileType.Weapon) {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.EquipWeapon, this.transform.position);
             if(!item.TryAs(out InventoryItem<WeaponItemData> weaponItem)) {
                 return;
             }
-            AudioClip EquipWeaponClip = Resources.Load("SFX/bron/wyjmowaniebroni") as AudioClip;
-            SoundFXManager.Instance.PlaySoundFXClip(EquipWeaponClip,transform);
+            if (weaponItem.ItemData.WeaponType == WeaponType.Fishingrod) {
+                Player.Instance.EquipFishingRod(true);
+                // return;
+            }
+
             Player.Inventory.Weapon = weaponItem;
         } else if (_tileType == TileType.Consumeable1) {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.EquipItem, this.transform.position);
             if(!item.TryAs(out InventoryItem<ConsumableItemData> consumableItem)) {
                 return;
             }
@@ -325,6 +333,7 @@ public class InvTileEquipment : InvTile {
                     Player.Inventory.Amulet = null;
                     break;
                 case TileType.Weapon:
+                    Player.Instance.EquipFishingRod(false);
                     Player.Inventory.Weapon = null;
                     break;
                 case TileType.Consumeable1:

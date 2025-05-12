@@ -15,6 +15,8 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private TextLocalizer _nameTextLocalizer, _dialogueTextLocalizer;
     [SerializeField] private TMP_InputField _inputField;
     [SerializeField] private GameObject _confirmButton;
+    [SerializeField] private GameObject _acceptButton;
+    [SerializeField] private GameObject _refuseButton;
  
     private bool _isTalking = false;
 
@@ -55,6 +57,20 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         _inputField.interactable = false;
         _inputField.DeactivateInputField();
         OnClick();
+    }
+    public void OnAcceptButtonClick(){
+        Player.Instance.BuyFishingRod(_talkable.transform);
+        ResetOfferButtons();
+        OnClick();
+    }
+    public void OnRefuseButtonClicked(){
+        ResetOfferButtons();
+        OnClick();
+    }
+    private void ResetOfferButtons(){
+        _blockClick = false;
+        _acceptButton.SetActive(false);
+        _refuseButton.SetActive(false);
     }
 
 
@@ -106,13 +122,8 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
 
     public void OnClick() {
         if (_blockClick) return;
-        if (_isTalking) {
-            StopAllCoroutines();
-            _dialogueText.text = _goalString;
-            _playerFaceAnimator.EndAnimation();
-            _otherFaceAnimator.EndAnimation();
-            _isTalking = false;
-        } else {
+        if (_isTalking) finishTalking();
+        else {
             if (_currentDialogueIndex >= _dialogue.DialogueEntries.Count) {
                 Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
                 return;
@@ -132,7 +143,6 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     private IEnumerator animateText() {
         _isTalking = true;
         _dialogueText.text = string.Empty;
-        bool SkipNextOne = true;
         foreach (char letter in _goalString.ToCharArray()) {
             _dialogueText.text += letter;
             float _letterInterval;
@@ -147,27 +157,32 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
                 _letterInterval = 0.3f;
             }
             else {
-                if(SkipNextOne){
-                    var InvClickClip = Resources.Load($"NEWSFX/ALPHABET/FASTER/{char.ToLower(letter)}") as AudioClip;  
-                    if(InvClickClip != null) {
-                        if(_dialogue.DialogueEntries[_currentDialogueIndex].IsPlayer){
-                            SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform, 1f, 1.2f);
-                        } else {
-                            SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform, 1f);
-                        }
-                    }
-                }
+                AudioManager.instance.PlayLetterSound(FMODEvents.instance.TalkingSounds, letter, this.transform.position);
                 _letterInterval = Mathf.Clamp(_textSpeed / _goalString.Length, 0.02f, 0.03f);
 
             }
 
             yield return new WaitForSeconds(_letterInterval);
         }
-
+        finishTalking();
+    }
+    private void finishTalking(){
+        StopAllCoroutines();
+        _dialogueText.text = _goalString;
         _playerFaceAnimator.EndAnimation();
         if (_otherFaceAnimator != null)
             _otherFaceAnimator.EndAnimation();
         _isTalking = false;
+        if(_dialogue.DialogueEntries[_currentDialogueIndex].IsOffer){
+            _acceptButton.SetActive(true);
+            _refuseButton.SetActive(true);
+            _acceptButton.GetComponent<Button>().interactable = Player.Instance.Coins < 150 ? false : true;
+            _inputField.gameObject.SetActive(false);
+            _confirmButton.SetActive(false);
+            _inputField.interactable = false;
+            _inputField.DeactivateInputField();
+            _blockClick = true;
+        }
     }
 
 
@@ -196,13 +211,18 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
 
   
         if (_dialogue.DialogueEntries[_currentDialogueIndex].IsInputField) {
+            _acceptButton.SetActive(false);
+            _refuseButton.SetActive(false);
             _inputField.gameObject.SetActive(true);
             _confirmButton.SetActive(true);
             _inputField.interactable = true;
             _inputField.Select();
             _inputField.ActivateInputField();
             _blockClick = true;
-        } else {
+        }
+        else {
+            _acceptButton.SetActive(false);
+            _refuseButton.SetActive(false);
             _inputField.gameObject.SetActive(false);
             _confirmButton.SetActive(false);
             _inputField.interactable = false;

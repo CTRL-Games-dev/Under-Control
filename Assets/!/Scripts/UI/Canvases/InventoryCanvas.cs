@@ -169,8 +169,7 @@ public class InventoryCanvas : MonoBehaviour, IUICanvasState
     }
 
     private void openTab(InventoryTab tab) {
-        AudioClip InvClickClip = Resources.Load("NEWSFX/UI/ClickEdited") as AudioClip;
-        SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.UIClickSound, this.transform.position);
         switch (tab) {
             case InventoryTab.Other:
                 otherTabEnter();

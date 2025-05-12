@@ -32,6 +32,7 @@ public class Pinecone : MonoBehaviour {
         
         if(entity == null) return;
         if(entity == _caster) return;
+        if(!_caster.Guild.IsHostileTowards(entity.Guild)) return;
 
         entity.TakeDamage(new Damage {
             Type = DamageType.PHYSICAL,
@@ -39,6 +40,7 @@ public class Pinecone : MonoBehaviour {
         });
 
         if(entity.IsPlayer) {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.RockHit, this.transform.position);
             CameraManager.ShakeCamera(7, 0.35f);
         }
 

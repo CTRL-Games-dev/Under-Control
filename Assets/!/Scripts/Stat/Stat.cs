@@ -144,7 +144,7 @@ public class StatPropertyField : PropertyField {
     private void OnAttachToPanel(AttachToPanelEvent evt) {
         m_CachedInspectorElement = null;
         m_CachedContextWidthElement = null;
-        for (VisualElement visualElement = base.parent; visualElement != null; visualElement = visualElement.parent)
+        for (VisualElement visualElement = parent; visualElement != null; visualElement = visualElement.parent)
         {
             if (visualElement.ClassListContains("unity-inspector-element"))
             {
