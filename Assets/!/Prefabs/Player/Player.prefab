@@ -2435,8 +2435,9 @@ MonoBehaviour:
   FishCatchWindow: 0
   _fishingRod: {fileID: 11400000, guid: 3b76e611537dc4343bd3910f29f7c6d9, type: 2}
   FishingBone: {fileID: 113949495058242226}
+  FishingForce: 3
+  AvailableFish: 0
   _bobberPrefab: {fileID: 6067050191753528366, guid: 28ff571691d16e245869edba8403a636, type: 3}
-  FishingForce: 4
   _currentBobber: {fileID: 0}
   _spellDataOne:
     Spell: {fileID: 11400000, guid: 6dabd4b9a691d42f89209aab27aeda97, type: 2}
@@ -2499,6 +2500,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   UpdateConsumablesEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  FishCaughtEvent:
     m_PersistentCalls:
       m_Calls: []
   _uiCanvas: {fileID: 3006076035978592924}
@@ -15590,8 +15594,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1646664192321711085}
   m_HandleRect: {fileID: 8565112724246989343}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.9991154
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -15791,8 +15795,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6609313837983394814}
   m_HandleRect: {fileID: 7294056453409053838}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.9991154
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -15836,7 +15840,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.4749756, y: -0.0006790769}
+  m_AnchoredPosition: {x: 0.4749756, y: 0.000021416367}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6274736155342227322
@@ -17071,8 +17075,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8585513677951088947}
   m_HandleRect: {fileID: 5667783115067739898}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.9990981
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -17745,7 +17749,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000044822693}
+  m_AnchoredPosition: {x: 0, y: -0.00000071525574}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &3304424980708954453
@@ -22341,7 +22345,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.4749756, y: -0.0006790769}
+  m_AnchoredPosition: {x: 0.4749756, y: 0.000021416367}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2779757702894924477
@@ -30952,7 +30956,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 2.4, y: -0.000654066}
+  m_AnchoredPosition: {x: 2.4, y: 0.0000021063922}
   m_SizeDelta: {x: 1121.5598, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6049122339610106530
@@ -56349,7 +56353,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 70}
-  m_SizeDelta: {x: 494, y: 70}
+  m_SizeDelta: {x: 0, y: 70}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &1538072248952587549
 CanvasRenderer:
