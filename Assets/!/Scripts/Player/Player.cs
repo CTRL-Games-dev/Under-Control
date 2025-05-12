@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using Unity.Behavior;
 using Unity.Cinemachine;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -88,13 +90,12 @@ public class Player : MonoBehaviour {
     public Camera MainCamera;
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
-    public bool CanFish = false;
     [SerializeField] private Material _dissolveMaterial;
     public Vector3 StartPosition;
     [SerializeField] private AudioClip _walkingSound;
     private AudioSource _walkingAudioSource;
 
-    public int _evolutionPoints = 0;
+    private int _evolutionPoints = 0;
     public int EvolutionPoints {
         get{ return _evolutionPoints; }
         set {
@@ -104,6 +105,15 @@ public class Player : MonoBehaviour {
     }
 
     public List<EvoUI> SelectedEvolutions;
+
+    [Header("Fishing")]
+    public bool CanFish = false;
+    public bool FishCatchWindow = false;
+    [SerializeField] private WeaponItemData _fishingRod;
+    public Transform FishingBone;
+    [SerializeField] private GameObject _bobberPrefab;
+    public float FishingForce = 1;
+    [SerializeField] private GameObject _currentBobber;
 
     [Header("Spells")]
     [SerializeField]
@@ -185,8 +195,7 @@ public class Player : MonoBehaviour {
     [Header("References")]
     [SerializeField] private UICanvas _uiCanvas;
     [SerializeField] private ParticleSystem[] _trailParticles;
-    public GameObject FBXModel;
-    public WeaponItemData FishingRod;
+    [SerializeField] public GameObject FBXModel;
 
     // Static reference getters
     public static LivingEntity LivingEntity { get; private set; }
@@ -618,6 +627,14 @@ public class Player : MonoBehaviour {
         if(CurrentWeapon == null) return;
         if(CurrentWeapon.ItemData == null) return;
 
+        //fishing interaction
+        if(CurrentWeapon.ItemData == _fishingRod){
+            if(!CanFish) return;
+            if (!LockRotation) transform.LookAt(GetMousePosition());
+            tryFish();
+            return;
+        }
+
         // Default to attacking if no interaction was commited
         
 
@@ -633,10 +650,7 @@ public class Player : MonoBehaviour {
         }
         LockRotation = true;
 
-        if(CurrentWeapon.ItemData == FishingRod){
-            tryFish();
-            return;
-        }
+        
         switch(interactionType) {
             case InteractionType.Primary:
                 performLightAttack();
@@ -648,10 +662,20 @@ public class Player : MonoBehaviour {
     }
 
     private bool tryFish(){
-        if (!CanFish) return false;
-        if(CurrentWeapon.ItemData != FishingRod) return false;
+        if(_currentBobber == null){
+            _currentBobber = Instantiate(_bobberPrefab,FishingBone.position,transform.rotation,null);
+            _currentBobber.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0,0.6f,1)*FishingForce,ForceMode.Impulse);
+            return true;
+        }
+        if(FishCatchWindow){
+            ConsumableItemData caughtFish = GameManager.Instance.CatchableFish[UnityEngine.Random.Range(0, GameManager.Instance.CatchableFish.Count())] as ConsumableItemData;
+            Inventory.AddItem(caughtFish,1,1);
+            UICanvas.PickupItemNotify(caughtFish, 1);
+            FishCatchWindow = false;
+        }
+        Destroy(_currentBobber);
+
         return true;
-        
     }
 
     private bool tryInteract(InteractionType interactionType) {
@@ -930,7 +954,7 @@ public class Player : MonoBehaviour {
          
     }
     public bool BuyFishingRod(Transform t){
-        ItemEntity.SpawnThrownRelative(FishingRod, 1, t.position, 1, t.rotation, Vector3.forward * 2);
+        ItemEntity.SpawnThrownRelative(_fishingRod, 1, t.position, 1, t.rotation, Vector3.forward * 3);
         return true;
     }
 

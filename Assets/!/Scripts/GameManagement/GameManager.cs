@@ -71,6 +71,7 @@ public class GameManager : MonoBehaviour {
     [Range(3,6)] public int RandomCardCount = 3;
     [Space]
     public float SaveCooldown = 15f;
+    public List<ItemData> CatchableFish;
     
     [Header("Debug")]
     public List<ItemData> DebugItems;
