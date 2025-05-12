@@ -79,15 +79,16 @@ MonoBehaviour:
   DropItemsOnDeath: 1
   DestroyOnDeath: 1
   IsInvisible: 0
+  IsBoss: 0
   AvoidGuildChange: 0
-  StartingHealth: 30
+  StartingHealth: 100
   StartingMana: 10
   _health: 0
   _mana: 100
   MaxHealth:
     _raw: 30
     _adjusted: 100
-    _initValue: 30
+    _initValue: 100
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
@@ -268,11 +269,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.3, y: 2, z: 0.8}
+  m_Size: {x: 0.6, y: 2, z: 1}
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &4198091276035405759
 MonoBehaviour:
