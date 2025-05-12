@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using Unity.Behavior;
 using Unity.Cinemachine;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -94,7 +96,7 @@ public class Player : MonoBehaviour {
     [SerializeField] private AudioClip _walkingSound;
     private AudioSource _walkingAudioSource;
 
-    public int _evolutionPoints = 0;
+    private int _evolutionPoints = 0;
     public int EvolutionPoints {
         get{ return _evolutionPoints; }
         set {
@@ -104,6 +106,16 @@ public class Player : MonoBehaviour {
     }
 
     public List<EvoUI> SelectedEvolutions;
+
+    [Header("Fishing")]
+    public bool CanFish = false;
+    public bool FishCatchWindow = false;
+    [SerializeField] private WeaponItemData _fishingRod;
+    public Transform FishingBone;
+    public float FishingForce = 1;
+    public int AvailableFish = 0;
+    [SerializeField] private GameObject _bobberPrefab;
+    [SerializeField] private GameObject _currentBobber;
 
     [Header("Spells")]
     [SerializeField]
@@ -163,6 +175,7 @@ public class Player : MonoBehaviour {
     public UnityEvent<EvoUI> OnEvolutionSelected = new();
     public UnityEvent<int> CoinsChangeEvent;
     public UnityEvent UpdateConsumablesEvent;
+    public UnityEvent FishCaughtEvent;
     public float CameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
 
     // State
@@ -185,7 +198,8 @@ public class Player : MonoBehaviour {
     [Header("References")]
     [SerializeField] private UICanvas _uiCanvas;
     [SerializeField] private ParticleSystem[] _trailParticles;
-    public GameObject FBXModel;
+    [SerializeField] public GameObject FBXModel;
+    public GameObject  FishingRod;
 
     // Static reference getters
     public static LivingEntity LivingEntity { get; private set; }
@@ -248,6 +262,9 @@ public class Player : MonoBehaviour {
         _walkingAudioSource.clip = _walkingSound;
         _walkingAudioSource.loop = true;
         _walkingAudioSource.playOnAwake = false;
+
+        CameraManager.SwitchCamera(TopDownCamera);
+
         if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
             WeaponHolder.UpdateWeapon(CurrentWeapon);
         }
@@ -422,39 +439,27 @@ public class Player : MonoBehaviour {
     }
 
     void OnUseConsumableOne(InputValue value) {
-        if(ConsumableItemOne == null) return;
-        if(!ConsumableCooldown.Execute()) return;
-        if(ConsumableItemOne.Amount <= 0) return;
-
-        ConsumableItemData c =  ConsumableItemOne.ItemData;
-
-        if(c == null) return;
-        c.Consume(LivingEntity);
-        ConsumableItemOne.Amount--;
-
-        if (ConsumableItemOne.Amount <= 0) {
-            ConsumableItemOne = null;
-        }
-
-        UICanvas.HUDCanvas.UseConsumable1();
-        UpdateConsumablesEvent?.Invoke();
+        useConsumable(ref ConsumableItemOne, 1);
     }
 
     void OnUseConsumableTwo(InputValue value) {
-        if(ConsumableItemTwo == null) return;
+        useConsumable(ref ConsumableItemTwo, 2);
+    }
+    private void useConsumable(ref InventoryItem<ConsumableItemData> consumable, int slotIndex) {
+        if(consumable == null) return;
         if(!ConsumableCooldown.Execute()) return;
-        if(ConsumableItemTwo.Amount <= 0) return;
+        if(consumable.Amount <= 0) return;
 
-        ConsumableItemData c =  ConsumableItemTwo.ItemData as ConsumableItemData;
+        ConsumableItemData c =  consumable.ItemData as ConsumableItemData;
         
         if(c == null) return;
-        c.Consume(LivingEntity);
-        ConsumableItemTwo.Amount--;
-        if (ConsumableItemTwo.Amount <= 0) {
-            ConsumableItemTwo = null;
+        if(!c.Consume(LivingEntity)) return;
+        consumable.Amount--;
+        if (consumable.Amount <= 0) {
+            consumable = null;
         }
 
-        UICanvas.HUDCanvas.UseConsumable2();
+        UICanvas.HUDCanvas.UseConsumable(slotIndex);
         UpdateConsumablesEvent?.Invoke();
     }
 
@@ -615,8 +620,18 @@ public class Player : MonoBehaviour {
         if(CurrentWeapon == null) return;
         if(CurrentWeapon.ItemData == null) return;
 
+        //fishing interaction
+        if(CurrentWeapon.ItemData == _fishingRod){
+            if(!CanFish) return;
+            if (!LockRotation) transform.LookAt(GetMousePosition());
+            Animator.SetTrigger("castRod");
+            // tryFish();
+            return;
+        }
+
         // Default to attacking if no interaction was commited
         
+
         if (CurrentAnimationState == AnimationState.Attack_ComboWindow) {
             _queuedRotation = GetMousePosition() - transform.position;
             LockRotation = false;
@@ -627,8 +642,9 @@ public class Player : MonoBehaviour {
         if (!LockRotation) {
             transform.LookAt(GetMousePosition());   
         }
-
         LockRotation = true;
+
+        
         switch(interactionType) {
             case InteractionType.Primary:
                 performLightAttack();
@@ -639,7 +655,28 @@ public class Player : MonoBehaviour {
         }
     }
 
-    
+    private bool tryFish(){
+        if(_currentBobber == null){
+            _currentBobber = Instantiate(_bobberPrefab,FishingBone.position,transform.rotation,null);
+            _currentBobber.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0.6f, 1) * FishingForce, ForceMode.Impulse);
+            Player.Instance.InputDisabled = true;
+            return true;
+        }
+        Animator.SetTrigger("catchFish");
+        Player.Instance.InputDisabled = false;
+        if(FishCatchWindow){
+            ConsumableItemData caughtFish = GameManager.Instance.CatchableFish[UnityEngine.Random.Range(0, GameManager.Instance.CatchableFish.Count())] as ConsumableItemData;
+            Inventory.AddItem(caughtFish,1,1);
+            UICanvas.PickupItemNotify(caughtFish, 1);
+            AvailableFish -= 1;
+            FishCaughtEvent?.Invoke();
+            FishCatchWindow = false;
+
+        }
+        Destroy(_currentBobber);
+
+        return true;
+    }
 
     private bool tryInteract(InteractionType interactionType) {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
@@ -679,7 +716,6 @@ public class Player : MonoBehaviour {
 
     public void OnInventoryChanged() {
         UpdateEquipment();
-        
     }
     public void UpdateEquipment(){
         WeaponHolder.UpdateWeapon(CurrentWeapon);
@@ -876,6 +912,7 @@ public class Player : MonoBehaviour {
         GameManager.Instance.ResetCards();
         GameManager.Instance.ResetInfluence();
         GameManager.Instance.ResetCardChoice();
+        CanFish = false;
         // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         EventBus.InventoryItemChangedEvent?.Invoke();
@@ -919,6 +956,14 @@ public class Player : MonoBehaviour {
         LivingEntity.Mana = LivingEntity.MaxMana;
          
     }
+    public bool BuyFishingRod(Transform t){
+        ItemEntity.SpawnThrownRelative(_fishingRod, 1, t.position, 1, t.rotation, Vector3.forward * 3);
+        return true;
+    }
+
+    public void EquipFishingRod(bool val) {
+        FishingRod.SetActive(val);
+    }
 
     public void SetPlayerPosition(Vector3 position, float time = 0.1f, float yRotation = 45) {
         Instance.gameObject.SetActive(true);
@@ -936,7 +981,7 @@ public class Player : MonoBehaviour {
         Animator.speed = 1;
         UpdateDisabled = false;
     }
-
+    
     public void PlayRespawnAnimation() {
         Animator.animatePhysics = false;
         UpdateDisabled = true;
@@ -976,6 +1021,10 @@ public class Player : MonoBehaviour {
         CurrentAnimationState = AnimationState.Locomotion;
         SlashManager.DisableSlash();
         UpdateEquipment();
+    }
+    
+    public void TryCatchFish() {
+        tryFish();
     }
 
     #endregion

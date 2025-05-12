@@ -214,6 +214,7 @@ public class InvTileEquipment : InvTile {
         if(!IsEmpty) return;
         PlaceItem(item);
     }
+
     public void PlaceItem(InventoryItem item){
         if (_tileType == TileType.Armor) {
             if(!item.TryAs(out InventoryItem<ArmorItemData> armorItem)) {
@@ -231,6 +232,11 @@ public class InvTileEquipment : InvTile {
             if(!item.TryAs(out InventoryItem<WeaponItemData> weaponItem)) {
                 return;
             }
+            if (weaponItem.ItemData.WeaponType == WeaponType.Fishingrod) {
+                Player.Instance.EquipFishingRod(true);
+                // return;
+            }
+
             AudioClip EquipWeaponClip = Resources.Load("SFX/bron/wyjmowaniebroni") as AudioClip;
             SoundFXManager.Instance.PlaySoundFXClip(EquipWeaponClip,transform);
             Player.Inventory.Weapon = weaponItem;
@@ -325,6 +331,7 @@ public class InvTileEquipment : InvTile {
                     Player.Inventory.Amulet = null;
                     break;
                 case TileType.Weapon:
+                    Player.Instance.EquipFishingRod(false);
                     Player.Inventory.Weapon = null;
                     break;
                 case TileType.Consumeable1:

@@ -6,6 +6,7 @@ public class DialogueEntry
 {
     public bool IsPlayer;
     public bool IsInputField;
+    public bool IsOffer;
     public string Text;
 }
 

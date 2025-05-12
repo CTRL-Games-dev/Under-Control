@@ -4,10 +4,11 @@ using UnityEngine;
 public class HealthPotionItemData : ConsumableItemData {
     public float HealAmount;
 
-    public override void Consume(LivingEntity consumer) {
+    public override bool Consume(LivingEntity consumer) {
         consumer.Health += HealAmount;
         if(consumer.Health > consumer.MaxHealth) {
             consumer.Health = consumer.MaxHealth;
         }
+        return true;
     }
 }

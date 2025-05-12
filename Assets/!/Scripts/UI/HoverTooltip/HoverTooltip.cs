@@ -24,7 +24,7 @@ public class HoverTooltip : MonoBehaviour {
         _interactableMask |= 1 << LayerMask.NameToLayer("Interactable");
     }
 
-    void Update() {
+    void LateUpdate() {
         if(!InputUtility.IsMousePositionAvailable()) return;
 
         _rectTransform.anchoredPosition = UICanvas.ScaleToCanvas(new Vector2(Input.mousePosition.x, Input.mousePosition.y)) - new Vector2(0, 1080);
