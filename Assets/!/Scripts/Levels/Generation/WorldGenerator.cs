@@ -92,8 +92,8 @@ public class WorldGenerator : MonoBehaviour {
         PlaceForestTiles(ref grid);
         Debug.Log("Spawned locations");
 
-        GenerateChunks(ref grid);
-        Debug.Log("Generated mesh chunks");
+        // GenerateChunks(ref grid);
+        // Debug.Log("Generated mesh chunks");
     }
 
 
