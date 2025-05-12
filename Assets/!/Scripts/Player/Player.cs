@@ -326,13 +326,13 @@ public class Player : MonoBehaviour {
         switch (CurrentAnimationState) {
             case AnimationState.Dash:
             case AnimationState.Attack_Windup:
-                if (_queuedRotation == Vector3.zero) return transform.forward;
-                Vector3 dir = _queuedRotation;
-                _queuedRotation = Vector3.zero;
-                return dir.normalized;
+                // if (_queuedRotation == Vector3.zero) return transform.forward;
+                // Vector3 dir = _queuedRotation;
+                // _queuedRotation = Vector3.zero;
+                // return dir.normalized;
             case AnimationState.Attack_Contact:
             case AnimationState.Attack_ComboWindow:
-                return transform.forward;
+                // return transform.forward;
 
             case AnimationState.Locomotion:
             case AnimationState.Attack_Recovery:
@@ -877,6 +877,7 @@ public class Player : MonoBehaviour {
         // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         EventBus.InventoryItemChangedEvent?.Invoke();
+        GameManager.Instance.LevelDepth = 0;
 
         Instance.UpdateEquipment();
         Player.LivingEntity.Health = Player.LivingEntity.MaxHealth;
