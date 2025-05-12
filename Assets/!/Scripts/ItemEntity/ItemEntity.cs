@@ -72,7 +72,7 @@ public class ItemEntity : MonoBehaviour, IInteractable
     }
 
     public void Interact() {
-        if(!Player.LivingEntity.Inventory.AddItem(ItemData, Amount, 1)) {
+        if(!Player.LivingEntity.Inventory.AddItem(ItemData, Amount, PowerScale)) {
             return;
         }
 
