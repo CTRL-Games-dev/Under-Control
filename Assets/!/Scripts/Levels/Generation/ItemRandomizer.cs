@@ -16,7 +16,7 @@ public class ItemRandomizer {
             .Where(x => influence >= x.MinInfluence)
             .Where(x => influenceDelta >= x.MinInfluenceDelta)
             .ToList();
-        int numberOfItems = UnityEngine.Random.Range(minAmount, maxAmount + 1);
+        int numberOfItems = UnityEngine.Random.Range(minAmount, maxAmount);
 
         for(int i = 0; i < numberOfItems; i++) {
             SpawnItemData item = shuffledItems[i];

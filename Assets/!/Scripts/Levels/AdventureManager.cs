@@ -63,12 +63,13 @@ public class AdventureManager : MonoBehaviour
         float influence = GameManager.Instance.TotalInfluence;
 
         Dimension dimension;
-        if(influence >= 100 && bossesDefeated == 2) {
+        if(influence >= 100 && bossesDefeated == 1) {
             dimension = Dimension.VEKTHAR_BOSS;
-        } else if(influence >= 66 && bossesDefeated == 1) {
+        } else if(influence >= 50 && bossesDefeated == 0) {
             dimension = Dimension.ENT_BOSS;
-        } else if(influence >= 33 && bossesDefeated == 0) {
-            dimension = Dimension.SLIME_BOSS;
+        
+        // } else if(influence >= 33 && bossesDefeated == 0) {
+        //     dimension = Dimension.SLIME_BOSS;
         } else {
             dimension = Dimension.CARD_CHOOSE;
         }

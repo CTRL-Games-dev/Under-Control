@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -334,13 +335,13 @@ void Update() {
         switch (CurrentAnimationState) {
             case AnimationState.Dash:
             case AnimationState.Attack_Windup:
-                if (_queuedRotation == Vector3.zero) return transform.forward;
-                Vector3 dir = _queuedRotation;
-                _queuedRotation = Vector3.zero;
-                return dir.normalized;
+                // if (_queuedRotation == Vector3.zero) return transform.forward;
+                // Vector3 dir = _queuedRotation;
+                // _queuedRotation = Vector3.zero;
+                // return dir.normalized;
             case AnimationState.Attack_Contact:
             case AnimationState.Attack_ComboWindow:
-                return transform.forward;
+                // return transform.forward;
 
             case AnimationState.Locomotion:
             case AnimationState.Attack_Recovery:
@@ -887,9 +888,10 @@ void Update() {
         GameManager.Instance.ResetCards();
         GameManager.Instance.ResetInfluence();
         GameManager.Instance.ResetCardChoice();
-        // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+        GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         EventBus.InventoryItemChangedEvent?.Invoke();
+        GameManager.Instance.LevelDepth = 0;
 
         Instance.UpdateEquipment();
         Player.LivingEntity.Health = Player.LivingEntity.MaxHealth;
@@ -931,12 +933,17 @@ void Update() {
     }
 
     public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
+        transform.rotation = Quaternion.Euler(0, yRotation, 0);
+        StartCoroutine(setPlayerPositionCoroutine(position, time));
+    }
+
+    private IEnumerator setPlayerPositionCoroutine(Vector3 position, float time) {
         UpdateDisabled = true;
         Animator.animatePhysics = false;
         gameObject.transform.position = position;
+        yield return new WaitForSeconds(time);
         Animator.animatePhysics = true;
         UpdateDisabled = false;
-        gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
 
 

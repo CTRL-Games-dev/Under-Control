@@ -167,7 +167,7 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
 
     public void OnCreditsBtnClick() {
         playClickSound();
-        Debug.Log("BY Ctrl Games");
+        Player.UICanvas.ChangeUITopState(UITopState.VideoPlayer);
     }
 
     public void OnExitBtnClick() {

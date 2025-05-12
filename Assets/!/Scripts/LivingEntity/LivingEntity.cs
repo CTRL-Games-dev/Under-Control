@@ -22,6 +22,7 @@ public class LivingEntity : MonoBehaviour {
     public bool DropItemsOnDeath = true;
     public bool DestroyOnDeath = true;
     public bool IsInvisible = false;
+    public bool IsBoss = false;
     public bool AvoidGuildChange = false;
 
     public string DebugName => $"{DisplayName} ({Guild.Name} {gameObject.name})";
@@ -195,6 +196,8 @@ public class LivingEntity : MonoBehaviour {
     public void Die() {
         if (HasDied) return;
         HasDied = true;
+
+        if (IsBoss) GameManager.Instance.BossesDefeated++;
 
         // Drop items
         if(DropItemsOnDeath) {

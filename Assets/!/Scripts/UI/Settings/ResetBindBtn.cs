@@ -13,6 +13,7 @@ public class ResetBindBtn : MonoBehaviour
     }
 
     public void RotateButton() {
+        EventBus.BindingsChangedEvent?.Invoke();
         _rectTransform.DOKill();
         _targetRectTransform.DOKill();
         _rectTransform.DORotate(new Vector3(0, 0, -360), _rotationSpeed * Settings.AnimationSpeed, RotateMode.FastBeyond360)
