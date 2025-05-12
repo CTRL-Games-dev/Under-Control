@@ -1,4 +1,4 @@
-using Unity.VisualScripting;
+using System.Collections;
 using UnityEngine;
 
 public class VektharBossBattleManager : MonoBehaviour
@@ -23,12 +23,14 @@ public class VektharBossBattleManager : MonoBehaviour
     // Previous player camera settings
     private float _previousMaxCameraDistance;
     private float _previousMinCameraDistance;
-    void Start()
-    {
-        Player.Instance.transform.position = LevelStart.position;
+
+    void Start() {
+        Player.Instance.SetPlayerPosition(LevelStart.position);
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
+        EventBus.SceneReadyEvent?.Invoke();
     }
-    void Update()
-    {
+
+    void Update() {
         switch (_state)
         {
             case BattleState.BeforeBattle:
@@ -58,11 +60,27 @@ public class VektharBossBattleManager : MonoBehaviour
         
     }
 
+    public IEnumerator disableSounds() {
+        yield return new WaitForSeconds(1);
+
+        GameManager.Instance.GetComponent<AudioSource>().mute = true;
+    
+        yield return new WaitForSeconds(30);
+
+        GameManager.Instance.GetComponent<AudioSource>().mute = false;
+    }
+
     private void startOfBattle() {
         foreach(ArenaWall w in walls) {
             w.Switch();
         }
+
         Vekthar = Instantiate(_vektharPrefab, VektharStart.position, Quaternion.Euler(0, 45, 0));
+
+        Vekthar.LivingEntity.OnDeath.AddListener(() => {
+            Player.UICanvas.ChangeUITopState(UITopState.VideoPlayer);
+            StartCoroutine(disableSounds());
+        });
 
         _previousMinCameraDistance = Player.Instance.MinCameraDistance;
         _previousMaxCameraDistance = Player.Instance.MaxCameraDistance;

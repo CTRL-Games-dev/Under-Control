@@ -315,7 +315,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 33.165985, y: 1, z: 33.24929}
+  m_Size: {x: 33, y: 1, z: 33}
   m_Center: {x: 0.04983139, y: 0, z: 0.06545162}
 --- !u!114 &3762160354113897002
 MonoBehaviour:
@@ -333,11 +333,23 @@ MonoBehaviour:
   _enemySpawnerExitPrefab: {fileID: 6897201124479605952, guid: 3a1253432af8415f1911889d926fc58e, type: 3}
   _entPrefab: {fileID: 430965844354737387, guid: 175022efad6a6384fa0383a3f74bb53d, type: 3}
   MaxExitsAtOnce: 2
+  MaxNumberOfWaves: 2
+  MinNumberOfWaves: 1
   Waves:
-  - {fileID: 11400000, guid: 133bb9471cf3cd23bb49585f8c0157ed, type: 2}
+  - {fileID: 11400000, guid: 2a1ae2384cdf74e59b1869d4f6990ffd, type: 2}
+  - {fileID: 11400000, guid: d48b83ffd39bf18b69e51d1eafa12c10, type: 2}
+  - {fileID: 11400000, guid: 4fd17a7641cdbdfe5bb75ea5e32a254e, type: 2}
+  - {fileID: 11400000, guid: 9451d7d784ffe5b3086d43f4aea9c2b6, type: 2}
+  - {fileID: 11400000, guid: 55909162a03ac2879a448ef3d555dbee, type: 2}
+  - {fileID: 11400000, guid: 870a08e6c357732b19da5f5fb38d8ea6, type: 2}
+  - {fileID: 11400000, guid: 83ced0a6b3652a006ba9b369d62294a1, type: 2}
+  - {fileID: 11400000, guid: 5bb0ed806a358c174bad3f58c1343e2a, type: 2}
+  - {fileID: 11400000, guid: 2936da10512cd080db0211d70aaf902b, type: 2}
+  - {fileID: 11400000, guid: f48d75bce5cded847a8ce6a364d61324, type: 2}
+  - {fileID: 11400000, guid: fe56146d9dbc036fb8dc5469ab0c968b, type: 2}
+  - {fileID: 11400000, guid: 417e7d0c373fd02cfbed497fa7407207, type: 2}
   SpawnPointsParent: {fileID: 1527191014470596022}
   SpawnPoints: []
-  WaveNumber: 0
   DefeatedEnemies:
     m_PersistentCalls:
       m_Calls: []
@@ -553,7 +565,7 @@ PrefabInstance:
       objectReference: {fileID: 3762160354113897002}
     - target: {fileID: 6793243234689528448, guid: 99690e03a676b43a589c0f9e5345b435, type: 3}
       propertyPath: ChanceToSpawn
-      value: 0.505
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7343777017094859292, guid: 99690e03a676b43a589c0f9e5345b435, type: 3}
       propertyPath: m_LocalScale.x

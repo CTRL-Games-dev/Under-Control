@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,6 +5,7 @@ using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(LivingEntity))]
 public class SlimeAIController : MonoBehaviour {
     public const float JumpMaxHeight = 0.9f;
     public const float JumpMinHeight = 0.1f;
@@ -20,8 +20,12 @@ public class SlimeAIController : MonoBehaviour {
     public float AngularSpeed = 200;
     public bool IsJumping => _startingPoint.HasValue;
 
+    public float CurrentJumpMaxDistance = MaxJumpDistance;
+    public float CurrentPreferredJumpDistance = PreferredJumpDistance;
+
     private Animator _animator;
     private NavMeshAgent _navMeshAgent;
+    private LivingEntity _livingEntity;
 
     // Jump parameters
     private Vector3? _startingPoint;
@@ -34,6 +38,7 @@ public class SlimeAIController : MonoBehaviour {
     void Start() {
         _animator = GetComponent<Animator>();
         _navMeshAgent = GetComponent<NavMeshAgent>();
+        _livingEntity = GetComponent<LivingEntity>();
 
         _navMeshAgent.updatePosition = false;
 
@@ -41,9 +46,9 @@ public class SlimeAIController : MonoBehaviour {
     }
 
     void Update() {
-        for(int i = 1; i < _navMeshAgent.path.corners.Length; i++) {
-            Debug.DrawLine(_navMeshAgent.path.corners[i - 1], _navMeshAgent.path.corners[i], Color.red);
-        }
+        // for(int i = 1; i < _navMeshAgent.path.corners.Length; i++) {
+        //     Debug.DrawLine(_navMeshAgent.path.corners[i - 1], _navMeshAgent.path.corners[i], Color.red);
+        // }
 
         if (IsJumping) {
             _navMeshAgent.nextPosition = _destinationPoint.Value;
@@ -77,12 +82,15 @@ public class SlimeAIController : MonoBehaviour {
         float cornerDistance = cornerDirection.magnitude;
         cornerDirection /= cornerDistance;
 
+        CurrentJumpMaxDistance = MaxJumpDistance * _livingEntity.MovementSpeed;
+        CurrentPreferredJumpDistance = PreferredJumpDistance * _livingEntity.MovementSpeed;
+
         Vector3 jumpDestination = closestCorner;
-        if (cornerDistance > 2 * PreferredJumpDistance) {
-            jumpDestination = transform.position + cornerDirection * PreferredJumpDistance;
-        } else if (cornerDistance > MaxJumpDistance) {
+        if (cornerDistance > 2 * CurrentPreferredJumpDistance) {
+            jumpDestination = transform.position + cornerDirection * CurrentPreferredJumpDistance;
+        } else if (cornerDistance > CurrentJumpMaxDistance) {
             jumpDestination = transform.position + cornerDirection * cornerDistance / 2;
-        } else if (cornerDistance > PreferredJumpDistance) {
+        } else if (cornerDistance > CurrentPreferredJumpDistance) {
             jumpDestination = transform.position + cornerDirection * cornerDistance;
         }
 
@@ -99,6 +107,11 @@ public class SlimeAIController : MonoBehaviour {
 
         _animator.SetTrigger(_jumpAnimationHash);
 
+        AudioClip jumpSound = Resources.Load("SFX/slime/skok") as AudioClip; //jump sound
+        SoundFXManager.Instance.PlaySoundFXClip(jumpSound, transform, 0.7f);
+
+
+
         // Debug.Log($"Jumping to {destination} from {transform.position} | Distance: {Vector3.Distance(transform.position, destination)}");
     }
 
@@ -106,7 +119,7 @@ public class SlimeAIController : MonoBehaviour {
         float simpleJumpLength = Vector3.Distance(_startingPoint.Value, _destinationPoint.Value);
 
         // Punish small jump's speed
-        float jumpSpeed = JumpSpeed * simpleJumpLength /  MaxJumpDistance;
+        float jumpSpeed = JumpSpeed * simpleJumpLength /  CurrentJumpMaxDistance;
 
         float totalDistX = _destinationPoint.Value.x - _startingPoint.Value.x;
         float totalDistZ = _destinationPoint.Value.z - _startingPoint.Value.z;

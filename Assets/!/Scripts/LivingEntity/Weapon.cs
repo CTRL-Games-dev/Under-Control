@@ -7,8 +7,8 @@ public class Weapon : MonoBehaviour {
 
     [SerializeField]
     private Collider Hitbox;
-    public WeaponTrait WeaponTrait = WeaponTrait.Basic;
 
+    public WeaponTrait WeaponTrait = WeaponTrait.Basic;
 
     public void OnTriggerEnter(Collider other) {
         LivingEntity victim = other.GetComponentInParent<LivingEntity>(includeInactive: true);
@@ -21,10 +21,14 @@ public class Weapon : MonoBehaviour {
     }
 
     public void EnableHitbox() {
+        if(Hitbox == null) return;
+        
         Hitbox.enabled = true;
     }
 
     public void DisableHitbox() {
+        if(Hitbox == null) return;
+
         Hitbox.enabled = false;
     }
 }

@@ -20,13 +20,6 @@ public class ItemContainer
         _size = new Vector2Int(width, height);
     }
 
-    public bool FitsWithinBounds(Vector2Int position, Vector2Int size) {
-        if (position.x + size.x > Size.x || position.y + size.y > Size.y) {
-            return false;
-        }
-        return true;
-    }
-
     public bool DoesFitWithin(Vector2Int position, Vector2Int size) {
         // Position is out of bounds
         if(!IsWithinBounds(position)) {
@@ -42,10 +35,10 @@ public class ItemContainer
         foreach(var inventoryItem in _items) {
             // Illegal bounds = rectangle in which item can't be placed
             var illegalBoundsMinX = inventoryItem.Position.x - size.x + 1;
-            var illegalBoundsMaxX = inventoryItem.Position.x + inventoryItem.ItemData.Size.x - 1;
+            var illegalBoundsMaxX = inventoryItem.Position.x + (inventoryItem.Rotated ? inventoryItem.ItemData.Size.y : inventoryItem.ItemData.Size.x) - 1;
 
             var illegalBoundsMinY = inventoryItem.Position.y - size.y + 1;
-            var illegalBoundsMaxY = inventoryItem.Position.y + inventoryItem.ItemData.Size.y - 1;
+            var illegalBoundsMaxY = inventoryItem.Position.y + (inventoryItem.Rotated ? inventoryItem.ItemData.Size.x : inventoryItem.ItemData.Size.y) - 1;
 
             if(position.x >= illegalBoundsMinX && position.x <= illegalBoundsMaxX && position.y >= illegalBoundsMinY && position.y <= illegalBoundsMaxY) {
                 return false;
@@ -100,16 +93,6 @@ public class ItemContainer
     // Use IsWithinBounds to check if the position is valid
     public InventoryItem GetInventoryItem(Vector2Int position) {
         foreach(var inventoryItem in _items) {
-            // var minX = inventoryItem.Position.x;
-            // var maxX = inventoryItem.Position.x + inventoryItem.ItemData.Size.x;
-
-            // var minY = inventoryItem.Position.y;
-            // var maxY = inventoryItem.Position.y + inventoryItem.ItemData.Size.y;
-
-            // if(position.x >= minX && position.x < maxX && position.y >= minY && position.y < maxY) {
-            //     return inventoryItem;
-            // }
-
             var minX = inventoryItem.Position.x;
             var maxX = inventoryItem.Position.x + (inventoryItem.Rotated ? inventoryItem.ItemData.Size.y : inventoryItem.ItemData.Size.x);
 
@@ -119,11 +102,6 @@ public class ItemContainer
             if(position.x >= minX && position.x < maxX && position.y >= minY && position.y < maxY) {
                 return inventoryItem;
             }
-
-            // // Nie dziala z powodu rotacji
-            // if(inventoryItem.Position == position) {
-            //     return inventoryItem;
-            // }
         }
 
         return null;

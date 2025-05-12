@@ -1,20 +1,20 @@
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.EventSystems;
-using TMPro;
 using UnityEngine.UI;
-using NUnit.Framework;
 
 public class CardUI : MonoBehaviour
 {
     [SerializeField] private TextLocalizer _nameTextLocalizer, _descriptionTextLocalizer;
     [SerializeField] private Image _barImg, _outlineImg, _icon;
+    [SerializeField] private GameObject _backCard, _frontCard;
+    [SerializeField] private RectTransform _holderRect;
 
     private Card _card;
     private CanvasGroup _canvasGroup;
     private RectTransform _rectTransform;
-    private bool _isHovered = false;
     public bool IsInCollection = false;
+    private float _zTilt = 0f;
 
 
     private void Awake() {
@@ -34,16 +34,14 @@ public class CardUI : MonoBehaviour
         EventBus.RunCardClickedEvent.AddListener(OnRunCardClicked);
     }
 
-    private void FixedUpdate() {
-        if (_isHovered) {
-            Vector2 mousePosition = Input.mousePosition;
-            Vector2 cardPosition = RectTransformUtility.WorldToScreenPoint(Camera.main, _rectTransform.position);
-            Vector2 direction = (mousePosition - cardPosition).normalized;
 
-            float tiltAmount = 30f;
-            Quaternion targetRotation = Quaternion.Euler(direction.y * tiltAmount, -direction.x * tiltAmount, 0);
-            _rectTransform.rotation = Quaternion.Lerp(_rectTransform.rotation, targetRotation, Time.deltaTime * 5f);
-        }
+    public void SetTilt(float tiltAmount) {
+        _zTilt = tiltAmount;
+        _rectTransform.localRotation = Quaternion.Euler(0, 0, tiltAmount);
+    }
+
+    public void SetPosition(Vector3 position) {
+        _rectTransform.anchoredPosition = position;
     }
 
 
@@ -51,19 +49,35 @@ public class CardUI : MonoBehaviour
         gameObject.SetActive(true);
         Awake();
 
-        _nameTextLocalizer.Key = _card.DisplayName;
-
-
-        _descriptionTextLocalizer.Key = _card.ShortDesc;
-
-        _icon.sprite = _card.Icon == null ? ElementalInfo.GetIconSprite(_card.ElementalType) : _card.Icon;        
-        _barImg.sprite = ElementalInfo.GetBarSprite(_card.ElementalType);
-        _outlineImg.color = ElementalInfo.GetColor(_card.ElementalType);
-
         _rectTransform.DOScale(Vector3.one, 0.5f * Settings.AnimationSpeed);
         _canvasGroup.DOFade(1, 0.3f * Settings.AnimationSpeed);
     }
 
+    public void RotateCard() {
+        _rectTransform.DOComplete();
+        _holderRect.DOKill();
+        _holderRect.DOLocalRotate(new Vector3(0, 90, 0), 0.25f).SetEase(Ease.InOutSine).OnComplete(() => {
+            _backCard.SetActive(false);
+            _frontCard.SetActive(true);
+            
+            _nameTextLocalizer.Key = _card.DisplayName;
+            _descriptionTextLocalizer.Key = _card.ShortDesc;
+
+            WeaponCard weaponCard = _card as WeaponCard;
+            if (weaponCard != null) {
+                _icon.sprite = weaponCard.WeaponData.Icon;
+            } else {
+                _icon.sprite = _card.Icon == null ? ElementalInfo.GetIconSprite(_card.ElementalType) : _card.Icon;        
+            }
+
+            _barImg.sprite = ElementalInfo.GetBarSprite(_card.ElementalType);
+            _outlineImg.color = ElementalInfo.GetColor(_card.ElementalType);
+            
+            _holderRect.DOLocalRotate(new Vector3(0, 0, 0), 0.25f).SetEase(Ease.InOutSine).OnComplete(() => {
+                _holderRect.localRotation = Quaternion.Euler(0, 0, 0);
+            });
+        });
+    }
 
 
 
@@ -91,7 +105,8 @@ public class CardUI : MonoBehaviour
     }
 
     public void OnPointerEnter() {
-        _isHovered = true;
+        var InvClickClip = Resources.Load($"NEWSFX/hihatdmg") as AudioClip;  
+        SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform);
         _rectTransform.DOScale(Vector3.one * 1.1f, 0.3f * Settings.AnimationSpeed);
         if (IsInCollection) {
             Player.UICanvas.InventoryCanvas.CardsPanel.ShowMoreInfo(_card);
@@ -101,8 +116,6 @@ public class CardUI : MonoBehaviour
     }
 
     public void OnPointerExit() {
-        _isHovered = false;
-        _rectTransform.DORotate(Vector3.zero, 0.1f * Settings.AnimationSpeed);
         _rectTransform.DOScale(Vector3.one, 0.3f * Settings.AnimationSpeed);
         if (IsInCollection) {
             Player.UICanvas.InventoryCanvas.CardsPanel.ShowMoreInfo(null);

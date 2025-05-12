@@ -1,14 +1,19 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.VFX;
 
 [RequireComponent(typeof(Chest))]
 public class ChestRandomizer : MonoBehaviour
 {
     [Range(0,1)]
     public float ChanceToSpawn = 1;
-    public List<ChestItemData> possibleItems;
+    public SpawnItemData[] possibleItems;
     public EnemySpawner Spawner;
+    public VisualEffect MorphVFX;
+    public int MinItems = 1;
+    public int MaxItems = 1;
     void Awake()
     {
         gameObject.SetActive(false);
@@ -24,32 +29,18 @@ public class ChestRandomizer : MonoBehaviour
     private void spawnChest()
     {
         gameObject.SetActive(true);
+        MorphVFX.Play();
+
+        StartCoroutine(stopEfect());
+    }
+    private IEnumerator stopEfect() {
+        yield return new WaitForSeconds(1.5f);
+        MorphVFX.Stop();
+        MorphVFX.SendEvent("StopOrbs");
     }
     private void setLoot()
     {
-        float influence = GameManager.Instance.TotalInfluence;
-        float influenceDelta = GameManager.Instance.InfluenceDelta;
-
-        Chest chest = GetComponent<Chest>();
-
-        foreach(var i in possibleItems)
-        {
-            if(influence < i.MinInfluence) continue;
-            if(influenceDelta < i.MinInfluenceDelta) continue;
-
-            bool ifSpawned = UnityEngine.Random.Range(0f, 1f) <= ChanceToSpawn;
-
-            if(!ifSpawned) continue;
-
-            int quantity = (int)(UnityEngine.Random.Range(0, i.MaxQuantity) * GameManager.Instance.GetInfluenceModifier());
-            quantity = Math.Max(quantity, 1);
-            quantity = (int)Math.Min(quantity, i.MaxQuantity);
-
-            float powerScale = (UnityEngine.Random.Range(0f, 0.33f) * GameManager.Instance.GetInfluenceModifier()) + 0.75f;
-
-            Debug.Log($"Adding item {i.item} of quantity {quantity} with power scale {powerScale} to chest");
-            bool spotFound = chest.Inventory.AddItem(i.item, quantity, powerScale);
-            if(!spotFound) Debug.Log($"Could not find empty spot for item {i.item} of quantity {quantity}");
-        }
+        SimpleInventory inventory = GetComponent<SimpleInventory>();
+        ItemRandomizer.SetRandomItems(possibleItems, inventory, MinItems, MaxItems);
     }
 }

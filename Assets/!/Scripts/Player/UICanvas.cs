@@ -26,8 +26,37 @@ public enum UITopState {
 }
 
 
-public class UICanvas : MonoBehaviour
-{
+public class UICanvas : MonoBehaviour {
+    #region Scalling
+    
+    public static Vector2 ScreenScale { get => new Vector2(Screen.width / 1920f, Screen.height / 1080f); }
+    public static Vector2 CanvasScale { get => new Vector2(1920f / Screen.width, 1080f / Screen.height); }
+
+    // Scales a vector to the virtual screen size (1920x1080).
+    public static Vector2 ScaleToCanvas(Vector2 original) {
+        Vector2 scale = CanvasScale;
+        return new Vector2(original.x * scale.x, original.y * scale.y);
+    }
+
+    // Scales a vector to the virtual screen size (1920x1080). Z is not scaled.
+    public static Vector3 ScaleToCanvas(Vector3 original) {
+        Vector2 scale = CanvasScale;
+        return new Vector3(original.x * scale.x, original.y * scale.y, original.z);
+    }
+
+    public static Vector2 ScaleToScreen(Vector2 original) {
+        Vector2 scale = ScreenScale;
+        return new Vector2(original.x * scale.x, original.y * scale.y);
+    }
+
+    // Scales a vector to the virtual screen size (1920x1080). Z is not scaled.
+    public static Vector3 ScaleToScreen(Vector3 original) {
+        Vector2 scale = ScreenScale;
+        return new Vector3(original.x * scale.x, original.y * scale.y, original.z);
+    }
+
+    #endregion
+
     public UIBottomState CurrentUIBottomState = UIBottomState.HUD;
     public UIMiddleState CurrentUIMiddleState = UIMiddleState.NotVisible;
     public UITopState CurrentUITopState = UITopState.NotVisible;
@@ -91,15 +120,20 @@ public class UICanvas : MonoBehaviour
     }   
 
     private void OnInventoryToggle() {
-        if (IsOtherUIOpen) return;
+        if (IsOtherUIOpen || CurrentUIBottomState == UIBottomState.Talking) return;
         if (CurrentUIMiddleState == UIMiddleState.NotVisible || CurrentUIMiddleState == UIMiddleState.Inventory) {
             ChangeUIMiddleState(CurrentUIMiddleState == UIMiddleState.Inventory ? UIMiddleState.NotVisible : UIMiddleState.Inventory);
         }
     }
 
     private void OnUICancel() {
-        if (IsOtherUIOpen) {
+        if (IsOtherUIOpen || CurrentUIMiddleState == UIMiddleState.Choose || CurrentUITopState == UITopState.Death || CurrentUIMiddleState == UIMiddleState.MainMenu) {
             Debug.Log("Other UI is open");
+            return;
+        }
+
+        if (CurrentUITopState == UITopState.VideoPlayer) {
+            ChangeUITopState(UITopState.NotVisible);
             return;
         }
 
@@ -179,7 +213,6 @@ public class UICanvas : MonoBehaviour
                 HUDCanvas.HideUI();
                 break;
             case UIBottomState.Talking:
-                Player.Instance.InputDisabled = false;
                 TalkingCanvas.HideUI();
                 break;
         }
@@ -188,7 +221,6 @@ public class UICanvas : MonoBehaviour
     private void openUIBottomState(UIBottomState state) {
         switch (state) {
             case UIBottomState.HUD:
-                Player.Instance.InputDisabled = false;
                 HUDCanvas.ShowUI();
                 break;
             case UIBottomState.Talking:
@@ -269,8 +301,14 @@ public class UICanvas : MonoBehaviour
                 SettingsCanvas.HideUI();
                 break;
             case UITopState.VideoPlayer:
+                GameManager.Instance.MusicPlayer.Play();
+
                 _videoPlayer.Stop();
-                _videoPlayer.gameObject.SetActive(false);
+                CanvasGroup canvasGroup = _videoPlayer.gameObject.GetComponent<CanvasGroup>();
+                canvasGroup.DOKill();
+                canvasGroup.DOFade(0, 1 * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
+                    _videoPlayer.gameObject.SetActive(false);
+                });
                 break;
         }
     }
@@ -285,12 +323,23 @@ public class UICanvas : MonoBehaviour
                 SettingsCanvas.ShowUI();
                 break;
             case UITopState.VideoPlayer:
-                Debug.Log("VideoPlayer");
-
+                GameManager.Instance.MusicPlayer.Stop();
                 _videoPlayer.gameObject.SetActive(true);
-                _videoPlayer.Play();
-                _videoPlayer.gameObject.GetComponent<CanvasGroup>().DOFade(1, 1 * Settings.AnimationSpeed).SetUpdate(true);
+                CanvasGroup canvasGroup = _videoPlayer.gameObject.GetComponent<CanvasGroup>();
+                canvasGroup.alpha = 0;
+                canvasGroup.DOKill();
+                canvasGroup.DOFade(1, 1 * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
+                    _videoPlayer.Play();
+                });
+
+                Invoke(nameof(endCredits), 40f);
                 break;
+        }
+    }
+
+    private void endCredits() {
+        if (CurrentUITopState == UITopState.VideoPlayer) {
+            ChangeUITopState(UITopState.NotVisible);
         }
     }
 

@@ -150,6 +150,7 @@ public class SellerPanels : MonoBehaviour
                 _sellCanvasGroup.blocksRaycasts = false;
                 break;
             case PanelType.Craft:
+                _craftBtnRect.DOComplete();
                 _craftBtnRect.DOKill();
                 _craftBtnRect.DOAnchorPosX(0, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
                 _craftPanelRect.DOAnchorPosY(-869f, 0.5f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);

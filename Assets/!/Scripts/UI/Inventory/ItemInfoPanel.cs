@@ -14,11 +14,9 @@ public class ItemInfoPanel : MonoBehaviour
     }
     
     private void Update() {
-        Vector2 scale = new(Screen.width / 1920f, Screen.height / 1080f);
-
         transform.position = new Vector2(
-            Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width * scale.x), 
-            Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height * scale.y, Screen.height)
+            Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width * UICanvas.ScreenScale.x), 
+            Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height * UICanvas.ScreenScale.y, Screen.height)
         );
     }
 
@@ -27,11 +25,9 @@ public class ItemInfoPanel : MonoBehaviour
         
         if (itemUI == null) return;
 
-        Vector2 scale = new(Screen.width / 1920f, Screen.height / 1080f);
-
         transform.position = new Vector2(
-            Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width * scale.x), 
-            Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height * scale.y, Screen.height)
+            Mathf.Clamp(Input.mousePosition.x, 0, Screen.width - _rectTransform.rect.width * UICanvas.ScreenScale.x), 
+            Mathf.Clamp(Input.mousePosition.y, _rectTransform.rect.height * UICanvas.ScreenScale.y, Screen.height)
         );
 
         InventoryItem item = itemUI.InventoryItem;
@@ -42,8 +38,8 @@ public class ItemInfoPanel : MonoBehaviour
         if (itemUI.InventoryItem.ItemData is WeaponItemData weaponItemData) {
             _lightAttackHolder.SetActive(true);
             _heavyAttackHolder.SetActive(true);
-            _itemLightDamage.text = $"{weaponItemData.LightDamageMin * item.PowerScale} - {weaponItemData.LightDamageMax * item.PowerScale}";
-            _itemHeavyDamage.text = $"{weaponItemData.HeavyDamageMin * item.PowerScale} - {weaponItemData.HeavyDamageMax * item.PowerScale}";
+            _itemLightDamage.text = $"{(int)(weaponItemData.LightDamageMin * item.PowerScale)} - {(int)(weaponItemData.LightDamageMax * item.PowerScale)}";
+            _itemHeavyDamage.text = $"{(int)(weaponItemData.HeavyDamageMin * item.PowerScale)} - {(int)(weaponItemData.HeavyDamageMax * item.PowerScale)}";
         } else {
             _lightAttackHolder.SetActive(false);
             _heavyAttackHolder.SetActive(false);

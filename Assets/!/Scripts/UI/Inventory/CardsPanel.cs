@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CardsPanel : MonoBehaviour
@@ -13,14 +14,25 @@ public class CardsPanel : MonoBehaviour
 
     void Start() {
         EventBus.RunCardClickedEvent.AddListener(OnCardClicked);
+        Player.LivingEntity.OnDeath.AddListener(wipeCards);
+    }
+
+    private void wipeCards() {
+        for (int i = _cardsParent.childCount - 1; i >= 0; i--) {
+            Destroy(_cardsParent.GetChild(i).gameObject);
+        }
     }
     
-    private void OnCardClicked(Card runCard) {
-        GameObject card = Instantiate(_cardPrefab, _cardsParent);
-        CardUI cardUI = card.GetComponent<CardUI>();
-        cardUI.SetCard(runCard);
+    private void OnCardClicked(Card card) {
+        AddCard(card);
+    }
+    public void AddCard(Card card) {
+        GameObject cardGameobject = Instantiate(_cardPrefab, _cardsParent);
+        CardUI cardUI = cardGameobject.GetComponent<CardUI>();
+        cardUI.SetCard(card);
         cardUI.Setup();
         cardUI.IsInCollection = true;
+        cardUI.RotateCard();
     }
 
     public void ShowMoreInfo(Card card) {
@@ -35,7 +47,13 @@ public class CardsPanel : MonoBehaviour
         _shortDescTextLocalizer.Key = card.ShortDesc;
         _longDescTextLocalizer.Key = card.LongDesc;
 
-        _icon.sprite = card.Icon == null ? ElementalInfo.GetIconSprite(card.ElementalType) : card.Icon;
+        WeaponCard weaponCard = card as WeaponCard;
+        if (weaponCard != null) {
+            _icon.sprite = weaponCard.WeaponData.Icon;
+        } else {
+            _icon.sprite = card.Icon == null ? ElementalInfo.GetIconSprite(card.ElementalType) : card.Icon;
+        }
+
         
         _barRect.DOScaleY(0, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutCubic).OnComplete(() => {
             _barImg.sprite = ElementalInfo.GetBarSprite(card.ElementalType);

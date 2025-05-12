@@ -1,11 +1,13 @@
 using Unity.Cinemachine;
 using UnityEngine;
 using DG.Tweening;
+using System.Collections.Generic;
 
 
 [RequireComponent(typeof(SimpleInventory))]
 public class Seller : MonoBehaviour, IInteractableInventory
 {
+    [SerializeField] private SpawnItemData[] _possibleItems;
     [SerializeField] private GameObject _uiPrefab; 
     public SimpleInventory BuyInventory, SellInventory;
     [SerializeField] private FaceAnimator _faceAnimator;
@@ -23,6 +25,11 @@ public class Seller : MonoBehaviour, IInteractableInventory
 
     void Awake() {
         _animator = GetComponent<Animator>();
+    }
+
+    void Start() {
+        SimpleInventory inventory = GetComponent<SimpleInventory>();
+        ItemRandomizer.SetRandomItems(_possibleItems, inventory, 5, 10);
     }
 
 
