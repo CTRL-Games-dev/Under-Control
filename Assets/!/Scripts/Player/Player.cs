@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -123,7 +124,7 @@ public class Player : MonoBehaviour {
         get => _spellDataOne.Spell;
         set {
             _spellDataOne.Spell = value;
-            // _spellDataOne.Cooldown = new Cooldown(value.CooldownTime); 
+            _spellDataOne.Cooldown = value == null ? null : new Cooldown(value.CooldownTime); 
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -134,7 +135,7 @@ public class Player : MonoBehaviour {
         get => _spellDataTwo.Spell;
         set {
             _spellDataTwo.Spell = value;
-            // _spellDataTwo.Cooldown = new Cooldown(value.CooldownTime);
+            _spellDataTwo.Cooldown = value == null ? null : new Cooldown(value.CooldownTime);
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -145,7 +146,7 @@ public class Player : MonoBehaviour {
         get => _spellDataThree.Spell;
         set {
             _spellDataThree.Spell = value;
-            // _spellDataThree.Cooldown = new Cooldown(value.CooldownTime);
+            _spellDataThree.Cooldown = value == null ? null : new Cooldown(value.CooldownTime);
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -158,7 +159,7 @@ public class Player : MonoBehaviour {
     public Cooldown ConsumableCooldown = new Cooldown(0.5f);
 
     [Header("Weapon")]
-    public WeaponHolder WeaponHolder;
+    public PlayerWeaponHolder WeaponHolder;
     public InventoryItem<WeaponItemData> CurrentWeapon { get => Inventory.Weapon; }
 
     private bool _isAttacking = false;
@@ -239,6 +240,7 @@ public class Player : MonoBehaviour {
 
         LivingEntity.OnDeath.AddListener(onDeath);
         LivingEntity.OnStunned.AddListener(onStunned);
+        LivingEntity.OnDamageTaken.AddListener(onDamageTaken);
         EventBus.ItemPlacedEvent.AddListener(UpdateEquipment);
         
         CameraDistance = MinCameraDistance;
@@ -249,9 +251,6 @@ public class Player : MonoBehaviour {
 
         OnEvolutionSelected.AddListener(x => ApplyEvolution(x));
 
-        LivingEntity.OnDamageTaken.AddListener((data) => {
-            CameraManager.ShakeCamera(2, 0.1f);
-        });
  
         _interactionMask |= 1 << LayerMask.NameToLayer("Interactable");
 
@@ -288,7 +287,6 @@ public class Player : MonoBehaviour {
         });
         
         OnDashSound =  Resources.Load("SFX/bohater/dash") as AudioClip;
-
         ResetRun();
     }
 
@@ -309,7 +307,6 @@ public class Player : MonoBehaviour {
             }
         }
         CharacterController.SimpleMove(getGoalDirection() * _currentSpeed);
-
     }
 
     void FixedUpdate() {
@@ -347,13 +344,13 @@ public class Player : MonoBehaviour {
         switch (CurrentAnimationState) {
             case AnimationState.Dash:
             case AnimationState.Attack_Windup:
-                if (_queuedRotation == Vector3.zero) return transform.forward;
-                Vector3 dir = _queuedRotation;
-                _queuedRotation = Vector3.zero;
-                return dir.normalized;
+                // if (_queuedRotation == Vector3.zero) return transform.forward;
+                // Vector3 dir = _queuedRotation;
+                // _queuedRotation = Vector3.zero;
+                // return dir.normalized;
             case AnimationState.Attack_Contact:
             case AnimationState.Attack_ComboWindow:
-                return transform.forward;
+                // return transform.forward;
 
             case AnimationState.Locomotion:
             case AnimationState.Attack_Recovery:
@@ -408,6 +405,12 @@ public class Player : MonoBehaviour {
 
     private void onStunned(float duration) {
         CameraManager.ShakeCamera(2, duration);
+    }
+    
+    private void onDamageTaken(DamageTakenEventData _) {
+        FaceAnimator.StartAnimation("HURT", 0.3f);
+        CameraManager.ShakeCamera(0.7f, 0.1f);
+
     }
 
     
@@ -553,7 +556,6 @@ public class Player : MonoBehaviour {
         }
         
         Animator.speed = 0;
-        // Animator.applyRootMotion = false;
         Animator.SetBool(_lightAttackHash, false);
         Animator.SetBool(_heavyAttackHash, false);
 
@@ -562,22 +564,6 @@ public class Player : MonoBehaviour {
         CurrentAnimationState = AnimationState.Dash;
         SoundFXManager.Instance.PlaySoundFXClip(OnDashSound, transform,1.2f);
         
-
-        // UpdateDisabled = true;
-        // Animator.animatePhysics = false;
-
-        // transform.DOMove(transform.position + transform.forward * DashDistance, DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
-        //     // Animator.applyRootMotion = true;
-        //     Animator.animatePhysics = true;
-        //     UpdateDisabled = false;
-        //     Animator.speed = 1;
-        //     DamageDisabled = false;
-        //     LockRotation = false;
-        //     foreach (ParticleSystem trail in _trailParticles) {
-        //         trail.Clear();
-        //         trail.Stop();
-        //     }
-        // }
         Invoke(nameof(endDash), DashDuration);
     }
 
@@ -735,7 +721,6 @@ public class Player : MonoBehaviour {
         Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
 
         if (CurrentWeapon?.ItemData != null) {
-            // Debug.Log(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
             SlashManager.SetSlashColor(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
         } 
         EventBus.InventoryItemChangedEvent.Invoke();
@@ -926,14 +911,15 @@ public class Player : MonoBehaviour {
         GameManager.Instance.ResetCards();
         GameManager.Instance.ResetInfluence();
         GameManager.Instance.ResetCardChoice();
-        GameManager.Instance.RandomCardCount = 3;
         CanFish = false;
         // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         EventBus.InventoryItemChangedEvent?.Invoke();
+        GameManager.Instance.LevelDepth = 0;
 
         Instance.UpdateEquipment();
-        
+        LivingEntity.Health = LivingEntity.MaxHealth;
+        LivingEntity.Mana = LivingEntity.MaxMana;     
     }
 
     private void registerStats() {
@@ -950,7 +936,10 @@ public class Player : MonoBehaviour {
         ModifierSystem.RegisterStat(ref DashCooldown);
         ModifierSystem.RegisterStat(ref DashDuration);
     }
+    
     public void ApplyEvolution(EvoUI evoUI) {
+        GameManager.Instance.RandomCardCount = 3;
+        
         switch (evoUI.ElementalType) {
             case ElementalType.Fire:
             case ElementalType.Ice:
@@ -975,13 +964,21 @@ public class Player : MonoBehaviour {
         FishingRod.SetActive(val);
     }
 
-    public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
+    public void SetPlayerPosition(Vector3 position, float time = 0.1f, float yRotation = 45) {
+        Instance.gameObject.SetActive(true);
+        transform.rotation = Quaternion.Euler(0, yRotation, 0);
+        StartCoroutine(setPlayerPositionCoroutine(position, time));
+    }
+
+    private IEnumerator setPlayerPositionCoroutine(Vector3 position, float time) {
         UpdateDisabled = true;
         Animator.animatePhysics = false;
+        Animator.speed = 0;
         gameObject.transform.position = position;
+        yield return new WaitForSeconds(time);
         Animator.animatePhysics = true;
+        Animator.speed = 1;
         UpdateDisabled = false;
-        gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
     
     public void PlayRespawnAnimation() {
@@ -994,7 +991,7 @@ public class Player : MonoBehaviour {
             _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
         }).OnComplete(() => {
             gameObject.transform.DOMoveY(-2, 0);
-            Player.Animator.SetTrigger("rise");
+            Animator.SetTrigger("rise");
             gameObject.transform.DOComplete();
 
             gameObject.transform.DOKill();
@@ -1006,7 +1003,7 @@ public class Player : MonoBehaviour {
             gameObject.transform.DOMoveY(1, 2f).SetEase(Ease.OutQuint).OnComplete(() => {
                 Animator.SetTrigger("live");
                 UpdateDisabled = false;
-                Player.Animator.animatePhysics = true;
+                Animator.animatePhysics = true;
                 UICanvas.ChangeUIBottomState(UIBottomState.HUD);
                 
             });

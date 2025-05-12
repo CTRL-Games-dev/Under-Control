@@ -14,10 +14,11 @@ public class InvTileEquipment : InvTile {
 
     [SerializeField] private GameObject _itemPrefab;
     [SerializeField] private TileType _tileType;
-    [SerializeField] private GameObject _hintImage;
-    [SerializeField] private Image _bgImage, _highlightImg;
+    [SerializeField] private GameObject _hintImgGO;
+    [SerializeField] private Image _bgImg, _highlightImg, _iconImg;
     [SerializeField] private Sprite _singleBg, _doubleBg, _tripleBg;
     [SerializeField] private Sprite _singleHighlight, _doubleHighlight, _tripleHighlight;
+    [SerializeField] private Color _defaultColor, _highlightColor;
     private RectTransform _rectTransform;
     private ItemUI _itemUI;
     
@@ -27,6 +28,10 @@ public class InvTileEquipment : InvTile {
         EventBus.TileSizeSetEvent.AddListener(OnTileSizeSetEvent);
         EventBus.ItemUILeftClickEvent.AddListener(OnItemUIClickEvent);
         EventBus.ItemUIRightClickEvent.AddListener(OnItemUIClickEvent);
+
+        EventBus.SelectedItemSet.AddListener(OnItemPickedUpEvent);
+
+        
         Player.LivingEntity.OnDeath.AddListener(resetToDefault);
         
 
@@ -90,6 +95,35 @@ public class InvTileEquipment : InvTile {
         }
     }
 
+    private void OnItemPickedUpEvent(ItemData itemData) {
+        if (!_hintImgGO.activeSelf) return;
+        if (itemData == null) {
+            _iconImg.DOKill();
+            _iconImg.DOColor(_defaultColor, 0.3f * Settings.AnimationSpeed);
+            return;
+        }
+
+        switch (_tileType) {
+            case TileType.Armor:
+                if (itemData is not ArmorItemData) return;
+                break;
+            case TileType.Amulet:
+                if (itemData is not AmuletItemData) return;
+                break;
+            case TileType.Weapon:
+                if (itemData is not WeaponItemData) return;
+                break;
+            case TileType.Consumeable1:
+            case TileType.Consumeable2:
+                if (itemData is not ConsumableItemData) return;
+                break;
+        }
+
+        _iconImg.DOKill();
+        _iconImg.DOColor(_highlightColor, 0.3f * Settings.AnimationSpeed);
+    }
+
+
     private void OnTileSizeSetEvent() {
         _rectTransform.sizeDelta = new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize * (_tileType == TileType.Weapon ? 3 : 1));
     }
@@ -102,11 +136,7 @@ public class InvTileEquipment : InvTile {
         } 
     }
 
-    private void OnItemUIClickEvent(ItemUI itemUI) {
-        // Debug.Log("ItemUIClickEvent");
-        // if (itemUI == _itemUI) 
-        //     Destroy(_itemUI.gameObject);
-        
+    private void OnItemUIClickEvent(ItemUI itemUI) {        
         if (itemUI == null || Player.UICanvas.SelectedItemUI.InventoryItem != null) return;
         
         if (itemUI != _itemUI) return;
@@ -140,7 +170,7 @@ public class InvTileEquipment : InvTile {
 
     private void resetToDefault() {
         IsEmpty = true;
-        _hintImage.SetActive(true);
+        _hintImgGO.SetActive(true);
     
         switch (_tileType) {
                 case TileType.Armor:
@@ -166,7 +196,7 @@ public class InvTileEquipment : InvTile {
         if (_tileType == TileType.Weapon) {
             _rectTransform.DOKill();
             _rectTransform.DOSizeDelta(new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize * 3), 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutBack).OnComplete(() => {
-                _bgImage.sprite = _tripleBg;
+                _bgImg.sprite = _tripleBg;
                 _highlightImg.sprite = _tripleHighlight;
             });
         }
@@ -227,7 +257,7 @@ public class InvTileEquipment : InvTile {
         }
 
 
-        _hintImage.SetActive(false);
+        _hintImgGO.SetActive(false);
         
         
         item.Rotated = _tileType == TileType.Weapon ? false : item.Rotated;
@@ -250,7 +280,7 @@ public class InvTileEquipment : InvTile {
             
             _rectTransform.DOKill();
             _rectTransform.DOSizeDelta(new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize * item.Size.y), 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutBack).OnComplete(() => {
-                _bgImage.sprite = goalSprite;
+                _bgImg.sprite = goalSprite;
             });
         }
 
@@ -315,11 +345,11 @@ public class InvTileEquipment : InvTile {
             }
             
             IsEmpty = true;
-            _hintImage.SetActive(true);
+            _hintImgGO.SetActive(true);
             if (_tileType == TileType.Weapon) {
                 _rectTransform.DOKill();
                 _rectTransform.DOSizeDelta(new Vector2(InventoryPanel.TileSize, InventoryPanel.TileSize * 3), 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutBack).OnComplete(() => {
-                    _bgImage.sprite = _tripleBg;
+                    _bgImg  .sprite = _tripleBg;
                     _highlightImg.sprite = _tripleHighlight;
                 });
             }

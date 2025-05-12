@@ -1,38 +1,30 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 public class SlashEdge : MonoBehaviour
 {
-    [SerializeField] private Transform _edgeToFollow;
-    [SerializeField] private Damage SlashDamage;
     public Vector3 Position => _edgeToFollow.position;
 
-    public UnityEvent<LivingEntity> OnHit = new();
-    public bool HitboxEnabled = true;
-    private SlashManager _slashManager;
+    [SerializeField] private Transform _edgeToFollow, _edgeToFollow2;
+    [SerializeField] private Damage SlashDamage;
 
-    void Awake() {
-        _slashManager = GetComponentInParent<SlashManager>();
-    }
+    [SerializeField] private bool _isInbetween = false;
 
     void Update() {
         if (_edgeToFollow != null){
-            transform.position = new Vector3(_edgeToFollow.position.x, 0.5f, _edgeToFollow.position.z);
+            if (_isInbetween) {
+                transform.SetPositionAndRotation(
+                    new Vector3(
+                    (_edgeToFollow.position.x + _edgeToFollow2.position.x) / 2,
+                    0.5f,
+                    (_edgeToFollow.position.z + _edgeToFollow2.position.z) / 2
+                    ),
+                    Quaternion.identity
+                );
+                    
+            } else {
+                transform.SetPositionAndRotation(new Vector3(_edgeToFollow.position.x, 0.5f, _edgeToFollow.position.z), Quaternion.identity);
+            }
+
         }
     }
-
-    public void OnTriggerEnter(Collider other) {
-        if (other.CompareTag("Player")) return;
-        if (_slashManager.HitEnemies.Contains(other)) return;
-
-        LivingEntity victim = other.GetComponentInParent<LivingEntity>(includeInactive: true);
-
-        if(victim == null) return;
-        _slashManager.HitEnemies.Add(other);
-
-
-        // victim.TakeDamage(Player.Instance.CurrentWeapon.ItemData.HeavyDamageMax, null);
-    }
-
-
 }

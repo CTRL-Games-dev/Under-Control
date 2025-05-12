@@ -35,12 +35,15 @@ public class GameManager : MonoBehaviour {
     public InvTileEquipment Consumable1Tile;
     public InvTileEquipment Consumable2Tile;
     public VisualEffect FireEffectPrefab;
-
+    public Guild FriendlyGuild;
+    public Guild EnemyGuild;
 
     public static readonly Dictionary<Dimension, string> SceneDictionary = new() {
         {Dimension.HUB, "NewHub"},
         {Dimension.FOREST, "Adventure"},
-        {Dimension.FOREST_VECTOR, "VectorBossBattle"},
+        {Dimension.VEKTHAR_BOSS, "VectorBossBattle"},
+        {Dimension.ENT_BOSS, "EntBossBattle"},
+        {Dimension.SLIME_BOSS, "Adventure"},
         {Dimension.CARD_CHOOSE, "CardChoose"}
     };
 
@@ -52,11 +55,12 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public static readonly float MinInfluenceDelta = 5.0f; 
     [HideInInspector] public static readonly float MaxInfluenceDelta = 10.0f;
     [HideInInspector] public float LevelDepth = 0;
+    [HideInInspector] public int BossesDefeated = 0;
     public bool ShowMainMenu = true;
 
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
-    private MusicPlayer _musicPlayer;
+    public MusicPlayer MusicPlayer;
 
     [Header("Ambient")]
     // Changed to use DimensionAmbient
@@ -81,7 +85,7 @@ public class GameManager : MonoBehaviour {
     public bool IsStarterDialogueOver = false;
 
     private void Awake()  {
-        _musicPlayer = GetComponent<MusicPlayer>();
+        MusicPlayer = GetComponent<MusicPlayer>();
         // SceneManager.sceneLoaded += OnLevelChange;
 
         if(Instance == null) {
@@ -142,12 +146,12 @@ public class GameManager : MonoBehaviour {
         playAmbientForDimension(dimension);
     }
     private void playMusicForDimension(Dimension dimension) {
-        _musicPlayer.Stop();
+        MusicPlayer.Stop();
 
         int dimensionMusicIndex = Array.FindIndex(MusicPalette, x => x.Dimension == dimension);
         if(dimensionMusicIndex != -1) {
-            _musicPlayer.MusicClips = MusicPalette[dimensionMusicIndex].Clips;
-            _musicPlayer.Play();
+            MusicPlayer.MusicClips = MusicPalette[dimensionMusicIndex].Clips;
+            MusicPlayer.Play();
         }
     }
 
@@ -231,6 +235,10 @@ public class GameManager : MonoBehaviour {
             nonWeaponCards.RemoveAt(index);
             cards[i] = card;
         }
+
+        if (cards.Length == 0)
+            Debug.LogError("No cards available!");
+            
         return cards;
     }
 

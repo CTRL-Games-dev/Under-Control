@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 1348201515944426591}
   - component: {fileID: 257547526749807108}
   - component: {fileID: 5767911997836727164}
-  - component: {fileID: 7688753585041148982}
   - component: {fileID: 1445341989758487919}
   - component: {fileID: 3729301384412433323}
   - component: {fileID: 6141905384866392085}
@@ -95,21 +94,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _activeModifiers: []
   _stats: []
---- !u!114 &7688753585041148982
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 190397464907128413}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99dbd46cc69694b43ac0166c94fd82c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _hitFlashMaterial: {fileID: 2100000, guid: a70176b5e5737f04f86db74d184df881, type: 2}
-  _flashDuration: 0.1
-  _isPlayer: 0
 --- !u!114 &1445341989758487919
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,14 +111,15 @@ MonoBehaviour:
   DropItemsOnDeath: 1
   DestroyOnDeath: 1
   IsInvisible: 0
-  StartingHealth: 100
+  AvoidGuildChange: 0
+  StartingHealth: 60
   StartingMana: 100
   _health: 0
   _mana: 100
   MaxHealth:
-    _raw: 100
+    _raw: 60
     _adjusted: 100
-    _initValue: 100
+    _initValue: 60
     OnValueChanged:
       m_PersistentCalls:
         m_Calls: []
@@ -355,6 +340,7 @@ MonoBehaviour:
   - {fileID: 326655341236531035}
   - {fileID: 2570764306484731243}
   - {fileID: 6464232203355078663}
+  _hitTintColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &3694224011092229271
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -374,13 +360,13 @@ MonoBehaviour:
     MaxAmount: 1
     MinPowerScale: 0
     MaxPowerScale: 0
-    Chance: 0.75
+    Chance: 0.25
   - Item: {fileID: 11400000, guid: c1e548f7a6db6244d8ac8fe782d6d5aa, type: 2}
     MinAmount: 1
     MaxAmount: 1
     MinPowerScale: 0
     MaxPowerScale: 0
-    Chance: 0.75
+    Chance: 0.25
 --- !u!114 &-8572241033336592475
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -407,8 +393,8 @@ GameObject:
   - component: {fileID: 2680246173572973860}
   - component: {fileID: 7035648692636490420}
   - component: {fileID: 1522705447730677996}
-  m_Layer: 10
-  m_Name: Hitbox
+  m_Layer: 16
+  m_Name: Hurtbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -475,7 +461,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.25, y: 4, z: 2.65}
+  m_Size: {x: 2, y: 3, z: 2}
   m_Center: {x: 0, y: 2, z: 0.46}
 --- !u!1 &4596922646486119177
 GameObject:
@@ -533,7 +519,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8830429498316826097, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
       propertyPath: m_Materials.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: -8830429498316826097, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -542,11 +528,11 @@ PrefabInstance:
     - target: {fileID: -8830429498316826097, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 6719245597448002910, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
+      objectReference: {fileID: 2100000, guid: c6a91334cc142a9469d7e11991cd1bd5, type: 2}
     - target: {fileID: -8830429498316826097, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
       propertyPath: 'm_Materials.Array.data[2]'
       value: 
-      objectReference: {fileID: 2100000, guid: fd1ebe14847ca50a3ac36a4c3aacfa8a, type: 2}
+      objectReference: {fileID: 6719245597448002910, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
     - target: {fileID: -8679921383154817045, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -589,7 +575,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -6750419884534634433, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
       propertyPath: m_Materials.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: -6750419884534634433, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -597,11 +583,15 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: acc3b20724406744cb8b49bdf4e3e028, type: 2}
     - target: {fileID: -6750419884534634433, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: c6a91334cc142a9469d7e11991cd1bd5, type: 2}
+    - target: {fileID: -6750419884534634433, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
       value: 
       objectReference: {fileID: 1280446133571650962, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
     - target: {fileID: -2861737852552858285, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
       propertyPath: m_Materials.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: -2861737852552858285, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -609,6 +599,10 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: acc3b20724406744cb8b49bdf4e3e028, type: 2}
     - target: {fileID: -2861737852552858285, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: c6a91334cc142a9469d7e11991cd1bd5, type: 2}
+    - target: {fileID: -2861737852552858285, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
       value: 
       objectReference: {fileID: 8009138033094245905, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}
     - target: {fileID: 919132149155446097, guid: 40985d6c7a600454ab6c36b6c5eb5d61, type: 3}

@@ -2,6 +2,7 @@ using UnityEngine.Events;
 
 public static class EventBus {
     public static UnityEvent InventoryItemChangedEvent = new();
+    public static UnityEvent<ItemData> SelectedItemSet = new();
     public static UnityEvent ItemPlacedEvent = new();
     public static UnityEvent<ItemUI> ItemUILeftClickEvent = new();
     public static UnityEvent<ItemUI> ItemUIRightClickEvent = new();
@@ -12,4 +13,5 @@ public static class EventBus {
     public static UnityEvent<Card> RunCardClickedEvent = new();
 
     public static UnityEvent SceneReadyEvent = new();
+    public static UnityEvent BindingsChangedEvent = new();
 }

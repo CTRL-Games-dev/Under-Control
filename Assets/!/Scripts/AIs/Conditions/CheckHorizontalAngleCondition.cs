@@ -19,14 +19,16 @@ public partial class CheckAngleCondition : Condition
             return false;
         }
 
-        Vector2 sourceVector = new Vector2(Source.Value.position.x, Source.Value.position.z);
-        Vector2 targetVector = new Vector2(Target.Value.position.x, Target.Value.position.z);
 
-        Vector2 directionToTarget = (targetVector - sourceVector).normalized;
-        Vector3 sourceDirection = Source.Value.rotation * Vector3.forward;
-        Vector2 sourceDirectionFlat = new Vector2(sourceDirection.x, sourceDirection.z);
+        Vector3 directionToTarget = Target.Value.position - Source.Value.position;
+        directionToTarget.y = 0;
+        directionToTarget.Normalize();
 
-        float angle = Vector2.SignedAngle(sourceDirectionFlat, directionToTarget);
+        Vector3 forward = Source.Value.forward;
+        forward.y = 0;
+        forward.Normalize();
+
+        float angle = Vector3.SignedAngle(forward, directionToTarget, Vector3.up);
 
         if(Absolute.Value) {
             angle = Mathf.Abs(angle);

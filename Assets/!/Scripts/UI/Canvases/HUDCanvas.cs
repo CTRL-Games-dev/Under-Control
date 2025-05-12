@@ -68,6 +68,24 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private RectTransform _spellSlot2Rect;
     [SerializeField] private RectTransform _spellSlot3Rect;
 
+    [Header("Rebinding")]
+    [SerializeField] private Button _rebindEventButton;
+    [SerializeField] private List<BindReferences> _bindReferences = new();
+    [SerializeField] private Image _keyConsumable1Img, _keyConsumable2Img, _keySpell1Img, _keySpell2Img, _keySpell3Img;
+
+    [Header("Boss Bar")]
+    [SerializeField] private Image _bossBarImg;
+    [SerializeField] private TextLocalizer _bossNameTextLocalizer;
+    [SerializeField] private GameObject _bossBarGO;
+
+    private LivingEntity _bossEntity;
+    private float _previousBossHealth;
+     
+    [Serializable] 
+    public struct BindReferences {
+        public TextMeshProUGUI HUDText, BindingText;
+    } 
+
     private float _previousHealth;
     private float _previousMana;
 
@@ -75,12 +93,15 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
 
     private void Start() {
         Player.Instance.UpdateConsumablesEvent.AddListener(OnUpdateConsumables);
+        _rebindEventButton.onClick.AddListener(updateBindingTextsLate);
+        EventBus.BindingsChangedEvent.AddListener(updateBindingTextsLate);
 
         _previousHealth = Player.LivingEntity.Health;
         _previousMana = Player.Instance.Mana;
 
         UpdateHealthBar();
         UpdateManaBar();
+        updateBindingTexts();
     }
 
     private void FixedUpdate() {
@@ -103,6 +124,16 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
                 }
                 if (!isHandled) handleEffect(effectData);
             }
+        }
+    }
+
+    private void updateBindingTextsLate() {
+        Invoke(nameof(updateBindingTexts), 0.1f);
+    }
+
+    private void updateBindingTexts() {
+        foreach (BindReferences bindReference in _bindReferences) {
+            bindReference.HUDText.text = bindReference.BindingText.text;
         }
     }
 
@@ -182,21 +213,25 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
     }
 
     public void UseSpell1() {
-        useSpell(_spellSlot1CooldownImg, _spellSlot1Rect, Player.Instance.SpellSlotOne);
+        useSpell(_spellSlot1CooldownImg, _spellSlot1Rect, Player.Instance.SpellSlotOne, _keySpell1Img);
     }
 
     public void UseSpell2() {
-        useSpell(_spellSlot2CooldownImg, _spellSlot2Rect, Player.Instance.SpellSlotTwo);
+        useSpell(_spellSlot2CooldownImg, _spellSlot2Rect, Player.Instance.SpellSlotTwo, _keySpell2Img);
     }
 
     public void UseSpell3() {
-        useSpell(_spellSlot3CooldownImg, _spellSlot3Rect, Player.Instance.SpellSlotThree);
+        useSpell(_spellSlot3CooldownImg, _spellSlot3Rect, Player.Instance.SpellSlotThree, _keySpell3Img);
     }
 
-    private void useSpell(Image fillImg, RectTransform rect, Spell spell) {
+    private void useSpell(Image fillImg, RectTransform rect, Spell spell, Image keyImg) {
         fillImg.DOKill();
         rect.DOKill();
         rect.DOShakeRotation(0.1f * Settings.AnimationSpeed, 10, 10, 90, false);
+        keyImg.DOKill();
+        keyImg.DOFillAmount(1, 0.05f * Settings.AnimationSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
+            keyImg.DOFillAmount(0, spell.CooldownTime - 0.05f * Settings.AnimationSpeed).SetEase(Ease.Linear);
+        });
         fillImg.DOFillAmount(1, 0.05f * Settings.AnimationSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
             fillImg.DOFillAmount(0, spell.CooldownTime - 0.05f * Settings.AnimationSpeed).SetEase(Ease.Linear).OnComplete(() => {
                 rect.DOShakeRotation(0.1f * Settings.AnimationSpeed, 10, 10, 90, false);
@@ -316,8 +351,16 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
             consumableRect.DOScale(Vector3.one, 0.1f * Settings.AnimationSpeed).SetEase(Ease.OutQuint);
         });
         
+        _keyConsumable1Img.DOKill();
+        _keyConsumable2Img.DOKill();
+        _keyConsumable1Img.DOFillAmount(1, 0.05f * Settings.AnimationSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
+            _keyConsumable1Img.DOFillAmount(0, Player.Instance.ConsumableCooldown.CooldownTime - 0.05f * Settings.AnimationSpeed).SetEase(Ease.Linear);
+        });
         _consumable1CooldownImg.DOFillAmount(1, 0.05f * Settings.AnimationSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
             _consumable1CooldownImg.DOFillAmount(0, Player.Instance.ConsumableCooldown.CooldownTime - 0.05f * Settings.AnimationSpeed).SetEase(Ease.Linear);
+        });
+        _keyConsumable2Img.DOFillAmount(1, 0.05f * Settings.AnimationSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
+            _keyConsumable2Img.DOFillAmount(0, Player.Instance.ConsumableCooldown.CooldownTime - 0.05f * Settings.AnimationSpeed).SetEase(Ease.Linear);
         });
         _consumable2CooldownImg.DOFillAmount(1, 0.05f * Settings.AnimationSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
             _consumable2CooldownImg.DOFillAmount(0, Player.Instance.ConsumableCooldown.CooldownTime - 0.05f * Settings.AnimationSpeed).SetEase(Ease.Linear).OnComplete(() => {
@@ -347,5 +390,31 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
                 });
             });
         });
+    }
+
+    public void ShowBossBar(LivingEntity bossEntity) {
+        _bossEntity = bossEntity;
+        _bossBarImg.gameObject.SetActive(true);
+        _bossBarGO.SetActive(true);
+        _bossNameTextLocalizer.Key = bossEntity.DisplayName;
+        _bossBarImg.fillAmount = bossEntity.Health / bossEntity.MaxHealth;
+        _previousBossHealth = bossEntity.Health;
+
+        _bossEntity.OnDamageTaken.AddListener(updateBossBar);
+        _bossEntity.OnDeath.AddListener(() => {
+            Debug.Log("Boss dead");
+            _bossBarGO.SetActive(false);
+            _bossEntity.OnDeath.RemoveAllListeners();
+            _bossEntity.OnDamageTaken.RemoveListener(updateBossBar);
+        });
+    }
+
+    private void updateBossBar(DamageTakenEventData _) {
+        if (_bossEntity == null) return;
+        _bossBarImg.DOKill();
+        Debug.Log($"Boss health: {_bossEntity.Health}");
+        _bossBarImg.DOFillAmount(_bossEntity.Health / _bossEntity.MaxHealth, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
+
+        _previousBossHealth = _bossEntity.Health;
     }
 }

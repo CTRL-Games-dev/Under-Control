@@ -3,5 +3,5 @@ using UnityEngine;
 
 public class ForestPortalLocation : Location
 {
-
+    public PortalInForest Portal;
 }
