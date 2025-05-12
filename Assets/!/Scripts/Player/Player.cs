@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -874,7 +875,7 @@ public class Player : MonoBehaviour {
         GameManager.Instance.ResetCards();
         GameManager.Instance.ResetInfluence();
         GameManager.Instance.ResetCardChoice();
-        // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+        GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         EventBus.InventoryItemChangedEvent?.Invoke();
         GameManager.Instance.LevelDepth = 0;
@@ -919,12 +920,17 @@ public class Player : MonoBehaviour {
     }
 
     public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
+        transform.rotation = Quaternion.Euler(0, yRotation, 0);
+        StartCoroutine(setPlayerPositionCoroutine(position, time));
+    }
+
+    private IEnumerator setPlayerPositionCoroutine(Vector3 position, float time) {
         UpdateDisabled = true;
         Animator.animatePhysics = false;
         gameObject.transform.position = position;
+        yield return new WaitForSeconds(time);
         Animator.animatePhysics = true;
         UpdateDisabled = false;
-        gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
 
     public void PlayRespawnAnimation() {
