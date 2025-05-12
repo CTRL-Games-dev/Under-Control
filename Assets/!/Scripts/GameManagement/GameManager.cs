@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour {
 
     [Header("Music")]
     public DimensionMusic[] MusicPalette;
-    private MusicPlayer _musicPlayer;
+    public MusicPlayer MusicPlayer;
 
     [Header("Ambient")]
     // Changed to use DimensionAmbient
@@ -81,7 +81,7 @@ public class GameManager : MonoBehaviour {
     public bool IsStarterDialogueOver = false;
 
     private void Awake()  {
-        _musicPlayer = GetComponent<MusicPlayer>();
+        MusicPlayer = GetComponent<MusicPlayer>();
         // SceneManager.sceneLoaded += OnLevelChange;
 
         if(Instance == null) {
@@ -142,12 +142,12 @@ public class GameManager : MonoBehaviour {
         playAmbientForDimension(dimension);
     }
     private void playMusicForDimension(Dimension dimension) {
-        _musicPlayer.Stop();
+        MusicPlayer.Stop();
 
         int dimensionMusicIndex = Array.FindIndex(MusicPalette, x => x.Dimension == dimension);
         if(dimensionMusicIndex != -1) {
-            _musicPlayer.MusicClips = MusicPalette[dimensionMusicIndex].Clips;
-            _musicPlayer.Play();
+            MusicPlayer.MusicClips = MusicPalette[dimensionMusicIndex].Clips;
+            MusicPlayer.Play();
         }
     }
 
