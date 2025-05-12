@@ -230,13 +230,13 @@ public class InvTileEquipment : InvTile {
 
             Player.Inventory.Amulet = amuletItem;
         } else if (_tileType == TileType.Weapon) {
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.EquipItem, this.transform.position);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.EquipWeapon, this.transform.position);
             if(!item.TryAs(out InventoryItem<WeaponItemData> weaponItem)) {
                 return;
             }
             Player.Inventory.Weapon = weaponItem;
         } else if (_tileType == TileType.Consumeable1) {
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.EquipWeapon, this.transform.position);
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.EquipItem, this.transform.position);
             if(!item.TryAs(out InventoryItem<ConsumableItemData> consumableItem)) {
                 return;
             }

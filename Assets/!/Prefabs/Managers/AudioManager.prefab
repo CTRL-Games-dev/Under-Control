@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5323050015598818535
+--- !u!1 &7501880802833891680
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,8 +8,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5598632793762617175}
-  - component: {fileID: 5174694321923318144}
+  - component: {fileID: 3294245161834282078}
+  - component: {fileID: 7709206523794108866}
   m_Layer: 0
   m_Name: FMODEvents
   m_TagString: Untagged
@@ -17,48 +17,419 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5598632793762617175
+--- !u!4 &3294245161834282078
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5323050015598818535}
+  m_GameObject: {fileID: 7501880802833891680}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5890932185824888025}
+  m_Father: {fileID: 8715527572472757384}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5174694321923318144
+--- !u!114 &7709206523794108866
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5323050015598818535}
+  m_GameObject: {fileID: 7501880802833891680}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 061786773d12bff4c81f6b630c4cc0ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <_UIClickSound>k__BackingField:
+  <MusicPlayer>k__BackingField:
+    Guid:
+      Data1: -892024672
+      Data2: 1288855186
+      Data3: -431253572
+      Data4: 1589716528
+    Path: event:/Music/MusicPlayer
+  <UIClickSound>k__BackingField:
     Guid:
       Data1: -246548868
       Data2: 1130886559
       Data3: -1749275519
       Data4: 760797068
     Path: event:/UI/ClickSound
-  <_PlayerWalkSound>k__BackingField:
+  <showOtherPane>k__BackingField:
+    Guid:
+      Data1: 708022575
+      Data2: 1087665843
+      Data3: -1797322088
+      Data4: -279656130
+    Path: event:/UI/ShowMenu
+  <TitleScreenAnim>k__BackingField:
+    Guid:
+      Data1: 1462408126
+      Data2: 1085358101
+      Data3: 536940690
+      Data4: -787309285
+    Path: event:/UI/TitleScreen
+  <GiveCard>k__BackingField:
+    Guid:
+      Data1: 708935473
+      Data2: 1204799666
+      Data3: 1449975733
+      Data4: 558359361
+    Path: event:/UI/GiveCard
+  <CardSelect>k__BackingField:
+    Guid:
+      Data1: -246548868
+      Data2: 1130886559
+      Data3: -1749275519
+      Data4: 760797068
+    Path: event:/UI/ClickSound
+  <CardHover>k__BackingField:
+    Guid:
+      Data1: 1950822526
+      Data2: 1323256711
+      Data3: 219265711
+      Data4: 1213781289
+    Path: event:/UI/HoverCard
+  <CardHoverExit>k__BackingField:
+    Guid:
+      Data1: -749986133
+      Data2: 1305778481
+      Data3: 1390420615
+      Data4: -923542802
+    Path: event:/UI/ExitHoverCard
+  <MoneySpend>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <MoneyEarned>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <ForestAmbience>k__BackingField:
+    Guid:
+      Data1: -1778440865
+      Data2: 1232431026
+      Data3: -267000945
+      Data4: 1330169984
+    Path: event:/Ambience/Wind
+  <BossAmbience>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <FightAmbience>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <HubAmbience>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <RespawnSound>k__BackingField:
+    Guid:
+      Data1: 157278895
+      Data2: 1077749184
+      Data3: -50885973
+      Data4: -1568225835
+    Path: event:/Player/PlayerRising
+  <PlayerWalkSound>k__BackingField:
     Guid:
       Data1: -526298295
       Data2: 1255664670
       Data3: 336786094
       Data4: -1939471182
     Path: event:/Player/PlayerFootsteps
---- !u!1 &7308941666956058626
+  <PlayerDashSound>k__BackingField:
+    Guid:
+      Data1: -1444616485
+      Data2: 1257272447
+      Data3: -787424584
+      Data4: -1778707486
+    Path: event:/Player/DashSound
+  <PlayerHitIndicator>k__BackingField:
+    Guid:
+      Data1: 1314684999
+      Data2: 1085469612
+      Data3: -369411441
+      Data4: -1092816526
+    Path: event:/Player/HitIndicator
+  <PlayerAttackIndicator>k__BackingField:
+    Guid:
+      Data1: -1757008230
+      Data2: 1154091819
+      Data3: -216882276
+      Data4: 1701419395
+    Path: event:/Player/AttackIndicator
+  <playerStunnedIndicator>k__BackingField:
+    Guid:
+      Data1: -1903159368
+      Data2: 1164860478
+      Data3: 1906224007
+      Data4: 28519035
+    Path: event:/Player/StunIndicator
+  <PlayerDeathSound>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <EquipArmor>k__BackingField:
+    Guid:
+      Data1: -1208602365
+      Data2: 1176570663
+      Data3: -1910444866
+      Data4: 786029872
+    Path: event:/UI/EquipArmor
+  <EquipWeapon>k__BackingField:
+    Guid:
+      Data1: -582266098
+      Data2: 1145079835
+      Data3: -402718566
+      Data4: -1049599189
+    Path: event:/UI/EquipWeapon
+  <EquipItem>k__BackingField:
+    Guid:
+      Data1: -424037828
+      Data2: 1146001178
+      Data3: 2017283246
+      Data4: -110546430
+    Path: event:/UI/EquipItem
+  <EquipAmulet>k__BackingField:
+    Guid:
+      Data1: 1448648936
+      Data2: 1207585145
+      Data3: 919993743
+      Data4: -767963473
+    Path: event:/UI/EquipAmulet
+  <PlayerAttack>k__BackingField:
+    Guid:
+      Data1: 1450466998
+      Data2: 1217614787
+      Data3: 537331129
+      Data4: -463124747
+    Path: event:/Attacks/Attack
+  <AttackContact>k__BackingField:
+    Guid:
+      Data1: -1809201225
+      Data2: 1266985612
+      Data3: 983921567
+      Data4: -1634739188
+    Path: event:/Attacks/AttackContact
+  <Fireball>k__BackingField:
+    Guid:
+      Data1: -894092470
+      Data2: 1211821356
+      Data3: 363654570
+      Data4: -845126873
+    Path: event:/Player/ShootFireball
+  <IceShard>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <FireballHit>k__BackingField:
+    Guid:
+      Data1: -1505333265
+      Data2: 1260804588
+      Data3: -1029897544
+      Data4: -1488472099
+    Path: event:/Player/HitFireball
+  <HogAttack>k__BackingField:
+    Guid:
+      Data1: -1984531683
+      Data2: 1257421875
+      Data3: 1164212383
+      Data4: 1683654309
+    Path: event:/Oponnents/Hog/HogAttack
+  <HogDeath>k__BackingField:
+    Guid:
+      Data1: 1611265312
+      Data2: 1133827342
+      Data3: -1589253955
+      Data4: 166880552
+    Path: event:/Oponnents/Hog/HogDie
+  <HogHit>k__BackingField:
+    Guid:
+      Data1: 931214455
+      Data2: 1298239848
+      Data3: -161702269
+      Data4: 1516099312
+    Path: event:/Oponnents/Hog/HogHit
+  <SlimeAttack>k__BackingField:
+    Guid:
+      Data1: 511212123
+      Data2: 1178247961
+      Data3: 1067328924
+      Data4: 1275694701
+    Path: event:/Oponnents/Slime/SlimeAttack
+  <SlimeDeath>k__BackingField:
+    Guid:
+      Data1: 908173610
+      Data2: 1295231012
+      Data3: -432223101
+      Data4: -993528323
+    Path: event:/Oponnents/Slime/SlimeDie
+  <SlimeJump>k__BackingField:
+    Guid:
+      Data1: 1997622904
+      Data2: 1179106150
+      Data3: -231764564
+      Data4: -1595836597
+    Path: event:/Oponnents/Slime/SlimeJump
+  <MantisAttack>k__BackingField:
+    Guid:
+      Data1: 126868816
+      Data2: 1114378690
+      Data3: -532092256
+      Data4: -1672899081
+    Path: event:/Oponnents/Mantis/MantisAttack
+  <MantisDeath>k__BackingField:
+    Guid:
+      Data1: -782440801
+      Data2: 1126965519
+      Data3: -382395993
+      Data4: 40540643
+    Path: event:/Oponnents/Mantis/MantisDie
+  <MantisHit>k__BackingField:
+    Guid:
+      Data1: -476192794
+      Data2: 1253412757
+      Data3: -1274480724
+      Data4: 20334324
+    Path: event:/Oponnents/Mantis/MantisHit
+  <TreeAttack>k__BackingField:
+    Guid:
+      Data1: -866168575
+      Data2: 1259277350
+      Data3: -963592521
+      Data4: -858496178
+    Path: event:/Oponnents/Tree/TreeAttack
+  <TreeDeath>k__BackingField:
+    Guid:
+      Data1: -1480165618
+      Data2: 1339348296
+      Data3: -1662563666
+      Data4: -2031210559
+    Path: event:/Oponnents/Tree/TreeDie
+  <TreeHit>k__BackingField:
+    Guid:
+      Data1: 1547205106
+      Data2: 1303686977
+      Data3: 1860143521
+      Data4: -783964891
+    Path: event:/Oponnents/Tree/TreeHit
+  <TreeAppear>k__BackingField:
+    Guid:
+      Data1: -1288054174
+      Data2: 1258643568
+      Data3: -891076462
+      Data4: 1391800284
+    Path: event:/Oponnents/Tree/TreeAppear
+  <TreeAttackStart>k__BackingField:
+    Guid:
+      Data1: 1984185859
+      Data2: 1078842090
+      Data3: 384676746
+      Data4: 1682823047
+    Path: event:/Oponnents/Tree/TreeAttackStart
+  <SlimeBossNormalAttack>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <SlimeBossDeath>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <SlimeBossHit>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <EntBossAttack>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <EntBossDeath>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <EntBossHit>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <VekTharAttack>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <VekTharDeath>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <VekTharHit>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <ChestOpen>k__BackingField:
+    Guid:
+      Data1: 546910094
+      Data2: 1202065084
+      Data3: 228089492
+      Data4: 1301911989
+    Path: event:/WorldInteraction/ChestOpen
+  <TalkingSounds>k__BackingField:
+    Guid:
+      Data1: -260204126
+      Data2: 1136076009
+      Data3: -1595406697
+      Data4: 60728629
+    Path: event:/Dialogue
+--- !u!1 &8054303050271683106
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -66,8 +437,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5890932185824888025}
-  - component: {fileID: 2116891601486016940}
+  - component: {fileID: 8715527572472757384}
+  - component: {fileID: 2436310135794580944}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -75,29 +446,29 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5890932185824888025
+--- !u!4 &8715527572472757384
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7308941666956058626}
+  m_GameObject: {fileID: 8054303050271683106}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 1.5051258, y: 2.3939283, z: 6.4218707}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5598632793762617175}
+  - {fileID: 3294245161834282078}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2116891601486016940
+--- !u!114 &2436310135794580944
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7308941666956058626}
+  m_GameObject: {fileID: 8054303050271683106}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d9758ee92bb1cfe4da9d9952b38e26f8, type: 3}

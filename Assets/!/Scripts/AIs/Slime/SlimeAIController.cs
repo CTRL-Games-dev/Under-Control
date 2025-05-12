@@ -107,8 +107,7 @@ public class SlimeAIController : MonoBehaviour {
 
         _animator.SetTrigger(_jumpAnimationHash);
 
-        AudioClip jumpSound = Resources.Load("SFX/slime/skok") as AudioClip; //jump sound
-        SoundFXManager.Instance.PlaySoundFXClip(jumpSound, transform, 0.7f);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.SlimeJump, transform.position);
 
 
 

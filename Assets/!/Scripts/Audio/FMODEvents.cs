@@ -30,6 +30,10 @@ public class FMODEvents : MonoBehaviour
     [field: Header("Player SFX")]
     [field: SerializeField] public EventReference PlayerWalkSound { get; private set; }
     [field: SerializeField] public EventReference PlayerDashSound { get; private set; }
+    [field: SerializeField] public EventReference PlayerHitIndicator { get; private set; }
+    [field: SerializeField] public EventReference PlayerAttackIndicator { get; private set; }
+    [field: SerializeField] public EventReference playerStunnedIndicator { get; private set; }
+    [field: SerializeField] public EventReference PlayerDeathSound { get; private set; }
 
     [field: Header("Item Equip SFX")]
     [field: SerializeField] public EventReference EquipArmor { get; private set; }
@@ -53,7 +57,7 @@ public class FMODEvents : MonoBehaviour
     [field: Header("Slime SFX")]
     [field: SerializeField] public EventReference SlimeAttack { get; private set; }
     [field: SerializeField] public EventReference SlimeDeath { get; private set; }
-    [field: SerializeField] public EventReference SlimeHit { get; private set; }
+    [field: SerializeField] public EventReference SlimeJump { get; private set; }
 
     [field: Header("Mantis SFX")]
     [field: SerializeField] public EventReference MantisAttack { get; private set; }
@@ -64,6 +68,9 @@ public class FMODEvents : MonoBehaviour
     [field: SerializeField] public EventReference TreeAttack { get; private set; }
     [field: SerializeField] public EventReference TreeDeath { get; private set; }
     [field: SerializeField] public EventReference TreeHit { get; private set; }
+    [field: SerializeField] public EventReference TreeAppear { get; private set; }
+    [field: SerializeField] public EventReference TreeAttackStart { get; private set; }
+
 
     [field: Header("Slime Boss SFX")]
     [field: SerializeField] public EventReference SlimeBossNormalAttack { get; private set; }
@@ -79,6 +86,10 @@ public class FMODEvents : MonoBehaviour
     [field: SerializeField] public EventReference VekTharAttack { get; private set; }
     [field: SerializeField] public EventReference VekTharDeath { get; private set; }
     [field: SerializeField] public EventReference VekTharHit { get; private set; }
+
+    [field: Header("World Interaction SFX")]
+    [field: SerializeField] public EventReference ChestOpen { get; private set; }
+    [field: SerializeField] public EventReference TalkingSounds { get; private set; }
     
 
     public static FMODEvents instance { get; private set; }

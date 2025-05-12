@@ -46,6 +46,21 @@ public class AudioManager : MonoBehaviour
         RuntimeManager.PlayOneShot(sound, position);
     }
 
+    public void PlayLetterSound(EventReference sound, char letter, Vector3 position)
+{
+    char lowerLetter = char.ToLower(letter);
+    if(!System.Enum.TryParse(lowerLetter.ToString(), out Alphabet letterEnum))
+    {
+        Debug.LogWarning($"Letter '{letter}' not defined in Alphabet enum.");
+        return;
+    }
+    EventInstance letterInstance = RuntimeManager.CreateInstance(sound);
+    letterInstance.setParameterByName("Letter", (float)letterEnum);
+    letterInstance.set3DAttributes(RuntimeUtils.To3DAttributes(position));
+    letterInstance.start();
+    letterInstance.release();
+}
+
     public void PlayAttackSound(EventReference sound, Vector3 position, WeaponType weaponType)
     {
         EventInstance attackInstance = RuntimeManager.CreateInstance(sound);

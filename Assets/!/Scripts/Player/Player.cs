@@ -148,7 +148,7 @@ public class Player : MonoBehaviour {
     public Cooldown ConsumableCooldown = new Cooldown(0.5f);
 
     [Header("Weapon")]
-    public WeaponHolder WeaponHolder;
+    public PlayerWeaponHolder WeaponHolder;
     public InventoryItem<WeaponItemData> CurrentWeapon { get => Inventory.Weapon; }
 
     private bool _isAttacking = false;
@@ -394,10 +394,12 @@ void Update() {
     }
 
     private void onStunned(float duration) {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.playerStunnedIndicator, transform.position);
         CameraManager.ShakeCamera(2, duration);
     }
     
     private void onDamageTaken(DamageTakenEventData _) {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.PlayerHitIndicator, transform.position);
         FaceAnimator.StartAnimation("HURT", 0.3f);
         CameraManager.ShakeCamera(0.7f, 0.1f);
 
@@ -561,8 +563,8 @@ void Update() {
         Animator.SetBool(_heavyAttackHash, false);
 
         foreach (ParticleSystem trail in _trailParticles) { trail.Play(); }
-        
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.PlayerDashSound, this.transform.position);
+        Debug.Log(transform.position);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.PlayerDashSound, transform.position);
         CurrentAnimationState = AnimationState.Dash;
 
         
@@ -585,6 +587,11 @@ void Update() {
     // przeniesc do save systemu 
 
     public void OnEnable() {
+        if (_PlayerWalkSound.isValid())
+    {
+        _PlayerWalkSound.release();
+    }
+    _PlayerWalkSound = AudioManager.instance.CreateEventInstance(FMODEvents.instance.PlayerWalkSound);
         var rebinds = PlayerPrefs.GetString("rebinds");
         if (!string.IsNullOrEmpty(rebinds))
             actions.LoadBindingOverridesFromJson(rebinds);

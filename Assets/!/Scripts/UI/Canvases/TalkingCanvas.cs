@@ -132,7 +132,6 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     private IEnumerator animateText() {
         _isTalking = true;
         _dialogueText.text = string.Empty;
-        bool SkipNextOne = true;
         foreach (char letter in _goalString.ToCharArray()) {
             _dialogueText.text += letter;
             float _letterInterval;
@@ -147,16 +146,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
                 _letterInterval = 0.3f;
             }
             else {
-                if(SkipNextOne){
-                    var InvClickClip = Resources.Load($"NEWSFX/ALPHABET/FASTER/{char.ToLower(letter)}") as AudioClip;  
-                    if(InvClickClip != null) {
-                        if(_dialogue.DialogueEntries[_currentDialogueIndex].IsPlayer){
-                            SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform, 1f, 1.2f);
-                        } else {
-                            SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform, 1f);
-                        }
-                    }
-                }
+                AudioManager.instance.PlayLetterSound(FMODEvents.instance.TalkingSounds, letter, this.transform.position);
                 _letterInterval = Mathf.Clamp(_textSpeed / _goalString.Length, 0.02f, 0.03f);
 
             }
