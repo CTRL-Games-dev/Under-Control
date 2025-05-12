@@ -77,9 +77,9 @@ public class VektharBossBattleManager : MonoBehaviour
         }
 
         Vekthar = Instantiate(_vektharPrefab, VektharStart.position, Quaternion.Euler(0, 45, 0));
+        Player.UICanvas.HUDCanvas.ShowBossBar(Vekthar.LivingEntity);
 
         Vekthar.LivingEntity.OnDeath.AddListener(() => {
-            Player.UICanvas.ChangeUITopState(UITopState.VideoPlayer);
             StartCoroutine(disableSounds());
         });
 
