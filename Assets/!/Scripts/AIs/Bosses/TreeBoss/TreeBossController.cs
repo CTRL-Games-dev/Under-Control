@@ -49,7 +49,7 @@ public class TreeBossController : MonoBehaviour {
     }
 
     public void OnPineconeThrow() {
-        CameraManager.ShakeCamera(1, 0.3f);
+        CameraManager.ShakeCamera(2f, 1f);
       
         Vector3 targetSpeed = (_target.transform.position - _targetStartingPosition) / (Time.time - _targetStartingPositionTime);
 
@@ -69,7 +69,7 @@ public class TreeBossController : MonoBehaviour {
     }
 
     public void OnRootAttack() {
-        CameraManager.ShakeCamera(10, 1);
+        CameraManager.ShakeCamera(6, 1f);
    
         Vector3 targetSpeed = (_target.transform.position - _targetStartingPosition) / (Time.time - _targetStartingPositionTime);
 

@@ -24,7 +24,7 @@ public class ItemRandomizer {
             quantity = Math.Max(quantity, 1);
             quantity = (int)Math.Min(quantity, item.MaxQuantity);
 
-            float powerScale = ItemRandomizer.GetPowerScale();
+            float powerScale = GetPowerScale();
 
             bool spotFound = inventory.AddItem(item.item, quantity, powerScale);
             if(!spotFound) {

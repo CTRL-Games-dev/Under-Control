@@ -880,8 +880,8 @@ public class Player : MonoBehaviour {
         GameManager.Instance.LevelDepth = 0;
 
         Instance.UpdateEquipment();
-        Player.LivingEntity.Health = Player.LivingEntity.MaxHealth;
-        Player.LivingEntity.Mana = Player.LivingEntity.MaxMana;     
+        LivingEntity.Health = LivingEntity.MaxHealth;
+        LivingEntity.Mana = LivingEntity.MaxMana;     
     }
 
     private void registerStats() {
@@ -937,7 +937,7 @@ public class Player : MonoBehaviour {
             _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
         }).OnComplete(() => {
             gameObject.transform.DOMoveY(-2, 0);
-            Player.Animator.SetTrigger("rise");
+            Animator.SetTrigger("rise");
             gameObject.transform.DOComplete();
 
             gameObject.transform.DOKill();
@@ -949,7 +949,7 @@ public class Player : MonoBehaviour {
             gameObject.transform.DOMoveY(1, 2f).SetEase(Ease.OutQuint).OnComplete(() => {
                 Animator.SetTrigger("live");
                 UpdateDisabled = false;
-                Player.Animator.animatePhysics = true;
+                Animator.animatePhysics = true;
                 UICanvas.ChangeUIBottomState(UIBottomState.HUD);
                 
             });
@@ -967,8 +967,6 @@ public class Player : MonoBehaviour {
         SlashManager.DisableSlash();
         UpdateEquipment();
     }
-
-    
 
     #endregion
     #region Save System

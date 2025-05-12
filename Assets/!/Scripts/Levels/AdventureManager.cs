@@ -19,6 +19,7 @@ public class AdventureManager : MonoBehaviour
     void Awake() {
         Instance = this;
     }
+    
     void Start() {
         GameManager.Instance.LevelDepth++;
 
@@ -31,7 +32,7 @@ public class AdventureManager : MonoBehaviour
 
         if(GameManager.Instance.LevelDepth == 1) {
             Vector3 weaponSpawnPosition = spawnLocation.transform.Find("ItemSpawn").position;
-            WeaponItemData randomWeapon = PossibleStartingItems[UnityEngine.Random.Range(0, PossibleStartingItems.Count())]; 
+            WeaponItemData randomWeapon = PossibleStartingItems[Random.Range(0, PossibleStartingItems.Count())]; 
             ItemEntity.Spawn(randomWeapon, 1, weaponSpawnPosition, ItemRandomizer.GetStartPowerScale(), Quaternion.Euler(new(0, 120, 30)));
         }
 

@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
+    private struct ShakeData {
+        public float Intensity;
+        public float Duration;
+        public float StartTime;
+    }
+
     private static CinemachineCamera _currentCamera;
     private static CinemachineCamera _previousCamera = null;
 
@@ -11,10 +17,7 @@ public class CameraManager : MonoBehaviour
 
     private static CinemachineBasicMultiChannelPerlin _noise;
 
-    private static float _startingIntensity;
-    private static float _shakeTimer;
-    private static float _shakeTimerTotal;
-
+    private static List<ShakeData> _shakeData = new List<ShakeData>();
 
     private void Awake() {
         DontDestroyOnLoad(this);
@@ -31,19 +34,30 @@ public class CameraManager : MonoBehaviour
     }
 
     void Update() {
-    if (_shakeTimer > 0) {
-        _shakeTimer -= Time.deltaTime;
-            _noise.AmplitudeGain = Mathf.Lerp(_startingIntensity, 0f, 1 - _shakeTimer / _shakeTimerTotal);
+        List<ShakeData> copyShakeDatas = new List<ShakeData>(_shakeData);
+
+        float currentGain = 0;
+
+        foreach(var shakeData in copyShakeDatas) {
+            float progress = (Time.time - shakeData.StartTime) / shakeData.Duration;
+            if(progress > 1) {
+                _shakeData.Remove(shakeData);
+                continue;
+            }
+        
+            currentGain += shakeData.Intensity * (1 - progress);
         }
+
+        _noise.AmplitudeGain = currentGain;
     }
 
     private static void shake(float intensity, float time) {
-        _noise.AmplitudeGain += intensity;
-        _startingIntensity += intensity;
-        _shakeTimerTotal += time;
-        _shakeTimer += time;
+        _shakeData.Add(new ShakeData {
+            Intensity = intensity,
+            Duration = time,
+            StartTime = Time.time
+        });
     }
-
 
     public static void SwitchCamera(CinemachineCamera camera) {
         if (camera == _currentCamera) {

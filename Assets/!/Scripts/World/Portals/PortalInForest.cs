@@ -14,7 +14,7 @@ public class PortalInForest : Portal
     {
         float maxDelta = GameManager.MaxInfluenceDelta;
         float minDelta = GameManager.MinInfluenceDelta;
-        influenceDelta = UnityEngine.Random.Range(minDelta, maxDelta);
+        influenceDelta = Random.Range(minDelta, maxDelta);
         Influence = influenceDelta + GameManager.Instance.TotalInfluence;
     }
 
