@@ -240,8 +240,6 @@ public class InvTileEquipment : InvTile {
                 // return;
             }
 
-            AudioClip EquipWeaponClip = Resources.Load("SFX/bron/wyjmowaniebroni") as AudioClip;
-            SoundFXManager.Instance.PlaySoundFXClip(EquipWeaponClip,transform);
             Player.Inventory.Weapon = weaponItem;
         } else if (_tileType == TileType.Consumeable1) {
             AudioManager.instance.PlayOneShot(FMODEvents.instance.EquipItem, this.transform.position);

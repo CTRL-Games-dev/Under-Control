@@ -38,7 +38,7 @@ public class MushroomAIController : MonoBehaviour {
         WeaponHolder.BeginAttack();
         WeaponHolder.EnableHitbox();
         AudioClip mainAttack = Resources.Load("SFX/grzyb/uderzenie") as AudioClip;
-        SoundFXManager.Instance.PlaySoundFXClip(mainAttack, transform, 1f);
+        // SoundFXManager.Instance.PlaySoundFXClip(mainAttack, transform, 1f);
     }
 
     public void OnPrimaryAttackAnimationEnd() {
