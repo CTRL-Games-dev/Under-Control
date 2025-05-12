@@ -5,7 +5,9 @@ using UnityEngine.Events;
 
 public enum Language {
     English,
-    Polish
+    Polish,
+    Slaski,
+    Ukrainian
 }
 
 public static class TextData {
@@ -19,8 +21,14 @@ public static class TextData {
             case Language.Polish:
                 CurrentLanguage = "pl";
                 break;
+            case Language.Slaski:
+                CurrentLanguage = "sl";
+                break;
+            case Language.Ukrainian:
+                CurrentLanguage = "uk";
+                break;
         }
-        OnLanguageChanged.Invoke();
+        OnLanguageChanged?.Invoke();
     }
 
     public static string CurrentLanguage = "en";
@@ -60,6 +68,21 @@ public static class TextData {
             foreach (LocalizationValue value in map.Values) {
                 _localizationTable[map.Key].Add(value.Lang, value.Value);
             }
+        }
+    }
+
+    public static Language GetLanguageEnum(string lang) {
+        switch (lang) {
+            case "en":
+                return Language.English;
+            case "pl":
+                return Language.Polish;
+            case "sl":
+                return Language.Slaski;
+            case "uk":
+                return Language.Ukrainian;
+            default:
+                return Language.English;
         }
     }
 }

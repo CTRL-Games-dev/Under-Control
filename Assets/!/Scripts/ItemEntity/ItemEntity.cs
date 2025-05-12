@@ -1,10 +1,13 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody))]
 
 [RequireComponent(typeof(Rigidbody))]
 public class ItemEntity : MonoBehaviour, IInteractable
 {
+    public UnityEvent PickupItemEvent = new();
+
     public int Amount;
     public ItemData ItemData;
     public float PowerScale;
@@ -73,6 +76,7 @@ public class ItemEntity : MonoBehaviour, IInteractable
             return;
         }
 
+        PickupItemEvent?.Invoke();
         Player.UICanvas.PickupItemNotify(ItemData, Amount);
         EventBus.InventoryItemChangedEvent?.Invoke();
         Destroy(gameObject);

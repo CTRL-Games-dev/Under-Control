@@ -276,22 +276,11 @@ public class InventoryPanel : MonoBehaviour
                 Player.UICanvas.SelectedItemUI.SelectedOffsetInv;
         }
 
-        Vector2Int size = _selectedInventoryItem.Rotated ? new Vector2Int(_selectedInventoryItem.Size.y, _selectedInventoryItem.Size.x) : _selectedInventoryItem.Size;
-
-        if (!_currentEntityInventory.FitsWithinBounds(selectedTilePos, size)) {
-            StartCoroutine(redPanelShow());
-            return;
-        }
-
-        if (!canBePlaced(selectedTilePos, size)) {
-            StartCoroutine(redPanelShow());
-            return;
-        }
-
         if (!_currentEntityInventory.AddItem(_selectedInventoryItem.ItemData, _selectedInventoryItem.Amount, selectedTilePos, _selectedInventoryItem.PowerScale, _selectedInventoryItem.Rotated)) {
             StartCoroutine(redPanelShow());
             return;
         };
+        
         GameObject item = createItemUI(_currentEntityInventory.GetInventoryItem(selectedTilePos));
         
         if (item.GetComponent<ItemUI>().CurrentInventoryPanel.IsSellerInventory) {
@@ -303,20 +292,6 @@ public class InventoryPanel : MonoBehaviour
         EventBus.ItemPlacedEvent?.Invoke();
 
         SelectedTile.SetHighlight(false);
-    }
-
-    private bool canBePlaced(Vector2Int pos, Vector2Int size) {
-        for (int y = pos.y; y < pos.y + size.y; y++) {
-            for (int x = pos.x; x < pos.x + size.x; x++) {
-                if (x < 0 || x >= _inventoryWidth || y < 0 || y >= _inventoryHeight) {
-                    return false;
-                }
-                if (!_inventoryTileArray[y, x].IsEmpty) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     #endregion
@@ -362,7 +337,7 @@ public class InventoryPanel : MonoBehaviour
         playInventorySound();
     }
     private void playInventorySound(){
-        AudioClip InvClickClip = Resources.Load("SFX/click") as AudioClip;
+        AudioClip InvClickClip = Resources.Load("NEWSFX/UI/Click") as AudioClip;
         SoundFXManager.Instance.PlaySoundFXClip(InvClickClip,transform);
     }
     public void ChangeCurrentInventory(ItemContainer newInventory){

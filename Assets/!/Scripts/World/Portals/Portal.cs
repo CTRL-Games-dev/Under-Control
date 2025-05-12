@@ -14,11 +14,12 @@ public abstract class Portal : MonoBehaviour
     [HideInInspector] public float Influence;
 
     private void Awake() {
-        _portalInsideRenderer = _portalInside.GetComponent<Renderer>();        
+        _portalInsideRenderer = _portalInside.GetComponent<Renderer>();
+        setInfluence();     
     }
 
     void Start() {
-        setInfluence();
+
     }
 
     protected void FixedUpdate() {
@@ -38,12 +39,16 @@ public abstract class Portal : MonoBehaviour
 
 
     void OnTriggerEnter(Collider other) {
+        if (!other.CompareTag("Player")) return;
+
         Debug.Log("Player entered portal to: " + _dimension.ToString());
+
+        Player.Instance.FBXModel.SetActive(false);
         GetComponent<Collider>().enabled = false;
         GameManager.Instance.ChangeDimension(_dimension, Influence);
     }
 
-    public void SetDimension(Dimension d) {
+    public virtual void SetDimension(Dimension d) {
         _dimension = d;
     }
 

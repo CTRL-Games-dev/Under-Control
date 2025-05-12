@@ -38,10 +38,10 @@ public class CameraManager : MonoBehaviour
     }
 
     private static void shake(float intensity, float time) {
-        _noise.AmplitudeGain = intensity;
-        _startingIntensity = intensity;
-        _shakeTimerTotal = time;
-        _shakeTimer = time;
+        _noise.AmplitudeGain += intensity;
+        _startingIntensity += intensity;
+        _shakeTimerTotal += time;
+        _shakeTimer += time;
     }
 
 

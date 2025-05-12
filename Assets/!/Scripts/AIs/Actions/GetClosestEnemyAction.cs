@@ -13,9 +13,11 @@ public partial class GetClosestEnemyAction : Action
 
     protected override Status OnStart() {
         LivingEntity closestEnemy = null;
-        Collider[] colliders = Physics.OverlapSphere(Agent.Value.transform.position, 1000);
+        Collider[] colliders = Physics.OverlapSphere(Agent.Value.transform.position, 100);
         foreach (Collider collider in colliders) {
-            if(!collider.TryGetComponent(out LivingEntity otherEntity)) {
+            LivingEntity otherEntity = collider.GetComponentInParent<LivingEntity>();
+
+            if(otherEntity == null) {
                 continue;
             }
 
@@ -25,7 +27,7 @@ public partial class GetClosestEnemyAction : Action
                     continue;
                 }
 
-                if(Vector3.Distance(closestEnemy.transform.position, otherEntity.transform.position) > Vector3.Distance(closestEnemy.transform.position, Agent.Value.transform.position)) {
+                if(Vector3.Distance(closestEnemy.transform.position, Agent.Value.transform.position) > Vector3.Distance(otherEntity.transform.position, Agent.Value.transform.position)) {
                     closestEnemy = otherEntity;
                 }
             }
@@ -33,16 +35,6 @@ public partial class GetClosestEnemyAction : Action
 
         Target.Value = closestEnemy;
 
-        return Status.Running;
-    }
-
-    protected override Status OnUpdate()
-    {
         return Status.Success;
     }
-
-    protected override void OnEnd()
-    {
-    }
 }
-

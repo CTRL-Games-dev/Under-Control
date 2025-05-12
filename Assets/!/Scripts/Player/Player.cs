@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -39,22 +40,22 @@ public class Player : MonoBehaviour {
     public Stat MaxHealth => LivingEntity.MaxHealth;
     public Stat MaxMana => LivingEntity.MaxMana;
     public float Mana => LivingEntity.Mana;
-    public Stat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
-    public Stat Armor = new Stat(StatType.ARMOR, 0f);
+    public Stat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL);
+    public Stat Armor = new Stat(StatType.ARMOR);
 
     // public Stat LightAttackDamage = new Stat(StatType.LIGHT_ATTACK_DAMAGE, 10f);
-    public Stat LightAttackSpeed = new Stat(StatType.LIGHT_ATTACK_SPEED, 1f);
+    public Stat LightAttackSpeed = new Stat(StatType.LIGHT_ATTACK_SPEED);
     // public Stat LightAttackRange = new Stat(StatType.LIGHT_ATTACK_RANGE, 1f);
 
     // public Stat HeavyAttackDamage = new Stat(StatType.HEAVY_ATTACK_DAMAGE, 20f);
-    public Stat HeavyAttackSpeed = new Stat(StatType.HEAVY_ATTACK_SPEED, 1f);
+    public Stat HeavyAttackSpeed = new Stat(StatType.HEAVY_ATTACK_SPEED);
     // public Stat HeavyAttackRange = new Stat(StatType.HEAVY_ATTACK_RANGE, 1f);
 
-    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 10f);
+    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED);
 
-    public Stat DashSpeedMultiplier = new Stat(StatType.DASH_SPEED_MULTIPLIER, 2f);
-    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 2f);
-    public Stat DashDuration = new Stat(StatType.DASH_COOLDOWN, 0.3f);
+    public Stat DashSpeedMultiplier = new Stat(StatType.DASH_SPEED_MULTIPLIER);
+    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN);
+    public Stat DashDuration = new Stat(StatType.DASH_COOLDOWN);
 
     // Coins
     [SerializeField] private int _coins = 100;
@@ -67,6 +68,7 @@ public class Player : MonoBehaviour {
     }
     [Header("Sound effects")]
     AudioClip OnDashSound;
+
     [Header("Properties")]
     [SerializeField] private float _acceleration = 8f;
     [SerializeField] private float _deceleration = 4f;
@@ -89,6 +91,8 @@ public class Player : MonoBehaviour {
     public bool DamageDisabled = false;
     [SerializeField] private Material _dissolveMaterial;
     public Vector3 StartPosition;
+    [SerializeField] private AudioClip _walkingSound;
+    private AudioSource _walkingAudioSource;
 
     public int _evolutionPoints = 0;
     public int EvolutionPoints {
@@ -108,7 +112,7 @@ public class Player : MonoBehaviour {
         get => _spellDataOne.Spell;
         set {
             _spellDataOne.Spell = value;
-            // _spellDataOne.Cooldown = new Cooldown(value.CooldownTime); 
+            _spellDataOne.Cooldown = value == null ? null : new Cooldown(value.CooldownTime); 
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -119,7 +123,7 @@ public class Player : MonoBehaviour {
         get => _spellDataTwo.Spell;
         set {
             _spellDataTwo.Spell = value;
-            // _spellDataTwo.Cooldown = new Cooldown(value.CooldownTime);
+            _spellDataTwo.Cooldown = value == null ? null : new Cooldown(value.CooldownTime);
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -130,7 +134,7 @@ public class Player : MonoBehaviour {
         get => _spellDataThree.Spell;
         set {
             _spellDataThree.Spell = value;
-            // _spellDataThree.Cooldown = new Cooldown(value.CooldownTime);
+            _spellDataThree.Cooldown = value == null ? null : new Cooldown(value.CooldownTime);
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -143,7 +147,7 @@ public class Player : MonoBehaviour {
     public Cooldown ConsumableCooldown = new Cooldown(0.5f);
 
     [Header("Weapon")]
-    public WeaponHolder WeaponHolder;
+    public PlayerWeaponHolder WeaponHolder;
     public InventoryItem<WeaponItemData> CurrentWeapon { get => Inventory.Weapon; }
 
     private bool _isAttacking = false;
@@ -194,9 +198,9 @@ public class Player : MonoBehaviour {
     public static HumanoidInventory Inventory => LivingEntity.Inventory as HumanoidInventory;
 
     [SerializeField] private LayerMask _groundLayerMask;
+    private Knockback _knockback;
     private LayerMask _interactionMask;
     public FaceAnimator FaceAnimator;
-    public Knockback Knockback;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
     private Vector3 _queuedRotation = Vector3.zero;
@@ -216,12 +220,13 @@ public class Player : MonoBehaviour {
         Animator = GetComponent<Animator>();
         CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
         SpellSpawner = GetComponentInChildren<SpellSpawner>();
-        Knockback = GetComponent<Knockback>();
+        _knockback = GetComponent<Knockback>();
 
         Instance = this;
 
         LivingEntity.OnDeath.AddListener(onDeath);
         LivingEntity.OnStunned.AddListener(onStunned);
+        LivingEntity.OnDamageTaken.AddListener(onDamageTaken);
         EventBus.ItemPlacedEvent.AddListener(UpdateEquipment);
         
         CameraDistance = MinCameraDistance;
@@ -230,15 +235,8 @@ public class Player : MonoBehaviour {
 
         StartPosition = transform.position;
 
-        OnEvolutionSelected.AddListener((evoUI) => {
-            foreach (Modifier modifier in evoUI.GetModifiers()) {
-                LivingEntity.ApplyIndefiniteModifier(modifier);
-            }
-        });
+        OnEvolutionSelected.AddListener(x => ApplyEvolution(x));
 
-        LivingEntity.OnDamageTaken.AddListener((data) => {
-            CameraManager.ShakeCamera(2, 0.1f);
-        });
  
         _interactionMask |= 1 << LayerMask.NameToLayer("Interactable");
 
@@ -246,6 +244,10 @@ public class Player : MonoBehaviour {
     }
 
     void Start() {
+        _walkingAudioSource = gameObject.GetComponent<AudioSource>();
+        _walkingAudioSource.clip = _walkingSound;
+        _walkingAudioSource.loop = true;
+        _walkingAudioSource.playOnAwake = false;
         if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
             WeaponHolder.UpdateWeapon(CurrentWeapon);
         }
@@ -268,9 +270,7 @@ public class Player : MonoBehaviour {
         });
         
         OnDashSound =  Resources.Load("SFX/bohater/dash") as AudioClip;
-
         ResetRun();
-        // ResetRun();
     }
 
     void Update() {
@@ -280,6 +280,15 @@ public class Player : MonoBehaviour {
         handleRotation();
 
         _currentSpeed = Mathf.MoveTowards(_currentSpeed, getGoalSpeed(), getSpeedChange() * Time.deltaTime);
+        if (_currentSpeed > 0.1f) {
+            if (!_walkingAudioSource.isPlaying && _walkingSound != null) {
+                _walkingAudioSource.Play();
+            }
+        } else {
+            if (_walkingAudioSource.isPlaying) {
+                _walkingAudioSource.Stop();
+            }
+        }
         CharacterController.SimpleMove(getGoalDirection() * _currentSpeed);
     }
 
@@ -318,13 +327,13 @@ public class Player : MonoBehaviour {
         switch (CurrentAnimationState) {
             case AnimationState.Dash:
             case AnimationState.Attack_Windup:
-                if (_queuedRotation == Vector3.zero) return transform.forward;
-                Vector3 dir = _queuedRotation;
-                _queuedRotation = Vector3.zero;
-                return dir.normalized;
+                // if (_queuedRotation == Vector3.zero) return transform.forward;
+                // Vector3 dir = _queuedRotation;
+                // _queuedRotation = Vector3.zero;
+                // return dir.normalized;
             case AnimationState.Attack_Contact:
             case AnimationState.Attack_ComboWindow:
-                return transform.forward;
+                // return transform.forward;
 
             case AnimationState.Locomotion:
             case AnimationState.Attack_Recovery:
@@ -366,7 +375,7 @@ public class Player : MonoBehaviour {
     private void onDeath() {
         if (HasPlayerDied) return;
         Debug.Log("Player died");
-        Knockback.Reset();
+        _knockback.Reset();
         GameManager.Instance.ShowMainMenu = false;
         HasPlayerDied = true;
         SlashManager.DisableSlash();
@@ -379,6 +388,12 @@ public class Player : MonoBehaviour {
 
     private void onStunned(float duration) {
         CameraManager.ShakeCamera(2, duration);
+    }
+    
+    private void onDamageTaken(DamageTakenEventData _) {
+        FaceAnimator.StartAnimation("HURT", 0.3f);
+        CameraManager.ShakeCamera(0.7f, 0.1f);
+
     }
 
     
@@ -536,7 +551,6 @@ public class Player : MonoBehaviour {
         }
         
         Animator.speed = 0;
-        // Animator.applyRootMotion = false;
         Animator.SetBool(_lightAttackHash, false);
         Animator.SetBool(_heavyAttackHash, false);
 
@@ -545,22 +559,6 @@ public class Player : MonoBehaviour {
         CurrentAnimationState = AnimationState.Dash;
         SoundFXManager.Instance.PlaySoundFXClip(OnDashSound, transform,1.2f);
         
-
-        // UpdateDisabled = true;
-        // Animator.animatePhysics = false;
-
-        // transform.DOMove(transform.position + transform.forward * DashDistance, DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
-        //     // Animator.applyRootMotion = true;
-        //     Animator.animatePhysics = true;
-        //     UpdateDisabled = false;
-        //     Animator.speed = 1;
-        //     DamageDisabled = false;
-        //     LockRotation = false;
-        //     foreach (ParticleSystem trail in _trailParticles) {
-        //         trail.Clear();
-        //         trail.Stop();
-        //     }
-        // }
         Invoke(nameof(endDash), DashDuration);
     }
 
@@ -680,16 +678,16 @@ public class Player : MonoBehaviour {
 
     public void OnInventoryChanged() {
         UpdateEquipment();
-        EventBus.InventoryItemChangedEvent.Invoke();
+        
     }
     public void UpdateEquipment(){
         WeaponHolder.UpdateWeapon(CurrentWeapon);
         Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
 
         if (CurrentWeapon?.ItemData != null) {
-            Debug.Log(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
             SlashManager.SetSlashColor(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
         } 
+        EventBus.InventoryItemChangedEvent.Invoke();
     }
 
     public Vector3 GetMousePosition() {
@@ -767,12 +765,12 @@ public class Player : MonoBehaviour {
                 _isAttacking = true;
                 _currentSpeed = 0;
                 SlashManager.EnableSlash();
-                WeaponHolder.EnableHitbox();
                 // SlashGO.SetActive(true);
 
                 break;
 
             case AnimationState.Attack_Contact:
+                WeaponHolder.EnableHitbox();
                 break;
 
             case AnimationState.Attack_ComboWindow:
@@ -868,15 +866,23 @@ public class Player : MonoBehaviour {
         WeaponHolder.UpdateWeapon(null);
         WeaponHolder.DisableHitbox();
         WeaponHolder.EndAttack();
-        Player.UICanvas.HUDCanvas.UpdateSpellSlots();
-        Player.UICanvas.HUDCanvas.UpdateHealthBar();
-        Player.UICanvas.HUDCanvas.UpdateManaBar();
-        Player.UICanvas.HUDCanvas.OnUpdateConsumables();
-        GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
-        GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+        UICanvas.HUDCanvas.UpdateSpellSlots();
+        UICanvas.HUDCanvas.UpdateHealthBar();
+        UICanvas.HUDCanvas.UpdateManaBar();
+        UICanvas.HUDCanvas.OnUpdateConsumables();
+        UICanvas.ChooseCanvas.ResetCardUI();
+        // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+        GameManager.Instance.ResetCards();
+        GameManager.Instance.ResetInfluence();
+        GameManager.Instance.ResetCardChoice();
+        // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
+        EventBus.InventoryItemChangedEvent?.Invoke();
+        GameManager.Instance.LevelDepth = 0;
 
-
+        Instance.UpdateEquipment();
+        Player.LivingEntity.Health = Player.LivingEntity.MaxHealth;
+        Player.LivingEntity.Mana = Player.LivingEntity.MaxMana;     
     }
 
     private void registerStats() {
@@ -893,15 +899,43 @@ public class Player : MonoBehaviour {
         ModifierSystem.RegisterStat(ref DashCooldown);
         ModifierSystem.RegisterStat(ref DashDuration);
     }
+    
+    public void ApplyEvolution(EvoUI evoUI) {
+        GameManager.Instance.RandomCardCount = 3;
+        
+        switch (evoUI.ElementalType) {
+            case ElementalType.Fire:
+            case ElementalType.Ice:
+                foreach (Modifier modifier in evoUI.GetModifiers()) {
+                    LivingEntity.ApplyIndefiniteModifier(modifier);
+                }
+                break;
+            case ElementalType.Earth:
+                GameManager.Instance.RandomCardCount++;
+                break;
+        }
+        LivingEntity.Health = LivingEntity.MaxHealth;
+        LivingEntity.Mana = LivingEntity.MaxMana;
+         
+    }
 
-    public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
+    public void SetPlayerPosition(Vector3 position, float time = 0.1f, float yRotation = 45) {
+        Instance.gameObject.SetActive(true);
+        transform.rotation = Quaternion.Euler(0, yRotation, 0);
+        StartCoroutine(setPlayerPositionCoroutine(position, time));
+    }
+
+    private IEnumerator setPlayerPositionCoroutine(Vector3 position, float time) {
         UpdateDisabled = true;
         Animator.animatePhysics = false;
+        Animator.speed = 0;
         gameObject.transform.position = position;
+        yield return new WaitForSeconds(time);
         Animator.animatePhysics = true;
+        Animator.speed = 1;
         UpdateDisabled = false;
-        gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
     }
+
     public void PlayRespawnAnimation() {
         Animator.animatePhysics = false;
         UpdateDisabled = true;
@@ -943,23 +977,36 @@ public class Player : MonoBehaviour {
         UpdateEquipment();
     }
 
+    
+
     #endregion
     #region Save System
     public void Save(ref PlayerSaveData data){
         data.EvolutionPoints = EvolutionPoints;
         data.SelectedEvolutions = SelectedEvolutions;
+        data.ConsumableItemOne = ConsumableItemOne;
+        data.ConsumableItemTwo = ConsumableItemTwo;
+        data.Health = Health;
+        data.Mana = Mana;
     }
     public void Load(PlayerSaveData data){
         EvolutionPoints = data.EvolutionPoints;
         foreach(EvoUI evolution in data.SelectedEvolutions){
             evolution.AddEvolution();   
         }
+        ConsumableItemOne = data.ConsumableItemOne;
+        ConsumableItemTwo = data.ConsumableItemTwo;
+        LivingEntity.Health = data.Health;
+        LivingEntity.Mana = data.Mana;
     }
     [Serializable]
     public struct PlayerSaveData{
+        public float Health;
+        public float Mana;
         public List<EvoUI> SelectedEvolutions;
         public int EvolutionPoints;
-
+        public InventoryItem<ConsumableItemData> ConsumableItemOne;
+        public InventoryItem<ConsumableItemData> ConsumableItemTwo;
     }
     #endregion
 }

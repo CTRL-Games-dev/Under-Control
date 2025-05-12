@@ -11,9 +11,7 @@ using UnityEngine.UIElements;
 // - @londek
 [Serializable]
 public class DynamicStat : Stat {
-    public DynamicStat(StatType statType, float initValue) : base(statType, initValue) {
-        Raw = initValue;
-    }
+    public DynamicStat(StatType statType) : base(statType) {}
 
     public void Add(float value) {
         Raw += value;
