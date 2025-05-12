@@ -125,6 +125,7 @@ public class EnemySpawner : MonoBehaviour
         Debug.Log("Starting fight");
 
         spawnWalls();
+        VektharControlManager.Instance.StartControlManager();
 
         _numberOfWaves = UnityEngine.Random.Range(MinNumberOfWaves, MaxNumberOfWaves + 1);
         _waveNumber = 0;
@@ -213,6 +214,7 @@ public class EnemySpawner : MonoBehaviour
         removeWalls();
         DefeatedEnemies.Invoke();
         Destroy(this);
+        VektharControlManager.Instance.StopControlManager();
     }
 
     private void OnTriggerEnter(Collider other) {

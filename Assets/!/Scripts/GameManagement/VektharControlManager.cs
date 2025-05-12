@@ -37,7 +37,7 @@ public class VektharControlManager : MonoBehaviour
             case ControlManagerState.Stopped: break;
             case ControlManagerState.Running: {
                 if(_currentCoroutine != null) return;
-                // if(getEffectChange() > 0) return;
+                if(getEffectChange() > 0) return;
                 _currentCoroutine = scheduleNewEffect(15);
                 StartCoroutine(_currentCoroutine);
             } break;
@@ -58,7 +58,7 @@ public class VektharControlManager : MonoBehaviour
         Debug.Log("Applying new effect");
         _currentCoroutine = null;
 
-        //if(UnityEngine.Random.Range(0f, 1f) > getEffectChange()) return;
+        if(UnityEngine.Random.Range(0f, 1f) > getEffectChange()) return;
 
         int effectIndex = UnityEngine.Random.Range(0, 3);
         switch(effectIndex) {
