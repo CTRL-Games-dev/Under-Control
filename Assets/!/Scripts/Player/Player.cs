@@ -591,8 +591,8 @@ void Update() {
     // przeniesc do save systemu 
 
     public void OnEnable() {
-        if (_PlayerWalkSound.isValid())
-    {
+    if (_PlayerWalkSound.isValid())
+{
         _PlayerWalkSound.release();
     }
     _PlayerWalkSound = AudioManager.instance.CreateEventInstance(FMODEvents.instance.PlayerWalkSound);
