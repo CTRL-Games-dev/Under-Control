@@ -51,7 +51,7 @@ public class LivingEntity : MonoBehaviour {
     }
    
     public Stat MaxHealth = new Stat(StatType.MAX_HEALTH);
-    public Stat Armor = new Stat(StatType.ARMOR);
+    public DynamicStat Armor = new DynamicStat(StatType.ARMOR);
     public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED);
     public Stat MaxMana = new Stat(StatType.MAX_MANA);
 

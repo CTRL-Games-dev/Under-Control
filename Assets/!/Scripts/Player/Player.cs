@@ -43,7 +43,7 @@ public class Player : MonoBehaviour {
     public Stat MaxMana => LivingEntity.MaxMana;
     public float Mana => LivingEntity.Mana;
     public Stat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL);
-    public Stat Armor = new Stat(StatType.ARMOR);
+    public DynamicStat Armor => LivingEntity.Armor;
 
     // public Stat LightAttackDamage = new Stat(StatType.LIGHT_ATTACK_DAMAGE, 10f);
     public Stat LightAttackSpeed = new Stat(StatType.LIGHT_ATTACK_SPEED);
@@ -161,6 +161,7 @@ public class Player : MonoBehaviour {
     [Header("Weapon")]
     public PlayerWeaponHolder WeaponHolder;
     public InventoryItem<WeaponItemData> CurrentWeapon { get => Inventory.Weapon; }
+    public InventoryItem<ArmorItemData> CurrentArmor { get => Inventory.Armor; }
 
     private bool _isAttacking = false;
     public bool LockRotation = false;
@@ -200,6 +201,8 @@ public class Player : MonoBehaviour {
     [SerializeField] private ParticleSystem[] _trailParticles;
     [SerializeField] public GameObject FBXModel;
     public GameObject  FishingRod;
+    [SerializeField] private SkinnedMeshRenderer _pauldronRenderer;
+    [SerializeField] private Material _defaultPauldronMaterial;
 
     // Static reference getters
     public static LivingEntity LivingEntity { get; private set; }
@@ -725,6 +728,14 @@ public class Player : MonoBehaviour {
             SlashManager.SetSlashColor(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
         } 
         EventBus.InventoryItemChangedEvent.Invoke();
+        if(CurrentArmor?.ItemData != null){
+            Armor.Set(CurrentArmor.ItemData.Armor);
+            _pauldronRenderer.material = CurrentArmor.ItemData.Material;
+        }
+        else{
+            Armor.Set(0);
+            _pauldronRenderer.material = _defaultPauldronMaterial;
+        }
     }
 
     public Vector3 GetMousePosition() {
@@ -920,12 +931,12 @@ public class Player : MonoBehaviour {
 
         Instance.UpdateEquipment();
         LivingEntity.Health = LivingEntity.MaxHealth;
-        LivingEntity.Mana = LivingEntity.MaxMana;     
+        LivingEntity.Mana = LivingEntity.MaxMana;
     }
 
     private void registerStats() {
         ModifierSystem.RegisterStat(ref VekhtarControl);
-        ModifierSystem.RegisterStat(ref Armor);
+        //ModifierSystem.RegisterStat(ref Armor);
         // ModifierSystem.RegisterStat(ref LightAttackDamage);
         ModifierSystem.RegisterStat(ref LightAttackSpeed);
         // ModifierSystem.RegisterStat(ref LightAttackRange);

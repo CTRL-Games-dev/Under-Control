@@ -307,7 +307,7 @@ public class GameManager : MonoBehaviour {
         }
         if(Input.GetKeyDown(KeyCode.F12)) {
             Debug.Log("<color=red>Debug Tools - damaged player");
-            Player.LivingEntity.TakeDamage(new Damage{Value = 50, Type = DamageType.PHYSICAL});
+            Player.LivingEntity.TakeDamage(new Damage{Value = 10, Type = DamageType.PHYSICAL});
         }
         if(Input.GetKeyDown(KeyCode.F8)) {
             TotalInfluence = 100;

@@ -17,15 +17,15 @@ public class Stat {
 
     [SerializeField]
     private float _raw;
-    public float Raw { get => _raw; protected set => _raw = value; }
+    public float Raw { get => _raw; set => _raw = value; }
 
     [SerializeField]
     private float _adjusted;
-    public float Adjusted { get => _adjusted; protected set => _adjusted = value; }
+    public float Adjusted { get => _adjusted; set => _adjusted = value; }
 
     [SerializeField]
     private float _initValue;
-    public float InitValue { get => _initValue; protected set => _initValue = value; }
+    public float InitValue { get => _initValue; set => _initValue = value; }
 
     public UnityEvent OnValueChanged;
 
