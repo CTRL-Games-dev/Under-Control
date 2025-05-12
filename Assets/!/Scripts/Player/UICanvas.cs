@@ -127,8 +127,13 @@ public class UICanvas : MonoBehaviour {
     }
 
     private void OnUICancel() {
-        if (IsOtherUIOpen || CurrentUIMiddleState == UIMiddleState.Choose || CurrentUITopState == UITopState.Death || CurrentUIMiddleState == UIMiddleState.MainMenu || CurrentUITopState == UITopState.VideoPlayer) {
+        if (IsOtherUIOpen || CurrentUIMiddleState == UIMiddleState.Choose || CurrentUITopState == UITopState.Death || CurrentUIMiddleState == UIMiddleState.MainMenu) {
             Debug.Log("Other UI is open");
+            return;
+        }
+
+        if (CurrentUITopState == UITopState.VideoPlayer) {
+            ChangeUITopState(UITopState.NotVisible);
             return;
         }
 
@@ -296,8 +301,14 @@ public class UICanvas : MonoBehaviour {
                 SettingsCanvas.HideUI();
                 break;
             case UITopState.VideoPlayer:
+                GameManager.Instance.MusicPlayer.Play();
+
                 _videoPlayer.Stop();
-                _videoPlayer.gameObject.SetActive(false);
+                CanvasGroup canvasGroup = _videoPlayer.gameObject.GetComponent<CanvasGroup>();
+                canvasGroup.DOKill();
+                canvasGroup.DOFade(0, 1 * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
+                    _videoPlayer.gameObject.SetActive(false);
+                });
                 break;
         }
     }
@@ -312,12 +323,23 @@ public class UICanvas : MonoBehaviour {
                 SettingsCanvas.ShowUI();
                 break;
             case UITopState.VideoPlayer:
-                Debug.Log("VideoPlayer");
-
+                GameManager.Instance.MusicPlayer.Stop();
                 _videoPlayer.gameObject.SetActive(true);
-                _videoPlayer.Play();
-                _videoPlayer.gameObject.GetComponent<CanvasGroup>().DOFade(1, 1 * Settings.AnimationSpeed).SetUpdate(true);
+                CanvasGroup canvasGroup = _videoPlayer.gameObject.GetComponent<CanvasGroup>();
+                canvasGroup.alpha = 0;
+                canvasGroup.DOKill();
+                canvasGroup.DOFade(1, 1 * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
+                    _videoPlayer.Play();
+                });
+
+                Invoke(nameof(endCredits), 40f);
                 break;
+        }
+    }
+
+    private void endCredits() {
+        if (CurrentUITopState == UITopState.VideoPlayer) {
+            ChangeUITopState(UITopState.NotVisible);
         }
     }
 
