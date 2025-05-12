@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using Unity.Behavior;
 using Unity.Cinemachine;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -96,7 +98,7 @@ public class Player : MonoBehaviour {
     //Audio
     private EventInstance _PlayerWalkSound;
 
-    public int _evolutionPoints = 0;
+    private int _evolutionPoints = 0;
     public int EvolutionPoints {
         get{ return _evolutionPoints; }
         set {
@@ -106,6 +108,16 @@ public class Player : MonoBehaviour {
     }
 
     public List<EvoUI> SelectedEvolutions;
+
+    [Header("Fishing")]
+    public bool CanFish = false;
+    public bool FishCatchWindow = false;
+    [SerializeField] private WeaponItemData _fishingRod;
+    public Transform FishingBone;
+    public float FishingForce = 1;
+    public int AvailableFish = 0;
+    [SerializeField] private GameObject _bobberPrefab;
+    [SerializeField] private GameObject _currentBobber;
 
     [Header("Spells")]
     [SerializeField]
@@ -165,6 +177,7 @@ public class Player : MonoBehaviour {
     public UnityEvent<EvoUI> OnEvolutionSelected = new();
     public UnityEvent<int> CoinsChangeEvent;
     public UnityEvent UpdateConsumablesEvent;
+    public UnityEvent FishCaughtEvent;
     public float CameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
 
     // State
@@ -187,7 +200,8 @@ public class Player : MonoBehaviour {
     [Header("References")]
     [SerializeField] private UICanvas _uiCanvas;
     [SerializeField] private ParticleSystem[] _trailParticles;
-    public GameObject FBXModel;
+    [SerializeField] public GameObject FBXModel;
+    public GameObject  FishingRod;
 
     // Static reference getters
     public static LivingEntity LivingEntity { get; private set; }
@@ -383,6 +397,7 @@ void Update() {
     private void onDeath() {
         if (HasPlayerDied) return;
         Debug.Log("Player died");
+        UICanvas.HUDCanvas.HideBossBar();   
         _knockback.Reset();
         GameManager.Instance.ShowMainMenu = false;
         HasPlayerDied = true;
@@ -431,39 +446,27 @@ void Update() {
     }
 
     void OnUseConsumableOne(InputValue value) {
-        if(ConsumableItemOne == null) return;
-        if(!ConsumableCooldown.Execute()) return;
-        if(ConsumableItemOne.Amount <= 0) return;
-
-        ConsumableItemData c =  ConsumableItemOne.ItemData;
-
-        if(c == null) return;
-        c.Consume(LivingEntity);
-        ConsumableItemOne.Amount--;
-
-        if (ConsumableItemOne.Amount <= 0) {
-            ConsumableItemOne = null;
-        }
-
-        UICanvas.HUDCanvas.UseConsumable1();
-        UpdateConsumablesEvent?.Invoke();
+        useConsumable(ref ConsumableItemOne, 1);
     }
 
     void OnUseConsumableTwo(InputValue value) {
-        if(ConsumableItemTwo == null) return;
+        useConsumable(ref ConsumableItemTwo, 2);
+    }
+    private void useConsumable(ref InventoryItem<ConsumableItemData> consumable, int slotIndex) {
+        if(consumable == null) return;
         if(!ConsumableCooldown.Execute()) return;
-        if(ConsumableItemTwo.Amount <= 0) return;
+        if(consumable.Amount <= 0) return;
 
-        ConsumableItemData c =  ConsumableItemTwo.ItemData as ConsumableItemData;
+        ConsumableItemData c =  consumable.ItemData as ConsumableItemData;
         
         if(c == null) return;
-        c.Consume(LivingEntity);
-        ConsumableItemTwo.Amount--;
-        if (ConsumableItemTwo.Amount <= 0) {
-            ConsumableItemTwo = null;
+        if(!c.Consume(LivingEntity)) return;
+        consumable.Amount--;
+        if (consumable.Amount <= 0) {
+            consumable = null;
         }
 
-        UICanvas.HUDCanvas.UseConsumable2();
+        UICanvas.HUDCanvas.UseConsumable(slotIndex);
         UpdateConsumablesEvent?.Invoke();
     }
 
@@ -629,8 +632,18 @@ void Update() {
         if(CurrentWeapon == null) return;
         if(CurrentWeapon.ItemData == null) return;
 
+        //fishing interaction
+        if(CurrentWeapon.ItemData == _fishingRod){
+            if(!CanFish) return;
+            if (!LockRotation) transform.LookAt(GetMousePosition());
+            Animator.SetTrigger("castRod");
+            // tryFish();
+            return;
+        }
+
         // Default to attacking if no interaction was commited
         
+
         if (CurrentAnimationState == AnimationState.Attack_ComboWindow) {
             _queuedRotation = GetMousePosition() - transform.position;
             LockRotation = false;
@@ -641,8 +654,9 @@ void Update() {
         if (!LockRotation) {
             transform.LookAt(GetMousePosition());   
         }
-
         LockRotation = true;
+
+        
         switch(interactionType) {
             case InteractionType.Primary:
                 performLightAttack();
@@ -653,7 +667,28 @@ void Update() {
         }
     }
 
-    
+    private bool tryFish(){
+        if(_currentBobber == null){
+            _currentBobber = Instantiate(_bobberPrefab,FishingBone.position,transform.rotation,null);
+            _currentBobber.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0.6f, 1) * FishingForce, ForceMode.Impulse);
+            Player.Instance.InputDisabled = true;
+            return true;
+        }
+        Animator.SetTrigger("catchFish");
+        Player.Instance.InputDisabled = false;
+        if(FishCatchWindow){
+            ConsumableItemData caughtFish = GameManager.Instance.CatchableFish[UnityEngine.Random.Range(0, GameManager.Instance.CatchableFish.Count())] as ConsumableItemData;
+            Inventory.AddItem(caughtFish,1,1);
+            UICanvas.PickupItemNotify(caughtFish, 1);
+            AvailableFish -= 1;
+            FishCaughtEvent?.Invoke();
+            FishCatchWindow = false;
+
+        }
+        Destroy(_currentBobber);
+
+        return true;
+    }
 
     private bool tryInteract(InteractionType interactionType) {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
@@ -689,7 +724,6 @@ void Update() {
 
     public void OnInventoryChanged() {
         UpdateEquipment();
-        
     }
     public void UpdateEquipment(){
         WeaponHolder.UpdateWeapon(CurrentWeapon);
@@ -888,14 +922,15 @@ void Update() {
         GameManager.Instance.ResetCards();
         GameManager.Instance.ResetInfluence();
         GameManager.Instance.ResetCardChoice();
-        GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+        CanFish = false;
+        // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
         GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         EventBus.InventoryItemChangedEvent?.Invoke();
         GameManager.Instance.LevelDepth = 0;
 
         Instance.UpdateEquipment();
-        Player.LivingEntity.Health = Player.LivingEntity.MaxHealth;
-        Player.LivingEntity.Mana = Player.LivingEntity.MaxMana;     
+        LivingEntity.Health = LivingEntity.MaxHealth;
+        LivingEntity.Mana = LivingEntity.MaxMana;     
     }
 
     private void registerStats() {
@@ -931,8 +966,17 @@ void Update() {
         LivingEntity.Mana = LivingEntity.MaxMana;
          
     }
+    public bool BuyFishingRod(Transform t){
+        ItemEntity.SpawnThrownRelative(_fishingRod, 1, t.position, 1, t.rotation, Vector3.forward * 3);
+        return true;
+    }
 
-    public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
+    public void EquipFishingRod(bool val) {
+        FishingRod.SetActive(val);
+    }
+
+    public void SetPlayerPosition(Vector3 position, float time = 0.1f, float yRotation = 45) {
+        Instance.gameObject.SetActive(true);
         transform.rotation = Quaternion.Euler(0, yRotation, 0);
         StartCoroutine(setPlayerPositionCoroutine(position, time));
     }
@@ -940,9 +984,11 @@ void Update() {
     private IEnumerator setPlayerPositionCoroutine(Vector3 position, float time) {
         UpdateDisabled = true;
         Animator.animatePhysics = false;
+        Animator.speed = 0;
         gameObject.transform.position = position;
         yield return new WaitForSeconds(time);
         Animator.animatePhysics = true;
+        Animator.speed = 1;
         UpdateDisabled = false;
     }
 
@@ -960,7 +1006,7 @@ void Update() {
             _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
         }).OnComplete(() => {
             gameObject.transform.DOMoveY(-2, 0);
-            Player.Animator.SetTrigger("rise");
+            Animator.SetTrigger("rise");
             gameObject.transform.DOComplete();
 
             gameObject.transform.DOKill();
@@ -972,7 +1018,7 @@ void Update() {
             gameObject.transform.DOMoveY(1, 2f).SetEase(Ease.OutQuint).OnComplete(() => {
                 Animator.SetTrigger("live");
                 UpdateDisabled = false;
-                Player.Animator.animatePhysics = true;
+                Animator.animatePhysics = true;
                 UICanvas.ChangeUIBottomState(UIBottomState.HUD);
                 
             });
@@ -990,8 +1036,10 @@ void Update() {
         SlashManager.DisableSlash();
         UpdateEquipment();
     }
-
     
+    public void TryCatchFish() {
+        tryFish();
+    }
 
     #endregion
     #region Save System

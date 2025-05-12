@@ -168,8 +168,9 @@ public class LivingEntity : MonoBehaviour {
             Debug.LogWarning($"Resistance for damage type {damage.Type} is greater than 1. Resistance is floored to 1. Resistance is {resistance}");
             resistance = 1;
         }
-
+        Debug.Log("Pre mitigation damage: " + desiredDamageAmount);
         desiredDamageAmount *= 1 - resistance;
+        Debug.Log("Post mitigation damage: " + desiredDamageAmount);
 
         float actualDamageAmount = desiredDamageAmount;
         if(actualDamageAmount > Health) {
@@ -237,15 +238,11 @@ public class LivingEntity : MonoBehaviour {
     }
 
     private float getDamageResistance(DamageType damageType) {
-        if(Inventory is not HumanoidInventory humanoidInventory) return 0;
-        var armor = humanoidInventory.Armor;
-        if(armor == null) return 0;
-
-        float resistanceValue = armor.ItemData?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance * armor.PowerScale) ?? 0;
+        float resistanceValue = 100/(100 + Armor.Adjusted);
         
         resistanceValue = resistanceValue < 0 ? 0 : resistanceValue;
         resistanceValue = resistanceValue > 90 ? 90 : resistanceValue;
-        return resistanceValue;
+        return 1 - resistanceValue;
     }
 
     #region Effects

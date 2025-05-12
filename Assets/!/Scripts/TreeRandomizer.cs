@@ -8,8 +8,8 @@ public class TreeRandomizer : MonoBehaviour
     [SerializeField] private GameObject _leaves;
     [SerializeField] private Gradient _gradient;
     void Awake() {
-        _tree.eulerAngles = new(0,UnityEngine.Random.Range(0f, 359f));
-        _tree.position += new Vector3(UnityEngine.Random.Range(-1, 1f), 0, UnityEngine.Random.Range(-1f, 1f));
+        _tree.eulerAngles = new(0, Random.Range(0f, 359f));
+        _tree.position += new Vector3(Random.Range(-1, 1f), 0, Random.Range(-1f, 1f));
     }
 
     void Start() {
