@@ -23,7 +23,6 @@ public class Talkable : MonoBehaviour, IInteractable
     void Start() {
         if (!GameManager.Instance.IsStarterDialogueOver) {
             _dialogue = StarterDialogue;
-            GameManager.Instance.IsStarterDialogueOver = true;
         } else {
             Random.InitState(System.DateTime.Now.Millisecond);
             _dialogue = Dialogues[Random.Range(0, Dialogues.Count)];
@@ -48,6 +47,9 @@ public class Talkable : MonoBehaviour, IInteractable
 
 
     public void EndInteract() {
+        if (_dialogue.Equals(StarterDialogue)) {
+            GameManager.Instance.IsStarterDialogueOver = true;
+        }
         CameraManager.SwitchCamera(null);
         Player.Instance.UICancelEvent.RemoveListener(EndInteract);
         Player.Instance.LockRotation = false;
