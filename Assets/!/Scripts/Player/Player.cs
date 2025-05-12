@@ -111,8 +111,9 @@ public class Player : MonoBehaviour {
     public bool FishCatchWindow = false;
     [SerializeField] private WeaponItemData _fishingRod;
     public Transform FishingBone;
-    [SerializeField] private GameObject _bobberPrefab;
     public float FishingForce = 1;
+    public int AvailableFish = 0;
+    [SerializeField] private GameObject _bobberPrefab;
     [SerializeField] private GameObject _currentBobber;
 
     [Header("Spells")]
@@ -173,6 +174,7 @@ public class Player : MonoBehaviour {
     public UnityEvent<EvoUI> OnEvolutionSelected = new();
     public UnityEvent<int> CoinsChangeEvent;
     public UnityEvent UpdateConsumablesEvent;
+    public UnityEvent FishCaughtEvent;
     public float CameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
 
     // State
@@ -671,6 +673,8 @@ public class Player : MonoBehaviour {
             ConsumableItemData caughtFish = GameManager.Instance.CatchableFish[UnityEngine.Random.Range(0, GameManager.Instance.CatchableFish.Count())] as ConsumableItemData;
             Inventory.AddItem(caughtFish,1,1);
             UICanvas.PickupItemNotify(caughtFish, 1);
+            AvailableFish -= 1;
+            FishCaughtEvent?.Invoke();
             FishCatchWindow = false;
         }
         Destroy(_currentBobber);

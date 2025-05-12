@@ -2427,12 +2427,17 @@ MonoBehaviour:
   MainCamera: {fileID: 469925352793417921}
   InputDisabled: 0
   DamageDisabled: 0
-  CanFish: 0
   _dissolveMaterial: {fileID: 2100000, guid: bfe4b1304878755499f4d9d6c76b2471, type: 2}
   StartPosition: {x: 0, y: 0, z: 0}
   _walkingSound: {fileID: 8300000, guid: 04560c23058165f4d821a55b57ec2cfb, type: 3}
-  _evolutionPoints: 0
   SelectedEvolutions: []
+  CanFish: 0
+  FishCatchWindow: 0
+  _fishingRod: {fileID: 0}
+  FishingBone: {fileID: 0}
+  _bobberPrefab: {fileID: 0}
+  FishingForce: 1
+  _currentBobber: {fileID: 0}
   _spellDataOne:
     Spell: {fileID: 11400000, guid: 6dabd4b9a691d42f89209aab27aeda97, type: 2}
     Cooldown:
@@ -2502,7 +2507,6 @@ MonoBehaviour:
   - {fileID: 2400485054620918674}
   - {fileID: 7383336144782633308}
   FBXModel: {fileID: 3077456365805493931}
-  FishingRod: {fileID: 0}
   _groundLayerMask:
     serializedVersion: 2
     m_Bits: 256
@@ -24114,7 +24118,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 20, y: 0}
+  m_AnchoredPosition: {x: -180, y: -27}
   m_SizeDelta: {x: 317.74, y: 139.0105}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1843625279657329299
@@ -49926,7 +49930,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7941845816251119428}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -49935,7 +49939,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 380, y: 0}
+  m_AnchoredPosition: {x: 180, y: -27}
   m_SizeDelta: {x: 317.74, y: 139.0105}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8519559907004742860

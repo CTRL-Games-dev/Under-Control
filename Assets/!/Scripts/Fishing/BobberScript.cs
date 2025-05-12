@@ -48,4 +48,14 @@ public class BobberScript : MonoBehaviour
 
         _lineRenderer.SetPositions(linePoints);
     }
+    void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log(collision.gameObject.name);
+        if(collision.gameObject.layer == LayerMask.NameToLayer("Water") && Player.Instance.AvailableFish <= 0) {Debug.Log("destroyed on water");Destroy(gameObject); }
+        else if(collision.gameObject.layer == LayerMask.NameToLayer("Terrain")){
+            Player.Instance.FishCatchWindow = false;
+            Debug.Log("destroyed on terrain");
+            Destroy(gameObject);
+        }
+    }
 }
