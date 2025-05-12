@@ -107,6 +107,8 @@ public class Player : MonoBehaviour {
         }
     }
 
+    private AttackType? _attackType;
+
     public List<EvoUI> SelectedEvolutions;
 
     [Header("Fishing")]
@@ -184,6 +186,7 @@ public class Player : MonoBehaviour {
     private Vector2 _movementInputVector = Vector2.zero;
     private InteractionType? _queuedInteraction;
     private Cooldown _dashCooldown = new Cooldown(0);
+    public bool InvertedControls = false;
 
     private List<Modifier> _currentRingModifiers;
     private List<Modifier> _currentAmuletModifiers;
@@ -472,6 +475,7 @@ void Update() {
 
     void OnMove(InputValue value) {
         _movementInputVector = value.Get<Vector2>();
+        _movementInputVector *= (InvertedControls ? -1 : 1);
     }
 
     void OnLook(InputValue value) {
@@ -659,9 +663,11 @@ void Update() {
         switch(interactionType) {
             case InteractionType.Primary:
                 performLightAttack();
+                _attackType = AttackType.LIGHT;
                 break;
             case InteractionType.Secondary:
                 performHeavyAttack();
+                _attackType = AttackType.HEAVY;
                 break;
         }
     }
@@ -786,7 +792,9 @@ void Update() {
 
             case AnimationState.Attack_Recovery:
                 SlashManager.DisableSlash();
+                WeaponHolder.EndAttack();
                 _isAttacking = false;
+                _attackType = null;
                 LockRotation = false;
                 break;
 
@@ -805,6 +813,18 @@ void Update() {
                 break;
 
             case AnimationState.Attack_Windup:
+                bool isPlayerAttackPaid = false;
+
+                if(_attackType == AttackType.HEAVY) {
+                    float manaPrice = WeaponHolder.GetManaCost();
+                    if(manaPrice <= Mana) {
+                        LivingEntity.Mana -= manaPrice;
+                        isPlayerAttackPaid = true;
+                    }
+                }
+
+                WeaponHolder.InitializeAttack(_attackType.Value, isPlayerAttackPaid);
+                WeaponHolder.BeginAttack();
                 AudioManager.instance.PlayAttackSound(FMODEvents.instance.PlayerAttack, this.transform.position, CurrentWeapon.ItemData.WeaponType);
                 LockRotation = true;
                 _isAttacking = true;
@@ -836,12 +856,10 @@ void Update() {
     }
 
     public void OnAttackAnimationStart(AttackType attackType) {
-        WeaponHolder.InitializeAttack(attackType);
-        WeaponHolder.BeginAttack();
+
     }
 
     public void OnAttackAnimationEnd(AttackType _) {
-        WeaponHolder.EndAttack();
     }
 
     #endregion
