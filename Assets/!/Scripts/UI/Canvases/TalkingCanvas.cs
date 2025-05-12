@@ -15,6 +15,8 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private TextLocalizer _nameTextLocalizer, _dialogueTextLocalizer;
     [SerializeField] private TMP_InputField _inputField;
     [SerializeField] private GameObject _confirmButton;
+    [SerializeField] private GameObject _acceptButton;
+    [SerializeField] private GameObject _refuseButton;
  
     private bool _isTalking = false;
 
@@ -55,6 +57,20 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         _inputField.interactable = false;
         _inputField.DeactivateInputField();
         OnClick();
+    }
+    public void OnAcceptButtonClick(){
+        Player.Instance.BuyFishingRod(_talkable.transform);
+        ResetOfferButtons();
+        OnClick();
+    }
+    public void OnRefuseButtonClicked(){
+        ResetOfferButtons();
+        OnClick();
+    }
+    private void ResetOfferButtons(){
+        _blockClick = false;
+        _acceptButton.SetActive(false);
+        _refuseButton.SetActive(false);
     }
 
 
@@ -196,13 +212,28 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
 
   
         if (_dialogue.DialogueEntries[_currentDialogueIndex].IsInputField) {
+            _acceptButton.SetActive(false);
+            _refuseButton.SetActive(false);
             _inputField.gameObject.SetActive(true);
             _confirmButton.SetActive(true);
             _inputField.interactable = true;
             _inputField.Select();
             _inputField.ActivateInputField();
             _blockClick = true;
-        } else {
+        }
+        else if(_dialogue.DialogueEntries[_currentDialogueIndex].IsOffer){
+            _acceptButton.SetActive(true);
+            _refuseButton.SetActive(true);
+            _acceptButton.GetComponent<Button>().interactable = Player.Instance.Coins < 150 ? false : true;
+            _inputField.gameObject.SetActive(false);
+            _confirmButton.SetActive(false);
+            _inputField.interactable = false;
+            _inputField.DeactivateInputField();
+            _blockClick = true;
+        }
+        else {
+            _acceptButton.SetActive(false);
+            _refuseButton.SetActive(false);
             _inputField.gameObject.SetActive(false);
             _confirmButton.SetActive(false);
             _inputField.interactable = false;

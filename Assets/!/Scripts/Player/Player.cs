@@ -649,8 +649,8 @@ public class Player : MonoBehaviour {
 
     private bool tryFish(){
         if (!CanFish) return false;
+        if(CurrentWeapon.ItemData != FishingRod) return false;
         return true;
-        //not yet implemented
         
     }
 
@@ -928,6 +928,10 @@ public class Player : MonoBehaviour {
         LivingEntity.Health = LivingEntity.MaxHealth;
         LivingEntity.Mana = LivingEntity.MaxMana;
          
+    }
+    public bool BuyFishingRod(Transform t){
+        ItemEntity.SpawnThrownRelative(FishingRod, 1, t.position, 1, t.rotation, Vector3.forward * 2);
+        return true;
     }
 
     public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
