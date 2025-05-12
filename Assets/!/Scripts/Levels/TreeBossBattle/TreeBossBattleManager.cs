@@ -56,6 +56,7 @@ public class TreeBossBattleManager : MonoBehaviour
     }
 
     void sceneReady() {
+        Player.Instance.SetPlayerPosition(LevelStart.position);
         EventBus.SceneReadyEvent?.Invoke();
     }
 
