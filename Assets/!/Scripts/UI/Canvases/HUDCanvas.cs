@@ -424,4 +424,10 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
 
         _previousBossHealth = _bossEntity.Health;
     }
+
+    public void HideBossBar() {
+        _bossBarGO.SetActive(false);
+        _bossEntity.OnDamageTaken.RemoveListener(updateBossBar);
+        _bossEntity.OnDeath.RemoveAllListeners();
+    }
 }
