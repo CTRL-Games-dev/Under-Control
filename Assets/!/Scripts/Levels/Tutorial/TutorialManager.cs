@@ -54,8 +54,7 @@ public class TutorialManager : MonoBehaviour
 
         Player.Animator.SetTrigger("die");
         CameraManager.SwitchCamera(_staringCamera);
-        Player.Instance.InputDisabled = true;
-        Player.Instance.LockRotation = true;
+        
 
     }
 
@@ -77,6 +76,8 @@ public class TutorialManager : MonoBehaviour
     public IEnumerator StartDialogue(TutorialState state) {
         switch (state) {
             case TutorialState.Intro:
+                Player.Instance.InputDisabled = true;
+                Player.Instance.LockRotation = true;
                 Player.Instance.FaceAnimator.StartInfiniteAnimation("CONFUSED");
                 yield return new WaitForSeconds(2f);
                 _talkingCanvas.ShowUI();
