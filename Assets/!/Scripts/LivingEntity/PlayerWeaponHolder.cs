@@ -15,6 +15,7 @@ public class PlayerWeaponHolder : MonoBehaviour {
     private List<LivingEntity> _hitEntities = new List<LivingEntity>();
     private AttackType? _currentAttackType;
     private bool _isAttacking = false;
+    private bool _isPlayerAttackPaid = false;
 
     public void UpdateWeapon(InventoryItem<WeaponItemData> weaponItem) {
         if (_currentWeaponHitter != null) {
@@ -94,7 +95,7 @@ public class PlayerWeaponHolder : MonoBehaviour {
         return Instantiate(UnknownWeaponPrefab, Vector3.zero, Quaternion.identity, transform);
     }
 
-    public void InitializeAttack(AttackType attackType) {
+    public void InitializeAttack(AttackType attackType, bool isPlayerAttackPaid = false) {
         if(_currentWeaponData == null) {
             Debug.LogWarning($"Current weapon is null");
             return;
@@ -111,6 +112,7 @@ public class PlayerWeaponHolder : MonoBehaviour {
         }
 
         _currentAttackType = attackType;
+        _isPlayerAttackPaid = isPlayerAttackPaid;
     }
 
     public void BeginAttack() {
@@ -145,6 +147,7 @@ public class PlayerWeaponHolder : MonoBehaviour {
         _isAttacking = false;
 
         _hitEntities.Clear();
+        _isPlayerAttackPaid = false;
         _currentAttackType = null;
     }
 
@@ -214,15 +217,27 @@ public class PlayerWeaponHolder : MonoBehaviour {
             damageValue = Self.ModifierSystem.CalculateForStatType(StatType.HEAVY_ATTACK_DAMAGE, damageValue);
         }
 
-        if(_currentPlayerWeaponAttack != null) {
+        if(_currentAttackType == AttackType.HEAVY && _isPlayerAttackPaid && _currentPlayerWeaponAttack != null) {
             _currentPlayerWeaponAttack.Attack(victim);
+
+            if(_currentPlayerWeaponAttack is not CharmAttack) {
+                    Self.Attack(new Damage{
+                    Type = _currentWeaponData.DamageType,
+                    Value = damageValue
+                }, victim);
+            }
+        } else {
+            Self.Attack(new Damage{
+                Type = _currentWeaponData.DamageType,
+                Value = damageValue
+            }, victim);
         }
 
-        Self.Attack(new Damage{
-            Type = _currentWeaponData.DamageType,
-            Value = damageValue
-        }, victim);
-
         _hitEntities.Add(victim);
+    }
+
+    public float GetManaCost() {
+        if(_currentPlayerWeaponAttack == null) return 0;
+        return _currentPlayerWeaponAttack.ManaCost;
     }
 }

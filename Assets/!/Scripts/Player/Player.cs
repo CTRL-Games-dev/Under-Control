@@ -103,6 +103,8 @@ public class Player : MonoBehaviour {
         }
     }
 
+    private AttackType? _attackType;
+
     public List<EvoUI> SelectedEvolutions;
 
     [Header("Spells")]
@@ -632,9 +634,11 @@ public class Player : MonoBehaviour {
         switch(interactionType) {
             case InteractionType.Primary:
                 performLightAttack();
+                _attackType = AttackType.LIGHT;
                 break;
             case InteractionType.Secondary:
                 performHeavyAttack();
+                _attackType = AttackType.HEAVY;
                 break;
         }
     }
@@ -743,7 +747,9 @@ public class Player : MonoBehaviour {
 
             case AnimationState.Attack_Recovery:
                 SlashManager.DisableSlash();
+                WeaponHolder.EndAttack();
                 _isAttacking = false;
+                _attackType = null;
                 LockRotation = false;
                 break;
 
@@ -762,6 +768,18 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_Windup:
+                bool isPlayerAttackPaid = false;
+
+                if(_attackType == AttackType.HEAVY) {
+                    float manaPrice = WeaponHolder.GetManaCost();
+                    if(manaPrice <= Mana) {
+                        LivingEntity.Mana -= manaPrice;
+                        isPlayerAttackPaid = true;
+                    }
+                }
+
+                WeaponHolder.InitializeAttack(_attackType.Value, isPlayerAttackPaid);
+                WeaponHolder.BeginAttack();
                 LockRotation = true;
                 _isAttacking = true;
                 _currentSpeed = 0;
@@ -791,12 +809,10 @@ public class Player : MonoBehaviour {
     }
 
     public void OnAttackAnimationStart(AttackType attackType) {
-        WeaponHolder.InitializeAttack(attackType);
-        WeaponHolder.BeginAttack();
+
     }
 
     public void OnAttackAnimationEnd(AttackType _) {
-        WeaponHolder.EndAttack();
     }
 
     #endregion
