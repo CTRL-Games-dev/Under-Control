@@ -217,6 +217,8 @@ public class PlayerWeaponHolder : MonoBehaviour {
             damageValue = Self.ModifierSystem.CalculateForStatType(StatType.HEAVY_ATTACK_DAMAGE, damageValue);
         }
 
+        Debug.Log($"{Self.DebugName}: Hit: {victim.DebugName} with damage: {damageValue}. Weapon: {_currentWeaponData.DisplayName}");
+
         if(_currentAttackType == AttackType.HEAVY && _isPlayerAttackPaid && _currentPlayerWeaponAttack != null) {
             _currentPlayerWeaponAttack.Attack(victim);
 

@@ -788,12 +788,13 @@ void Update() {
                 break;
 
             case AnimationState.Attack_ComboWindow:
+                WeaponHolder.DisableHitbox();
+                SlashManager.DisableSlash();
+                WeaponHolder.EndAttack();
                 _isAttacking = false;
                 break;
 
             case AnimationState.Attack_Recovery:
-                SlashManager.DisableSlash();
-                WeaponHolder.EndAttack();
                 _isAttacking = false;
                 _attackType = null;
                 LockRotation = false;
@@ -844,7 +845,6 @@ void Update() {
                 break;
 
             case AnimationState.Attack_Recovery:
-                WeaponHolder.DisableHitbox();
                 LockRotation = false;
                 // LockRotation = true;
                 break;
