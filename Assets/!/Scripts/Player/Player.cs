@@ -169,6 +169,7 @@ public class Player : MonoBehaviour {
     private Vector2 _movementInputVector = Vector2.zero;
     private InteractionType? _queuedInteraction;
     private Cooldown _dashCooldown = new Cooldown(0);
+    public bool InvertedControls = false;
 
     private List<Modifier> _currentRingModifiers;
     private List<Modifier> _currentAmuletModifiers;
@@ -459,6 +460,7 @@ public class Player : MonoBehaviour {
 
     void OnMove(InputValue value) {
         _movementInputVector = value.Get<Vector2>();
+        _movementInputVector *= (InvertedControls ? -1 : 1);
     }
 
     void OnLook(InputValue value) {
