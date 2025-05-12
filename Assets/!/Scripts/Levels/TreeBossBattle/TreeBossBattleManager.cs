@@ -107,10 +107,10 @@ public class TreeBossBattleManager : MonoBehaviour
 
         TreeBoss = Instantiate(_treeBossPrefab, TreeBossStart.position, Quaternion.Euler(0, 225, 0));
 
-        TreeBoss.GetComponent<LivingEntity>().OnDeath.AddListener(() => {
-            Player.UICanvas.ChangeUITopState(UITopState.VideoPlayer);
-            StartCoroutine(disableSounds());
-        });
+        // TreeBoss.GetComponent<LivingEntity>().OnDeath.AddListener(() => {
+        //     Player.UICanvas.ChangeUITopState(UITopState.VideoPlayer);
+        //     StartCoroutine(disableSounds());
+        // });
 
         CameraManager.ShakeCamera(3, 3);
 
