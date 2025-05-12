@@ -10,6 +10,9 @@ public class Talkable : MonoBehaviour, IInteractable
     [SerializeField] private FaceAnimator _faceAnimator;
     [SerializeField] private Texture _faceImage;
     [SerializeField] private string _nameKey;
+    [SerializeField] private Transform _target;
+    [SerializeField] private Vector3 _talkOffset;
+    [SerializeField] private float _talkRotation;
     public Dialogue StarterDialogue;
     private Dialogue _dialogue;
     private bool _interacted = false;
@@ -34,7 +37,7 @@ public class Talkable : MonoBehaviour, IInteractable
         Player.UICanvas.StartTalking(_dialogue, _faceImage, _faceAnimator, _nameKey, this);
         _interacted = true;
         CameraManager.SwitchCamera(TalkCamera);
-        Player.Instance.SetPlayerPosition(new Vector3(1.7f, 0, 1.2f), 0.5f, 114);
+        Player.Instance.SetPlayerPosition(_target.position + _talkOffset, 0.5f, _talkRotation);
         Player.Instance.LockRotation = true;
         
         _exclamationMark?.DOComplete();
