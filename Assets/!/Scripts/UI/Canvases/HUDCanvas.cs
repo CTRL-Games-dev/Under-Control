@@ -394,6 +394,11 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
 
     public void ShowBossBar(LivingEntity bossEntity) {
         _bossEntity = bossEntity;
+
+        RectTransform bossBarRect = _bossBarGO.transform as RectTransform;
+        bossBarRect.anchoredPosition = new Vector2(0, 40);
+        bossBarRect.DOAnchorPosY(-30, 2).SetEase(Ease.OutQuint);
+
         _bossBarImg.gameObject.SetActive(true);
         _bossBarGO.SetActive(true);
         _bossNameTextLocalizer.Key = bossEntity.DisplayName;
@@ -402,8 +407,10 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
 
         _bossEntity.OnDamageTaken.AddListener(updateBossBar);
         _bossEntity.OnDeath.AddListener(() => {
-            Debug.Log("Boss dead");
-            _bossBarGO.SetActive(false);
+            bossBarRect.DOAnchorPosY(40, 2).SetEase(Ease.OutQuint).OnComplete(() => {
+                _bossBarGO.SetActive(false);
+            });
+
             _bossEntity.OnDeath.RemoveAllListeners();
             _bossEntity.OnDamageTaken.RemoveListener(updateBossBar);
         });
@@ -416,5 +423,11 @@ public class HUDCanvas : MonoBehaviour, IUICanvasState
         _bossBarImg.DOFillAmount(_bossEntity.Health / _bossEntity.MaxHealth, 0.3f * Settings.AnimationSpeed).SetEase(Ease.OutCubic);
 
         _previousBossHealth = _bossEntity.Health;
+    }
+
+    public void HideBossBar() {
+        _bossBarGO.SetActive(false);
+        _bossEntity.OnDamageTaken.RemoveListener(updateBossBar);
+        _bossEntity.OnDeath.RemoveAllListeners();
     }
 }

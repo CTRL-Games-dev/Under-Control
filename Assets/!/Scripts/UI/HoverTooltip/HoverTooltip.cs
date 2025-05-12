@@ -8,6 +8,7 @@ public class HoverTooltip : MonoBehaviour {
     public GenericInteractableTooltip GenericInteractableTooltip;
     public TalkableTooltip TalkableTooltip;
 
+    private RectTransform _rectTransform;
     private LayerMask _playerMask;
     private LayerMask _interactableMask;
 
@@ -15,6 +16,8 @@ public class HoverTooltip : MonoBehaviour {
     private Camera _camera;
 
     void Start() {
+        _rectTransform = GetComponent<RectTransform>();
+
         _camera = Player.Instance.MainCamera;
         _playerMask |= 1 << LayerMask.NameToLayer("Player");
         _playerMask |= 1 << LayerMask.NameToLayer("Hitboxes");
@@ -24,7 +27,7 @@ public class HoverTooltip : MonoBehaviour {
     void LateUpdate() {
         if(!InputUtility.IsMousePositionAvailable()) return;
 
-        transform.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        _rectTransform.anchoredPosition = UICanvas.ScaleToCanvas(new Vector2(Input.mousePosition.x, Input.mousePosition.y)) - new Vector2(0, 1080);
     }
 
     void FixedUpdate() {

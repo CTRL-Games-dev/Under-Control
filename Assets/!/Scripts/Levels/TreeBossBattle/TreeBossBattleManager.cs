@@ -56,6 +56,7 @@ public class TreeBossBattleManager : MonoBehaviour
     }
 
     void sceneReady() {
+        Player.Instance.SetPlayerPosition(LevelStart.position);
         EventBus.SceneReadyEvent?.Invoke();
     }
 
@@ -114,6 +115,8 @@ public class TreeBossBattleManager : MonoBehaviour
         CameraManager.ShakeCamera(3, 3);
 
         _state = BattleState.DuringBattle;
+
+        Player.UICanvas.HUDCanvas.ShowBossBar(TreeBoss.GetComponent<LivingEntity>());
     }
 
     private void duringBattle() {
