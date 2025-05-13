@@ -149,7 +149,7 @@ public class LivingEntity : MonoBehaviour {
         AudioManager.Instance.PlayOneShot(OnDamageSound, transform.position);
 
         if (IsPlayer) {
-            if (Player.Instance.DamageDisabled) {
+            if (Player.Instance.DamageDisabled || Player.Instance.FullDamageDisable) {
                 return;
             }
         }

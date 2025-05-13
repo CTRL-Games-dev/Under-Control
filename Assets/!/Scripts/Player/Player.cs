@@ -228,6 +228,8 @@ public class Player : MonoBehaviour {
     private Vector3 _queuedRotation = Vector3.zero;
     public List<WeaponItemData> StarterWeapons = new List<WeaponItemData>();
 
+    public bool FullDamageDisable = false;
+
     #region Unity Methods
     void Awake() {
         DontDestroyOnLoad(gameObject);

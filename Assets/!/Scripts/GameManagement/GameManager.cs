@@ -248,35 +248,9 @@ public class GameManager : MonoBehaviour {
 
     public void DebugCommands() {
         if (Input.GetKeyDown(KeyCode.F1)) {
-            Player.Instance.DamageDisabled = true;
+            Player.Instance.FullDamageDisable = !Player.Instance.FullDamageDisable;
         }
-        if (Input.GetKeyDown(KeyCode.F2)) {
-            TotalInfluence = 50;
-            ChangeDimension(Dimension.ENT_BOSS);
-        }
-        if (Input.GetKeyDown(KeyCode.F3)) {
-            TotalInfluence = 100;
-            ChangeDimension(Dimension.VEKTHAR_BOSS);
-        }
-        if(Input.GetKeyDown(KeyCode.F9)) {
-            Debug.Log("<color=blue>Debug Tools - added item1");
-            Player.LivingEntity.Inventory.AddItem(DebugItems[0],1,1);
-        }
-        if(Input.GetKeyDown(KeyCode.F10)) {
-            Debug.Log("<color=blue>Debug Tools - added item2");
-            Player.LivingEntity.Inventory.AddItem(DebugItems[1],1,1);
-        }
-        if(Input.GetKeyDown(KeyCode.F11)) {
-            Debug.Log("<color=blue>Debug Tools - added item3");
-            Player.LivingEntity.Inventory.AddItem(DebugItems[2],1,1);
-        }
-        if(Input.GetKeyDown(KeyCode.F12)) {
-            Debug.Log("<color=red>Debug Tools - damaged player");
-            Player.LivingEntity.TakeDamage(new Damage{Value = 10, Type = DamageType.PHYSICAL});
-        }
-        if(Input.GetKeyDown(KeyCode.F8)) {
-            TotalInfluence = 100;
-        }
+        
     }
     #region Save System
     public void Save(ref GlobalSaveData data){
