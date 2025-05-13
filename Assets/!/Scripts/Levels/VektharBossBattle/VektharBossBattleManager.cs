@@ -76,11 +76,9 @@ public class VektharBossBattleManager : MonoBehaviour
     }
 
     public IEnumerator disableSounds() {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(30);
 
-        // GameManager.Instance.GetComponent<AudioSource>().mute = true;
-    
-        // yield return new WaitForSeconds(30);
+        GameManager.Instance.ChangeDimension(Dimension.HUB);
 
         // GameManager.Instance.GetComponent<AudioSource>().mute = false;
     }
