@@ -57,7 +57,7 @@ public class AdventureManager : MonoBehaviour
         Player.Instance.ResetToDefault();
         setPortals();
 
-        Invoke(nameof(sceneReady), 0.2f);
+        Invoke(nameof(sceneReady), 2f);
     }
 
     private void setPortals() {
