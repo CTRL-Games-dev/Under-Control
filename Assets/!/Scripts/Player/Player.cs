@@ -999,7 +999,10 @@ void Update() {
          
     }
     public bool BuyFishingRod(Transform t){
-        ItemEntity.SpawnThrownRelative(_fishingRod, 1, t.position, 1, t.rotation, Vector3.forward * 3);
+        Inventory.AddItem(_fishingRod, 1, 1);
+
+        GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
+
         return true;
     }
 

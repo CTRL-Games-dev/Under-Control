@@ -54,6 +54,8 @@ public class TutorialManager : MonoBehaviour
 
         Player.Animator.SetTrigger("die");
         CameraManager.SwitchCamera(_staringCamera);
+
+        GameManager.Instance.SetTutorialDimension();
         
 
     }
