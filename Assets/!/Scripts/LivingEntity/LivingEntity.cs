@@ -105,7 +105,6 @@ public class LivingEntity : MonoBehaviour {
         _health = StartingHealth;
         _mana = StartingMana;
         
-
         if (IsPlayer) {
             MaxHealth.OnValueChanged.AddListener(() => Player.UICanvas.HUDCanvas.UpdateHealthBar());
             MaxMana.OnValueChanged.AddListener(() => Player.UICanvas.HUDCanvas.UpdateManaBar());
@@ -114,8 +113,14 @@ public class LivingEntity : MonoBehaviour {
 
     void Update() {
         recheckEffects();
+
         _animator.SetFloat(_movementSpeedHash, MovementSpeed);
+
         if (Health <= 0) {
+            Die();
+        }
+
+        if (transform.position.y < -30) {
             Die();
         }
     }
