@@ -37,9 +37,9 @@ public class CoinAnimator : MonoBehaviour
             return;
         }
         if(change > 0) {
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.MoneyEarned, this.transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.Instance.MoneyEarned, this.transform.position);
         } else {
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.MoneySpend, this.transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.Instance.MoneySpend, this.transform.position);
         }
         float coins = Player.Instance.Coins;
         _coinsRectTransform.DOComplete();

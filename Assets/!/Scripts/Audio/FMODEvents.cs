@@ -101,14 +101,14 @@ public class FMODEvents : MonoBehaviour
     [field: SerializeField] public EventReference TalkingSounds { get; private set; }
     
 
-    public static FMODEvents instance { get; private set; }
+    public static FMODEvents Instance { get; private set; }
 
     private void Awake()
     {
-        if (instance != null)
+        if (Instance != null)
         {
             Debug.LogError("More than one FMODEvents in the scene");
         }
-        instance = this;
+        Instance = this;
     }
 }

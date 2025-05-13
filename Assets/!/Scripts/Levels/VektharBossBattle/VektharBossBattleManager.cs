@@ -27,7 +27,7 @@ public class VektharBossBattleManager : MonoBehaviour
     void Start() {
         Player.Instance.gameObject.SetActive(false);
         
-        AudioManager.instance.setMusicArea(MusicArea.VEKTHAR);
+        AudioManager.Instance.setMusicArea(MusicArea.VEKTHAR);
         Player.Instance.SetPlayerPosition(LevelStart.position);
         Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
         Player.Instance.MaxCameraDistance = 25;
@@ -102,7 +102,7 @@ public class VektharBossBattleManager : MonoBehaviour
         _previousMaxCameraDistance = Player.Instance.MaxCameraDistance;
         Player.Instance.CameraDistance = FightCameraDistance;
         Player.Instance.MaxCameraDistance = FightCameraDistance;
-        Player.Instance.MinCameraDistance = FightCameraDistance;
+        // Player.Instance.MinCameraDistance = FightCameraDistance;
 
         _state = BattleState.DuringBattle;
     }

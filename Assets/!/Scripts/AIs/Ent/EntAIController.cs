@@ -80,33 +80,33 @@ public class EntAIController : MonoBehaviour {
     }
 
     public void OnRightHandAttackStart() {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.TreeAttackStart, transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.TreeAttackStart, transform.position);
         RightWeaponHolder.InitializeAttack(AttackType.LIGHT);
         RightWeaponHolder.BeginAttack();
         RightWeaponHolder.EnableHitbox();
     }
 
     public void OnRightHandAttackEnd() {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.TreeAttack, transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.TreeAttack, transform.position);
         RightWeaponHolder.EndAttack();
         RightWeaponHolder.DisableHitbox();
     }
 
     public void OnLeftHandAttackStart() {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.TreeAttackStart, transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.TreeAttackStart, transform.position);
         LeftWeaponHolder.InitializeAttack(AttackType.LIGHT);
         LeftWeaponHolder.BeginAttack();
         LeftWeaponHolder.EnableHitbox();
     }
 
     public void OnLeftHandAttackEnd() {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.TreeAttack, transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.TreeAttack, transform.position);
         LeftWeaponHolder.EndAttack();
         LeftWeaponHolder.DisableHitbox();
     }
 
     public void OnAppearStarted() {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.TreeAppear, transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.TreeAppear, transform.position);
         RealEnt.SetActive(true);
     }
 

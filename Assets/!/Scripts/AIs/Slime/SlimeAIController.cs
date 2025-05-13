@@ -107,7 +107,7 @@ public class SlimeAIController : MonoBehaviour {
 
         _animator.SetTrigger(_jumpAnimationHash);
 
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.SlimeJump, transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.SlimeJump, transform.position);
 
 
 

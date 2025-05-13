@@ -157,7 +157,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
                 _letterInterval = 0.3f;
             }
             else {
-                AudioManager.instance.PlayLetterSound(FMODEvents.instance.TalkingSounds, letter, this.transform.position);
+                AudioManager.Instance.PlayLetterSound(FMODEvents.Instance.TalkingSounds, letter, this.transform.position);
                 _letterInterval = Mathf.Clamp(_textSpeed / _goalString.Length, 0.02f, 0.03f);
 
             }

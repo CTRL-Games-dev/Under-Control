@@ -217,21 +217,21 @@ public class InvTileEquipment : InvTile {
 
     public void PlaceItem(InventoryItem item){
         if (_tileType == TileType.Armor) {
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.EquipArmor, this.transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.Instance.EquipArmor, this.transform.position);
             if(!item.TryAs(out InventoryItem<ArmorItemData> armorItem)) {
                 return;
             }
 
             Player.Inventory.Armor = armorItem;
         } else if (_tileType == TileType.Amulet) {
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.EquipAmulet, this.transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.Instance.EquipAmulet, this.transform.position);
             if(!item.TryAs(out InventoryItem<AmuletItemData> amuletItem)) {
                 return;
             }
 
             Player.Inventory.Amulet = amuletItem;
         } else if (_tileType == TileType.Weapon) {
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.EquipWeapon, this.transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.Instance.EquipWeapon, this.transform.position);
             if(!item.TryAs(out InventoryItem<WeaponItemData> weaponItem)) {
                 return;
             }
@@ -242,7 +242,7 @@ public class InvTileEquipment : InvTile {
 
             Player.Inventory.Weapon = weaponItem;
         } else if (_tileType == TileType.Consumeable1) {
-            AudioManager.instance.PlayOneShot(FMODEvents.instance.EquipItem, this.transform.position);
+            AudioManager.Instance.PlayOneShot(FMODEvents.Instance.EquipItem, this.transform.position);
             if(!item.TryAs(out InventoryItem<ConsumableItemData> consumableItem)) {
                 return;
             }
