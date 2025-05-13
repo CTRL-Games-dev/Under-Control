@@ -93,6 +93,23 @@ public class VektharHand : MonoBehaviour {
         if(Vekthar.attacking) Vekthar.attacking = false;
     }
 
+    public void TriggerAttackSound() {
+        switch (State) {
+            case HandState.Fist:
+                AudioManager.Instance.PlayOneShot(FMODEvents.Instance.Fist, transform.position);
+                break;
+            case HandState.Sandwitch:
+                if(IsLeft) {
+                    AudioManager.Instance.PlayOneShot(FMODEvents.Instance.Clap, transform.position);
+                }
+                
+                break;
+            case HandState.Slam:
+                AudioManager.Instance.PlayOneShot(FMODEvents.Instance.OpenHand, transform.position);
+                break;
+        }
+    }
+
     private void onIdle() {
         Debug.Log("Hand is now idle");
     }

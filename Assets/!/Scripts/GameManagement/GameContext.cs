@@ -14,7 +14,8 @@ public enum Dimension
     VEKTHAR_BOSS,
     ENT_BOSS,
     SLIME_BOSS,
-    CARD_CHOOSE
+    CARD_CHOOSE,
+    TUTORIAL,
 }
 
 // [CreateAssetMenu(fileName = "SO_GameContext", menuName = "GameContext")]

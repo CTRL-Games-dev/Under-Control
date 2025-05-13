@@ -1,10 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
-using System.Collections.Generic;
 using System.Collections;
-using Unity.VisualScripting;
-using JetBrains.Annotations;
 
 public class LoadingScreen : MonoBehaviour
 {
@@ -37,7 +34,7 @@ public class LoadingScreen : MonoBehaviour
     }
 
     public static void LoadScene(string sceneName) {
-        AudioManager.instance.setMusicArea(MusicArea.LOADING);
+        AudioManager.Instance.setMusicArea(MusicArea.LOADING);
         if (IsLoading) return;
         Debug.Log($"Loading scene: {sceneName}");
         // if (sceneName == _currentSceneName) return;
@@ -65,6 +62,8 @@ public class LoadingScreen : MonoBehaviour
     }
 
     private void OnSceneReadyEvent() {
+        Player.Instance.FBXModel.SetActive(true);
+
         Instance._topImgRect.DOComplete();
         Instance._bottomImgRect.DOComplete();
         Instance._topImgRect.DOKill();
@@ -76,7 +75,6 @@ public class LoadingScreen : MonoBehaviour
         Instance._topImgRect.DOAnchorPos(new Vector2(0, 540), 0.7f).SetEase(Ease.InOutSine).SetUpdate(true);
         Instance._bottomImgRect.DOAnchorPos(new Vector2(0, -540), 0.7f).SetEase(Ease.InOutSine).SetUpdate(true).OnComplete(() => {
             IsLoading = false;
-            Player.Instance.FBXModel.SetActive(true);
             Instance._rotatingImgRect.gameObject.SetActive(false);
         });
     }

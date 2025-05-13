@@ -105,16 +105,13 @@ public class VektharBoss : MonoBehaviour {
         switch (attackNumber) {
             case 0:
                 _handRight.Attack(VektharHand.HandState.Fist);
-                AudioManager.instance.PlayOneShot(FMODEvents.instance.Fist, this.transform.position);
             break;
             case 1:
                 _handLeft.Attack(VektharHand.HandState.Sandwitch);
                 _handRight.Attack(VektharHand.HandState.Sandwitch);
-                AudioManager.instance.PlayOneShot(FMODEvents.instance.Clap, this.transform.position);
             break;
             case 2: 
                 _handLeft.Attack(VektharHand.HandState.Slam);
-                AudioManager.instance.PlayOneShot(FMODEvents.instance.OpenHand, this.transform.position);
             break;
         }
 

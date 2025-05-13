@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using FMODUnity;
@@ -7,6 +5,8 @@ using FMOD.Studio;
 
 public class AudioManager : MonoBehaviour
 {
+    public bool DebugMode = false;
+
     private List<EventInstance> eventInstances;
 
     private EventInstance ambientInstance;
@@ -15,19 +15,20 @@ public class AudioManager : MonoBehaviour
 
     private EventInstance attackInstance;
 
-    public static AudioManager instance {get; private set;}
+    public static AudioManager Instance {get; private set;}
+
     private void Awake(){
-        if(instance != null && instance != this){
+        if(Instance != null && Instance != this){
             Destroy(gameObject);
             return;
         }
-        instance = this;
+        Instance = this;
         DontDestroyOnLoad(gameObject);  // make persistent across scenes
         eventInstances = new List<EventInstance>();
     }
 
     private void Start(){
-        InitializeMusic(FMODEvents.instance.MusicPlayer);
+        InitializeMusic(FMODEvents.Instance.MusicPlayer);
     }
 
     private void InitializeMusic(EventReference eventReference){
@@ -44,6 +45,14 @@ public class AudioManager : MonoBehaviour
     }
 
     public void PlayOneShot(EventReference sound, Vector3 position){
+        if(sound.IsNull) {
+            if(DebugMode) {
+                Debug.LogWarning($"Oneshot sound is null: {sound}");
+            }
+            
+            return;
+        }
+
         RuntimeManager.PlayOneShot(sound, position);
     }
 

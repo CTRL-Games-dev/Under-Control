@@ -27,17 +27,17 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private List<ItemData> _starterItems;
     [SerializeField] private CinemachineCamera _staringCamera;
 
-    
     [SerializeField] private TutorialTalkingCanvas _talkingCanvas;
 
     [SerializeField] private List<TutDialogue> _dialogues = new List<TutDialogue>();
 
-
     [SerializeField] private Transform _enemySpawnLocation, _wall;
     [SerializeField] private GameObject _enemyPrefab;
 
+    public Transform PortalWall;
 
     private Dictionary<TutorialState, string> _dialogueDictionary = new Dictionary<TutorialState, string>();
+
     private void Awake() {
         _dialogueDictionary.Clear();
         foreach (var dialogue in _dialogues) {
@@ -47,13 +47,14 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
-
     void Start() {
         _languageChoose.LanguageChooseEvent.AddListener(OnLanguageChooseEvent);
         EventBus.ItemPlacedEvent.AddListener(OnItemPlacedEvent);
 
         Player.Animator.SetTrigger("die");
         CameraManager.SwitchCamera(_staringCamera);
+
+        GameManager.Instance.SetTutorialDimension();
         
 
     }
@@ -99,7 +100,7 @@ public class TutorialManager : MonoBehaviour
             case TutorialState.SwordPickup:
                 _talkingCanvas.StartDialogue(_dialogueDictionary[state]);
                 yield return new WaitForSeconds(1f);
-                ItemEntity weapon = ItemEntity.Spawn(_starterItems[UnityEngine.Random.Range(0, _starterItems.Count -1)], 1, Player.Instance.transform.position + Vector3.up * 2 + Player.Instance.transform.forward * 2, 1, Quaternion.identity)[0];
+                ItemEntity weapon = ItemEntity.Spawn(_starterItems[UnityEngine.Random.Range(0, _starterItems.Count -1)], 1, Player.Instance.transform.position + Vector3.up * 2 + Player.Instance.transform.forward * 2, 0.05f, Quaternion.identity)[0];
                 weapon.PickupItemEvent.AddListener(OnWeaponPickupEvent);
 
                 break;
@@ -118,6 +119,7 @@ public class TutorialManager : MonoBehaviour
 
                 break;
             case TutorialState.GoPortal:
+                PortalWall.DOScaleY(0, 3f).SetEase(Ease.InOutSine);
                 _talkingCanvas.StartDialogue(_dialogueDictionary[state]);
                 yield return new WaitForSeconds(7f);
                 _talkingCanvas.HideUI();

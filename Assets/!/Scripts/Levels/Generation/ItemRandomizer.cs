@@ -41,6 +41,7 @@ public class ItemRandomizer {
         return (UnityEngine.Random.Range(0f, 0.25f) * GameManager.Instance.GetInfluenceModifier()) + 0.75f;
     }
     public static float GetStartPowerScale() {
+        Debug.Log((UnityEngine.Random.Range(0f, 0.25f) * GameManager.Instance.GetInfluenceModifier()) + 0.5f);
         return (UnityEngine.Random.Range(0f, 0.25f) * GameManager.Instance.GetInfluenceModifier()) + 0.5f;
     }
 }

@@ -21,9 +21,9 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private Image _logoImg;
     [SerializeField] private GameObject _generalButton, _audioButton, _videoButton, _controlsButton, _backButton;
 
-    private RectTransform _generalButtonRect, _audioButtonRect, _videoButtonRect, _controlsButtonRect, _backButtonRect;
-    private CanvasGroup _generalButtonCanvasGroup, _audioButtonCanvasGroup, _videoButtonCanvasGroup, _controlsButtonCanvasGroup, _backButtonCanvasGroup;
-    private float _generalButtonStartingY, _audioButtonStartingY, _videoButtonStartingY, _controlsButtonStartingY, _backButtonStartingY;
+    private RectTransform _generalButtonRect, _videoButtonRect, _controlsButtonRect, _backButtonRect;
+    private CanvasGroup _generalButtonCanvasGroup, _videoButtonCanvasGroup, _controlsButtonCanvasGroup, _backButtonCanvasGroup;
+    private float _generalButtonStartingY, _videoButtonStartingY, _controlsButtonStartingY, _backButtonStartingY;
 
     [Header("General")]
     [SerializeField] private GameObject _generalPanel;
@@ -62,19 +62,16 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
         _canvasGroup = GetComponent<CanvasGroup>();
 
         _generalButtonRect = _generalButton.GetComponent<RectTransform>();
-        _audioButtonRect = _audioButton.GetComponent<RectTransform>();
         _videoButtonRect = _videoButton.GetComponent<RectTransform>();
         _controlsButtonRect = _controlsButton.GetComponent<RectTransform>();
         _backButtonRect = _backButton.GetComponent<RectTransform>();
 
         _generalButtonStartingY = _generalButtonRect.anchoredPosition.y;
-        _audioButtonStartingY = _audioButtonRect.anchoredPosition.y;
         _videoButtonStartingY = _videoButtonRect.anchoredPosition.y;
         _controlsButtonStartingY = _controlsButtonRect.anchoredPosition.y;
         _backButtonStartingY = _backButtonRect.anchoredPosition.y;
 
         _generalButtonCanvasGroup = _generalButton.GetComponent<CanvasGroup>();
-        _audioButtonCanvasGroup = _audioButton.GetComponent<CanvasGroup>();
         _videoButtonCanvasGroup = _videoButton.GetComponent<CanvasGroup>();
         _controlsButtonCanvasGroup = _controlsButton.GetComponent<CanvasGroup>();
         _backButtonCanvasGroup = _backButton.GetComponent<CanvasGroup>();
@@ -85,11 +82,7 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
             _generalSettingsCanvasGroups[i] = _generalSettings[i].GetComponent<CanvasGroup>();
         }
 
-        _audioCanvasGroup = _audioPanel.GetComponent<CanvasGroup>();
-        _audioSettingsCanvasGroups = new CanvasGroup[_audioSettings.Length];
-        for (int i = 0; i < _audioSettings.Length; i++) {
-            _audioSettingsCanvasGroups[i] = _audioSettings[i].GetComponent<CanvasGroup>();
-        }
+
 
         _videoCanvasGroup = _videoPanel.GetComponent<CanvasGroup>();
         _videoSettingsCanvasGroups = new CanvasGroup[_videoSettings.Length];
@@ -130,16 +123,14 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
             _logoImg.DOFade(1, 0.15f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
                 _generalButtonRect.DOAnchorPosY(_generalButtonStartingY + 20, moveSpeed).SetEase(ease).SetUpdate(true);
                 _generalButtonCanvasGroup.DOFade(1, fadeSpeed).SetUpdate(true).OnComplete(() => {
-                    _audioButtonRect.DOAnchorPosY(_audioButtonStartingY + 20, moveSpeed).SetEase(ease).SetUpdate(true);
-                    _audioButtonCanvasGroup.DOFade(1, fadeSpeed).SetUpdate(true).OnComplete(() => {
+
                         _videoButtonRect.DOAnchorPosY(_videoButtonStartingY + 20, moveSpeed).SetEase(ease).SetUpdate(true);
-                        _videoButtonCanvasGroup.DOFade(1, fadeSpeed).SetUpdate(true).OnComplete(() => {
-                            _controlsButtonRect.DOAnchorPosY(_controlsButtonStartingY + 20, moveSpeed).SetEase(ease).SetUpdate(true);
-                            _controlsButtonCanvasGroup.DOFade(1, fadeSpeed).SetUpdate(true).OnComplete(() => {
-                                _backButtonRect.DOAnchorPosY(_backButtonStartingY + 20, moveSpeed).SetEase(ease).SetUpdate(true);
-                                _backButtonCanvasGroup.DOFade(1, fadeSpeed).SetUpdate(true).OnComplete(() => {
-                                    openSettingsPanel(_currentState);
-                                });
+                    _videoButtonCanvasGroup.DOFade(1, fadeSpeed).SetUpdate(true).OnComplete(() => {
+                        _controlsButtonRect.DOAnchorPosY(_controlsButtonStartingY + 20, moveSpeed).SetEase(ease).SetUpdate(true);
+                        _controlsButtonCanvasGroup.DOFade(1, fadeSpeed).SetUpdate(true).OnComplete(() => {
+                            _backButtonRect.DOAnchorPosY(_backButtonStartingY + 20, moveSpeed).SetEase(ease).SetUpdate(true);
+                            _backButtonCanvasGroup.DOFade(1, fadeSpeed).SetUpdate(true).OnComplete(() => {
+                                openSettingsPanel(_currentState);
                             });
                         });
                     });
@@ -165,12 +156,10 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
     private void killTweens() {
         _generalButtonRect.DOKill();
-        _audioButtonRect.DOKill();
         _videoButtonRect.DOKill();
         _controlsButtonRect.DOKill();
         _backButtonRect.DOKill();
         _generalButtonCanvasGroup.DOKill();
-        _audioButtonCanvasGroup.DOKill();
         _videoButtonCanvasGroup.DOKill();
         _controlsButtonCanvasGroup.DOKill();
         _backButtonCanvasGroup.DOKill();
@@ -180,7 +169,6 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
     private void resetBtnAlphas() {
         _generalButtonCanvasGroup.alpha = 0;
-        _audioButtonCanvasGroup.alpha = 0;
         _videoButtonCanvasGroup.alpha = 0;
         _controlsButtonCanvasGroup.alpha = 0;
         _backButtonCanvasGroup.alpha = 0;
@@ -188,7 +176,6 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
     private void resetBtnScales() {
         _generalButtonRect.localScale = Vector3.one;
-        _audioButtonRect.localScale = Vector3.one;
         _videoButtonRect.localScale = Vector3.one;
         _controlsButtonRect.localScale = Vector3.one;
         _backButtonRect.localScale = Vector3.one;
@@ -196,14 +183,12 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
     private void resetBtnPositions() {
         _generalButtonRect.anchoredPosition = new Vector2(_generalButtonRect.anchoredPosition.x, _generalButtonStartingY);
-        _audioButtonRect.anchoredPosition = new Vector2(_audioButtonRect.anchoredPosition.x, _audioButtonStartingY);
         _videoButtonRect.anchoredPosition = new Vector2(_videoButtonRect.anchoredPosition.x, _videoButtonStartingY);
         _controlsButtonRect.anchoredPosition = new Vector2(_controlsButtonRect.anchoredPosition.x, _controlsButtonStartingY);
         _backButtonRect.anchoredPosition = new Vector2(_backButtonRect.anchoredPosition.x, _backButtonStartingY);
     }
 
     private void resetPanelAlphas() {
-        _audioCanvasGroup.alpha = 0;
         _videoCanvasGroup.alpha = 0;
         _controlsCanvasGroup.alpha = 0;
     }
@@ -303,7 +288,6 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
         _audioPanel.SetActive(true);
         _audioCanvasGroup.interactable = true;
         _audioCanvasGroup.blocksRaycasts = true;
-        _audioButtonRect.DOScale(1.1f, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
         foreach (var canvasGroup in _audioSettingsCanvasGroups) {
             canvasGroup.alpha = 0;
         }
@@ -341,7 +325,6 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
     private void closeAudioPanel() {
         _audioCanvasGroup.DOKill();
-        _audioButtonRect.DOScale(1, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
         StopCoroutine(fadeInCanvasGroups(_audioSettingsCanvasGroups, 0.2f, 0.1f));
         _audioCanvasGroup.DOFade(0, 0.25f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
             foreach (var canvasGroup in _audioSettingsCanvasGroups) {

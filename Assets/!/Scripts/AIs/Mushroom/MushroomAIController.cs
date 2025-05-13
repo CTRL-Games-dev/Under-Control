@@ -33,7 +33,7 @@ public class MushroomAIController : MonoBehaviour {
     }
 
     public void OnPrimaryAttackAnimationStart() {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.MushAttackStart, this.transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.MushAttackStart, this.transform.position);
         WeaponHolder.InitializeAttack(AttackType.LIGHT);
         WeaponHolder.BeginAttack();
         WeaponHolder.EnableHitbox();
@@ -42,13 +42,13 @@ public class MushroomAIController : MonoBehaviour {
     }
 
     public void OnPrimaryAttackAnimationEnd() {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.MushAttack, this.transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.MushAttack, this.transform.position);
         WeaponHolder.DisableHitbox();
         WeaponHolder.EndAttack();
     }
 
     public void OnSecondaryAttackAnimationStart() {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.MushAttackStart, this.transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.MushAttackStart, this.transform.position);
         if(!_behaviorGraphAgent.GetVariable("Target", out BlackboardVariable<LivingEntity> blackboardTarget)) {
             Debug.LogWarning($"Failed to get target from behavior graph agent");
             return;
@@ -70,7 +70,7 @@ public class MushroomAIController : MonoBehaviour {
     }
 
     public void OnSecondaryAttackAnimationEnd() {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.MushAttack, this.transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.MushAttack, this.transform.position);
         PullVFX.Stop();
                 
         if(_pullTarget == null) return;

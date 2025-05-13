@@ -105,7 +105,6 @@ public class LivingEntity : MonoBehaviour {
         _health = StartingHealth;
         _mana = StartingMana;
         
-
         if (IsPlayer) {
             MaxHealth.OnValueChanged.AddListener(() => Player.UICanvas.HUDCanvas.UpdateHealthBar());
             MaxMana.OnValueChanged.AddListener(() => Player.UICanvas.HUDCanvas.UpdateManaBar());
@@ -114,8 +113,14 @@ public class LivingEntity : MonoBehaviour {
 
     void Update() {
         recheckEffects();
+
         _animator.SetFloat(_movementSpeedHash, MovementSpeed);
+
         if (Health <= 0) {
+            Die();
+        }
+
+        if (transform.position.y < -30) {
             Die();
         }
     }
@@ -135,13 +140,14 @@ public class LivingEntity : MonoBehaviour {
     }
 
     public void Attack(Damage damage, LivingEntity target) {
-        AudioManager.instance.PlayOneShot(OnAttack, transform.position);
+        AudioManager.Instance.PlayOneShot(OnAttack, transform.position);
         target.TakeDamage(damage, this);
     }
 
     public void TakeDamage(Damage damage, LivingEntity source = null) {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.PlayerAttackIndicator, transform.position);
-        AudioManager.instance.PlayOneShot(OnDamageSound, transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.PlayerAttackIndicator, transform.position);
+        AudioManager.Instance.PlayOneShot(OnDamageSound, transform.position);
+
         if (IsPlayer) {
             if (Player.Instance.DamageDisabled) {
                 return;
@@ -227,10 +233,10 @@ public class LivingEntity : MonoBehaviour {
                 }
             }
         } else {
-            AudioManager.instance.PlayOneShot(OnAttack, transform.position);
+            AudioManager.Instance.PlayOneShot(OnAttack, transform.position);
         }
 
-        AudioManager.instance.PlayOneShot(OnDeathSound, transform.position);
+        AudioManager.Instance.PlayOneShot(OnDeathSound, transform.position);
 
         OnDeath?.Invoke();
 

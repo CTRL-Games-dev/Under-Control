@@ -337,4 +337,11 @@ public class GameManager : MonoBehaviour {
         public float InfluenceDelta;
     }
     #endregion
+
+    public void SetTutorialDimension() {
+        CurrentDimension = Dimension.TUTORIAL;
+        InfluenceDelta = 0;
+        TotalInfluence = 0;
+        LevelDepth = 0;
+    }
 }

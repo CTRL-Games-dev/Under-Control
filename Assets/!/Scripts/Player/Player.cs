@@ -266,7 +266,7 @@ public class Player : MonoBehaviour {
     }
 
     void Start() {
-        _PlayerWalkSound = AudioManager.instance.CreateEventInstance(FMODEvents.instance.PlayerWalkSound);
+        _PlayerWalkSound = AudioManager.Instance.CreateEventInstance(FMODEvents.Instance.PlayerWalkSound);
         if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
             WeaponHolder.UpdateWeapon(CurrentWeapon);
         }
@@ -416,12 +416,12 @@ void Update() {
     }
 
     private void onStunned(float duration) {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.playerStunnedIndicator, transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.playerStunnedIndicator, transform.position);
         CameraManager.ShakeCamera(2, duration);
     }
     
     private void onDamageTaken(DamageTakenEventData _) {
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.PlayerHitIndicator, transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.PlayerHitIndicator, transform.position);
         FaceAnimator.StartAnimation("HURT", 0.3f);
         CameraManager.ShakeCamera(0.7f, 0.1f);
 
@@ -575,7 +575,7 @@ void Update() {
 
         foreach (ParticleSystem trail in _trailParticles) { trail.Play(); }
         Debug.Log(transform.position);
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.PlayerDashSound, transform.position);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.PlayerDashSound, transform.position);
         CurrentAnimationState = AnimationState.Dash;
 
         
@@ -802,7 +802,6 @@ void Update() {
                 WeaponHolder.DisableHitbox();
                 SlashManager.DisableSlash();
                 WeaponHolder.EndAttack();
-                _isAttacking = false;
                 break;
 
             case AnimationState.Attack_Recovery:
@@ -841,7 +840,7 @@ void Update() {
 
                 WeaponHolder.InitializeAttack(_attackType.Value, isPlayerAttackPaid);
                 WeaponHolder.BeginAttack();
-                AudioManager.instance.PlayAttackSound(FMODEvents.instance.PlayerAttack, this.transform.position, CurrentWeapon.ItemData.WeaponType);
+                AudioManager.Instance.PlayAttackSound(FMODEvents.Instance.PlayerAttack, this.transform.position, CurrentWeapon.ItemData.WeaponType);
                 LockRotation = true;
                 _isAttacking = true;
                 _currentSpeed = 0;
@@ -851,7 +850,7 @@ void Update() {
                 break;
 
             case AnimationState.Attack_Contact:
-                AudioManager.instance.PlayAttackSound(FMODEvents.instance.AttackContact, this.transform.position, CurrentWeapon.ItemData.WeaponType);
+                AudioManager.Instance.PlayAttackSound(FMODEvents.Instance.AttackContact, this.transform.position, CurrentWeapon.ItemData.WeaponType);
                 WeaponHolder.EnableHitbox();
                 break;
 
@@ -999,7 +998,13 @@ void Update() {
          
     }
     public bool BuyFishingRod(Transform t){
-        ItemEntity.SpawnThrownRelative(_fishingRod, 1, t.position, 1, t.rotation, Vector3.forward * 3);
+        if (Coins < 150) return false;
+        Coins -= 150;
+
+        Inventory.AddItem(_fishingRod, 1, 1);
+
+        GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
+
         return true;
     }
 
@@ -1027,8 +1032,8 @@ void Update() {
 
 
     public void PlayRespawnAnimation() {
-        AudioManager.instance.setMusicArea(MusicArea.HUB);
-        AudioManager.instance.PlayOneShot(FMODEvents.instance.RespawnSound, this.transform.position);
+        AudioManager.Instance.setMusicArea(MusicArea.HUB);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.RespawnSound, this.transform.position);
         Animator.animatePhysics = false;
         UpdateDisabled = true;
         transform.position = StartPosition - Vector3.up * 3f;
