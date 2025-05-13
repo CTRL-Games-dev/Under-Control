@@ -802,7 +802,6 @@ void Update() {
                 WeaponHolder.DisableHitbox();
                 SlashManager.DisableSlash();
                 WeaponHolder.EndAttack();
-                _isAttacking = false;
                 break;
 
             case AnimationState.Attack_Recovery:
