@@ -201,6 +201,11 @@ public class WeaponHolder : MonoBehaviour {
             damageValue = Self.ModifierSystem.CalculateForStatType(StatType.HEAVY_ATTACK_DAMAGE, damageValue);
         }
 
+        IAttackAddon[] attackAddons = _currentWeaponHitter.GetComponents<IAttackAddon>();
+        foreach(IAttackAddon addon in attackAddons) {
+            addon.OnHit(victim);
+        }
+
         Self.Attack(new Damage{
             Type = _currentWeaponData.DamageType,
             Value = damageValue
