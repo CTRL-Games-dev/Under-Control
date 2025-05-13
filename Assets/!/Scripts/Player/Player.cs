@@ -998,6 +998,9 @@ void Update() {
          
     }
     public bool BuyFishingRod(Transform t){
+        if (Coins < 150) return false;
+        Coins -= 150;
+
         Inventory.AddItem(_fishingRod, 1, 1);
 
         GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
