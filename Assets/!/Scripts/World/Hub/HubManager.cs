@@ -1,6 +1,5 @@
 using Unity.Cinemachine;
 using UnityEngine;
-using DG.Tweening;
 
 public class HubManager : MonoBehaviour
 {

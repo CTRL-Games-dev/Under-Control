@@ -19,7 +19,6 @@ public class VektharControlManager : MonoBehaviour
     public StunEffect StunEffectData;
     public static VektharControlManager Instance; 
     [SerializeField] private ControlManagerState _state;
-    private Volume _globalVolume;
     private IEnumerator _currentCoroutine;
     void Awake() {
         if(Instance == null) {
@@ -28,7 +27,7 @@ public class VektharControlManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    public UnityEngine.Rendering.Volume globalVolume;
+    public UnityEngine.Rendering.Volume _globalVolume;
     void Start() {
         _globalVolume = FindAnyObjectByType<Volume>();
     }
@@ -37,13 +36,13 @@ public class VektharControlManager : MonoBehaviour
             case ControlManagerState.Stopped: break;
             case ControlManagerState.Running: {
                 if(_currentCoroutine != null) return;
-                if(getEffectChange() > 0) return;
+                if(getEffectChance() < 0) return;
                 _currentCoroutine = scheduleNewEffect(15);
                 StartCoroutine(_currentCoroutine);
             } break;
         }
     }
-    private float getEffectChange() {
+    private float getEffectChance() {
         float influence = GameManager.Instance.TotalInfluence;
         float chance = (influence-30) / (100 - 30);
         return chance;
@@ -58,13 +57,16 @@ public class VektharControlManager : MonoBehaviour
         Debug.Log("Applying new effect");
         _currentCoroutine = null;
 
-        if(UnityEngine.Random.Range(0f, 1f) > getEffectChange()) return;
+        if(UnityEngine.Random.Range(0f, 1f) > getEffectChance()) return;
 
-        int effectIndex = UnityEngine.Random.Range(0, 3);
+        int effectIndex = UnityEngine.Random.Range(0, 2);
+
+        Debug.Log($"Applying effect {effectIndex}");
+
         switch(effectIndex) {
             case 0: _blurEffect(); break;
             case 1: _stunEffect(); break;
-            case 2: _invertEffect(); break;
+            // case 2: _invertEffect(); break;
         }
 
         PlayAnimation();
@@ -72,7 +74,7 @@ public class VektharControlManager : MonoBehaviour
 
     private void _blurEffect() {
         Debug.Log("Applying effect: Blur");
-        if (globalVolume.profile.TryGet<LensDistortion>(out var lensDistortion))
+        if (_globalVolume.profile.TryGet<LensDistortion>(out var lensDistortion))
         {
             float intensity = 0f;
             DOTween.To(() => intensity, x => intensity = x, 0.5f, 0.25f).OnUpdate(() => {
