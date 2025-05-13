@@ -8,6 +8,7 @@ public class FireballSpell : Spell {
     public override void Cast() {}
 
     public override void OnCastReady() {
+        
         Player.Instance.StartCoroutine(castOnTheEndOfFrame());
     }
 

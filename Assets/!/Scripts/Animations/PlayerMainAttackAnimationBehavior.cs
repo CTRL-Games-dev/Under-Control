@@ -9,7 +9,7 @@ public class PlayerMainAttackAnimationBehavior : StateMachineBehaviour {
 
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
         if(_isAttacking) return;
-        if(_maxLayerIndex != -1) return;
+        if(stateInfo.fullPathHash == Animator.StringToHash("attack_heavy")) return;
 
         animator.SendMessage("OnAttackAnimationStart", AttackType);
         _isAttacking = true;

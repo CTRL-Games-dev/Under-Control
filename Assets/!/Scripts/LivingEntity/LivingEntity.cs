@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using FMODUnity;
 using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(ModifierSystem))]
 [RequireComponent(typeof(EntityInventory))]
-[RequireComponent(typeof(HitFlashAnimator))]
 [RequireComponent(typeof(TintAnimator))]
 public class LivingEntity : MonoBehaviour {
     public struct EffectData {
@@ -15,10 +15,15 @@ public class LivingEntity : MonoBehaviour {
 
     [Header("Properties")]
     public string DisplayName;
+
+    [SerializeField]
     public Guild Guild;
+
     public bool DropItemsOnDeath = true;
     public bool DestroyOnDeath = true;
     public bool IsInvisible = false;
+    public bool IsBoss = false;
+    public bool AvoidGuildChange = false;
 
     public string DebugName => $"{DisplayName} ({Guild.Name} {gameObject.name})";
 
@@ -32,7 +37,7 @@ public class LivingEntity : MonoBehaviour {
         get => _health;
         set {
             _health = value;
-            if (_isPlayer) Player.UICanvas.HUDCanvas.UpdateHealthBar();
+            if (IsPlayer) Player.UICanvas.HUDCanvas.UpdateHealthBar();
         }
     }
    
@@ -42,19 +47,21 @@ public class LivingEntity : MonoBehaviour {
         get => _mana;
         set {
             _mana = value;
-            if (_isPlayer) Player.UICanvas.HUDCanvas.UpdateManaBar();
+            if (IsPlayer) Player.UICanvas.HUDCanvas.UpdateManaBar();
         }
     }
    
-    public Stat MaxHealth = new Stat(StatType.MAX_HEALTH, 100);
-    public Stat Armor = new Stat(StatType.ARMOR, 0);
-    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 1);
-    public Stat MaxMana = new Stat(StatType.MAX_MANA, 100f);
+    public Stat MaxHealth = new Stat(StatType.MAX_HEALTH);
+    public DynamicStat Armor = new DynamicStat(StatType.ARMOR);
+    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED);
+    public Stat MaxMana = new Stat(StatType.MAX_MANA);
+
     [Header("Sounds")]
-    public AudioClip OnDeathSound;
-    public AudioClip OnDamageSound;
-    public AudioClip OnAttack;
-    public AudioClip[] IdleSounds;
+    public EventReference OnDeathSound;
+    public EventReference OnDamageSound;
+    public EventReference OnAttack;
+    public EventReference IdleSounds;
+    
 
     [Header("Events")]
     public UnityEvent OnDeath;
@@ -68,20 +75,25 @@ public class LivingEntity : MonoBehaviour {
         private set { _activeEffects = value; }
     }
 
+    public bool HasDied = false;
+
     private readonly int _hurtHash = Animator.StringToHash("hurt");
+    private readonly int _movementSpeedHash = Animator.StringToHash("movement_speed");
 
     // References
     public ModifierSystem ModifierSystem { get; private set; }
     public EntityInventory Inventory { get; private set; }
-    public HitFlashAnimator HitFlashAnimator { get; private set; }
     public TintAnimator TintAnimator { get; private set; }
+    private Animator _animator;
 
-    public bool _isPlayer = false;
+    [SerializeField, HideInInspector]
+    private bool _isPlayer = false;
+    public bool IsPlayer { get => _isPlayer; private set => _isPlayer = value; }
 
     void Awake() {
+        _animator = GetComponent<Animator>();
         ModifierSystem = GetComponent<ModifierSystem>();
         Inventory = GetComponent<EntityInventory>();
-        HitFlashAnimator = GetComponent<HitFlashAnimator>();
         TintAnimator = GetComponent<TintAnimator>();
 
         ModifierSystem.RegisterStat(ref MaxHealth);
@@ -89,11 +101,12 @@ public class LivingEntity : MonoBehaviour {
         ModifierSystem.RegisterStat(ref MovementSpeed);
         ModifierSystem.RegisterStat(ref MaxMana);
  
-        _isPlayer = gameObject.GetComponent<Player>() != null;
+        IsPlayer = gameObject.GetComponent<Player>() != null;
         _health = StartingHealth;
         _mana = StartingMana;
+        
 
-        if (_isPlayer) {
+        if (IsPlayer) {
             MaxHealth.OnValueChanged.AddListener(() => Player.UICanvas.HUDCanvas.UpdateHealthBar());
             MaxMana.OnValueChanged.AddListener(() => Player.UICanvas.HUDCanvas.UpdateManaBar());
         }
@@ -101,7 +114,7 @@ public class LivingEntity : MonoBehaviour {
 
     void Update() {
         recheckEffects();
-
+        _animator.SetFloat(_movementSpeedHash, MovementSpeed);
         if (Health <= 0) {
             Die();
         }
@@ -122,12 +135,14 @@ public class LivingEntity : MonoBehaviour {
     }
 
     public void Attack(Damage damage, LivingEntity target) {
+        AudioManager.instance.PlayOneShot(OnAttack, transform.position);
         target.TakeDamage(damage, this);
     }
 
     public void TakeDamage(Damage damage, LivingEntity source = null) {
-
-        if (_isPlayer) {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.PlayerAttackIndicator, transform.position);
+        AudioManager.instance.PlayOneShot(OnDamageSound, transform.position);
+        if (IsPlayer) {
             if (Player.Instance.DamageDisabled) {
                 return;
             }
@@ -136,7 +151,6 @@ public class LivingEntity : MonoBehaviour {
         if (gameObject.CompareTag("Boar")) {
             gameObject.GetComponent<Animator>()?.SetTrigger(_hurtHash);
         }
-
 
         // Check if entity is dead
         if(Health == 0) {
@@ -154,8 +168,9 @@ public class LivingEntity : MonoBehaviour {
             Debug.LogWarning($"Resistance for damage type {damage.Type} is greater than 1. Resistance is floored to 1. Resistance is {resistance}");
             resistance = 1;
         }
-
+        Debug.Log("Pre mitigation damage: " + desiredDamageAmount);
         desiredDamageAmount *= 1 - resistance;
+        Debug.Log("Post mitigation damage: " + desiredDamageAmount);
 
         float actualDamageAmount = desiredDamageAmount;
         if(actualDamageAmount > Health) {
@@ -172,7 +187,7 @@ public class LivingEntity : MonoBehaviour {
             Victim = this
         });
 
-        HitFlashAnimator.Flash();
+        TintAnimator.HitTint();
 
         if (Health == 0) {
             Die();
@@ -180,6 +195,11 @@ public class LivingEntity : MonoBehaviour {
     }
     
     public void Die() {
+        if (HasDied) return;
+        HasDied = true;
+
+        if (IsBoss) GameManager.Instance.BossesDefeated++;
+
         // Drop items
         if(DropItemsOnDeath) {
             // Drop common slots
@@ -201,35 +221,28 @@ public class LivingEntity : MonoBehaviour {
                     humanoidInventory.Amulet = null;
                 }
 
-                    if(humanoidInventory.Weapon != null) {
-                        dropItem(humanoidInventory.Weapon);
-                        humanoidInventory.Weapon = null;
-                    }
+                if(humanoidInventory.Weapon != null) {
+                    dropItem(humanoidInventory.Weapon);
+                    humanoidInventory.Weapon = null;
                 }
-            
-
-            if(OnDeathSound!=null) SoundFXManager.Instance.PlaySoundFXClip(OnDeathSound, transform, 0.4f);
-
-            OnDeath?.Invoke();
-
-            if (DestroyOnDeath) Destroy(gameObject);
+            }
+        } else {
+            AudioManager.instance.PlayOneShot(OnAttack, transform.position);
         }
-        else {
-            AudioClip hitSound = Resources.Load("SFX/uderzenie") as AudioClip; //hitsound
-            SoundFXManager.Instance.PlaySoundFXClip(hitSound, transform, 0.7f);
-        }
+
+        AudioManager.instance.PlayOneShot(OnDeathSound, transform.position);
+
+        OnDeath?.Invoke();
+
+        if (DestroyOnDeath) Destroy(gameObject);
     }
 
     private float getDamageResistance(DamageType damageType) {
-        if(Inventory is not HumanoidInventory humanoidInventory) return 0;
-        var armor = humanoidInventory.Armor;
-        if(armor == null) return 0;
-
-        float resistanceValue = armor.ItemData?.DamageResistances.Where(x => x.DamageType == damageType).Sum(x => x.Resistance * armor.PowerScale) ?? 0;
+        float resistanceValue = 100/(100 + Armor.Adjusted);
         
         resistanceValue = resistanceValue < 0 ? 0 : resistanceValue;
         resistanceValue = resistanceValue > 90 ? 90 : resistanceValue;
-        return resistanceValue;
+        return 1 - resistanceValue;
     }
 
     #region Effects
@@ -272,8 +285,6 @@ public class LivingEntity : MonoBehaviour {
     public List<EffectData> GetActiveEffects() {
         return ActiveEffects;
     }
-
-    
 
     // public void RemoveAllEffectsLike(Effect effect) {
     //     for(int i = 0; i < activeEffects.Count; i++) {

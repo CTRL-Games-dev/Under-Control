@@ -1,11 +1,16 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
+using Unity.Behavior;
 using Unity.Cinemachine;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using FMOD.Studio;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Animator))]
@@ -38,22 +43,22 @@ public class Player : MonoBehaviour {
     public Stat MaxHealth => LivingEntity.MaxHealth;
     public Stat MaxMana => LivingEntity.MaxMana;
     public float Mana => LivingEntity.Mana;
-    public Stat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL, 0);
-    public Stat Armor = new Stat(StatType.ARMOR, 0f);
+    public Stat VekhtarControl = new DynamicStat(StatType.VEKTHAR_CONTROL);
+    public DynamicStat Armor => LivingEntity.Armor;
 
     // public Stat LightAttackDamage = new Stat(StatType.LIGHT_ATTACK_DAMAGE, 10f);
-    public Stat LightAttackSpeed = new Stat(StatType.LIGHT_ATTACK_SPEED, 1f);
+    public Stat LightAttackSpeed = new Stat(StatType.LIGHT_ATTACK_SPEED);
     // public Stat LightAttackRange = new Stat(StatType.LIGHT_ATTACK_RANGE, 1f);
 
     // public Stat HeavyAttackDamage = new Stat(StatType.HEAVY_ATTACK_DAMAGE, 20f);
-    public Stat HeavyAttackSpeed = new Stat(StatType.HEAVY_ATTACK_SPEED, 1f);
+    public Stat HeavyAttackSpeed = new Stat(StatType.HEAVY_ATTACK_SPEED);
     // public Stat HeavyAttackRange = new Stat(StatType.HEAVY_ATTACK_RANGE, 1f);
 
-    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED, 10f);
+    public Stat MovementSpeed = new Stat(StatType.MOVEMENT_SPEED);
 
-    public Stat DashSpeedMultiplier = new Stat(StatType.DASH_SPEED_MULTIPLIER, 2f);
-    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN, 3f);
-    public Stat DashDuration = new Stat(StatType.DASH_COOLDOWN, 0.3f);
+    public Stat DashSpeedMultiplier = new Stat(StatType.DASH_SPEED_MULTIPLIER);
+    public Stat DashCooldown = new Stat(StatType.DASH_COOLDOWN);
+    public Stat DashDuration = new Stat(StatType.DASH_COOLDOWN);
 
     // Coins
     [SerializeField] private int _coins = 100;
@@ -66,6 +71,7 @@ public class Player : MonoBehaviour {
     }
     [Header("Sound effects")]
     AudioClip OnDashSound;
+
     [Header("Properties")]
     [SerializeField] private float _acceleration = 8f;
     [SerializeField] private float _deceleration = 4f;
@@ -86,6 +92,11 @@ public class Player : MonoBehaviour {
     public Camera MainCamera;
     public bool InputDisabled = true;
     public bool DamageDisabled = false;
+    [SerializeField] private Material _dissolveMaterial;
+    public Vector3 StartPosition;
+
+    //Audio
+    private EventInstance _PlayerWalkSound;
 
     private int _evolutionPoints = 0;
     public int EvolutionPoints {
@@ -96,7 +107,19 @@ public class Player : MonoBehaviour {
         }
     }
 
+    private AttackType? _attackType;
+
     public List<EvoUI> SelectedEvolutions;
+
+    [Header("Fishing")]
+    public bool CanFish = false;
+    public bool FishCatchWindow = false;
+    [SerializeField] private WeaponItemData _fishingRod;
+    public Transform FishingBone;
+    public float FishingForce = 1;
+    public int AvailableFish = 0;
+    [SerializeField] private GameObject _bobberPrefab;
+    [SerializeField] private GameObject _currentBobber;
 
     [Header("Spells")]
     [SerializeField]
@@ -105,7 +128,7 @@ public class Player : MonoBehaviour {
         get => _spellDataOne.Spell;
         set {
             _spellDataOne.Spell = value;
-            // _spellDataOne.Cooldown = new Cooldown(value.CooldownTime); 
+            _spellDataOne.Cooldown = value == null ? null : new Cooldown(value.CooldownTime); 
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -116,7 +139,7 @@ public class Player : MonoBehaviour {
         get => _spellDataTwo.Spell;
         set {
             _spellDataTwo.Spell = value;
-            // _spellDataTwo.Cooldown = new Cooldown(value.CooldownTime);
+            _spellDataTwo.Cooldown = value == null ? null : new Cooldown(value.CooldownTime);
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -127,7 +150,7 @@ public class Player : MonoBehaviour {
         get => _spellDataThree.Spell;
         set {
             _spellDataThree.Spell = value;
-            // _spellDataThree.Cooldown = new Cooldown(value.CooldownTime);
+            _spellDataThree.Cooldown = value == null ? null : new Cooldown(value.CooldownTime);
             UICanvas.HUDCanvas.UpdateSpellSlots();
         }
     }
@@ -140,8 +163,9 @@ public class Player : MonoBehaviour {
     public Cooldown ConsumableCooldown = new Cooldown(0.5f);
 
     [Header("Weapon")]
-    public WeaponHolder WeaponHolder;
+    public PlayerWeaponHolder WeaponHolder;
     public InventoryItem<WeaponItemData> CurrentWeapon { get => Inventory.Weapon; }
+    public InventoryItem<ArmorItemData> CurrentArmor { get => Inventory.Armor; }
 
     private bool _isAttacking = false;
     public bool LockRotation = false;
@@ -156,12 +180,14 @@ public class Player : MonoBehaviour {
     public UnityEvent<EvoUI> OnEvolutionSelected = new();
     public UnityEvent<int> CoinsChangeEvent;
     public UnityEvent UpdateConsumablesEvent;
+    public UnityEvent FishCaughtEvent;
     public float CameraDistance { get => CinemachinePositionComposer.CameraDistance; set => CinemachinePositionComposer.CameraDistance = value; }
 
     // State
     private Vector2 _movementInputVector = Vector2.zero;
     private InteractionType? _queuedInteraction;
     private Cooldown _dashCooldown = new Cooldown(0);
+    public bool InvertedControls = false;
 
     private List<Modifier> _currentRingModifiers;
     private List<Modifier> _currentAmuletModifiers;
@@ -178,7 +204,10 @@ public class Player : MonoBehaviour {
     [Header("References")]
     [SerializeField] private UICanvas _uiCanvas;
     [SerializeField] private ParticleSystem[] _trailParticles;
-    public GameObject FBXModel;
+    [SerializeField] public GameObject FBXModel;
+    public GameObject  FishingRod;
+    [SerializeField] private SkinnedMeshRenderer _pauldronRenderer;
+    [SerializeField] private Material _defaultPauldronMaterial;
 
     // Static reference getters
     public static LivingEntity LivingEntity { get; private set; }
@@ -191,6 +220,8 @@ public class Player : MonoBehaviour {
     public static HumanoidInventory Inventory => LivingEntity.Inventory as HumanoidInventory;
 
     [SerializeField] private LayerMask _groundLayerMask;
+    private Knockback _knockback;
+    private LayerMask _interactionMask;
     public FaceAnimator FaceAnimator;
     public AnimationState CurrentAnimationState = AnimationState.Locomotion;
     public InputActionAsset actions;
@@ -211,30 +242,31 @@ public class Player : MonoBehaviour {
         Animator = GetComponent<Animator>();
         CinemachinePositionComposer = CinemachineObject.GetComponent<CinemachinePositionComposer>();
         SpellSpawner = GetComponentInChildren<SpellSpawner>();
+        _knockback = GetComponent<Knockback>();
 
         Instance = this;
 
         LivingEntity.OnDeath.AddListener(onDeath);
         LivingEntity.OnStunned.AddListener(onStunned);
+        LivingEntity.OnDamageTaken.AddListener(onDamageTaken);
+        EventBus.ItemPlacedEvent.AddListener(UpdateEquipment);
         
         CameraDistance = MinCameraDistance;
 
         registerStats();
 
-        OnEvolutionSelected.AddListener((evoUI) => {
-            foreach (Modifier modifier in evoUI.GetModifiers()) {
-                LivingEntity.ApplyIndefiniteModifier(modifier);
-            }
-        });
+        StartPosition = transform.position;
 
-        LivingEntity.OnDamageTaken.AddListener((data) => {
-            CameraManager.ShakeCamera(2, 0.1f);
-        });
+        OnEvolutionSelected.AddListener(x => ApplyEvolution(x));
+
+ 
+        _interactionMask |= 1 << LayerMask.NameToLayer("Interactable");
 
         // LoadKeybinds();
     }
 
     void Start() {
+        _PlayerWalkSound = AudioManager.instance.CreateEventInstance(FMODEvents.instance.PlayerWalkSound);
         if (CurrentWeapon.ItemData != null && CurrentWeapon != null) {
             WeaponHolder.UpdateWeapon(CurrentWeapon);
         }
@@ -255,29 +287,46 @@ public class Player : MonoBehaviour {
                 }
             }
         });
-        OnDashSound =  Resources.Load("SFX/bohater/dash") as AudioClip;
+        
+
 
         ResetRun();
-        // ResetRun();
     }
 
-    void Update() {
-        if (UpdateDisabled) return;
+void Update() {
+    if (UpdateDisabled) return;
 
-        handleInteraction();
-        handleRotation();
+    handleInteraction();
+    handleRotation();
 
-        _currentSpeed = Mathf.MoveTowards(_currentSpeed, getGoalSpeed(), getSpeedChange() * Time.deltaTime);
-        CharacterController.SimpleMove(getGoalDirection() * _currentSpeed);
+    _currentSpeed = Mathf.MoveTowards(_currentSpeed, getGoalSpeed(), getSpeedChange() * Time.deltaTime);
+    CharacterController.SimpleMove(getGoalDirection() * _currentSpeed);
+
+    if (_PlayerWalkSound.isValid()) {
+        _PlayerWalkSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(transform.position));
+
+        FMOD.Studio.PLAYBACK_STATE playbackState;
+        _PlayerWalkSound.getPlaybackState(out playbackState);
+
+        if (_currentSpeed > 0.1f) {
+            if (playbackState == FMOD.Studio.PLAYBACK_STATE.STOPPED || playbackState == FMOD.Studio.PLAYBACK_STATE.STOPPING) {
+                _PlayerWalkSound.start();
+            }
+        } else {
+            if (playbackState == FMOD.Studio.PLAYBACK_STATE.PLAYING) {
+                _PlayerWalkSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            }
+        }
     }
+}
 
     void FixedUpdate() {
         // Magiczna liczba to predkosc animacji biegu
-        Animator.SetFloat(_speedHash, _currentSpeed / Instance.MovementSpeed);
-        Animator.SetFloat(_lightAttackSpeedHash, Instance.LightAttackSpeed);
-        Animator.SetFloat(_heavyAttackSpeedHash, Instance.HeavyAttackSpeed);
-
+        Animator.SetFloat(_speedHash, _currentSpeed / MovementSpeed);
+        Animator.SetFloat(_lightAttackSpeedHash, LightAttackSpeed);
+        Animator.SetFloat(_heavyAttackSpeedHash, HeavyAttackSpeed);
         ModifierSystem.GetActiveModifiers();
+
     }
 
     #endregion
@@ -306,13 +355,13 @@ public class Player : MonoBehaviour {
         switch (CurrentAnimationState) {
             case AnimationState.Dash:
             case AnimationState.Attack_Windup:
-                if (_queuedRotation == Vector3.zero) return transform.forward;
-                Vector3 dir = _queuedRotation;
-                _queuedRotation = Vector3.zero;
-                return dir.normalized;
+                // if (_queuedRotation == Vector3.zero) return transform.forward;
+                // Vector3 dir = _queuedRotation;
+                // _queuedRotation = Vector3.zero;
+                // return dir.normalized;
             case AnimationState.Attack_Contact:
             case AnimationState.Attack_ComboWindow:
-                return transform.forward;
+                // return transform.forward;
 
             case AnimationState.Locomotion:
             case AnimationState.Attack_Recovery:
@@ -353,6 +402,9 @@ public class Player : MonoBehaviour {
 
     private void onDeath() {
         if (HasPlayerDied) return;
+        Debug.Log("Player died");
+        UICanvas.HUDCanvas.HideBossBar();   
+        _knockback.Reset();
         GameManager.Instance.ShowMainMenu = false;
         HasPlayerDied = true;
         SlashManager.DisableSlash();
@@ -364,7 +416,15 @@ public class Player : MonoBehaviour {
     }
 
     private void onStunned(float duration) {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.playerStunnedIndicator, transform.position);
         CameraManager.ShakeCamera(2, duration);
+    }
+    
+    private void onDamageTaken(DamageTakenEventData _) {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.PlayerHitIndicator, transform.position);
+        FaceAnimator.StartAnimation("HURT", 0.3f);
+        CameraManager.ShakeCamera(0.7f, 0.1f);
+
     }
 
     
@@ -392,44 +452,33 @@ public class Player : MonoBehaviour {
     }
 
     void OnUseConsumableOne(InputValue value) {
-        if(ConsumableItemOne == null) return;
-        if(!ConsumableCooldown.Execute()) return;
-        if(ConsumableItemOne.Amount <= 0) return;
-
-        ConsumableItemData c =  ConsumableItemOne.ItemData;
-
-        if(c == null) return;
-        c.Consume(LivingEntity);
-        ConsumableItemOne.Amount--;
-
-        if (ConsumableItemOne.Amount <= 0) {
-            ConsumableItemOne = null;
-        }
-
-        UICanvas.HUDCanvas.UseConsumable1();
-        UpdateConsumablesEvent?.Invoke();
+        useConsumable(ref ConsumableItemOne, 1);
     }
 
     void OnUseConsumableTwo(InputValue value) {
-        if(ConsumableItemTwo == null) return;
+        useConsumable(ref ConsumableItemTwo, 2);
+    }
+    private void useConsumable(ref InventoryItem<ConsumableItemData> consumable, int slotIndex) {
+        if(consumable == null) return;
         if(!ConsumableCooldown.Execute()) return;
-        if(ConsumableItemTwo.Amount <= 0) return;
+        if(consumable.Amount <= 0) return;
 
-        ConsumableItemData c =  ConsumableItemTwo.ItemData as ConsumableItemData;
+        ConsumableItemData c =  consumable.ItemData as ConsumableItemData;
         
         if(c == null) return;
-        c.Consume(LivingEntity);
-        ConsumableItemTwo.Amount--;
-        if (ConsumableItemTwo.Amount <= 0) {
-            ConsumableItemTwo = null;
+        if(!c.Consume(LivingEntity)) return;
+        consumable.Amount--;
+        if (consumable.Amount <= 0) {
+            consumable = null;
         }
 
-        UICanvas.HUDCanvas.UseConsumable2();
+        UICanvas.HUDCanvas.UseConsumable(slotIndex);
         UpdateConsumablesEvent?.Invoke();
     }
 
     void OnMove(InputValue value) {
         _movementInputVector = value.Get<Vector2>();
+        _movementInputVector *= (InvertedControls ? -1 : 1);
     }
 
     void OnLook(InputValue value) {
@@ -470,6 +519,15 @@ public class Player : MonoBehaviour {
     void OnSecondaryInteraction(InputValue value) {
         _queuedInteraction = InteractionType.Secondary;
     }
+    void OnKeyboardInteraction(InputValue value){
+        if(UICanvas.CurrentUIMiddleState != UIMiddleState.NotVisible || UICanvas.CurrentUITopState != UITopState.NotVisible || UICanvas.CurrentUIBottomState != UIBottomState.HUD) return;
+        if(InputDisabled) return;
+        Collider[] colliders = Physics.OverlapSphere(transform.position,MaxInteractionRange, _interactionMask);
+        if (colliders.Length == 0) return;
+        colliders = colliders.OrderBy(x => Vector3.Distance(transform.position, x.gameObject.transform.position)).ToArray();
+        IInteractable closestInteractable = colliders[0].GetComponent<IInteractable>();
+        closestInteractable?.Interact();
+    }
 
     void OnScrollWheel(InputValue value) {
         var delta = value.Get<Vector2>();
@@ -496,7 +554,6 @@ public class Player : MonoBehaviour {
 
     void OnDodge() {
         if (_isAttacking || InputDisabled) return;
-
         _dashCooldown.CooldownTime = DashCooldown;
         
         if (!_dashCooldown.Execute()) {
@@ -513,31 +570,15 @@ public class Player : MonoBehaviour {
         }
         
         Animator.speed = 0;
-        // Animator.applyRootMotion = false;
         Animator.SetBool(_lightAttackHash, false);
         Animator.SetBool(_heavyAttackHash, false);
 
         foreach (ParticleSystem trail in _trailParticles) { trail.Play(); }
-
+        Debug.Log(transform.position);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.PlayerDashSound, transform.position);
         CurrentAnimationState = AnimationState.Dash;
-        SoundFXManager.Instance.PlaySoundFXClip(OnDashSound, transform,1.2f);
+
         
-
-        // UpdateDisabled = true;
-        // Animator.animatePhysics = false;
-
-        // Instance.transform.DOMove(transform.position + transform.forward * Instance.DashDistance, Instance.DashSpeed).SetEase(Ease.OutQuint).OnComplete(() => {
-        //     // Animator.applyRootMotion = true;
-        //     Animator.animatePhysics = true;
-        //     UpdateDisabled = false;
-        //     Animator.speed = 1;
-        //     DamageDisabled = false;
-        //     LockRotation = false;
-        //     foreach (ParticleSystem trail in _trailParticles) {
-        //         trail.Clear();
-        //         trail.Stop();
-        //     }
-        // }
         Invoke(nameof(endDash), DashDuration);
     }
 
@@ -557,6 +598,10 @@ public class Player : MonoBehaviour {
     // przeniesc do save systemu 
 
     public void OnEnable() {
+    if (_PlayerWalkSound.isValid())
+{
+        _PlayerWalkSound.release();
+    }
         var rebinds = PlayerPrefs.GetString("rebinds");
         if (!string.IsNullOrEmpty(rebinds))
             actions.LoadBindingOverridesFromJson(rebinds);
@@ -574,19 +619,19 @@ public class Player : MonoBehaviour {
 
     private void handleInteraction() {
         if(_queuedInteraction == null) return;
+        if(UICanvas.CurrentUIMiddleState != UIMiddleState.NotVisible || UICanvas.CurrentUITopState != UITopState.NotVisible || UICanvas.CurrentUIBottomState != UIBottomState.HUD) {
+            _queuedInteraction = null;
+            return;
+        }
+        if(EventSystem.current.IsPointerOverGameObject()) return;
+
 
         interact(_queuedInteraction.Value);
 
         _queuedInteraction = null;
     }
-
-
     private void interact(InteractionType interactionType) {
-        if(EventSystem.current.IsPointerOverGameObject()) {
-            return;
-        }
-
-        if(UICanvas.CurrentUIMiddleState != UIMiddleState.NotVisible || UICanvas.CurrentUITopState != UITopState.NotVisible) return;
+        Debug.Log($"Interacting with {interactionType}");
 
         bool interacted = tryInteract(interactionType);
         
@@ -594,8 +639,18 @@ public class Player : MonoBehaviour {
         if(CurrentWeapon == null) return;
         if(CurrentWeapon.ItemData == null) return;
 
+        //fishing interaction
+        if(CurrentWeapon.ItemData == _fishingRod){
+            if(!CanFish) return;
+            if (!LockRotation) transform.LookAt(GetMousePosition());
+            Animator.SetTrigger("castRod");
+            // tryFish();
+            return;
+        }
+
         // Default to attacking if no interaction was commited
         
+
         if (CurrentAnimationState == AnimationState.Attack_ComboWindow) {
             _queuedRotation = GetMousePosition() - transform.position;
             LockRotation = false;
@@ -606,24 +661,47 @@ public class Player : MonoBehaviour {
         if (!LockRotation) {
             transform.LookAt(GetMousePosition());   
         }
-
         LockRotation = true;
+
+        
         switch(interactionType) {
             case InteractionType.Primary:
                 performLightAttack();
+                _attackType = AttackType.LIGHT;
                 break;
             case InteractionType.Secondary:
                 performHeavyAttack();
+                _attackType = AttackType.HEAVY;
                 break;
         }
     }
 
-    
+    private bool tryFish(){
+        if(_currentBobber == null){
+            _currentBobber = Instantiate(_bobberPrefab,FishingBone.position,transform.rotation,null);
+            _currentBobber.GetComponent<Rigidbody>().AddRelativeForce(new Vector3(0, 0.6f, 1) * FishingForce, ForceMode.Impulse);
+            Player.Instance.InputDisabled = true;
+            return true;
+        }
+        Animator.SetTrigger("catchFish");
+        Player.Instance.InputDisabled = false;
+        if(FishCatchWindow){
+            ConsumableItemData caughtFish = GameManager.Instance.CatchableFish[UnityEngine.Random.Range(0, GameManager.Instance.CatchableFish.Count())] as ConsumableItemData;
+            Inventory.AddItem(caughtFish,1,1);
+            UICanvas.PickupItemNotify(caughtFish, 1);
+            AvailableFish -= 1;
+            FishCaughtEvent?.Invoke();
+            FishCatchWindow = false;
+
+        }
+        Destroy(_currentBobber);
+
+        return true;
+    }
 
     private bool tryInteract(InteractionType interactionType) {
         Ray ray = MainCamera.ScreenPointToRay(Input.mousePosition);
-        int layerMask = ~LayerMask.GetMask("Player");
-        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask)) {
+        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _interactionMask)) {
             return false;
         }
 
@@ -646,25 +724,32 @@ public class Player : MonoBehaviour {
     private void performLightAttack() {
         Animator.SetBool(_heavyAttackHash, false);
         Animator.SetTrigger(_lightAttackHash);
-        AudioClip attackSound = Resources.Load("SFX/bron/atak4") as AudioClip;
-        SoundFXManager.Instance.PlaySoundFXClip(attackSound, transform, 0.35f);
     }
 
     private void performHeavyAttack() {
         Animator.SetBool(_lightAttackHash, false);
         Animator.SetTrigger(_heavyAttackHash);
-        AudioClip attackSound = Resources.Load("SFX/bron/atak2") as AudioClip;
-        SoundFXManager.Instance.PlaySoundFXClip(attackSound, transform, 0.35f);
     }
 
     public void OnInventoryChanged() {
+        UpdateEquipment();
+    }
+    public void UpdateEquipment(){
         WeaponHolder.UpdateWeapon(CurrentWeapon);
         Animator.SetInteger(_weaponTypeHash, (int) (CurrentWeapon?.ItemData?.WeaponType ?? WeaponType.None));
 
         if (CurrentWeapon?.ItemData != null) {
-            Debug.Log(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
             SlashManager.SetSlashColor(CurrentWeapon.ItemData.WeaponPrefab.WeaponTrait);
         } 
+        EventBus.InventoryItemChangedEvent.Invoke();
+        if(CurrentArmor?.ItemData != null){
+            Armor.Set(CurrentArmor.ItemData.Armor);
+            _pauldronRenderer.material = CurrentArmor.ItemData.Material;
+        }
+        else{
+            Armor.Set(0);
+            _pauldronRenderer.material = _defaultPauldronMaterial;
+        }
     }
 
     public Vector3 GetMousePosition() {
@@ -714,12 +799,18 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_ComboWindow:
+                WeaponHolder.DisableHitbox();
+                SlashManager.DisableSlash();
+                WeaponHolder.EndAttack();
                 _isAttacking = false;
                 break;
 
             case AnimationState.Attack_Recovery:
+                WeaponHolder.DisableHitbox();
                 SlashManager.DisableSlash();
+                WeaponHolder.EndAttack();
                 _isAttacking = false;
+                _attackType = null;
                 LockRotation = false;
                 break;
 
@@ -738,23 +829,36 @@ public class Player : MonoBehaviour {
                 break;
 
             case AnimationState.Attack_Windup:
+                bool isPlayerAttackPaid = false;
+
+                if(_attackType == AttackType.HEAVY) {
+                    float manaPrice = WeaponHolder.GetManaCost();
+                    if(manaPrice <= Mana) {
+                        LivingEntity.Mana -= manaPrice;
+                        isPlayerAttackPaid = true;
+                    }
+                }
+
+                WeaponHolder.InitializeAttack(_attackType.Value, isPlayerAttackPaid);
+                WeaponHolder.BeginAttack();
+                AudioManager.instance.PlayAttackSound(FMODEvents.instance.PlayerAttack, this.transform.position, CurrentWeapon.ItemData.WeaponType);
                 LockRotation = true;
                 _isAttacking = true;
                 _currentSpeed = 0;
                 SlashManager.EnableSlash();
-                WeaponHolder.EnableHitbox();
                 // SlashGO.SetActive(true);
 
                 break;
 
             case AnimationState.Attack_Contact:
+                AudioManager.instance.PlayAttackSound(FMODEvents.instance.AttackContact, this.transform.position, CurrentWeapon.ItemData.WeaponType);
+                WeaponHolder.EnableHitbox();
                 break;
 
             case AnimationState.Attack_ComboWindow:
                 break;
 
             case AnimationState.Attack_Recovery:
-                WeaponHolder.DisableHitbox();
                 LockRotation = false;
                 // LockRotation = true;
                 break;
@@ -767,12 +871,10 @@ public class Player : MonoBehaviour {
     }
 
     public void OnAttackAnimationStart(AttackType attackType) {
-        WeaponHolder.InitializeAttack(attackType);
-        WeaponHolder.BeginAttack();
+
     }
 
     public void OnAttackAnimationEnd(AttackType _) {
-        WeaponHolder.EndAttack();
     }
 
     #endregion
@@ -833,29 +935,39 @@ public class Player : MonoBehaviour {
             }
         }
 
-        Player.Instance.GetComponent<HumanoidInventory>().Clear();
-        Player.Instance.GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
-        Player.Instance.ConsumableItemOne = null;
-        Player.Instance.ConsumableItemTwo = null;
-        Player.Instance.SpellSlotOne = null;
-        Player.Instance.SpellSlotTwo = null;
-        Player.Instance.SpellSlotThree = null;
-        Player.Instance.WeaponHolder.UpdateWeapon(null);
-        Player.Instance.WeaponHolder.DisableHitbox();
-        Player.Instance.WeaponHolder.EndAttack();
-        Player.UICanvas.HUDCanvas.UpdateSpellSlots();
-        Player.UICanvas.HUDCanvas.UpdateHealthBar();
-        Player.UICanvas.HUDCanvas.UpdateManaBar();
-        Player.UICanvas.HUDCanvas.OnUpdateConsumables();
+        GetComponent<HumanoidInventory>().Clear();
+        GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
+        ConsumableItemOne = null;
+        ConsumableItemTwo = null;
+        SpellSlotOne = null;
+        SpellSlotTwo = null;
+        SpellSlotThree = null;
+        WeaponHolder.UpdateWeapon(null);
+        WeaponHolder.DisableHitbox();
+        WeaponHolder.EndAttack();
+        UICanvas.HUDCanvas.UpdateSpellSlots();
+        UICanvas.HUDCanvas.UpdateHealthBar();
+        UICanvas.HUDCanvas.UpdateManaBar();
+        UICanvas.HUDCanvas.OnUpdateConsumables();
+        UICanvas.ChooseCanvas.ResetCardUI();
+        // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+        GameManager.Instance.ResetCards();
+        GameManager.Instance.ResetInfluence();
+        GameManager.Instance.ResetCardChoice();
+        CanFish = false;
+        // GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
+        GetComponent<HumanoidInventory>().OnInventoryChanged?.Invoke();
         EventBus.InventoryItemChangedEvent?.Invoke();
-        Player.Instance.GetComponent<HumanoidInventory>().AddItem(StarterWeapons[UnityEngine.Random.Range(0, StarterWeapons.Count)], 1, 1);
-        EventBus.InventoryItemChangedEvent?.Invoke();
+        GameManager.Instance.LevelDepth = 0;
 
+        Instance.UpdateEquipment();
+        LivingEntity.Health = LivingEntity.MaxHealth;
+        LivingEntity.Mana = LivingEntity.MaxMana;
     }
 
     private void registerStats() {
         ModifierSystem.RegisterStat(ref VekhtarControl);
-        ModifierSystem.RegisterStat(ref Armor);
+        //ModifierSystem.RegisterStat(ref Armor);
         // ModifierSystem.RegisterStat(ref LightAttackDamage);
         ModifierSystem.RegisterStat(ref LightAttackSpeed);
         // ModifierSystem.RegisterStat(ref LightAttackRange);
@@ -867,15 +979,129 @@ public class Player : MonoBehaviour {
         ModifierSystem.RegisterStat(ref DashCooldown);
         ModifierSystem.RegisterStat(ref DashDuration);
     }
+    
+    public void ApplyEvolution(EvoUI evoUI) {
+        GameManager.Instance.RandomCardCount = 3;
+        
+        switch (evoUI.ElementalType) {
+            case ElementalType.Fire:
+            case ElementalType.Ice:
+                foreach (Modifier modifier in evoUI.GetModifiers()) {
+                    LivingEntity.ApplyIndefiniteModifier(modifier);
+                }
+                break;
+            case ElementalType.Earth:
+                GameManager.Instance.RandomCardCount++;
+                break;
+        }
+        LivingEntity.Health = LivingEntity.MaxHealth;
+        LivingEntity.Mana = LivingEntity.MaxMana;
+         
+    }
+    public bool BuyFishingRod(Transform t){
+        ItemEntity.SpawnThrownRelative(_fishingRod, 1, t.position, 1, t.rotation, Vector3.forward * 3);
+        return true;
+    }
 
-    public void SetPlayerPosition(Vector3 position, float time = 0, float yRotation = 45) {
+    public void EquipFishingRod(bool val) {
+        FishingRod.SetActive(val);
+    }
+
+    public void SetPlayerPosition(Vector3 position, float time = 0.1f, float yRotation = 45) {
+        Instance.gameObject.SetActive(true);
+        transform.rotation = Quaternion.Euler(0, yRotation, 0);
+        StartCoroutine(setPlayerPositionCoroutine(position, time));
+    }
+
+    private IEnumerator setPlayerPositionCoroutine(Vector3 position, float time) {
         UpdateDisabled = true;
         Animator.animatePhysics = false;
-        Instance.gameObject.transform.position = position;
+        Animator.speed = 0;
+        gameObject.transform.position = position;
+        yield return new WaitForSeconds(time);
         Animator.animatePhysics = true;
+        Animator.speed = 1;
         UpdateDisabled = false;
-        Instance.gameObject.transform.DORotate(new Vector3(0, yRotation, 0), time);
+    }
+
+
+
+    public void PlayRespawnAnimation() {
+        AudioManager.instance.setMusicArea(MusicArea.HUB);
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.RespawnSound, this.transform.position);
+        Animator.animatePhysics = false;
+        UpdateDisabled = true;
+        transform.position = StartPosition - Vector3.up * 3f;
+        transform.rotation = Quaternion.Euler(0, 45, 0);
+        float dissolve = 1f;
+        DOTween.To(() => dissolve, x => dissolve = x, 0f, 2f).SetDelay(1f).OnUpdate(() => {
+            _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
+        }).OnComplete(() => {
+            gameObject.transform.DOMoveY(-2, 0);
+            Animator.SetTrigger("rise");
+            gameObject.transform.DOComplete();
+
+            gameObject.transform.DOKill();
+
+            dissolve = 0f;
+            DOTween.To(() => dissolve, x => dissolve = x, 1f, 4f).SetDelay(1f).OnUpdate(() => {
+                _dissolveMaterial.SetFloat("_DissolveStrength", dissolve);
+            });
+            gameObject.transform.DOMoveY(1, 2f).SetEase(Ease.OutQuint).OnComplete(() => {
+                Animator.SetTrigger("live");
+                UpdateDisabled = false;
+                Animator.animatePhysics = true;
+                UICanvas.ChangeUIBottomState(UIBottomState.HUD);
+                
+            });
+        });
+   
+    }
+
+    public void ResetToDefault() {
+        LockRotation = false;
+        UpdateDisabled = false;
+        DamageDisabled = false;
+        HasPlayerDied = false;
+        _isAttacking = false;
+        CurrentAnimationState = AnimationState.Locomotion;
+        SlashManager.DisableSlash();
+        UpdateEquipment();
+    }
+    
+    public void TryCatchFish() {
+        tryFish();
     }
 
     #endregion
+    #region Save System
+    public void Save(ref PlayerSaveData data){
+        data.EvolutionPoints = EvolutionPoints;
+        data.SelectedEvolutions = SelectedEvolutions;
+        data.ConsumableItemOne = ConsumableItemOne;
+        data.ConsumableItemTwo = ConsumableItemTwo;
+        data.Health = Health;
+        data.Mana = Mana;
+    }
+    public void Load(PlayerSaveData data){
+        EvolutionPoints = data.EvolutionPoints;
+        foreach(EvoUI evolution in data.SelectedEvolutions){
+            evolution.AddEvolution();   
+        }
+        ConsumableItemOne = data.ConsumableItemOne;
+        ConsumableItemTwo = data.ConsumableItemTwo;
+        LivingEntity.Health = data.Health;
+        LivingEntity.Mana = data.Mana;
+    }
+    [Serializable]
+    public struct PlayerSaveData{
+        public float Health;
+        public float Mana;
+        public List<EvoUI> SelectedEvolutions;
+        public int EvolutionPoints;
+        public InventoryItem<ConsumableItemData> ConsumableItemOne;
+        public InventoryItem<ConsumableItemData> ConsumableItemTwo;
+    }
+    #endregion
+    
 }

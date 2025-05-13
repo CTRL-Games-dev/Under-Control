@@ -10,8 +10,6 @@ public class SelectedItemUI : MonoBehaviour
 
     public GameObject Holder;
 
-    // private Vector3 _pivotPosition = new Vector3(0, 0, 0);
-
     public Vector2Int SelectedOffsetInv;
 
     private InventoryItem _inventoryItem = null;
@@ -28,22 +26,29 @@ public class SelectedItemUI : MonoBehaviour
             _inventoryItem = value;
             gameObject.SetActive(_inventoryItem != null);
             if (_inventoryItem == null) {
+                EventBus.SelectedItemSet?.Invoke(null);
+                
+
                 _image.sprite = null;
                 transform.rotation = Quaternion.identity;
                 gameObject.SetActive(false);
             } else {
+                EventBus.SelectedItemSet?.Invoke(_inventoryItem.ItemData);
+
                 Vector3 itemUiOffset = Vector3.zero;
                 if(_inventoryItem.ItemUI != null) {
                     itemUiOffset = _inventoryItem.ItemUI.transform.position - Input.mousePosition;
                     if (_inventoryItem.Rotated) {
                         itemUiOffset = new Vector3(
-                            itemUiOffset.y - InventoryPanel.TileSize * value.Size.x,
+                            itemUiOffset.y - InventoryPanel.TileSize * value.Size.x * UICanvas.ScreenScale.x,
                             -itemUiOffset.x,
                             0
                         );
                     }
                 }
-             
+
+                itemUiOffset = UICanvas.ScaleToCanvas(itemUiOffset);
+
                 Holder.transform.localPosition = itemUiOffset;
 
                 SelectedOffsetInv.x = (int)(itemUiOffset.x / InventoryPanel.TileSize);
@@ -81,18 +86,20 @@ public class SelectedItemUI : MonoBehaviour
     private void Awake() {
         _rectTransform = GetComponent<RectTransform>();
         _image = GetComponentInChildren<Image>();
+        
     }
 
     private void Start() {
         Player.Instance.ItemRotateEvent.AddListener(OnRotate);
+        gameObject.SetActive(false);
     }
 
-    private void Update()  {
+    private void LateUpdate()  {
         if(_inventoryItem == null) {
             return;
         }
         
-        transform.position = Input.mousePosition;
+        _rectTransform.anchoredPosition = UICanvas.ScaleToCanvas(Input.mousePosition);
 
         if (transform.rotation != _goalRotation) {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, _goalRotation, _rotationSpeed * Settings.AnimationSpeed * Time.deltaTime);

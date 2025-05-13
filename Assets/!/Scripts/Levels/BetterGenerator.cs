@@ -69,7 +69,7 @@
 //         _meshRenderer = GetComponent<MeshRenderer>();
 //     }
 
-//     public T Getlocation<T>()
+//     public T GetLocation<T>()
 //     where T : Location
 //     {
 //         foreach(var l in wd.Locations)

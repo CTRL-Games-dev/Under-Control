@@ -15,7 +15,9 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     [SerializeField] private TextLocalizer _nameTextLocalizer, _dialogueTextLocalizer;
     [SerializeField] private TMP_InputField _inputField;
     [SerializeField] private GameObject _confirmButton;
-
+    [SerializeField] private GameObject _acceptButton;
+    [SerializeField] private GameObject _refuseButton;
+ 
     private bool _isTalking = false;
 
     private int _currentDialogueIndex = 0;
@@ -56,6 +58,20 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         _inputField.DeactivateInputField();
         OnClick();
     }
+    public void OnAcceptButtonClick(){
+        Player.Instance.BuyFishingRod(_talkable.transform);
+        ResetOfferButtons();
+        OnClick();
+    }
+    public void OnRefuseButtonClicked(){
+        ResetOfferButtons();
+        OnClick();
+    }
+    private void ResetOfferButtons(){
+        _blockClick = false;
+        _acceptButton.SetActive(false);
+        _refuseButton.SetActive(false);
+    }
 
 
     public void SetupDialogue(Dialogue dialogue, Texture faceImage, FaceAnimator faceAnimator, string nameKey, Talkable talkable) {
@@ -92,6 +108,7 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     public void HideUI() {
         _canvasGroup.DOFade(0, 0.7f * Settings.AnimationSpeed).SetEase(Ease.InOutSine).OnComplete(() => {
             gameObject.SetActive(false);
+            Player.Instance.InputDisabled = false;
         });
         _middleCanvasGroup.DOFade(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
         _otherImage.DOFade(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
@@ -99,18 +116,14 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
         _topBarCanvasGroup.DOFade(0, 1f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
         _bottomBar.DOScaleY(0, 0.5f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
         _bottomBarCanvasGroup.DOFade(0, 1f * Settings.AnimationSpeed).SetEase(Ease.InOutSine);
+        
     }
 
 
     public void OnClick() {
         if (_blockClick) return;
-        if (_isTalking) {
-            StopAllCoroutines();
-            _dialogueText.text = _goalString;
-            _playerFaceAnimator.EndAnimation();
-            _otherFaceAnimator.EndAnimation();
-            _isTalking = false;
-        } else {
+        if (_isTalking) finishTalking();
+        else {
             if (_currentDialogueIndex >= _dialogue.DialogueEntries.Count) {
                 Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
                 return;
@@ -130,12 +143,12 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
     private IEnumerator animateText() {
         _isTalking = true;
         _dialogueText.text = string.Empty;
-
         foreach (char letter in _goalString.ToCharArray()) {
             _dialogueText.text += letter;
             float _letterInterval;
             if (letter == ' ') {
                 _letterInterval = 0.05f;
+                
             }
             else if (letter == '.' || letter == ',' || letter == ';' || letter == ':') {
                 _letterInterval = 0.2f;
@@ -144,16 +157,32 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
                 _letterInterval = 0.3f;
             }
             else {
-                _letterInterval = Mathf.Clamp(_textSpeed / _goalString.Length, 0.02f, 0.07f);
+                AudioManager.instance.PlayLetterSound(FMODEvents.instance.TalkingSounds, letter, this.transform.position);
+                _letterInterval = Mathf.Clamp(_textSpeed / _goalString.Length, 0.02f, 0.03f);
+
             }
 
             yield return new WaitForSeconds(_letterInterval);
         }
-
+        finishTalking();
+    }
+    private void finishTalking(){
+        StopAllCoroutines();
+        _dialogueText.text = _goalString;
         _playerFaceAnimator.EndAnimation();
         if (_otherFaceAnimator != null)
             _otherFaceAnimator.EndAnimation();
         _isTalking = false;
+        if(_dialogue.DialogueEntries[_currentDialogueIndex].IsOffer){
+            _acceptButton.SetActive(true);
+            _refuseButton.SetActive(true);
+            _acceptButton.GetComponent<Button>().interactable = Player.Instance.Coins < 150 ? false : true;
+            _inputField.gameObject.SetActive(false);
+            _confirmButton.SetActive(false);
+            _inputField.interactable = false;
+            _inputField.DeactivateInputField();
+            _blockClick = true;
+        }
     }
 
 
@@ -182,12 +211,23 @@ public class TalkingCanvas : MonoBehaviour, IUICanvasState
 
   
         if (_dialogue.DialogueEntries[_currentDialogueIndex].IsInputField) {
+            _acceptButton.SetActive(false);
+            _refuseButton.SetActive(false);
             _inputField.gameObject.SetActive(true);
             _confirmButton.SetActive(true);
             _inputField.interactable = true;
             _inputField.Select();
             _inputField.ActivateInputField();
             _blockClick = true;
+        }
+        else {
+            _acceptButton.SetActive(false);
+            _refuseButton.SetActive(false);
+            _inputField.gameObject.SetActive(false);
+            _confirmButton.SetActive(false);
+            _inputField.interactable = false;
+            _inputField.DeactivateInputField();
+            _blockClick = false;
         }
             
     }

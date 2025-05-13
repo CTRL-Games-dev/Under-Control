@@ -2,5 +2,18 @@ public enum ElementalType
 {
     Fire,
     Ice, 
-    Earth
+    Earth,
+    Charming,
+    LifeSteal,
+    ManaSteal,
+    Stun,
+    Health,
+    Mana,
+    Armor,
+    LightAttack,
+    HeavyAttack,
+    EvoHealth,
+    EvoMana,
+    EvoCards,
+    None
 }

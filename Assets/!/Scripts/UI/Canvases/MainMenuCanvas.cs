@@ -1,4 +1,6 @@
+using System.IO;
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +11,7 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
     private RectTransform _continueRect, _newGameRect, _optionsRect, _creditsRect, _exitRect;
     private float _continueBtnStartingX, _newGameBtnStartingX, _optionsBtnStartingX, _creditsBtnStartingX, _exitBtnStartingX;
     private CanvasGroup _canvasGroup, _continueGroup, _newGameGroup, _optionsGroup, _creditsGroup, _exitGroup;
+    private TextMeshProUGUI _continueText;
 
     private void Awake() {
         _canvasGroup = GetComponent<CanvasGroup>();
@@ -30,6 +33,8 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         _optionsBtnStartingX = _optionsRect.anchoredPosition.x;
         _creditsBtnStartingX = _creditsRect.anchoredPosition.x;
         _exitBtnStartingX = _exitRect.anchoredPosition.x;
+
+        _continueText = _continueButton.GetComponentInChildren<TextMeshProUGUI>();
     }
 
 
@@ -38,22 +43,18 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
     }
 
     public void ShowUI() {
+        AudioManager.instance.setMusicArea(MusicArea.MAIN_MENU);
         killTweens();
         if (HubManager.MainMenuCamera != null) CameraManager.SwitchCamera(HubManager.MainMenuCamera);
 
         gameObject.SetActive(true);
-        if (GameManager.Instance.ShowNewGame) {
-            _continueButton.SetActive(false);
-            _newGameButton.SetActive(true);
-        } else {
-            _continueButton.SetActive(true);
-            _newGameButton.SetActive(false);
-        }
 
         _canvasGroup.alpha = 1;
         _bgImage.DOFade(230.0f / 255.0f, 1f * Settings.AnimationSpeed).OnComplete(() => {
             animateButtons();
         });
+        if(!File.Exists(SaveSystem.SaveFileName())) setTextDisabled(_continueText);
+        else resetTextDecoration(_continueText);
     }
 
     public void HideUI() {
@@ -67,6 +68,14 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
             gameObject.SetActive(false);
         });
     }
+    private void resetTextDecoration(TextMeshProUGUI text) {
+        text.color = Color.white;
+        text.fontStyle = FontStyles.Normal;
+    }
+    private void setTextDisabled(TextMeshProUGUI text) {
+        text.color = Color.gray;
+        text.fontStyle = FontStyles.Strikethrough;
+    }
 
     private void animateButtons() {
         Ease ease = Ease.OutQuint;
@@ -78,14 +87,19 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         resetBtnPositions();
 
         _logoImage.DOFade(1, 0.6f * Settings.AnimationSpeed).SetEase(Ease.InSine).OnComplete(() => {
-            _continueRect.DOAnchorPosX(_continueBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
-            _continueGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
-                _newGameRect.DOAnchorPosX(_newGameBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
-                _newGameGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+            AudioManager.instance.PlayOneShot(FMODEvents.instance.TitleScreenAnim, this.transform.position);
+            _newGameRect.DOAnchorPosX(_newGameBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
+            _newGameGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+                AudioManager.instance.PlayOneShot(FMODEvents.instance.TitleScreenAnim, this.transform.position);
+                _continueRect.DOAnchorPosX(_continueBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
+                _continueGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+                    AudioManager.instance.PlayOneShot(FMODEvents.instance.TitleScreenAnim, this.transform.position);
                     _optionsRect.DOAnchorPosX(_optionsBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
                     _optionsGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+                        AudioManager.instance.PlayOneShot(FMODEvents.instance.TitleScreenAnim, this.transform.position);
                         _creditsRect.DOAnchorPosX(_creditsBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
                         _creditsGroup.DOFade(1, fadeSpeed * Settings.AnimationSpeed).OnComplete(() => {
+                            AudioManager.instance.PlayOneShot(FMODEvents.instance.TitleScreenAnim, this.transform.position);
                             _exitRect.DOAnchorPosX(_exitBtnStartingX -50, moveSpeed * Settings.AnimationSpeed).SetEase(ease);
                             _exitGroup.DOFade(1, 0.2f * Settings.AnimationSpeed);
                         });
@@ -127,26 +141,37 @@ public class MainMenuCanvas : MonoBehaviour, IUICanvasState
         _exitRect.anchoredPosition = new Vector2(_exitBtnStartingX +50, _exitRect.anchoredPosition.y);
     }
 
+    public void playClickSound(){
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.UIClickSound, this.transform.position);
+    }
+
     public void OnContinueGameBtnClick() {
+        if(!File.Exists(SaveSystem.SaveFileName())) return;
+        playClickSound();
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
-        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
+        SaveSystem.LoadGame();
     }
 
     public void OnNewGameBtnClick() {
+        playClickSound();
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.NotVisible);
-        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
-        GameManager.Instance.ShowNewGame = false;
+        Player.Instance.transform.position = Player.Instance.StartPosition;
+        Player.Instance.PlayRespawnAnimation();
     }
 
     public void OnSettingsBtnClick() {
+        playClickSound();
         Player.UICanvas.ChangeUITopState(UITopState.Settings);
     }
 
     public void OnCreditsBtnClick() {
-        Debug.Log("BY Ctrl Games");
+        playClickSound();
+        Player.UICanvas.ChangeUITopState(UITopState.VideoPlayer);
     }
 
     public void OnExitBtnClick() {
+        playClickSound();
         Application.Quit();
     }
 

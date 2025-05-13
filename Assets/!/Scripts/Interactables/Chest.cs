@@ -13,9 +13,11 @@ public class Chest : MonoBehaviour, IInteractableInventory
     }
 
     public void Interact() {
+        AudioManager.instance.PlayOneShot(FMODEvents.instance.ChestOpen, transform.position);
         _animator.SetTrigger("open");
-        Player.UICanvas.InventoryCanvas.SetOtherInventory(Inventory, _uiPrefab, this, "interactable_name_chest_key");
+        Player.UICanvas.InventoryCanvas.SetOtherInventory(Inventory, _uiPrefab, this, "interactable_name_chest_key", false, true);
         Player.UICanvas.ChangeUIMiddleState(UIMiddleState.Inventory);
+        Player.Instance.FaceAnimator.StartAnimation("EXCITED", 3f);
     }
 
     public void EndInteract() {

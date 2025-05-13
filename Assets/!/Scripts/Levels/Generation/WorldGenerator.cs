@@ -16,6 +16,7 @@ public enum CellType
 {
     Empty,
     Forest,
+    DeadZone,
 }
 
 public struct Grid
@@ -41,7 +42,7 @@ public class WorldGenerator : MonoBehaviour {
     [SerializeField] private GameObject _terrainChunkHolder;
     [HideInInspector] public List<Location> PlacedLocations = new();
 
-    public T Getlocation<T>()
+    public T GetLocation<T>()
     where T : Location
     {
         foreach(var l in PlacedLocations)
@@ -51,7 +52,7 @@ public class WorldGenerator : MonoBehaviour {
         return null;
     }
 
-    public List<T> GetAllLocation<T>()
+    public List<T> GetAllLocations<T>()
     where T : Location
     {
         List<T> locations = new();
@@ -73,9 +74,9 @@ public class WorldGenerator : MonoBehaviour {
                 (locations, grid) = PlaceLocationsForest();
             } break;
             default: {
-                Debug.LogError($"This type of dimension is not implemented! -> {type}");
-                return;
-            };
+                Debug.LogError($"This type of dimension is not implemented ({type}). Spawning regular forest");
+                (locations, grid) = PlaceLocationsForest();
+            } break;
         }
 
         Debug.Log("Locations have been placed");
@@ -91,8 +92,8 @@ public class WorldGenerator : MonoBehaviour {
         PlaceForestTiles(ref grid);
         Debug.Log("Spawned locations");
 
-        GenerateChunks(ref grid);
-        Debug.Log("Generated mesh chunks");
+        // GenerateChunks(ref grid);
+        // Debug.Log("Generated mesh chunks");
     }
 
 
@@ -163,6 +164,7 @@ public class WorldGenerator : MonoBehaviour {
         Location[] rockyFieldsPrefabs = Resources.LoadAll<Location>("Prefabs/Forest/Locations/RockyFields");
         Location wellPrefab = Resources.Load<Location>("Prefabs/Forest/Locations/Well");
         Location sellerPrefab = Resources.Load<Location>("Prefabs/Forest/Locations/Seller");
+        Location pondPrefab = Resources.Load<Location>("Prefabs/Forest/Locations/FishingPond");
 
         Debug.Log("Loaded location prefabs");
 
@@ -189,6 +191,7 @@ public class WorldGenerator : MonoBehaviour {
 
         allLocations.Add(Instantiate(sellerPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform));
         allLocations.Add(Instantiate(wellPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform));
+        allLocations.Add(Instantiate(pondPrefab, Vector3.zero, Quaternion.identity, _terrainHolder.transform));
 
         List<LocationNode> nodes = new()
         {
@@ -313,16 +316,18 @@ public class WorldGenerator : MonoBehaviour {
 
                     grid.Cells[x, y] = new WorldCell
                     {
-                        Type = CellType.Forest,
+                        Type = CellType.DeadZone,
                         WasPlaced = true
                     };
                 }
             }
 
+            int locationOffset = 12;
+
             // Dig out the actual location
-            for(int ix = 0; ix < (int)l.Width - 1; ix++)
+            for(int ix = -locationOffset; ix < (int)l.Width + locationOffset - 1; ix++)
             {
-                for (int iy = 0; iy < (int)l.Height - 1; iy++)
+                for (int iy = -locationOffset; iy < (int)l.Height + locationOffset - 1; iy++)
                 {
                     Vector2 pos = l.GetTopLeftCorner();
                     int x = (int)(pos.x + ix - grid.Offset.x);
@@ -330,7 +335,11 @@ public class WorldGenerator : MonoBehaviour {
 
                     // Debug.Log($"Index: {new Vector2(x, y)}");
 
-                    grid.Cells[x,y] = new WorldCell { Type = CellType.Empty, WasPlaced = true };
+                    if(ix >= 0 && ix < l.Width && iy >= 0 && iy < l.Height) {
+                        grid.Cells[x,y] = new WorldCell { Type = CellType.Empty, WasPlaced = true };   
+                    } else {
+                        grid.Cells[x,y] = new WorldCell { Type = CellType.Forest, WasPlaced = true };
+                    }
                 }
             }
         }
@@ -373,6 +382,8 @@ public class WorldGenerator : MonoBehaviour {
 
             int thickness = UnityEngine.Random.Range(10, 15);
 
+
+            int locationOffset = 12;
             if(point2.x != point1.x)
             {
                 float a = (point2.y - point1.y)/(point2.x - point1.x);
@@ -384,6 +395,7 @@ public class WorldGenerator : MonoBehaviour {
                 int ySymbol = a > 0 ? 1 : -1;
 
                 // Debug.LogFormat("yLen = {0}, a = {1}, b = {2}", yLength, a, b);
+
 
                 for(int ix = (int)Math.Floor(point1.x); ix < (int)Math.Floor(point2.x); ix++)
                 {
@@ -400,6 +412,17 @@ public class WorldGenerator : MonoBehaviour {
                             for(int ty = 0; ty < thickness; ty++)
                             {
                                 grid.Cells[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = new WorldCell { Type = CellType.Empty };
+                            }
+                        }
+
+                        for(int tx = -locationOffset; tx < thickness + locationOffset; tx++)
+                        {
+                            for(int ty = -locationOffset; ty < thickness + locationOffset; ty++)
+                            {
+                                WorldCell cell = grid.Cells[indexX+tx-(thickness/2),indexY+ty-(thickness/2)];
+                                if(cell.Type == CellType.DeadZone) {
+                                    grid.Cells[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = new WorldCell { Type = CellType.Forest };
+                                }
                             }
                         }
                     }
@@ -424,6 +447,16 @@ public class WorldGenerator : MonoBehaviour {
                         for (int ty = 0; ty < thickness; ty++)
                         {
                             grid.Cells[indexX + tx - (thickness / 2), indexY + ty - (thickness / 2)] = new WorldCell { Type = CellType.Empty };
+                        }
+                    }
+
+                    for(int tx = -locationOffset; tx < thickness + locationOffset; tx++)
+                    {
+                        for(int ty = -locationOffset; ty < thickness + locationOffset; ty++)
+                        {
+                            WorldCell cell = grid.Cells[indexX+tx-(thickness/2),indexY+ty-(thickness/2)];
+                            if(cell.Type == CellType.DeadZone)
+                                grid.Cells[indexX+tx-(thickness/2),indexY+ty-(thickness/2)] = new WorldCell { Type = CellType.Forest };
                         }
                     }
                 }
@@ -459,13 +492,29 @@ public class WorldGenerator : MonoBehaviour {
                 int gridPositionX = ix * spaceBetweenTrees;
                 int gridPositionY = iy * spaceBetweenTrees;
 
-                if(grid.Cells[gridPositionX, gridPositionY].Type != CellType.Forest) continue;
+                switch(grid.Cells[gridPositionX, gridPositionY].Type) {
+                    case CellType.Empty: continue;
+                    case CellType.Forest: {
+                        float worldPositionX = gridPositionX + grid.Offset.x;
+                        float worldPositionY = gridPositionY + grid.Offset.y;
 
-                float worldPositionX = gridPositionX + grid.Offset.x;
-                float worldPositionY = gridPositionY + grid.Offset.y;
+                        Location forestTilePrefab = forestTilePrefabs[UnityEngine.Random.Range(0, forestTilePrefabs.Length)];
+                        if(forestTilePrefab is ForestBorder borderPrefab) {
+                            Instantiate(borderPrefab, new Vector3(worldPositionX + 0.5f , 0, worldPositionY + 0.5f), Quaternion.identity, _terrainHolder.transform)
+                                .SetDeadZone(false);
+                        }
+                    } break;
+                    case CellType.DeadZone: {
+                        float worldPositionX = gridPositionX + grid.Offset.x;
+                        float worldPositionY = gridPositionY + grid.Offset.y;
 
-                Location forestTilePrefab = forestTilePrefabs[UnityEngine.Random.Range(0, forestTilePrefabs.Length)];
-                Instantiate(forestTilePrefab, new Vector3(worldPositionX + 0.5f , 0, worldPositionY + 0.5f), Quaternion.identity, _terrainHolder.transform);
+                        Location forestTilePrefab = forestTilePrefabs[UnityEngine.Random.Range(0, forestTilePrefabs.Length)];
+                        if(forestTilePrefab is ForestBorder borderPrefab) {
+                            Instantiate(borderPrefab, new Vector3(worldPositionX + 0.5f , 0, worldPositionY + 0.5f), Quaternion.identity, _terrainHolder.transform)
+                                .SetDeadZone(true);
+                        }
+                    } break;
+                }
             }
         }   
     }
@@ -481,33 +530,31 @@ public class WorldGenerator : MonoBehaviour {
         public float Height;
     }
 
-    public void GenerateChunks(ref Grid grid)
-    {
+    public void GenerateChunks(ref Grid grid) {
         List<ChunkData> chunkInfo = new();
 
         int maxChunkWidth = 100;
         int maxChunkHeight = 100;
 
-        int widthLeft = grid.GetWidthCeil();
-        int heightLeft = grid.GetHeightCeil();
+        int gridWidth = grid.GetWidthCeil();
+        int gridHeight = grid.GetHeightCeil();
 
-        for(int ix = 0; ix < grid.GetWidthCeil() / maxChunkWidth + 1; ix++)
+        int numChunksX = (int)Math.Ceiling((float)gridWidth / maxChunkWidth);
+        int numChunksY = (int)Math.Ceiling((float)gridHeight / maxChunkHeight);
+
+        for (int ix = 0; ix < numChunksX; ix++)
         {
-            for (int iy = 0; iy < grid.GetHeightCeil() / maxChunkHeight + 1; iy++)
+            for (int iy = 0; iy < numChunksY; iy++)
             {
-                int chunkWidth;
-                int chunkHeight;
-
-                if(widthLeft - maxChunkWidth > 0) chunkWidth = maxChunkWidth;
-                else chunkWidth = widthLeft;
-
-                if(heightLeft - maxChunkHeight > 0) chunkHeight = maxChunkHeight;
-                else chunkHeight = maxChunkHeight;
+                // Calculate remaining width/height for edge chunks
+                int chunkWidth = Math.Min(maxChunkWidth, gridWidth - ix * maxChunkWidth);
+                int chunkHeight = Math.Min(maxChunkHeight, gridHeight - iy * maxChunkHeight);
 
                 float x = ix * maxChunkWidth + grid.Offset.x;
                 float y = iy * maxChunkHeight + grid.Offset.y;
 
-                chunkInfo.Add(new ChunkData {
+                chunkInfo.Add(new ChunkData
+                {
                     TopLeftCorner = new(x, y),
                     Width = chunkWidth,
                     Height = chunkHeight,
@@ -515,12 +562,13 @@ public class WorldGenerator : MonoBehaviour {
             }
         }
 
-        foreach(var ci in chunkInfo)
+        foreach (var ci in chunkInfo)
         {
             Chunk chunk = Instantiate(_chunkPrefab, Vector3.zero, Quaternion.identity, _terrainChunkHolder.transform);
             chunk.GenerateChunkMesh(ci.TopLeftCorner, (int)ci.Width, (int)ci.Height);
         }
     }
+
 
     #endregion
 }

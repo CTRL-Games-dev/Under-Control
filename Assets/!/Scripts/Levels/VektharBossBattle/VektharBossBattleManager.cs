@@ -1,7 +1,5 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Audio;
 
 public class VektharBossBattleManager : MonoBehaviour
 {
@@ -27,7 +25,24 @@ public class VektharBossBattleManager : MonoBehaviour
     private float _previousMinCameraDistance;
 
     void Start() {
-        Player.Instance.transform.position = LevelStart.position;
+        Player.Instance.gameObject.SetActive(false);
+        
+        AudioManager.instance.setMusicArea(MusicArea.VEKTHAR);
+        Player.Instance.SetPlayerPosition(LevelStart.position);
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
+        Player.Instance.MaxCameraDistance = 25;
+        Player.Instance.ResetToDefault();
+
+        Player.Instance.gameObject.SetActive(true);
+        
+        CameraManager.SwitchCamera(Player.Instance.TopDownCamera);
+
+        Invoke(nameof(sceneReady), 0.2f);
+    }
+
+    void sceneReady() {
+        Player.Instance.SetPlayerPosition(LevelStart.position);
+        EventBus.SceneReadyEvent?.Invoke();
     }
 
     void Update() {
@@ -63,11 +78,11 @@ public class VektharBossBattleManager : MonoBehaviour
     public IEnumerator disableSounds() {
         yield return new WaitForSeconds(1);
 
-        GameManager.Instance.GetComponent<AudioSource>().mute = true;
+        // GameManager.Instance.GetComponent<AudioSource>().mute = true;
     
-        yield return new WaitForSeconds(30);
+        // yield return new WaitForSeconds(30);
 
-        GameManager.Instance.GetComponent<AudioSource>().mute = false;
+        // GameManager.Instance.GetComponent<AudioSource>().mute = false;
     }
 
     private void startOfBattle() {
@@ -76,6 +91,7 @@ public class VektharBossBattleManager : MonoBehaviour
         }
 
         Vekthar = Instantiate(_vektharPrefab, VektharStart.position, Quaternion.Euler(0, 45, 0));
+        Player.UICanvas.HUDCanvas.ShowBossBar(Vekthar.LivingEntity);
 
         Vekthar.LivingEntity.OnDeath.AddListener(() => {
             Player.UICanvas.ChangeUITopState(UITopState.VideoPlayer);

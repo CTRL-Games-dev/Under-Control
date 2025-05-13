@@ -9,18 +9,15 @@ using JetBrains.Annotations;
 public class LoadingScreen : MonoBehaviour
 {
     public static LoadingScreen Instance;
-    [SerializeField] private GameObject _imageGO;
-    [SerializeField] private Image _image;
-    [SerializeField] private List<Sprite> _sprites;
-    private CanvasGroup _canvasGroup;
+    [SerializeField] private RectTransform _topImgRect, _bottomImgRect, _rotatingImgRect;
+    [SerializeField] private Image _rotatingImg;
+    [SerializeField] private float _rotateSpeed = -1f;
     public static bool IsLoading = false;
     // private static string _currentSceneName = string.Empty;
 
-    private void Awake()
-    {
+    private void Awake() {
         DontDestroyOnLoad(gameObject);
-        if (Instance != null && Instance != this)
-        {
+        if (Instance != null && Instance != this) {
             Destroy(gameObject);
             return;
         }
@@ -28,57 +25,59 @@ public class LoadingScreen : MonoBehaviour
         Instance = this;
     }
 
-
     private void Start() {
-        _canvasGroup = _image.GetComponent<CanvasGroup>();
-        StopCoroutine(animateImages());
+        EventBus.SceneReadyEvent.RemoveListener(OnSceneReadyEvent);
+        EventBus.SceneReadyEvent.AddListener(OnSceneReadyEvent);
     }
 
+    private void Update() {
+        if (!IsLoading) return;
+        _rotatingImgRect.Rotate(new Vector3(0, 0, _rotateSpeed * Time.deltaTime));
+        
+    }
 
     public static void LoadScene(string sceneName) {
+        AudioManager.instance.setMusicArea(MusicArea.LOADING);
         if (IsLoading) return;
+        Debug.Log($"Loading scene: {sceneName}");
         // if (sceneName == _currentSceneName) return;
         // _currentSceneName = sceneName;
-        
-        Instance._canvasGroup.alpha = 0;
-        Instance._imageGO.SetActive(true);
         IsLoading = true;
-        Instance.StartCoroutine(Instance.animateImages());
-        Instance._canvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => Instance.StartCoroutine(Instance.loadSceneAsync(sceneName))); 
-        Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
+
+        Instance._topImgRect.DOKill();
+        Instance._bottomImgRect.DOKill();
+
+        Instance._topImgRect.DOAnchorPos(Vector2.zero, 0.7f).SetEase(Ease.InOutSine).SetUpdate(true);
+        Instance._bottomImgRect.DOAnchorPos(Vector2.zero, 0.7f).SetEase(Ease.InOutSine).SetUpdate(true).OnComplete(() => {
+            Instance._rotatingImgRect.gameObject.SetActive(true);
+            Instance._rotatingImgRect.DOKill();
+            Instance._rotatingImg.DOFade(1, 0.5f).SetEase(Ease.OutCubic).SetUpdate(true);
+            Instance.StartCoroutine(Instance.loadSceneAsync(sceneName)); 
+        });
     }
 
 
     private IEnumerator loadSceneAsync(string sceneName) {
-        AsyncOperation operation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName);
+        yield return new WaitForSecondsRealtime(2f);
 
-        while (!operation.isDone) {
-
-            if (operation.progress >= 0.9f) {
-                yield return new WaitForSeconds(0.5f);
-                operation.allowSceneActivation = true;
-                Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
-                _canvasGroup.DOFade(0, 0.5f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
-                    _imageGO.SetActive(false);
-                    StopCoroutine(animateImages());
-                });
-            }
-
-            yield return null;
-        }
-
-        IsLoading = false;
-        Player.UICanvas.ChangeUIBottomState(UIBottomState.HUD);
+        yield return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName);
+        Player.UICanvas.ChangeUIBottomState(UIBottomState.NotVisible);
     }
 
+    private void OnSceneReadyEvent() {
+        Instance._topImgRect.DOComplete();
+        Instance._bottomImgRect.DOComplete();
+        Instance._topImgRect.DOKill();
+        Instance._bottomImgRect.DOKill();
 
-    private IEnumerator animateImages() {
-        int index = 0;
-        while(true) {
-            _image.sprite = _sprites[index];
-            index = (index + 1) % _sprites.Count;
-            yield return new WaitForSeconds(0.1f);
-        }
+        Instance._rotatingImgRect.DOKill();
+        Instance._rotatingImg.DOFade(0, 0.5f).SetEase(Ease.OutCubic).SetUpdate(true);
+        
+        Instance._topImgRect.DOAnchorPos(new Vector2(0, 540), 0.7f).SetEase(Ease.InOutSine).SetUpdate(true);
+        Instance._bottomImgRect.DOAnchorPos(new Vector2(0, -540), 0.7f).SetEase(Ease.InOutSine).SetUpdate(true).OnComplete(() => {
+            IsLoading = false;
+            Player.Instance.FBXModel.SetActive(true);
+            Instance._rotatingImgRect.gameObject.SetActive(false);
+        });
     }
-
 }

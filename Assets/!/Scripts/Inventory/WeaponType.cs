@@ -2,5 +2,6 @@ public enum WeaponType {
     None,
     Sword,
     Axe,
-    Greatsword
+    Greatsword,
+    Fishingrod  
 }

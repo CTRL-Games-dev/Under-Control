@@ -110,8 +110,8 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 #region Public Methods
 
     public void ShowUI() {
-        float fadeSpeed = 0.2f * Settings.AnimationSpeed;
-        float moveSpeed = 0.4f * Settings.AnimationSpeed;
+        float fadeSpeed = 0.1f * Settings.AnimationSpeed;
+        float moveSpeed = 0.2f * Settings.AnimationSpeed;
         Ease ease = Ease.OutBack;
 
         gameObject.SetActive(true);
@@ -126,8 +126,8 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
         resetPanelAlphas();
         resetBtnPositions();
 
-        _canvasGroup.DOFade(1, 0.3f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
-            _logoImg.DOFade(1, 0.3f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
+        _canvasGroup.DOFade(1, 0.15f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
+            _logoImg.DOFade(1, 0.15f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
                 _generalButtonRect.DOAnchorPosY(_generalButtonStartingY + 20, moveSpeed).SetEase(ease).SetUpdate(true);
                 _generalButtonCanvasGroup.DOFade(1, fadeSpeed).SetUpdate(true).OnComplete(() => {
                     _audioButtonRect.DOAnchorPosY(_audioButtonStartingY + 20, moveSpeed).SetEase(ease).SetUpdate(true);
@@ -153,7 +153,7 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
         _canvasGroup.blocksRaycasts = false;
         
         killTweens();
-        _canvasGroup.DOFade(0, 0.8f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
+        _canvasGroup.DOFade(0, 0.3f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
             resetBtnAlphas();
             resetBtnPositions();
             gameObject.SetActive(false);
@@ -237,12 +237,12 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
     public void OnPointerEnter(GameObject button) {
         if (button.GetComponent<RectTransform>().localScale.x > 1.05f) return;
-        button.GetComponent<RectTransform>().DOScale(1.05f, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
+        button.GetComponent<RectTransform>().DOScale(1.05f, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
     }
 
     public void OnPointerExit(GameObject button) {
         if (button.GetComponent<RectTransform>().localScale.x > 1.05f) return;
-        button.GetComponent<RectTransform>().DOScale(1, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
+        button.GetComponent<RectTransform>().DOScale(1, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
     }
 
 #endregion
@@ -294,7 +294,7 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
             canvasGroup.alpha = 0;
         }
         _generalCanvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
-            StartCoroutine(fadeInCanvasGroups(_generalSettingsCanvasGroups, 0.2f * Settings.AnimationSpeed, 0.1f * Settings.AnimationSpeed));
+            StartCoroutine(fadeInCanvasGroups(_generalSettingsCanvasGroups, 0.1f * Settings.AnimationSpeed, 0.05f * Settings.AnimationSpeed));
         });
     }
 
@@ -308,7 +308,7 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
             canvasGroup.alpha = 0;
         }
         _audioCanvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
-            StartCoroutine(fadeInCanvasGroups(_audioSettingsCanvasGroups, 0.2f * Settings.AnimationSpeed, 0.1f * Settings.AnimationSpeed));
+            StartCoroutine(fadeInCanvasGroups(_audioSettingsCanvasGroups, 0.1f * Settings.AnimationSpeed, 0.05f * Settings.AnimationSpeed));
         });
     }
 
@@ -321,7 +321,7 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
             canvasGroup.alpha = 0;
         }
         _videoCanvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
-            StartCoroutine(fadeInCanvasGroups(_videoSettingsCanvasGroups, 0.2f * Settings.AnimationSpeed, 0.1f * Settings.AnimationSpeed));
+            StartCoroutine(fadeInCanvasGroups(_videoSettingsCanvasGroups, 0.1f * Settings.AnimationSpeed, 0.05f * Settings.AnimationSpeed));
         });
     }
 
@@ -334,16 +334,16 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
             canvasGroup.alpha = 0;
         }
         _controlsCanvasGroup.DOFade(1, 0.5f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
-            StartCoroutine(fadeInCanvasGroups(_controlsSettingsCanvasGroups, 0.2f * Settings.AnimationSpeed, 0.1f * Settings.AnimationSpeed));
+            StartCoroutine(fadeInCanvasGroups(_controlsSettingsCanvasGroups, 0.1f * Settings.AnimationSpeed, 0.05f * Settings.AnimationSpeed));
         });
     }
 
 
     private void closeAudioPanel() {
         _audioCanvasGroup.DOKill();
-        _audioButtonRect.DOScale(1, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
+        _audioButtonRect.DOScale(1, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
         StopCoroutine(fadeInCanvasGroups(_audioSettingsCanvasGroups, 0.2f, 0.1f));
-        _audioCanvasGroup.DOFade(0, 0.5f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
+        _audioCanvasGroup.DOFade(0, 0.25f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
             foreach (var canvasGroup in _audioSettingsCanvasGroups) {
                 canvasGroup.alpha = 0;
             }
@@ -355,9 +355,9 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
     private void closeVideoPanel() {
         _videoCanvasGroup.DOKill();
-        _videoButtonRect.DOScale(1, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
-        StopCoroutine(fadeInCanvasGroups(_videoSettingsCanvasGroups, 0.2f, 0.1f));
-        _videoCanvasGroup.DOFade(0, 0.5f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
+        _videoButtonRect.DOScale(1, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
+        StopCoroutine(fadeInCanvasGroups(_videoSettingsCanvasGroups, 0.1f, 0.05f));
+        _videoCanvasGroup.DOFade(0, 0.25f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
             foreach (var canvasGroup in _videoSettingsCanvasGroups) {
                 canvasGroup.alpha = 0;
             }
@@ -369,9 +369,9 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
     private void closeControlsPanel() {
         _controlsCanvasGroup.DOKill();
-        _controlsButtonRect.DOScale(1, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
-        StopCoroutine(fadeInCanvasGroups(_controlsSettingsCanvasGroups, 0.2f, 0.1f));
-        _controlsCanvasGroup.DOFade(0, 0.5f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
+        _controlsButtonRect.DOScale(1, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
+        StopCoroutine(fadeInCanvasGroups(_controlsSettingsCanvasGroups, 0.1f, 0.05f));
+        _controlsCanvasGroup.DOFade(0, 0.25f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
             foreach (var canvasGroup in _controlsSettingsCanvasGroups) {
                 canvasGroup.alpha = 0;
             }
@@ -383,9 +383,9 @@ public class SettingsCanvas : MonoBehaviour, IUICanvasState
 
     private void closeGeneralPanel() {
         _generalCanvasGroup.DOKill();
-        _generalButtonRect.DOScale(1, 0.4f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
-        StopCoroutine(fadeInCanvasGroups(_generalSettingsCanvasGroups, 0.2f, 0.1f));
-        _generalCanvasGroup.DOFade(0, 0.5f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
+        _generalButtonRect.DOScale(1, 0.2f * Settings.AnimationSpeed).SetEase(Ease.OutSine).SetUpdate(true);
+        StopCoroutine(fadeInCanvasGroups(_generalSettingsCanvasGroups, 0.1f, 0.05f));
+        _generalCanvasGroup.DOFade(0, 0.25f * Settings.AnimationSpeed).SetUpdate(true).OnComplete(() => {
             foreach (var canvasGroup in _generalSettingsCanvasGroups) {
                 canvasGroup.alpha = 0;
             }

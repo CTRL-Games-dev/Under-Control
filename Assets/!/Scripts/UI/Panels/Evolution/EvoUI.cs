@@ -3,7 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.EventSystems;
+using System;
 
+[Serializable]
 public class EvoUI : MonoBehaviour
 {
     
@@ -12,12 +14,15 @@ public class EvoUI : MonoBehaviour
     [SerializeField] private EvoUI _nextEvoUI;
 
     [SerializeField] private string _title;
-    [SerializeField, Multiline] private string _desc;
+    [SerializeField] private string _desc;
+    [SerializeField] private string _flavor;
+    [SerializeField] Tiers _tier;
     [SerializeField] private bool _isAvailable = false;
     [SerializeField] private bool _isSelected = false;
 
     [SerializeField] private List<Modifier> _modifiers = new List<Modifier>();
     [SerializeField] private ElementalType _elementalType;
+    public ElementalType ElementalType => _elementalType;
 
     private RectTransform _rectTransform;
     private EventTrigger _eventTrigger;
@@ -29,7 +34,7 @@ public class EvoUI : MonoBehaviour
         _rectTransform.localScale = _isAvailable ? Vector3.one : Vector3.one * 0.95f;
         _bgImage.color = _isAvailable ? Color.white : Color.gray;
         _lineImage.fillAmount = _isSelected ? 1 : 0;
-        _lineImage.color = ElementalInfo.GetColor(_elementalType);
+        _lineImage.color = ElementalInfo.GetColor(ElementalType);
     }
 
 
@@ -41,7 +46,7 @@ public class EvoUI : MonoBehaviour
     }
 
     public void OnPointerEnter() {
-        Player.UICanvas.InventoryCanvas.EvoInfo.SetInfo(_title, _desc, _elementalType);
+        Player.UICanvas.InventoryCanvas.EvoInfo.SetInfo(_title, _desc, _flavor, _tier, ElementalType);
         if (!_isAvailable) return;
         _rectTransform.DOKill();
         _rectTransform.DOScale(1.1f, 0.2f * Settings.AnimationSpeed);
@@ -56,20 +61,25 @@ public class EvoUI : MonoBehaviour
     public void OnPointerClick() {
         if (!_isAvailable || _isSelected || Player.Instance.EvolutionPoints <= 0) return;
         Player.Instance.EvolutionPoints--;
+        AddEvolution();
+    }
+    public void AddEvolution(){
         Player.Instance.SelectedEvolutions.Add(this);
         Player.Instance.OnEvolutionSelected.Invoke(this);
-        float fillAmount = 0;
+        _isSelected = true;
+        if (_nextEvoUI != null) _nextEvoUI.SetAvailable();
+
+         float fillAmount = 0;
         DOTween.To(() => fillAmount, x => fillAmount = x, 1, 0.8f * Settings.AnimationSpeed).SetEase(Ease.OutSine).OnUpdate(() => {
             _lineImage.fillAmount = fillAmount;
         }).OnComplete(() => {
             _rectTransform.DOScale(1.05f, 0.2f * Settings.AnimationSpeed);
         });
-        _isSelected = true;
         _rectTransform.DOKill();
-        if (_nextEvoUI != null) _nextEvoUI.SetAvailable();
     }
-
     public List<Modifier> GetModifiers() {
         return new List<Modifier>(_modifiers);
     }
+
+
 }
