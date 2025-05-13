@@ -152,6 +152,7 @@ public class InvTileEquipment : InvTile {
                 Player.Inventory.Amulet = null;
                 break;
             case TileType.Weapon:
+                Player.Instance.EquipFishingRod(false);
                 Player.Inventory.Weapon = null;
                 break;
             case TileType.Consumeable1:
