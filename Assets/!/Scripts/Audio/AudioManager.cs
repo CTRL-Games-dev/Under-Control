@@ -27,7 +27,7 @@ public class AudioManager : MonoBehaviour
     }
 
     private void Start(){
-        // InitializeMusic(FMODEvents.instance.MusicPlayer);
+        InitializeMusic(FMODEvents.instance.MusicPlayer);
     }
 
     private void InitializeMusic(EventReference eventReference){
